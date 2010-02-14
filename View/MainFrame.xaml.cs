@@ -15,14 +15,18 @@ namespace JA_Tennis.View
 {
     public partial class MainFrame : UserControl
     {
-        public MainFrameViewModel MainFrameViewModel {
-            get { return (MainFrameViewModel)this.DataContext; } 
-            set { this.DataContext=value;            }
-        }
-
-        public MainFrame()
+        public MainFrame( MainFrameViewModel viewModel)
         {
             InitializeComponent();
+
+            this.DataContext = viewModel;
+
+            //Init player list
+            PlayerListView playerListView = new PlayerListView(
+                new PlayerListViewModel(viewModel.Tournaments.List[0])
+            );
+            LayoutRoot.Children.Clear();
+            LayoutRoot.Children.Add(playerListView);
         }
     }
 }

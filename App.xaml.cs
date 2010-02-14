@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using JA_Tennis.View;
 using JA_Tennis.ViewModel;
 
@@ -16,7 +7,6 @@ namespace JA_Tennis
 {
     public partial class App : Application
     {
-
         public App()
         {
             this.Startup += this.Application_Startup;
@@ -28,8 +18,7 @@ namespace JA_Tennis
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            MainFrame mainFrame = new MainFrame();
-            mainFrame.DataContext = new MainFrameViewModel();
+            MainFrame mainFrame = new MainFrame(new MainFrameViewModel());
             this.RootVisual = mainFrame;
         }
 

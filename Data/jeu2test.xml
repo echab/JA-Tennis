@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Tournament xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>jeu2test</Name>
+  <Players>
+    <Player Id="J1" Name="Toto" />
+    <Player Id="J2" Name="Dudu" />
+  </Players>
+</Tournament>

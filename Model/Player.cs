@@ -8,11 +8,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace JA_Tennis.Model
 {
     public class Player
     {
+        [XmlAttribute]
+        public string Id { get; set; }        
+
+        [XmlAttribute]
         public string Name {get; set;}
     }
 }

@@ -21,16 +21,5 @@ namespace JA_Tennis.Model
         public Tournaments() {
             List = new List<Tournament>();
         }
-
-        public Tournament Open(Stream stream) {
-
-            XmlSerializer serializer = new XmlSerializer(typeof (Tournament));
-
-            Tournament tournament =(Tournament) serializer.Deserialize(stream);
-
-            List.Add(tournament);
-
-            return tournament;
-        }
     }
 }
