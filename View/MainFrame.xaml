@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="JA_Tennis.View.MainFrame"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:jv="clr-namespace:JA_Tennis.View"
+    xmlns:jvm="clr-namespace:JA_Tennis.ViewModel"
+    Width="800" Height="600">
+    
+    <Grid x:Name="LayoutRoot" Background="Gray">
+        <TextBlock Text="MainFrame"/>
+        
+    </Grid>
+</UserControl>
