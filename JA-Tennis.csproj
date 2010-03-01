@@ -66,14 +66,27 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Command\ButtonBaseClickCommandBehavior.cs" />
+    <Compile Include="Command\Click.cs" />
+    <Compile Include="Command\CommandBehaviorBase.cs" />
+    <Compile Include="Command\CommandBinding.cs" />
+    <Compile Include="Command\CommandGroup.cs" />
+    <Compile Include="Command\CommandManager.cs" />
+    <Compile Include="Command\DelegateCommand.cs" />
     <Compile Include="Model\Player.cs" />
+    <Compile Include="ViewModel\PlayerEditorViewModel.cs" />
+    <Compile Include="ViewModel\Selection.cs" />
     <Compile Include="Model\Tournament.cs" />
     <Compile Include="Model\Tournaments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\MainFrameViewModel.cs" />
     <Compile Include="ViewModel\PlayerListViewModel.cs" />
+    <Compile Include="Model\NotifyPropertyChangedBase.cs" />
     <Compile Include="View\MainFrame.xaml.cs">
       <DependentUpon>MainFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\PlayerEditorView.xaml.cs">
+      <DependentUpon>PlayerEditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\PlayerListView.xaml.cs">
       <DependentUpon>PlayerListView.xaml</DependentUpon>
@@ -106,7 +119,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Command\" />
+    <Page Include="View\PlayerEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

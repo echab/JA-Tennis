@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 using JA_Tennis.ViewModel;
 
 namespace JA_Tennis.View
 {
     public partial class MainFrame : UserControl
     {
-        public MainFrame( MainFrameViewModel viewModel)
+        public MainFrame()
         {
             InitializeComponent();
+        }
 
-            this.DataContext = viewModel;
+        public MainFrameViewModel ViewModel {
+            set
+            {
+                this.DataContext = value;
 
-            //Init player list
-            PlayerListView playerListView = new PlayerListView(
-                new PlayerListViewModel(viewModel.Tournaments.List[0])
-            );
-            LayoutRoot.Children.Clear();
-            LayoutRoot.Children.Add(playerListView);
+                //Init player list
+                //TODO: Bind to selected tournament
+                playerListView.ViewModel = new PlayerListViewModel( 
+                    value.Tournaments[0]
+                );
+
+                //playerEditorView.ViewModel = new PlayerEditorViewModel(
+                //    value.Tournaments[0].Players[0]
+                //);
+            }
         }
     }
 }

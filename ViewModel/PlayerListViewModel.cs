@@ -1,30 +1,41 @@
-﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using JA_Tennis.Model;
-using System.Collections.Generic;
 
 namespace JA_Tennis.ViewModel
 {
-    public class PlayerListViewModel
+    public class PlayerListViewModel : NotifyPropertyChangedBase
     {
-        public Tournament tournament { get; set; }
+        public PlayerListViewModel() {
+            Tournament.PropertyChanged += (sender, args) => FirePropertyChanged("Tournament");
+            Selection.PropertyChanged += (sender, args) => FirePropertyChanged("Selection");
+
+            _Selection = new Selection();
+        }
+
+
+        Tournament _Tournament;
+        public Tournament Tournament
+        {
+            get { return _Tournament; }
+            set { _Tournament = value; FirePropertyChanged("Tournament"); }
+        }
+
+        Selection _Selection;
+        public Selection Selection
+        {
+            get { return _Selection; }
+            set { _Selection = value; FirePropertyChanged("Selection"); }
+        }
 
         public IEnumerable<Player> Players { 
             get {
-                return tournament.Players;
+                return Tournament.Players;
             }
         }
 
         public PlayerListViewModel(Tournament tournament) {
-            this.tournament = tournament;
+            Tournament = tournament;
         }
     }
 }

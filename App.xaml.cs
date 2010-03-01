@@ -18,7 +18,7 @@ namespace JA_Tennis
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            MainFrame mainFrame = new MainFrame(new MainFrameViewModel());
+            MainFrame mainFrame = new MainFrame() { ViewModel = new MainFrameViewModel() };
             this.RootVisual = mainFrame;
         }
 

@@ -1,21 +1,39 @@
 ﻿using System;
 using System.Windows.Resources;
 using JA_Tennis.Model;
+using System.ComponentModel;
+using JA_Tennis.Command;
+using System.Windows.Input;
 
 namespace JA_Tennis.ViewModel
 {
-    public class MainFrameViewModel
+    public class MainFrameViewModel : NotifyPropertyChangedBase
     {
         public Tournaments Tournaments = new Tournaments();
 
         public MainFrameViewModel() {
 
+            LoadDocumentCommand = new DelegateCommand(LoadDocument, CanLoadDocument);
+
+            Tournaments.CollectionChanged += (s, args) => FirePropertyChanged("Tournaments");
+
+            //Tournaments.Add(new Tournament());
+            LoadDocument(null);
+        }
+
+        //Referenced into View like this: <Button cmd:Click.Command="{Binding LoadDocumentCommand}"/>
+        public ICommand LoadDocumentCommand { get; set; }
+
+        private void LoadDocument(object param)
+        {
+            //string filter = param as string ?? string.Empty;
+
             //*
             //TODO test
             Tournament t = new Tournament() { Name = "test2"};
-            t.AddPlayer(new Player() {Id="J1", Name = "Toto" });
-            t.AddPlayer(new Player() { Id = "J2", Name = "Dudu" });
-            Tournaments.List.Add(t);
+            t.Players.Add(new Player() {Id="J1", Name = "Toto" });
+            t.Players.Add(new Player() { Id = "J2", Name = "Dudu" });
+            Tournaments.Add(t);
             System.IO.MemoryStream stream2 = new System.IO.MemoryStream();
             t.Save(stream2);
             stream2.Seek(0, System.IO.SeekOrigin.Begin);
@@ -32,9 +50,12 @@ namespace JA_Tennis.ViewModel
             StreamResourceInfo sri = App.GetResourceStream(new Uri("JA_Tennis;component/Data/jeu2test.xml", UriKind.Relative));  //Resource
             if (sri != null){
                 Tournament tournament = Tournament.Open(sri.Stream);
-                Tournaments.List.Add(tournament);
+                Tournaments.Add(tournament);
             }
-
+        }
+        private bool CanLoadDocument(object param)
+        {
+            return true;
         }
     }
 }
