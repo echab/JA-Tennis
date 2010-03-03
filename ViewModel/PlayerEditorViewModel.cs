@@ -1,4 +1,5 @@
 ﻿using JA_Tennis.Model;
+using JA_Tennis.Assets.Resources;
 
 namespace JA_Tennis.ViewModel
 {
@@ -13,6 +14,11 @@ namespace JA_Tennis.ViewModel
         public PlayerEditorViewModel(Player player)
         {
             this.Player = player;
+        }
+
+        public string ResourceLabelName
+        {
+            get { return Strings.Label_Name + Strings.Label_Suffix; }
         }
     }
 }

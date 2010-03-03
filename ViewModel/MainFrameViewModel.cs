@@ -4,6 +4,7 @@ using JA_Tennis.Model;
 using System.ComponentModel;
 using JA_Tennis.Command;
 using System.Windows.Input;
+using JA_Tennis.Assets.Resources;
 
 namespace JA_Tennis.ViewModel
 {
@@ -56,6 +57,11 @@ namespace JA_Tennis.ViewModel
         private bool CanLoadDocument(object param)
         {
             return true;
+        }
+
+        public string ResourceCommandLoad
+        {
+            get { return Strings.Command_Load; }
         }
     }
 }

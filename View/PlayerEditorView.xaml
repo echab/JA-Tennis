@@ -11,7 +11,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" TextAlignment="Right" VerticalAlignment="Stretch"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ResourceLabelName}" TextAlignment="Right" VerticalAlignment="Stretch"/>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" />
     </Grid>
 </UserControl>

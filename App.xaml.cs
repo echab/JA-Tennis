@@ -2,6 +2,8 @@
 using System.Windows;
 using JA_Tennis.View;
 using JA_Tennis.ViewModel;
+using System.Globalization;
+using System.Threading;
 
 namespace JA_Tennis
 {
@@ -18,6 +20,11 @@ namespace JA_Tennis
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            // Set the culture, for testing purposes
+            //var culture = new CultureInfo("fr");
+            //Thread.CurrentThread.CurrentCulture = culture;
+            //Thread.CurrentThread.CurrentUICulture = culture;
+
             MainFrame mainFrame = new MainFrame() { ViewModel = new MainFrameViewModel() };
             this.RootVisual = mainFrame;
         }

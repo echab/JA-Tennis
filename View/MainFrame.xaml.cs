@@ -21,9 +21,9 @@ namespace JA_Tennis.View
                     value.Tournaments[0]
                 );
 
-                //playerEditorView.ViewModel = new PlayerEditorViewModel(
-                //    value.Tournaments[0].Players[0]
-                //);
+                playerEditorView.ViewModel = new PlayerEditorViewModel(
+                    value.Tournaments[0].Players[0]
+                );
             }
         }
     }

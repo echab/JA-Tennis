@@ -17,10 +17,10 @@
         </Grid.ColumnDefinitions>
         
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-            <Button Content="Load (Prism)" Width="100"
+            <Button Content="{Binding ResourceCommandLoad}" Width="100"
                    cmd:Click.Command="{Binding LoadDocumentCommand}"
             />
-            <Button Content="Load (Manager)" Width="100"
+            <Button Content="{Binding ResourceCommandLoad}" Width="100"
                    cmd:CommandManager.EventName="Click"
                    cmd:CommandManager.Command="{Binding LoadDocumentCommand}"
             />
