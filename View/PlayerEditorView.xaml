@@ -12,6 +12,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ResourceLabelName}" TextAlignment="Right" VerticalAlignment="Stretch"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" />
+        <TextBox Grid.Row="0" Grid.Column="1" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" 
+                 Text="{Binding Path=Player.Name, Mode=TwoWay}" 
+                 IsEnabled="{Binding IsPlayer}"
+                 />
     </Grid>
 </UserControl>

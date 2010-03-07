@@ -61,7 +61,7 @@ namespace JA_Tennis.Assets.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load.
+        ///   Looks up a localized string similar to Ouvrir.
         /// </summary>
         internal static string Command_Load {
             get {
@@ -70,7 +70,7 @@ namespace JA_Tennis.Assets.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name.
+        ///   Looks up a localized string similar to Nom.
         /// </summary>
         internal static string Label_Name {
             get {
@@ -79,7 +79,7 @@ namespace JA_Tennis.Assets.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to :.
+        ///   Looks up a localized string similar to  :.
         /// </summary>
         internal static string Label_Suffix {
             get {

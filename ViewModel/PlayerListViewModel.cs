@@ -6,11 +6,12 @@ namespace JA_Tennis.ViewModel
 {
     public class PlayerListViewModel : NotifyPropertyChangedBase
     {
-        public PlayerListViewModel() {
-            Tournament.PropertyChanged += (sender, args) => FirePropertyChanged("Tournament");
-            Selection.PropertyChanged += (sender, args) => FirePropertyChanged("Selection");
+        public PlayerListViewModel()
+        {
+            //Tournament.PropertyChanged += (sender, args) => FirePropertyChanged("Tournament");
 
-            _Selection = new Selection();
+            //_Selection = new Selection();   //TODO: pb events
+            //Selection.PropertyChanged += (sender, args) => FirePropertyChanged("Selection");
         }
 
 
@@ -18,24 +19,53 @@ namespace JA_Tennis.ViewModel
         public Tournament Tournament
         {
             get { return _Tournament; }
-            set { _Tournament = value; FirePropertyChanged("Tournament"); }
+            set
+            {
+                if (_Tournament == value) { return; }
+                if (_Tournament != null)
+                {
+                    _Tournament.PropertyChanged -= (sender, args) => FirePropertyChanged("Tournament");
+                }
+
+                _Tournament = value;
+
+                if (_Tournament != null)
+                {
+                    _Tournament.PropertyChanged += (sender, args) => FirePropertyChanged("Tournament");
+                    FirePropertyChanged("Tournament");
+                }
+            }
         }
 
         Selection _Selection;
         public Selection Selection
         {
             get { return _Selection; }
-            set { _Selection = value; FirePropertyChanged("Selection"); }
-        }
+            set
+            {
+                if (_Selection == value) { return; }
+                if (_Selection != null)
+                {
+                    _Selection.PropertyChanged -= (sender, args) => FirePropertyChanged("Selection");
+                }
 
-        public IEnumerable<Player> Players { 
-            get {
-                return Tournament.Players;
+                _Selection = value;
+
+                if (_Selection != null)
+                {
+                    _Selection.PropertyChanged += (sender, args) => FirePropertyChanged("Selection");
+                    FirePropertyChanged("Selection");
+                }
+
             }
         }
 
-        public PlayerListViewModel(Tournament tournament) {
-            Tournament = tournament;
+        public IEnumerable<Player> Players
+        {
+            get
+            {
+                return Tournament.Players;
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using JA_Tennis.View;
 using JA_Tennis.ViewModel;
 using System.Globalization;
 using System.Threading;
+using System.Windows.Browser;
 
 namespace JA_Tennis
 {
@@ -21,11 +22,13 @@ namespace JA_Tennis
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             // Set the culture, for testing purposes
-            //var culture = new CultureInfo("fr");
+            //var culture = new CultureInfo("en");
             //Thread.CurrentThread.CurrentCulture = culture;
             //Thread.CurrentThread.CurrentUICulture = culture;
 
-            MainFrame mainFrame = new MainFrame() { ViewModel = new MainFrameViewModel() };
+            MainFrameView mainFrame = new MainFrameView() { 
+                ViewModel = new MainFrameViewModel() 
+            };
             this.RootVisual = mainFrame;
         }
 
@@ -56,7 +59,7 @@ namespace JA_Tennis
                 string errorMsg = e.ExceptionObject.Message + e.ExceptionObject.StackTrace;
                 errorMsg = errorMsg.Replace('"', '\'').Replace("\r\n", @"\n");
 
-                System.Windows.Browser.HtmlPage.Window.Eval("throw new Error(\"Unhandled Error in Silverlight Application " + errorMsg + "\");");
+                HtmlPage.Window.Eval("throw new Error(\"Unhandled Error in Silverlight Application " + errorMsg + "\");");
             }
             catch (Exception)
             {

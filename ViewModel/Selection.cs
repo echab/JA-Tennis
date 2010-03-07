@@ -9,16 +9,24 @@ namespace JA_Tennis.ViewModel
         Tournament _Tournament;
         public Tournament Tournament {
             get { return _Tournament; }
-            set { _Tournament = value; FirePropertyChanged("Tournament"); }
+            set {
+                if (_Tournament == value) { return; }
+                _Tournament = value; 
+                FirePropertyChanged("Tournament"); 
+            }
         }
 
         Player _Player;
         public Player Player
         {
             get { return _Player; }
-            set { _Player = value; FirePropertyChanged("Player"); }
+            set {
+                if (_Player == value) { return; }
+                _Player = value; 
+                FirePropertyChanged("Player"); 
+            }
         }
 
-        public ObservableCollection<Player> Players { get; set; }
+        //public ObservableCollection<Player> Players { get; set; }     //TODO selection multiple players 
     }
 }

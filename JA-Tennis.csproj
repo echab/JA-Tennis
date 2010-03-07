@@ -12,7 +12,7 @@
     <AssemblyName>JA_Tennis</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <SilverlightApplication>true</SilverlightApplication>
-    <SupportedCultures>en-US;fr</SupportedCultures>
+    <SupportedCultures>fr;en</SupportedCultures>
     <XapOutputs>true</XapOutputs>
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
     <XapFilename>JA-Tennis.xap</XapFilename>
@@ -86,8 +86,8 @@
     <Compile Include="ViewModel\MainFrameViewModel.cs" />
     <Compile Include="ViewModel\PlayerListViewModel.cs" />
     <Compile Include="Model\NotifyPropertyChangedBase.cs" />
-    <Compile Include="View\MainFrame.xaml.cs">
-      <DependentUpon>MainFrame.xaml</DependentUpon>
+    <Compile Include="View\MainFrameView.xaml.cs">
+      <DependentUpon>MainFrameView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\PlayerEditorView.xaml.cs">
       <DependentUpon>PlayerEditorView.xaml</DependentUpon>
@@ -106,7 +106,7 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="View\MainFrame.xaml">
+    <Page Include="View\MainFrameView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:MarkupCompilePass1</Generator>
     </Page>
@@ -129,7 +129,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Resources\Strings.fr.resx">
+    <EmbeddedResource Include="Assets\Resources\Strings.en.resx">
       <LastGenOutput>Strings.fr-FR.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\Resources\Strings.resx">

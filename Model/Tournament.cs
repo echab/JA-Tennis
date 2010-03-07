@@ -23,7 +23,7 @@ namespace JA_Tennis.Model
         public Tournament() {
             Players = new ObservableCollection<Player>();
 
-            Players.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Players_CollectionChanged);
+            Players.CollectionChanged += new NotifyCollectionChangedEventHandler(Players_CollectionChanged);
         }
 
         public static Tournament Open(Stream stream)
@@ -44,7 +44,7 @@ namespace JA_Tennis.Model
 
         void Players_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //TODO: manage dependencies (registrations, matches, etc.)
+            //TODO: Tournamenent players collection changed, manage dependencies (registrations, matches, etc.)
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:

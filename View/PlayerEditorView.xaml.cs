@@ -12,10 +12,8 @@ namespace JA_Tennis.View
 
         public PlayerEditorViewModel ViewModel
         {
-            set
-            {
-                this.DataContext = value;
-            }
+            get { return DataContext as PlayerEditorViewModel; }
+            set { this.DataContext = value; }
         }
     }
 }

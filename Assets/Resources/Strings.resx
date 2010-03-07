@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Command_Load" xml:space="preserve">
-    <value>Load</value>
+    <value>Ouvrir</value>
   </data>
   <data name="Label_Name" xml:space="preserve">
-    <value>Name</value>
+    <value>Nom</value>
   </data>
   <data name="Label_Suffix" xml:space="preserve">
-    <value>:</value>
+    <value> :</value>
   </data>
 </root>
