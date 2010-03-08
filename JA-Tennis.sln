@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Web Developer Express 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JA-Tennis", "JA-Tennis\JA-Tennis.csproj", "{466BEDE7-DEF0-472A-92B7-5B310C1A3C79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JA-Tennis UnitTest", "JA-Tennis_UnitTest\JA-Tennis UnitTest.csproj", "{591C2650-B294-408B-A4DD-4FEBE840A57E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JA-Tennis UnitTest", "JA-Tennis UnitTest\JA-Tennis UnitTest.csproj", "{591C2650-B294-408B-A4DD-4FEBE840A57E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
