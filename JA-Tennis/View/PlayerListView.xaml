@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="JA_Tennis.View.PlayerListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cmd="clr-namespace:JA_Tennis.Command">
+    <Grid x:Name="LayoutRoot"
+          Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal">
+            <Button Content="{Binding ResourceCommandNewPlayer}"
+                    cmd:Click.Command="{Binding CommandNewPlayer}" />
+        </StackPanel>
+
+        <ListBox x:Name="PlayerListbox"
+                 ItemsSource="{Binding Players}"
+                 SelectionMode="Single"
+                 SelectedItem="{Binding Path=Selection.Player, Mode=TwoWay}"
+                 Grid.Row="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Id}"
+                                   MinWidth="20" />
+                        <TextBlock Text="{Binding Name}"
+                                   MinWidth="80" />
+                        <!--TextBox Text="{Binding Name, Mode=TwoWay}"/-->
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
