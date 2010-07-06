@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.ObjectModel;
 using JA_Tennis.Model;
+using JA_Tennis.Helpers;
 
 namespace JA_Tennis.ViewModel
 {
@@ -12,7 +13,7 @@ namespace JA_Tennis.ViewModel
             set {
                 if (_Tournament == value) { return; }
                 _Tournament = value; 
-                FirePropertyChanged("Tournament"); 
+                RaisePropertyChanged(()=>Tournament); 
             }
         }
 
@@ -23,10 +24,10 @@ namespace JA_Tennis.ViewModel
             set {
                 if (_Player == value) { return; }
                 _Player = value; 
-                FirePropertyChanged("Player"); 
+                RaisePropertyChanged(()=>Player); 
             }
         }
 
-        //public ObservableCollection<Player> Players { get; set; }     //TODO selection multiple players 
+        //public PlayerCollection Players { get; set; }     //TODO selection multiple players 
     }
 }

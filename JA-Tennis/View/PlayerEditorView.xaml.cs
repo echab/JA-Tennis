@@ -13,7 +13,7 @@ namespace JA_Tennis.View
         public PlayerEditorViewModel ViewModel
         {
             get { return DataContext as PlayerEditorViewModel; }
-            set { this.DataContext = value; }
+            set { DataContext = value; }
         }
     }
 }

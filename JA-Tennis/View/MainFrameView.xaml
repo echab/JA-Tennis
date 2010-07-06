@@ -3,8 +3,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
     xmlns:jv="clr-namespace:JA_Tennis.View"
     xmlns:jvm="clr-namespace:JA_Tennis.ViewModel"
-    xmlns:cmd="clr-namespace:JA_Tennis.Command"             
-    Width="800" Height="600">
+    xmlns:cmd="clr-namespace:JA_Tennis.Command"    
+             
+    Width="800" Height="600"
+         
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"             
+    d:DataContext="{d:DesignInstance jvm:MainFrameViewModel}"
+    >
     
     <Grid x:Name="LayoutRoot" Background="Gray">
         <Grid.RowDefinitions>
@@ -18,12 +25,14 @@
         
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <Button Content="{Binding ResourceCommandLoad}" Width="100"
-                   cmd:Click.Command="{Binding LoadDocumentCommand}"
+                   cmd:Click.Command="{Binding OpenDocumentCommand}"
             />
             <Button Content="{Binding ResourceCommandLoad}" Width="100"
                    cmd:CommandManager.EventName="Click"
-                   cmd:CommandManager.Command="{Binding LoadDocumentCommand}"
+                   cmd:CommandManager.Command="{Binding OpenDocumentCommand}"
             />
+            <Button Content="Open" Width="100" Command="{Binding Path=OpenDocumentCommand}" />
+            <Button Content="Close" Width="100" Command="{Binding Path=CloseDocumentCommand}" CommandParameter="{Binding Path=Selection.Tournament}" />
         </StackPanel>
         
         <jv:PlayerListView x:Name="playerListView" Grid.Row="1" Grid.Column="0"/>

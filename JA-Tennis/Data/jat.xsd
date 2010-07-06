@@ -18,6 +18,7 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
+      <xs:attribute name="Id" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
 </xsd:schema>

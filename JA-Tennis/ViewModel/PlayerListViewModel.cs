@@ -2,9 +2,10 @@
 using System.ComponentModel;
 using JA_Tennis.Model;
 using JA_Tennis.Command;
-using System;
 using System.Windows.Input;
-using JA_Tennis.Assets.Resources;
+using JA_Tennis.Helpers;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace JA_Tennis.ViewModel
 {
@@ -12,32 +13,68 @@ namespace JA_Tennis.ViewModel
     {
         public PlayerListViewModel()
         {
-            CommandNewPlayer = new DelegateCommand(NewPlayer, CanNewPlayer);
+
+            AddPlayerCommand = new DelegateCommand<Player>(AddPlayer, CanAddPlayer);
+            DeletePlayerCommand = new DelegateCommand<Player>(DeletePlayer, CanDeletePlayer);
+
+            //Tournament.PropertyChanged += (sender, args) => RaisePropertyChanged(()=>Tournament));
+
+            //_Selection = new Selection();   //TODO: pb events
+            //Selection.PropertyChanged += (sender, args) => RaisePropertyChanged(()=>Selection));
         }
 
-        Tournament _Tournament;
+        #region AddPlayerCommand
+        public ICommand AddPlayerCommand { get; private set; }
+        private void AddPlayer(Player player)
+        {
+            // Add the Player to the collection
+            Tournament.Players.Add(player);
+
+            // Update the selection
+            Selection.Player = player;
+        }
+
+        private bool CanAddPlayer(Player player)
+        {
+            return Tournament != null && player != null;
+        }
+        #endregion
+
+        #region DeletePlayerCommand
+        public ICommand DeletePlayerCommand { get; private set; }
+        private void DeletePlayer(Player player)
+        {
+            // Delete the Player from the collection
+            Tournament.Players.Remove(player);
+
+            // Update the selection
+            Selection.Player = null;
+        }
+
+        private bool CanDeletePlayer(Player player)
+        {
+            return Tournament != null && player != null;
+        }
+        #endregion
+
+
         public Tournament Tournament
         {
-            get { return _Tournament; }
-            set
+            get
             {
-                if (_Tournament == value) { return; }
-                if (_Tournament != null)
-                {
-                    _Tournament.PropertyChanged -= (sender, args) => FirePropertyChanged("Tournament");
-                }
-
-                _Tournament = value;
-
-                if (_Tournament != null)
-                {
-                    _Tournament.PropertyChanged += (sender, args) => FirePropertyChanged("Tournament");
-                    FirePropertyChanged("Tournament");
-                }
+                return Selection != null ? Selection.Tournament : null;
             }
         }
 
-        Selection _Selection;
+        public PlayerCollection Players
+        {
+            get
+            {
+                return Tournament != null ? Tournament.Players : null;
+            }
+        }
+
+        private Selection _Selection;
         public Selection Selection
         {
             get { return _Selection; }
@@ -46,50 +83,29 @@ namespace JA_Tennis.ViewModel
                 if (_Selection == value) { return; }
                 if (_Selection != null)
                 {
-                    _Selection.PropertyChanged -= (sender, args) => FirePropertyChanged("Selection");
+                    _Selection.PropertyChanged -= Selection_PropertyChanged;
                 }
 
                 _Selection = value;
 
                 if (_Selection != null)
                 {
-                    _Selection.PropertyChanged += (sender, args) => FirePropertyChanged("Selection");
-                    FirePropertyChanged("Selection");
+                    RaisePropertyChanged(() => Selection);
+                    _Selection.PropertyChanged += Selection_PropertyChanged;
                 }
-
             }
         }
 
-        public IEnumerable<Player> Players
+        void Selection_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            get
+            RaisePropertyChanged(() => Selection);
+
+            if (e.PropertyName == Member.Of<Selection>(s => s.Tournament))
             {
-                return Tournament.Players;
+                RaisePropertyChanged(() => Tournament);
+                RaisePropertyChanged(() => Players);
             }
         }
 
-        #region Commands
-        public Player newPlayer;
-
-        public ICommand CommandNewPlayer { get; set; }
-
-        private void NewPlayer(object param)
-        {
-            newPlayer = new Player();
-            Selection.Player = newPlayer;
-        }
-
-        private bool CanNewPlayer(object param)
-        {
-            return Selection.Player == null;
-        }
-        #endregion
-
-        #region Resources
-        public string ResourceCommandNewPlayer
-        {
-            get { return Strings.Command_NewPlayer; }
-        }
-        #endregion Resources
     }
 }

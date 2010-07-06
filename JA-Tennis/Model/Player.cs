@@ -1,24 +1,25 @@
 ﻿using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using JA_Tennis.Helpers;
 
 namespace JA_Tennis.Model
 {
     [XmlType(IncludeInSchema=false)]
     public class Player : NotifyPropertyChangedBase //, IXmlSerializable
     {
-        string _Id;
+        private string _Id;
         [XmlAttribute]
         public string Id {
             get { return _Id; }
-            set { _Id = value; FirePropertyChanged("Id"); } 
+            set { _Id = value; RaisePropertyChanged(()=>Id); } 
         }
 
-        string _Name;
+        private string _Name;
         [XmlAttribute]
         public string Name {
             get { return _Name; }
-            set { _Name = value; FirePropertyChanged("Name"); } 
+            set { _Name = value; RaisePropertyChanged(()=>Name); } 
         }
 
         /*
@@ -47,5 +48,12 @@ namespace JA_Tennis.Model
 
         #endregion
         //*/
+
+#if DEBUG
+        public override string ToString()
+        {
+            return string.Format("[{0}] {1}", Id, Name);
+        }
+#endif //DEBUG
     }
 }

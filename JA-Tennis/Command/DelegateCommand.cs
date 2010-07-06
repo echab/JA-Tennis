@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace JA_Tennis.Command
 {
-    public class DelegateCommand<T>:ICommand  where T:class 
+    public class DelegateCommand<T> : ICommand where T : class
     {
         Func<T, bool> canExecute;
         Action<T> executeAction;
@@ -20,7 +20,7 @@ namespace JA_Tennis.Command
         public bool CanExecute(object parameter)
         {
             bool temp = canExecute(parameter as T);
-    
+
             if (canExecuteCache != temp)
             {
                 canExecuteCache = temp;
@@ -29,7 +29,7 @@ namespace JA_Tennis.Command
                     CanExecuteChanged(this, new EventArgs());
                 }
             }
-    
+
             return canExecuteCache;
         }
 
@@ -46,7 +46,7 @@ namespace JA_Tennis.Command
     public class DelegateCommand : DelegateCommand<object>
     {
         public DelegateCommand(Action<object> executeAction, Func<object, bool> canExecute)
-            : base(o => executeAction(o), o=>canExecute(o))
+            : base(o => executeAction(o), o => canExecute(o))
         {
         }
     }

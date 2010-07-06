@@ -3,28 +3,41 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Xml.Serialization;
+using JA_Tennis.Helpers;
 
 namespace JA_Tennis.Model
 {
     public class Tournament : NotifyPropertyChangedBase //:IXmlSerializable
     {
-        string _Name;
+        private string _Id;
+        [XmlAttribute]
+        public string Id
+        {
+            get { return _Id; }
+            set { _Id = value; RaisePropertyChanged(() => Id); }
+        }
+
+        private string _Name;
         public string Name
         {
             get { return _Name; }
-            set { _Name = value; FirePropertyChanged("Name"); }
+            set { _Name = value; RaisePropertyChanged(()=>Name); }
         }
 
-        public ObservableCollection<Player> Players { get; set; }
+        //public ObservableCollection<Player> Players { get; private set; }
+        public PlayerCollection Players { get; private set; }
 
 
-        public const string Namespace = "http://jatennis.free.fr/schema";
 
         public Tournament() {
-            Players = new ObservableCollection<Player>();
+            //Players = new ObservableCollection<Player>();
+            Players = new PlayerCollection();
 
-            Players.CollectionChanged += new NotifyCollectionChangedEventHandler(Players_CollectionChanged);
+            Players.CollectionChanged += Players_CollectionChanged;
         }
+
+        #region Serialization
+        public const string Namespace = @"http://jatennis.free.fr/schema";
 
         public static Tournament Open(Stream stream)
         {
@@ -41,6 +54,7 @@ namespace JA_Tennis.Model
             serializer.Serialize(stream, this, namespaces);
             return true;
         }
+        #endregion Serialization
 
         void Players_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -61,7 +75,7 @@ namespace JA_Tennis.Model
 /*
         #region IXmlSerializable Members
 
-        public System.Xml.Schema.XmlSchema GetSchema()
+        public XmlSchema GetSchema()
         {
             throw new System.NotImplementedException();
         }
@@ -106,6 +120,13 @@ namespace JA_Tennis.Model
             writer.WriteEndElement();    //Players
         }
         #endregion
- //*/ 
+ //*/
+
+#if DEBUG
+        public override string ToString()
+        {
+            return string.Format("[{0}] {1}", Id, Name);
+        }
+#endif //DEBUG
     }
 }

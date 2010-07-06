@@ -2,6 +2,7 @@
 <Tournament xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xsi:schemaLocation="http://jatennis.free.fr/schema jat.xsd"
   xmlns="http://jatennis.free.fr/schema"
+  Id="T1"
 >
   <Name>jeu2test</Name>
   <Players>

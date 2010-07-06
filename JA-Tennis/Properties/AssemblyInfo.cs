@@ -33,3 +33,8 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+#if DEBUG
+//For UnitTest
+[assembly: InternalsVisibleTo("JA-Tenis_UnitTest")]
+#endif //DEBUG

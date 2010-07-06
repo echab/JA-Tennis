@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows;
 
 namespace JA_Tennis.Command
 {
@@ -24,7 +25,7 @@ namespace JA_Tennis.Command
             clickableObject.Click += OnClick;
         }
 
-        private void OnClick(object sender, System.Windows.RoutedEventArgs e)
+        private void OnClick(object sender, RoutedEventArgs e)
         {
             ExecuteCommand();
         }

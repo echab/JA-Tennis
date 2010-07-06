@@ -36,7 +36,7 @@ namespace JA_Tennis_UnitTest.Model
             Assert.AreEqual("Toto",player.Name);
         }
 
-        delegate void delegatePropertyChanged(object sender, PropertyChangedEventArgs e);
+        //delegate void delegatePropertyChanged(object sender, PropertyChangedEventArgs e);
 
         [TestMethod]
         public void VerifyNotifyPropertyChanged()
@@ -49,7 +49,7 @@ namespace JA_Tennis_UnitTest.Model
 
             int nChangeName = 0;
             int nChangeId = 0;
-            delegatePropertyChanged playerNameChanged = (sender, args) =>
+            PropertyChangedEventHandler playerNameChanged = (sender, args) =>
             {
                 Assert.AreSame(player,sender);
                 Assert.AreEqual("Name",args.PropertyName);
@@ -57,18 +57,18 @@ namespace JA_Tennis_UnitTest.Model
                 nChangeName++;
             };
 
-            player.PropertyChanged += new PropertyChangedEventHandler(playerNameChanged);
+            player.PropertyChanged += playerNameChanged;
 
             player.Name = "Tata";
             Assert.AreEqual(1, nChangeName,"PropertyChanged fire once for Name");
 
-            player.PropertyChanged -= new PropertyChangedEventHandler(playerNameChanged);
+            player.PropertyChanged -= playerNameChanged;
 
             player.Name = "Toto";
             player.Id = "J4";
             Assert.AreEqual(1, nChangeName, "PropertyChanged does not fire when disconnected for Name");
 
-            delegatePropertyChanged playerIdChanged = (sender, args) =>
+            PropertyChangedEventHandler playerIdChanged = (sender, args) =>
             {
                 Assert.AreSame(player,sender);
                 Assert.AreEqual("Id",args.PropertyName);
@@ -77,12 +77,12 @@ namespace JA_Tennis_UnitTest.Model
                 nChangeId++;
             };
 
-            player.PropertyChanged += new PropertyChangedEventHandler(playerIdChanged);
+            player.PropertyChanged += playerIdChanged;
 
             player.Id = "J5";
             Assert.AreEqual(1, nChangeId, "PropertyChanged fire once for Id");
 
-            player.PropertyChanged -= new PropertyChangedEventHandler(playerIdChanged);
+            player.PropertyChanged -= playerIdChanged;
 
             player.Name = "Tztz";
             player.Id = "J6";

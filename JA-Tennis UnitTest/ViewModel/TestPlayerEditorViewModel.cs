@@ -56,7 +56,7 @@ namespace JA_Tennis_UnitTest.ViewModel
             int nChangePlayer = 0;
             int nChangeOhter = 0;
 
-            delegatePropertyChanged playerChanged = (sender, args) =>
+            PropertyChangedEventHandler playerChanged = (sender, args) =>
             {
                 Assert.AreSame(viewModel,sender);
                 if ("Player" == args.PropertyName)
@@ -69,7 +69,7 @@ namespace JA_Tennis_UnitTest.ViewModel
                 }
             };
 
-            viewModel.PropertyChanged += new PropertyChangedEventHandler(playerChanged);
+            viewModel.PropertyChanged += playerChanged;
 
             Assert.IsNull(viewModel.Player);
             viewModel.Player = player1;
@@ -93,7 +93,7 @@ namespace JA_Tennis_UnitTest.ViewModel
         {
             PlayerEditorViewModel viewModel = new PlayerEditorViewModel();
 
-            delegatePropertyChanged playerChanged = (sender, args) =>
+            PropertyChangedEventHandler playerChanged = (sender, args) =>
             {
                 Assert.AreSame(viewModel, sender);
                 if ("Player" == args.PropertyName)
@@ -102,7 +102,7 @@ namespace JA_Tennis_UnitTest.ViewModel
                 }
             };
 
-            viewModel.PropertyChanged += new PropertyChangedEventHandler(playerChanged);
+            viewModel.PropertyChanged += playerChanged;
 
             viewModel.Player = player1;
         }
