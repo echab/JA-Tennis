@@ -7,6 +7,12 @@ namespace JA_Tennis.View
     {
         public MainFrameView()
         {
+            //On message: No matching constructor found on type 'JA_Tennis.Assets.Resources.Strings'. [Line: 18 Position: 28]
+            //Change into generated file JA_Tennis\Assets\Resources\Strings.Designer.cs:
+            //  internal Strings()
+            //to
+            //  public Strings()
+
             InitializeComponent();
         }
 
@@ -14,11 +20,11 @@ namespace JA_Tennis.View
             get { return DataContext as MainFrameViewModel; }
             set
             {
-                DataContext = value;
-
                 //Init children ViewModels
                 playerListView.ViewModel = value.PlayerListViewModel;
                 playerEditorView.ViewModel = value.PlayerEditorViewModel;
+
+                DataContext = value;
             }
         }
 

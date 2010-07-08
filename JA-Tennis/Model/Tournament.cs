@@ -4,24 +4,25 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Xml.Serialization;
 using JA_Tennis.Helpers;
+using JA_Tennis.ComponentModel;
 
 namespace JA_Tennis.Model
 {
-    public class Tournament : NotifyPropertyChangedBase //:IXmlSerializable
+    public class Tournament : BindableType  //NotifyPropertyChangedBase //:IXmlSerializable
     {
         private string _Id;
         [XmlAttribute]
         public string Id
         {
             get { return _Id; }
-            set { _Id = value; RaisePropertyChanged(() => Id); }
+            set { Set<string>(ref _Id, value, () => Id); }
         }
 
         private string _Name;
         public string Name
         {
             get { return _Name; }
-            set { _Name = value; RaisePropertyChanged(()=>Name); }
+            set { Set<string>(ref _Name, value, () => Name); }
         }
 
         //public ObservableCollection<Player> Players { get; private set; }
@@ -29,7 +30,8 @@ namespace JA_Tennis.Model
 
 
 
-        public Tournament() {
+        public Tournament()
+        {
             //Players = new ObservableCollection<Player>();
             Players = new PlayerCollection();
 
@@ -72,55 +74,55 @@ namespace JA_Tennis.Model
             }
         }
 
-/*
-        #region IXmlSerializable Members
+        /*
+                #region IXmlSerializable Members
 
-        public XmlSchema GetSchema()
-        {
-            throw new System.NotImplementedException();
-        }
+                public XmlSchema GetSchema()
+                {
+                    throw new System.NotImplementedException();
+                }
 
-        public void ReadXml(XmlReader reader)
-        {
-            reader.ReadStartElement("Tournament", Tournament.Namespace);
+                public void ReadXml(XmlReader reader)
+                {
+                    reader.ReadStartElement("Tournament", Tournament.Namespace);
 
-            reader.ReadStartElement("Name", Tournament.Namespace);
-            Name = reader.ReadContentAsString();
-            reader.ReadEndElement();
+                    reader.ReadStartElement("Name", Tournament.Namespace);
+                    Name = reader.ReadContentAsString();
+                    reader.ReadEndElement();
 
-            reader.ReadStartElement("Players", Tournament.Namespace);
+                    reader.ReadStartElement("Players", Tournament.Namespace);
             
-            var serializer = new XmlSerializer(typeof(Player), Tournament.Namespace);
-            while (reader.IsStartElement("Player", Tournament.Namespace))
-            {
-                Player player = (Player)serializer.Deserialize(reader.ReadSubtree());
-                this.Players.Add(player);
-                reader.ReadStartElement();
-            }
+                    var serializer = new XmlSerializer(typeof(Player), Tournament.Namespace);
+                    while (reader.IsStartElement("Player", Tournament.Namespace))
+                    {
+                        Player player = (Player)serializer.Deserialize(reader.ReadSubtree());
+                        this.Players.Add(player);
+                        reader.ReadStartElement();
+                    }
 
-            reader.ReadEndElement();    //Players
+                    reader.ReadEndElement();    //Players
 
-            reader.ReadEndElement();    //Tournament
-        }
+                    reader.ReadEndElement();    //Tournament
+                }
 
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteElementString("Name", Tournament.Namespace, Name);
+                public void WriteXml(XmlWriter writer)
+                {
+                    writer.WriteElementString("Name", Tournament.Namespace, Name);
 
-            writer.WriteStartElement("Players", Tournament.Namespace);
+                    writer.WriteStartElement("Players", Tournament.Namespace);
 
-            var serializer = new XmlSerializer(typeof(Player), Tournament.Namespace);
-            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
-            namespaces.Add(String.Empty, Tournament.Namespace);
-            foreach (Player player in Players)
-            {
-                serializer.Serialize(writer, player, namespaces);
-            }
+                    var serializer = new XmlSerializer(typeof(Player), Tournament.Namespace);
+                    XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+                    namespaces.Add(String.Empty, Tournament.Namespace);
+                    foreach (Player player in Players)
+                    {
+                        serializer.Serialize(writer, player, namespaces);
+                    }
 
-            writer.WriteEndElement();    //Players
-        }
-        #endregion
- //*/
+                    writer.WriteEndElement();    //Players
+                }
+                #endregion
+         //*/
 
 #if DEBUG
         public override string ToString()

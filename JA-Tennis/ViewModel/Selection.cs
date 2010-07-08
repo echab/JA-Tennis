@@ -2,30 +2,24 @@
 using System.Collections.ObjectModel;
 using JA_Tennis.Model;
 using JA_Tennis.Helpers;
+using JA_Tennis.ComponentModel;
 
 namespace JA_Tennis.ViewModel
 {
-    public class Selection : NotifyPropertyChangedBase
+    public class Selection : BindableType //NotifyPropertyChangedBase
     {
         Tournament _Tournament;
-        public Tournament Tournament {
+        public Tournament Tournament
+        {
             get { return _Tournament; }
-            set {
-                if (_Tournament == value) { return; }
-                _Tournament = value; 
-                RaisePropertyChanged(()=>Tournament); 
-            }
+            set { Set<Tournament>(ref _Tournament, value, () => Tournament); }
         }
 
         Player _Player;
         public Player Player
         {
             get { return _Player; }
-            set {
-                if (_Player == value) { return; }
-                _Player = value; 
-                RaisePropertyChanged(()=>Player); 
-            }
+            set { Set<Player>(ref _Player, value, () => Player); }
         }
 
         //public PlayerCollection Players { get; set; }     //TODO selection multiple players 

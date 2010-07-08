@@ -1,7 +1,9 @@
-﻿using System;
+﻿using System.ComponentModel;
+using JA_Tennis.Helpers;
 using JA_Tennis.Model;
+using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.ComponentModel;
+using JA_Tennis.ComponentModel;
 
 namespace JA_Tennis_UnitTest.Model
 {
@@ -92,6 +94,26 @@ namespace JA_Tennis_UnitTest.Model
             //Assert.IsNull(handler);
 
             player = null;
+        }
+
+        [TestMethod]
+        [Tag("Undo")]
+        public void TestDirty()
+        {
+            JA_Tennis.Model.Player player = new JA_Tennis.Model.Player();
+
+            Assert.IsFalse(player.IsDirty, "IsDirty is initially false");
+            
+            using( new SuspendDirtyContext( player)) {
+                player.Id="J1";
+                player.Name="Toto";
+            }
+
+            Assert.IsFalse(player.IsDirty, "IsDirty is false using SuspendDirtyContext");
+
+            player.Name = "Tutu";
+
+            Assert.IsTrue(player.IsDirty, "IsDirty is true after Name change");
         }
     }
 }

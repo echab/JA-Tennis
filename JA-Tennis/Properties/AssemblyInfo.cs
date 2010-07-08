@@ -37,4 +37,5 @@ using System.Runtime.InteropServices;
 #if DEBUG
 //For UnitTest
 [assembly: InternalsVisibleTo("JA-Tenis_UnitTest")]
+[assembly: InternalsVisibleTo("JA-Tenis UnitTest")]
 #endif //DEBUG

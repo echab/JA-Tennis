@@ -2,52 +2,32 @@
 using JA_Tennis.Assets.Resources;
 using System.ComponentModel;
 using JA_Tennis.Helpers;
+using JA_Tennis.ComponentModel;
 
 namespace JA_Tennis.ViewModel
 {
     /// <summary>
     /// ViewModel for player editor view. 
     /// </summary>
-    public class PlayerEditorViewModel:NotifyPropertyChangedBase
+    public class PlayerEditorViewModel : BindableType //NotifyPropertyChangedBase
     {
         Player _Player;
-        public Player Player { 
+        public Player Player
+        {
             get { return _Player; }
-            set {
-                if (_Player == value) { return; }
+            set
+            {
+                Set<Player>(ref _Player, value, () => Player);
 
-                if (_Player != null)
-                {
-                    _Player.PropertyChanged -= (sender, args) => RaisePropertyChanged(()=>Player);
-                }
-                bool oldIsPlayer = _Player != null;
-
-                _Player = value;
-                RaisePropertyChanged(()=>Player);
-
-                if (_Player != null)
-                {
-                    _Player.PropertyChanged += (sender, args) => RaisePropertyChanged(()=>Player);
-                }
-                if ((_Player != null) != IsPlayer)
-                {
-                    IsPlayer = _Player != null;
-                    RaisePropertyChanged(() => IsPlayer);
-                }
+                Set<bool>(ref _IsPlayer, _Player != null, () => IsPlayer);
             }
         }
 
-        public bool IsPlayer { get; private set; }
+        bool _IsPlayer;
+        public bool IsPlayer { get{ return _IsPlayer;} }
 
         //public PlayerEditorViewModel()
         //{
         //}
-
-        #region Resources
-        public string ResourceLabelName
-        {
-            get { return Strings.Label_Name + Strings.Label_Suffix; }
-        }
-        #endregion Resources
     }
 }

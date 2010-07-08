@@ -5,6 +5,8 @@ using System.Reflection;
 
 namespace JA_Tennis.Helpers
 {
+    // http://jeffhandley.com/archive/2010/04/10/memberof.aspx
+
     /// <summary>
     /// Class for easily getting information about a type member,
     /// and referencing the member by name, or getting it as a

@@ -7,20 +7,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace JA_Tennis_UnitTest.View
 {
     [TestClass]
+    [Ignore]    //TODO Test PlayerEditorView
     public class TestPlayerEditorView : SilverlightTest
     {
-        private PlayerEditorView view = new PlayerEditorView();
-        private PlayerEditorViewModel viewModel = new PlayerEditorViewModel();
-        private PlayerEditorViewModel viewModelEmpty = new PlayerEditorViewModel();
+        private PlayerEditorView view; //= new PlayerEditorView();
+        private PlayerEditorViewModel viewModel; // = new PlayerEditorViewModel();
+        private PlayerEditorViewModel viewModelEmpty; // = new PlayerEditorViewModel();
 
         [TestInitialize]
         public void PrepareView()
         {
-            view = new PlayerEditorView();
-            TestPanel.Children.Add(view);
-
-            viewModelEmpty = new PlayerEditorViewModel();
-
             viewModel = new PlayerEditorViewModel()
             {
                 Player = new Player()
@@ -29,6 +25,15 @@ namespace JA_Tennis_UnitTest.View
                     Name = "Toto"
                 }
             };
+
+            view = new PlayerEditorView()
+            {
+                ViewModel = viewModel
+            };
+            TestPanel.Children.Add(view);
+
+            viewModelEmpty = new PlayerEditorViewModel();
+
         }
 
         [TestCleanup]

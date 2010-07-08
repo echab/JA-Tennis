@@ -1,20 +1,32 @@
 ﻿<UserControl x:Class="JA_Tennis.View.PlayerEditorView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    Width="400" Height="300">
+
+    xmlns:jv="clr-namespace:JA_Tennis.View"
+    xmlns:jvm="clr-namespace:JA_Tennis.ViewModel"
+    xmlns:cmd="clr-namespace:JA_Tennis.Command"    
+             
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"             
+    d:DataContext="{d:DesignInstance jvm:PlayerEditorViewModel}" Height="300" Width="400" DataContext="{Binding}">
+    
     <Grid x:Name="LayoutRoot" Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="60"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="240*" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ResourceLabelName}" TextAlignment="Right" VerticalAlignment="Stretch"/>
-        <TextBox Grid.Row="0" Grid.Column="1" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" 
+        <TextBlock Text="{Binding Path=Strings.Label_Name, Source={StaticResource ResourceWrapper}}" TextAlignment="Right" VerticalAlignment="Top" Padding="0,0,6,0" Margin="0,4,0,0" />
+        <TextBox Grid.Column="1" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" 
                  Text="{Binding Path=Player.Name, Mode=TwoWay}" 
-                 IsEnabled="{Binding IsPlayer}"
-                 />
+                 IsEnabled="{Binding IsPlayer}" Margin="0,0,0,3" Height="20" />
+        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" HorizontalAlignment="Left" Name="textBlock1" Text="{Binding Path=Player.Id}" VerticalAlignment="Top" Width="68" />
+        <TextBlock Margin="0,4,0,0" Padding="0,0,6,0" Text="{Binding Path=Strings.Label_Id, Source={StaticResource ResourceWrapper}}" TextAlignment="Right" VerticalAlignment="Top" Grid.Row="1" />
     </Grid>
 </UserControl>

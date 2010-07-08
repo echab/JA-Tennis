@@ -1,18 +1,16 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Input;
-using System.Windows.Resources;
-using JA_Tennis.Assets.Resources;
-using JA_Tennis.Command;
-using JA_Tennis.Model;
-using JA_Tennis.Helpers;
-using System.Windows.Controls;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Windows.Input;
+using System.Windows.Resources;
+using JA_Tennis.Command;
+using JA_Tennis.ComponentModel;
+using JA_Tennis.Helpers;
+using JA_Tennis.Model;
 
 namespace JA_Tennis.ViewModel
 {
-    public class MainFrameViewModel : NotifyPropertyChangedBase
+    public class MainFrameViewModel : BindableType //NotifyPropertyChangedBase
     {
         public TournamentCollection Tournaments { get; private set; }
 
@@ -20,7 +18,7 @@ namespace JA_Tennis.ViewModel
         public Selection Selection
         {
             get { return _Selection; }
-            set { _Selection = value; RaisePropertyChanged(() => Selection); }
+            set { Set<Selection>(ref _Selection, value, () => Selection); }
         }
 
         #region Child ViewModels
@@ -29,31 +27,21 @@ namespace JA_Tennis.ViewModel
         public PlayerListViewModel PlayerListViewModel
         {
             get { return _PlayerListViewModel; }
-            private set
-            {
-                if (PlayerListViewModel == value) { return; }
-                _PlayerListViewModel = value;
-                RaisePropertyChanged(() => PlayerListViewModel);
-            }
+            private set { Set<PlayerListViewModel>(ref _PlayerListViewModel, value, () => PlayerListViewModel); }
         }
 
         private PlayerEditorViewModel _PlayerEditorViewModel;
         public PlayerEditorViewModel PlayerEditorViewModel
         {
             get { return _PlayerEditorViewModel; }
-            private set
-            {
-                if (PlayerEditorViewModel == value) { return; }
-                _PlayerEditorViewModel = value;
-                RaisePropertyChanged(() => PlayerEditorViewModel);
-            }
+            private set { Set<PlayerEditorViewModel>(ref _PlayerEditorViewModel, value, () => PlayerEditorViewModel); }
         }
         #endregion Child ViewModels
 
         public MainFrameViewModel()
         {
             Tournaments = new TournamentCollection();
-            Tournaments.CollectionChanged += (s, args) => RaisePropertyChanged(() => Tournaments);
+            Tournaments.CollectionChanged += (s, args) => OnPropertyChanged(() => Tournaments);
 
             Selection = new Selection();
             Selection.PropertyChanged += Selection_PropertyChanged;
@@ -104,7 +92,8 @@ namespace JA_Tennis.ViewModel
                 case NotifyCollectionChangedAction.Replace:
                     if (e.OldItems.Contains(Selection.Tournament))
                     {
-                        Selection.Tournament = null;
+                        TournamentCollection tournaments = sender as TournamentCollection;
+                        Selection.Tournament = tournaments.Count > 0 ? tournaments[tournaments.Count - 1] : null;   //Last one
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
@@ -124,19 +113,6 @@ namespace JA_Tennis.ViewModel
         {
             //string filter = param as string ?? string.Empty;
 
-            /*
-            //TODO test: serialization to xml
-            Tournament t = new Tournament() { Name = "test2"};
-            t.Players.Add(new Player() {Id="J1", Name = "Toto" });
-            t.Players.Add(new Player() { Id = "J2", Name = "Dudu" });
-            Tournaments.Add(t);
-            MemoryStream stream2 = new MemoryStream();
-            t.Save(stream2);
-            stream2.Seek(0, SeekOrigin.Begin);
-            StreamReader reader = new StreamReader( stream2 );
-            string sXml = reader.ReadToEnd();
-            reader.Close();
-            //*/
 
             //TODO test: serialization from embedded resource xml
             //Stream stream = this.GetType().Assembly.GetManifestResourceStream("JA_Tennis.Data.jeu2test.xml");  //embedded resource
@@ -180,12 +156,5 @@ namespace JA_Tennis.ViewModel
             return Tournaments.Count > 0 && tournament != null;
         }
         #endregion CloseDocumentCommand
-
-        #region Resources
-        public string ResourceCommandLoad
-        {
-            get { return Strings.Command_Load; }
-        }
-        #endregion Resources
     }
 }

@@ -22,7 +22,7 @@ namespace JA_Tennis.Assets.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Strings {
+    public class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace JA_Tennis.Assets.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JA_Tennis.Assets.Resources.Strings", typeof(Strings).Assembly);
@@ -51,7 +51,7 @@ namespace JA_Tennis.Assets.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,29 +61,38 @@ namespace JA_Tennis.Assets.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fermer.
+        /// </summary>
+        public static string Command_Close {
+            get {
+                return ResourceManager.GetString("Command_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ouvrir.
         /// </summary>
-        internal static string Command_Load {
+        public static string Command_Open {
             get {
-                return ResourceManager.GetString("Command_Load", resourceCulture);
+                return ResourceManager.GetString("Command_Open", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nom.
+        ///   Looks up a localized string similar to Id:.
         /// </summary>
-        internal static string Label_Name {
+        public static string Label_Id {
+            get {
+                return ResourceManager.GetString("Label_Id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nom:.
+        /// </summary>
+        public static string Label_Name {
             get {
                 return ResourceManager.GetString("Label_Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  :.
-        /// </summary>
-        internal static string Label_Suffix {
-            get {
-                return ResourceManager.GetString("Label_Suffix", resourceCulture);
             }
         }
     }

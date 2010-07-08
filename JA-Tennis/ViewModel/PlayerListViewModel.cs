@@ -1,26 +1,19 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using JA_Tennis.Model;
-using JA_Tennis.Command;
+﻿using System.ComponentModel;
 using System.Windows.Input;
+using JA_Tennis.Command;
+using JA_Tennis.ComponentModel;
 using JA_Tennis.Helpers;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using JA_Tennis.Model;
 
 namespace JA_Tennis.ViewModel
 {
-    public class PlayerListViewModel : NotifyPropertyChangedBase
+    public class PlayerListViewModel : BindableType //NotifyPropertyChangedBase
     {
         public PlayerListViewModel()
         {
 
             AddPlayerCommand = new DelegateCommand<Player>(AddPlayer, CanAddPlayer);
             DeletePlayerCommand = new DelegateCommand<Player>(DeletePlayer, CanDeletePlayer);
-
-            //Tournament.PropertyChanged += (sender, args) => RaisePropertyChanged(()=>Tournament));
-
-            //_Selection = new Selection();   //TODO: pb events
-            //Selection.PropertyChanged += (sender, args) => RaisePropertyChanged(()=>Selection));
         }
 
         #region AddPlayerCommand
@@ -60,18 +53,12 @@ namespace JA_Tennis.ViewModel
 
         public Tournament Tournament
         {
-            get
-            {
-                return Selection != null ? Selection.Tournament : null;
-            }
+            get { return Selection != null ? Selection.Tournament : null; }
         }
 
         public PlayerCollection Players
         {
-            get
-            {
-                return Tournament != null ? Tournament.Players : null;
-            }
+            get { return Tournament != null ? Tournament.Players : null; }
         }
 
         private Selection _Selection;
@@ -86,11 +73,10 @@ namespace JA_Tennis.ViewModel
                     _Selection.PropertyChanged -= Selection_PropertyChanged;
                 }
 
-                _Selection = value;
+                Set<Selection>(ref _Selection, value, () => Selection);
 
                 if (_Selection != null)
                 {
-                    RaisePropertyChanged(() => Selection);
                     _Selection.PropertyChanged += Selection_PropertyChanged;
                 }
             }
@@ -98,12 +84,11 @@ namespace JA_Tennis.ViewModel
 
         void Selection_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            RaisePropertyChanged(() => Selection);
-
+            //Raise change on ViewModel when a property of Selection change (ie a sub-property of ViewModel)
             if (e.PropertyName == Member.Of<Selection>(s => s.Tournament))
             {
-                RaisePropertyChanged(() => Tournament);
-                RaisePropertyChanged(() => Players);
+                OnPropertyChanged(() => Tournament);
+                OnPropertyChanged(() => Players);
             }
         }
 
