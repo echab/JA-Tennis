@@ -53,7 +53,10 @@ namespace JA_Tennis.Model
             XmlSerializer serializer = new XmlSerializer(typeof(Tournament), Tournament.Namespace);
             XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
             namespaces.Add(String.Empty, Tournament.Namespace);
+            stream.Position = 0;
             serializer.Serialize(stream, this, namespaces);
+            stream.SetLength(stream.Position);  //Truncate
+            //stream.Flush();
             return true;
         }
         #endregion Serialization
