@@ -96,7 +96,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\AssertXml.cs" />
+    <Compile Include="Helpers\XmlAssert.cs" />
     <Compile Include="Model\TestPlayer.cs" />
     <Compile Include="Model\TestTournament.cs" />
     <Compile Include="Model\TestTournamentSerialization.cs" />
@@ -113,6 +113,7 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram_UnitTest.cd" />
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>

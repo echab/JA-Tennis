@@ -46,7 +46,7 @@ namespace JA_Tennis_UnitTest.ViewModel
             Assert.AreSame(player1,viewModel.Player);
         }
  
-        delegate void delegatePropertyChanged(object sender, PropertyChangedEventArgs e);
+        //delegate void delegatePropertyChanged(object sender, PropertyChangedEventArgs e);
 
         [TestMethod]
         public void VerifyNotifyPropertyChanged()

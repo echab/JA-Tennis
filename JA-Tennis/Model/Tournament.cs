@@ -22,7 +22,7 @@ namespace JA_Tennis.Model
         public string Name
         {
             get { return _Name; }
-            set { Set<string>(ref _Name, value, () => Name); }
+            set { Set<string>(ref _Name, value.Trim(), () => Name); }
         }
 
         //public ObservableCollection<Player> Players { get; private set; }
@@ -44,6 +44,7 @@ namespace JA_Tennis.Model
         public static Tournament Open(Stream stream)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Tournament), Tournament.Namespace);
+            stream.Position = 0;
             Tournament tournament = (Tournament)serializer.Deserialize(stream);
             return tournament;
         }

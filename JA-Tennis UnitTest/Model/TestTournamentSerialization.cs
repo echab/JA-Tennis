@@ -22,33 +22,32 @@ namespace JA_Tennis_UnitTest.Model
             string sXml = ss.ToString();
 
             // see http://xmlunit.sourceforge.net/
-            AssertXml.AreEqual(@"<Tournament xmlns=""http://jatennis.free.fr/schema"">
+            XmlAssert.AreEqual(@"<Tournament xmlns=""http://jatennis.free.fr/schema"">
                   <Name>test2</Name>
                   <Players>
                     <Player Id=""J1"" Name=""Toto"" />
                     <Player Id=""J2"" Name=""Dudu"" />
                   </Players>
                 </Tournament>"
-                , sXml, null, null);
+                , sXml, true, null);
 
 
 
-            t = new Tournament() { Name = "test3", Id="T3" };
+            t = new Tournament() { Name = " test3", Id="T3" };
             t.Players.Add(new Player() { Id = "J1", Name = "Toto" });
 
             t.Save(ss.Stream);
             sXml = ss.ToString();
-
+            
             // see http://xmlunit.sourceforge.net/
-            AssertXml.AreEqual(@"<Tournament xmlns=""http://jatennis.free.fr/schema"" Id=""T3"">
-                  <Name>test3</Name>
+            XmlAssert.AreEqual(@"<Tournament xmlns=""http://jatennis.free.fr/schema"" Id=""T3"">
+                  <Name> test3</Name>
                   <Players>
                     <Player Id=""J1"" Name=""Toto"" />
                   </Players>
                 </Tournament>"
-                , sXml, null, null);
+                , sXml, true, null);
         }
-
 
     }
 

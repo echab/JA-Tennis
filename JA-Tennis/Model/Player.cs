@@ -55,7 +55,7 @@ namespace JA_Tennis.Model
                     _errMgr.ClearErrors(Member.Of(() => Name));
                 }
 
-                Set<string>(ref _Name, value, () => Name);
+                Set<string>(ref _Name, value.Trim(), () => Name);
             }
         }
 
