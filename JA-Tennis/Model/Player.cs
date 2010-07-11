@@ -10,13 +10,13 @@ using JA_Tennis.ComponentModel;
 namespace JA_Tennis.Model
 {
     [XmlType(IncludeInSchema = false)]
-    public class Player : BindableType, INotifyDataErrorInfo, IDirtyAware //NotifyPropertyChangedBase //, IXmlSerializable
+    public class Player : BindableType, IIdentifiable, INotifyDataErrorInfo //, IDirtyAware //NotifyPropertyChangedBase //, IXmlSerializable
     {
         public Player()
         {
             _errMgr = new ValidationErrorManager(this, s => OnErrorsChanged(s));
 
-            ChangeBehaviors.Add(new DirtyPropertyBehavior(this));
+            //ChangeBehaviors.Add(new DirtyPropertyBehavior(this));
         }
 
         private string _Id;
@@ -34,6 +34,8 @@ namespace JA_Tennis.Model
                 {
                     _errMgr.ClearErrors(Member.Of(() => Id));
                 }
+
+                IdManager.DeclareId(value);
 
                 Set<string>(ref _Id, value, () => Id);
             }
@@ -59,8 +61,7 @@ namespace JA_Tennis.Model
             }
         }
 
-        /*
-        #region IXmlSerializable Members
+/*      #region IXmlSerializable Members
 
         public XmlSchema GetSchema()
         {
@@ -86,7 +87,7 @@ namespace JA_Tennis.Model
         #endregion
         //*/
 
-        #region INotifyDataErrorInfo Members
+      #region INotifyDataErrorInfo Members
         ValidationErrorManager _errMgr;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
@@ -105,12 +106,13 @@ namespace JA_Tennis.Model
         }
         #endregion
 
-        #region IDirtyAware Members
+/*      #region IDirtyAware Members
 
         [XmlIgnore]
         public bool IsDirty { get; set; }
 
         #endregion
+//*/
 
 #if DEBUG
         public override string ToString()

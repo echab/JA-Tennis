@@ -31,8 +31,8 @@ namespace JA_Tennis.ComponentModel
         /// 
         /// </summary>
         /// <param name="propName"></param>
-        [DebuggerStepThrough]
-        private void OnPropertyChanged(string propName)
+        //[DebuggerStepThrough]
+        protected void OnPropertyChanged(string propName)
         {
             var handler = PropertyChanged;
             if (null != handler && !SuspendChangeNotification)
@@ -78,6 +78,7 @@ namespace JA_Tennis.ComponentModel
             }
         }
 
+        [DebuggerStepThrough]
         protected void Set<T>(ref T local, T newVal, Expression<Func<object>> member)
         {
             Set<T>(ref local, newVal, Member.Of(member));

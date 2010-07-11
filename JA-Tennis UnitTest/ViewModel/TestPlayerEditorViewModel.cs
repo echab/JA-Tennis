@@ -36,9 +36,9 @@ namespace JA_Tennis_UnitTest.ViewModel
         [TestMethod]
         public void TestConstructor()
         {
-            PlayerEditorViewModel viewModel = new PlayerEditorViewModel();
+            PlayerEditorViewModel viewModel = new PlayerEditorViewModel(null);
             Assert.IsFalse(viewModel.IsPlayer);
-            Assert.IsNull(viewModel.Player);
+            //Assert.IsNull(viewModel.Player);
 
             viewModel.Player = player1;
             Assert.IsTrue(viewModel.IsPlayer);
@@ -51,7 +51,7 @@ namespace JA_Tennis_UnitTest.ViewModel
         [TestMethod]
         public void VerifyNotifyPropertyChanged()
         {
-            PlayerEditorViewModel viewModel = new PlayerEditorViewModel();
+            PlayerEditorViewModel viewModel = new PlayerEditorViewModel(null);
 
             int nChangePlayer = 0;
             int nChangeOhter = 0;
@@ -91,7 +91,7 @@ namespace JA_Tennis_UnitTest.ViewModel
         [Asynchronous]
         public void TestAsynchronous() 
         {
-            PlayerEditorViewModel viewModel = new PlayerEditorViewModel();
+            PlayerEditorViewModel viewModel = new PlayerEditorViewModel(null);
 
             PropertyChangedEventHandler playerChanged = (sender, args) =>
             {

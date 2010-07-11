@@ -123,6 +123,12 @@
   <data name="Command_Open" xml:space="preserve">
     <value>Ouvrir</value>
   </data>
+  <data name="Command_Redo" xml:space="preserve">
+    <value>Refaire</value>
+  </data>
+  <data name="Command_Undo" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
   <data name="Label_Id" xml:space="preserve">
     <value>Id:</value>
   </data>

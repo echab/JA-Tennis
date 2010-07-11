@@ -96,24 +96,25 @@ namespace JA_Tennis_UnitTest.Model
             player = null;
         }
 
-        [TestMethod]
-        [Tag("Undo")]
-        public void TestDirty()
-        {
-            JA_Tennis.Model.Player player = new JA_Tennis.Model.Player();
+        //[TestMethod]
+        //[Tag("Undo")]
+        //public void TestDirty()
+        //{
+        //    JA_Tennis.Model.Player player = new JA_Tennis.Model.Player();
 
-            Assert.IsFalse(player.IsDirty, "IsDirty is initially false");
-            
-            using( new SuspendDirtyContext( player)) {
-                player.Id="J1";
-                player.Name="Toto";
-            }
+        //    Assert.IsFalse(player.IsDirty, "IsDirty is initially false");
 
-            Assert.IsFalse(player.IsDirty, "IsDirty is false using SuspendDirtyContext");
+        //    using (new SuspendDirtyContext(player))
+        //    {
+        //        player.Id = "J1";
+        //        player.Name = "Toto";
+        //    }
 
-            player.Name = "Tutu";
+        //    Assert.IsFalse(player.IsDirty, "IsDirty is false using SuspendDirtyContext");
 
-            Assert.IsTrue(player.IsDirty, "IsDirty is true after Name change");
-        }
+        //    player.Name = "Tutu";
+
+        //    Assert.IsTrue(player.IsDirty, "IsDirty is true after Name change");
+        //}
     }
 }

@@ -24,9 +24,9 @@
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding Path=Strings.Label_Name, Source={StaticResource ResourceWrapper}}" TextAlignment="Right" VerticalAlignment="Top" Padding="0,0,6,0" Margin="0,4,0,0" />
         <TextBox Grid.Column="1" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" 
-                 Text="{Binding Path=Player.Name, Mode=TwoWay}" 
+                 Text="{Binding Path=Name, Mode=TwoWay}" 
                  IsEnabled="{Binding IsPlayer}" Margin="0,0,0,3" Height="20" />
-        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" HorizontalAlignment="Left" Name="textBlock1" Text="{Binding Path=Player.Id}" VerticalAlignment="Top" Width="68" />
+        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" HorizontalAlignment="Left" Name="textBlock1" Text="{Binding Path=Id}" VerticalAlignment="Top" Width="68" />
         <TextBlock Margin="0,4,0,0" Padding="0,0,6,0" Text="{Binding Path=Strings.Label_Id, Source={StaticResource ResourceWrapper}}" TextAlignment="Right" VerticalAlignment="Top" Grid.Row="1" />
     </Grid>
 </UserControl>

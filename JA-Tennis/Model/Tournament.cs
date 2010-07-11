@@ -8,14 +8,18 @@ using JA_Tennis.ComponentModel;
 
 namespace JA_Tennis.Model
 {
-    public class Tournament : BindableType  //NotifyPropertyChangedBase //:IXmlSerializable
+    public class Tournament : BindableType, IIdentifiable  //NotifyPropertyChangedBase //:IXmlSerializable
     {
         private string _Id;
         [XmlAttribute]
         public string Id
         {
             get { return _Id; }
-            set { Set<string>(ref _Id, value, () => Id); }
+            set {
+                IdManager.DeclareId(value);
+
+                Set<string>(ref _Id, value, () => Id); 
+            }
         }
 
         private string _Name;

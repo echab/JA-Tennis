@@ -79,6 +79,24 @@ namespace JA_Tennis.Assets.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refaire.
+        /// </summary>
+        public static string Command_Redo {
+            get {
+                return ResourceManager.GetString("Command_Redo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Annuler.
+        /// </summary>
+        public static string Command_Undo {
+            get {
+                return ResourceManager.GetString("Command_Undo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id:.
         /// </summary>
         public static string Label_Id {

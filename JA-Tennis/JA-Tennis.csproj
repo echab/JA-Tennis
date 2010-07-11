@@ -95,16 +95,21 @@
     <Compile Include="Command\CommandGroup.cs" />
     <Compile Include="Command\CommandManager.cs" />
     <Compile Include="Command\DelegateCommand.cs" />
+    <Compile Include="Command\UndoablePropertySet.cs" />
     <Compile Include="ComponentModel\BindableType.cs" />
     <Compile Include="ComponentModel\DirtyPropertyBehavior.cs" />
     <Compile Include="ComponentModel\IDirtyAware.cs" />
+    <Compile Include="ComponentModel\UndoPropertyBehavior.cs" />
     <Compile Include="Helpers\IEnumerableExtension.cs" />
     <Compile Include="ComponentModel\IPropertyChangedBehavior.cs" />
     <Compile Include="Helpers\Member.cs" />
     <Compile Include="ComponentModel\NotifyPropertyBehavior.cs" />
     <Compile Include="ComponentModel\SuspendDirtyContext.cs" />
     <Compile Include="ComponentModel\ValidationErrorManager.cs" />
+    <Compile Include="Helpers\PropertyHandler.cs" />
     <Compile Include="Helpers\ResourceWrapper.cs" />
+    <Compile Include="Model\IdManager.cs" />
+    <Compile Include="Model\IIdentifiable.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\PlayerCollection.cs" />
     <Compile Include="ViewModel\PlayerEditorViewModel.cs" />
@@ -114,6 +119,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\MainFrameViewModel.cs" />
     <Compile Include="ViewModel\PlayerListViewModel.cs" />
+    <Compile Include="Command\UndoManager.cs" />
     <Compile Include="View\MainFrameView.xaml.cs">
       <DependentUpon>MainFrameView.xaml</DependentUpon>
     </Compile>

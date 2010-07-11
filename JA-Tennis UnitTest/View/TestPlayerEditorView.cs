@@ -11,19 +11,19 @@ namespace JA_Tennis_UnitTest.View
     public class TestPlayerEditorView : SilverlightTest
     {
         private PlayerEditorView view; //= new PlayerEditorView();
-        private PlayerEditorViewModel viewModel; // = new PlayerEditorViewModel();
-        private PlayerEditorViewModel viewModelEmpty; // = new PlayerEditorViewModel();
+        private PlayerEditorViewModel viewModel; // = new PlayerEditorViewModel(null);
+        private PlayerEditorViewModel viewModelEmpty; // = new PlayerEditorViewModel(null);
 
         [TestInitialize]
         public void PrepareView()
         {
-            viewModel = new PlayerEditorViewModel()
+            viewModel = new PlayerEditorViewModel(null)
             {
-                Player = new Player()
-                {
+                //Player = new Player()
+                //{
                     Id = "J1",
                     Name = "Toto"
-                }
+                //}
             };
 
             view = new PlayerEditorView()
@@ -32,7 +32,7 @@ namespace JA_Tennis_UnitTest.View
             };
             TestPanel.Children.Add(view);
 
-            viewModelEmpty = new PlayerEditorViewModel();
+            viewModelEmpty = new PlayerEditorViewModel(null);
 
         }
 

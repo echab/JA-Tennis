@@ -12,6 +12,8 @@ namespace JA_Tennis.ViewModel
 {
     public class MainFrameViewModel : BindableType //NotifyPropertyChangedBase
     {
+        public UndoManager UndoManager { get; private set; }
+
         public TournamentCollection Tournaments { get; private set; }
 
         private Selection _Selection;
@@ -40,6 +42,8 @@ namespace JA_Tennis.ViewModel
 
         public MainFrameViewModel()
         {
+            UndoManager = new UndoManager();
+
             Tournaments = new TournamentCollection();
             Tournaments.CollectionChanged += (s, args) => OnPropertyChanged(() => Tournaments);
 
@@ -52,9 +56,11 @@ namespace JA_Tennis.ViewModel
                 Selection = this.Selection
             };
 
-            _PlayerEditorViewModel = new PlayerEditorViewModel()
+            _PlayerEditorViewModel = new PlayerEditorViewModel(UndoManager)
             {
-                Player = this.Selection.Player
+                Name = this.Selection.Player.Name,
+                Id = this.Selection.Player.Id
+                //Player = this.Selection.Player
             };
 
             //Init commands
@@ -77,7 +83,10 @@ namespace JA_Tennis.ViewModel
 
             if (e.PropertyName == Member.Of<Selection>(s => s.Player))
             {
-                _PlayerEditorViewModel.Player = selection.Player;
+                //_PlayerEditorViewModel.Player = selection.Player;
+                _PlayerEditorViewModel.Name = selection.Player.Name;
+                _PlayerEditorViewModel.Id = selection.Player.Id;
+                //PropertyHandler.SetProperties(typeof(Player).GetProperties(), selection.Player, _PlayerEditorViewModel);  //TODO
             }
         }
 

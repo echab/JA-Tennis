@@ -42,6 +42,12 @@
             <!-- Silverlight 4 -->
             <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Open}" Width="100" Command="{Binding Path=OpenDocumentCommand}" />
             <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Close}" Width="100" Command="{Binding Path=CloseDocumentCommand}" CommandParameter="{Binding Path=Selection.Tournament}" />
+            <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Undo}" Width="100" Command="{Binding Path=UndoManager.UndoCommand}" Margin="4,0,0,0"
+                    ToolTipService.ToolTip="{Binding Path=UndoManager.UndoDescription}"
+                    />
+            <Button Command="{Binding Path=UndoManager.RedoCommand}" Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Redo}" Width="100"
+                    ToolTipService.ToolTip="{Binding Path=UndoManager.RedoDescription}"
+                    />
         </StackPanel>
         
         <jv:PlayerListView x:Name="playerListView" Grid.Row="1" Grid.Column="0"/>

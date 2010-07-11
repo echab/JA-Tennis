@@ -34,7 +34,7 @@ namespace JA_Tennis_UnitTest.Model
 
 
             t = new Tournament() { Name = " test3", Id="T3" };
-            t.Players.Add(new Player() { Id = "J1", Name = "Toto" });
+            t.Players.Add(new Player() { Id = "J3", Name = "Toto" });
 
             t.Save(ss.Stream);
             sXml = ss.ToString();
@@ -43,7 +43,7 @@ namespace JA_Tennis_UnitTest.Model
             XmlAssert.AreEqual(@"<Tournament xmlns=""http://jatennis.free.fr/schema"" Id=""T3"">
                   <Name> test3</Name>
                   <Players>
-                    <Player Id=""J1"" Name=""Toto"" />
+                    <Player Id=""J3"" Name=""Toto"" />
                   </Players>
                 </Tournament>"
                 , sXml, true, null);
