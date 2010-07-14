@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using JA_Tennis.Helpers;
+using System.Linq.Expressions;
 
 // http://www.damonpayne.com/2010/06/17/GreatFeaturesForMVVMFriendlyObjectsPart0FavorCompositionOverInheritance.aspx
 
@@ -54,6 +55,32 @@ namespace JA_Tennis.ComponentModel
             ErrorsChanged(propName);
         }
 
+        public bool Validate(string propName, params Check[] checks)
+        {
+            bool isOk = true;
+
+            foreach (Check check in checks)
+            {
+                if (!check.Condition)
+                {
+                    isOk = false;
+                    AddError(propName, check.Message);
+                }
+            }
+
+            if (isOk)
+            {
+                ClearErrors(propName);
+            }
+
+            return isOk;
+        }
+        public bool Validate(Expression<Func<object>> member, params Check[] checks)
+        {
+            return Validate(Member.Of(member), checks);
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -104,5 +131,17 @@ namespace JA_Tennis.ComponentModel
             }
         }
 
+    }
+
+    public class Check
+    {
+        public bool Condition;
+        public string Message;
+
+        public Check(bool condition, string message)
+        {
+            this.Condition = condition;
+            this.Message = message;
+        }
     }
 }

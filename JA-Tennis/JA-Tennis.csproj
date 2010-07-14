@@ -49,7 +49,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT WITH_SUBPLAYER</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -88,14 +88,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="Command\ButtonBaseClickCommandBehavior.cs" />
-    <Compile Include="Command\Click.cs" />
-    <Compile Include="Command\CommandBehaviorBase.cs" />
-    <Compile Include="Command\CommandBinding.cs" />
-    <Compile Include="Command\CommandGroup.cs" />
-    <Compile Include="Command\CommandManager.cs" />
     <Compile Include="Command\DelegateCommand.cs" />
-    <Compile Include="Command\UndoablePropertySet.cs" />
+    <Compile Include="Command\IUndoRedo.cs" />
+    <Compile Include="Command\UndoableCollection.cs" />
+    <Compile Include="Command\UndoableProperty.cs" />
     <Compile Include="ComponentModel\BindableType.cs" />
     <Compile Include="ComponentModel\DirtyPropertyBehavior.cs" />
     <Compile Include="ComponentModel\IDirtyAware.cs" />
@@ -106,8 +102,9 @@
     <Compile Include="ComponentModel\NotifyPropertyBehavior.cs" />
     <Compile Include="ComponentModel\SuspendDirtyContext.cs" />
     <Compile Include="ComponentModel\ValidationErrorManager.cs" />
-    <Compile Include="Helpers\PropertyHandler.cs" />
+    <Compile Include="Helpers\PropertyHelper.cs" />
     <Compile Include="Helpers\ResourceWrapper.cs" />
+    <Compile Include="Helpers\XamlHelper.cs" />
     <Compile Include="Model\IdManager.cs" />
     <Compile Include="Model\IIdentifiable.cs" />
     <Compile Include="Model\Player.cs" />

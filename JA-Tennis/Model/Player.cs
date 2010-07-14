@@ -26,18 +26,12 @@ namespace JA_Tennis.Model
             get { return _Id; }
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
+                if (_errMgr.Validate(() => Id, new Check( !string.IsNullOrWhiteSpace(value), "Id cannot be empty")))
                 {
-                    _errMgr.AddError(Member.Of(() => Id), "Id cannot be empty");
+                    IdManager.FreeId(_Id);
+                    IdManager.DeclareId(value);
+                    Set<string>(ref _Id, value, () => Id);
                 }
-                else
-                {
-                    _errMgr.ClearErrors(Member.Of(() => Id));
-                }
-
-                IdManager.DeclareId(value);
-
-                Set<string>(ref _Id, value, () => Id);
             }
         }
 
@@ -48,16 +42,10 @@ namespace JA_Tennis.Model
             get { return _Name; }
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
+                if (_errMgr.Validate(() => Name, new Check( !string.IsNullOrWhiteSpace(value), "Name cannot be empty")))
                 {
-                    _errMgr.AddError(Member.Of(() => Name), "Name cannot be empty");
+                    Set<string>(ref _Name, value.Trim(), () => Name);
                 }
-                else
-                {
-                    _errMgr.ClearErrors(Member.Of(() => Name));
-                }
-
-                Set<string>(ref _Name, value.Trim(), () => Name);
             }
         }
 
@@ -121,5 +109,13 @@ namespace JA_Tennis.Model
         }
 #endif //DEBUG
 
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            IdManager.FreeId(this);
+        }
+
+        #endregion
     }
 }

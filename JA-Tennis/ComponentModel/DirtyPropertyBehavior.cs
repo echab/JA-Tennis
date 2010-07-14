@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace JA_Tennis.ComponentModel
 {
@@ -48,6 +49,12 @@ namespace JA_Tennis.ComponentModel
             {
                 _owner.IsDirty = true;
             }
+            return true;
+        }
+
+        public bool CollectionChanged<T>(object owningInstance, NotifyCollectionChangedAction changedAction, T item, string propertyName)
+        {
+            //TODO
             return true;
         }
     }

@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Specialized;
 namespace JA_Tennis.ComponentModel
 {
     // http://www.damonpayne.com/2010/06/20/GreatFeaturesForMVVMFriendlyObjectsPart1IntroducingPropertyChangeBehaviors.aspx
@@ -15,5 +16,7 @@ namespace JA_Tennis.ComponentModel
         /// <param name="propertyName"></param>
         /// <returns>Returns true of more behaviors can keep processing</returns>
         bool PropertyChanged<T>(object owningInstance, T oldVal, T newVal, string propertyName);
+
+        bool CollectionChanged<T>(object owningInstance, NotifyCollectionChangedAction changedAction, T item, string propertyName);
     }
 }

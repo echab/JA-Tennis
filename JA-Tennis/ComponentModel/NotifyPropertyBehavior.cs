@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Collections.Specialized;
 
 namespace JA_Tennis.ComponentModel
 {
@@ -47,5 +48,12 @@ namespace JA_Tennis.ComponentModel
                 return false;
             }
         }
+
+        public bool CollectionChanged<T>(object owningInstance, NotifyCollectionChangedAction changedAction, T item, string propertyName)
+        {
+            //TODO Notify CollectionChanged ?
+            return true;
+        }
+
     }
 }

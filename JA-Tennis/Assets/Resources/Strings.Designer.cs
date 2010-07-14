@@ -61,11 +61,29 @@ namespace JA_Tennis.Assets.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Annuler.
+        /// </summary>
+        public static string Command_Cancel {
+            get {
+                return ResourceManager.GetString("Command_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fermer.
         /// </summary>
         public static string Command_Close {
             get {
                 return ResourceManager.GetString("Command_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        public static string Command_Ok {
+            get {
+                return ResourceManager.GetString("Command_Ok", resourceCulture);
             }
         }
         

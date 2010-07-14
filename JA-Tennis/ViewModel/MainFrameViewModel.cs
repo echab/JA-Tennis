@@ -58,14 +58,28 @@ namespace JA_Tennis.ViewModel
 
             _PlayerEditorViewModel = new PlayerEditorViewModel(UndoManager)
             {
-                Name = this.Selection.Player.Name,
-                Id = this.Selection.Player.Id
-                //Player = this.Selection.Player
+#if WITH_SUBPLAYER
+                Player = this.Selection.Player
+#else
+                //Name = this.Selection.Player != null ? this.Selection.Player.Name : null,
+                //Id = this.Selection.Player != null ? this.Selection.Player.Id : null
+#endif
             };
+#if !WITH_SUBPLAYER
+            if (this.Selection.Player != null)
+            {
+                PropertyHelper.Copy(_PlayerEditorViewModel, this.Selection.Player);
+            }
+#endif
 
             //Init commands
             OpenDocumentCommand = new DelegateCommand(OpenDocument, CanOpenDocument);
             CloseDocumentCommand = new DelegateCommand<Tournament>(CloseDocument, CanCloseDocument);
+
+#if !WITH_SUBPLAYER
+            _PlayerEditorViewModel.OnOk += (s, args) => PropertyHelper.Copy(Selection.Player, _PlayerEditorViewModel);
+            _PlayerEditorViewModel.OnCancel += (s, args) => PropertyHelper.Copy(_PlayerEditorViewModel, this.Selection.Player);
+#endif
 
             Tournaments.CollectionChanged += Tournaments_CollectionChanged;
 
@@ -83,10 +97,13 @@ namespace JA_Tennis.ViewModel
 
             if (e.PropertyName == Member.Of<Selection>(s => s.Player))
             {
-                //_PlayerEditorViewModel.Player = selection.Player;
-                _PlayerEditorViewModel.Name = selection.Player.Name;
-                _PlayerEditorViewModel.Id = selection.Player.Id;
-                //PropertyHandler.SetProperties(typeof(Player).GetProperties(), selection.Player, _PlayerEditorViewModel);  //TODO
+#if WITH_SUBPLAYER
+                _PlayerEditorViewModel.Player = selection.Player;
+#else
+                //_PlayerEditorViewModel.Name = selection.Player != null ? selection.Player.Name : null;
+                //_PlayerEditorViewModel.Id = selection.Player != null ? selection.Player.Id : null;
+                PropertyHelper.Copy(_PlayerEditorViewModel, selection.Player);
+#endif
             }
         }
 

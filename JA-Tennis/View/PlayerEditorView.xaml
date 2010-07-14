@@ -4,7 +4,7 @@
 
     xmlns:jv="clr-namespace:JA_Tennis.View"
     xmlns:jvm="clr-namespace:JA_Tennis.ViewModel"
-    xmlns:cmd="clr-namespace:JA_Tennis.Command"    
+    xmlns:h="clr-namespace:JA_Tennis.Helpers"
              
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -24,9 +24,13 @@
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding Path=Strings.Label_Name, Source={StaticResource ResourceWrapper}}" TextAlignment="Right" VerticalAlignment="Top" Padding="0,0,6,0" Margin="0,4,0,0" />
         <TextBox Grid.Column="1" MaxHeight="20" VerticalAlignment="Top" VerticalContentAlignment="Top" 
-                 Text="{Binding Path=Name, Mode=TwoWay}" 
+                 Text="{Binding Path=Player.Name, Mode=TwoWay}" 
                  IsEnabled="{Binding IsPlayer}" Margin="0,0,0,3" Height="20" />
-        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" HorizontalAlignment="Left" Name="textBlock1" Text="{Binding Path=Id}" VerticalAlignment="Top" Width="68" />
+        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" HorizontalAlignment="Left" Name="textBlock1" Text="{Binding Path=Player.Id}" VerticalAlignment="Top" Width="68" />
         <TextBlock Margin="0,4,0,0" Padding="0,0,6,0" Text="{Binding Path=Strings.Label_Id, Source={StaticResource ResourceWrapper}}" TextAlignment="Right" VerticalAlignment="Top" Grid.Row="1" />
+        <StackPanel Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" Name="stackPanel1" VerticalAlignment="Top" Orientation="Horizontal">
+            <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Ok}" Height="23" Width="75" Margin="6,6,0,0" Command="{Binding Path=OkCommand}" h:XamlHelper.IsDefault="True" />
+            <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Cancel}" Height="23" Width="75" Margin="6,6,0,0" Command="{Binding Path=CancelCommand}" h:XamlHelper.IsCancel="True" />
+        </StackPanel>
     </Grid>
 </UserControl>

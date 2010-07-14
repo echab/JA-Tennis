@@ -3,6 +3,7 @@
              x:Class="JA_Tennis_UnitTest.App"
              >
     <Application.Resources>
+
         
     </Application.Resources>
 </Application>

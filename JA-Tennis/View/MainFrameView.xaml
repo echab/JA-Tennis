@@ -4,7 +4,6 @@
              
     xmlns:jv="clr-namespace:JA_Tennis.View"
     xmlns:jvm="clr-namespace:JA_Tennis.ViewModel"
-    xmlns:cmd="clr-namespace:JA_Tennis.Command"    
              
     Width="800" Height="600"
          
@@ -24,22 +23,6 @@
         </Grid.ColumnDefinitions>
         
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-          <!-- Silverlight 3 -->
-            <!--
-          <Button Content="{Binding Path=Command_Open, Source={StaticResource Strings}}" Width="100"
-                   cmd:Click.Command="{Binding OpenDocumentCommand}"
-            />
-            <Button Content="{Binding Path=Command_Open, Source={StaticResource Strings}}" Width="100"
-                   cmd:CommandManager.EventName="Click"
-                   cmd:CommandManager.Command="{Binding OpenDocumentCommand}"
-            />
-          <Button Content="{Binding Source={StaticResource Strings}, Path=Command_Close}" Width="100"
-                 cmd:CommandManager.EventName="Click"
-                 cmd:CommandManager.Command="{Binding CloseDocumentCommand}"
-                 cmd:CommandManager.CommandParameter="{Binding Path=Selection.Tournament}"
-            />
-            -->
-            <!-- Silverlight 4 -->
             <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Open}" Width="100" Command="{Binding Path=OpenDocumentCommand}" />
             <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Close}" Width="100" Command="{Binding Path=CloseDocumentCommand}" CommandParameter="{Binding Path=Selection.Tournament}" />
             <Button Content="{Binding Source={StaticResource ResourceWrapper}, Path=Strings.Command_Undo}" Width="100" Command="{Binding Path=UndoManager.UndoCommand}" Margin="4,0,0,0"

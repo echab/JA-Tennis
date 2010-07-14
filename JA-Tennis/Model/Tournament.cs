@@ -16,6 +16,7 @@ namespace JA_Tennis.Model
         {
             get { return _Id; }
             set {
+                IdManager.FreeId(_Id);
                 IdManager.DeclareId(value);
 
                 Set<string>(ref _Id, value, () => Id); 
@@ -131,6 +132,15 @@ namespace JA_Tennis.Model
                 }
                 #endregion
          //*/
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            IdManager.FreeId(this);
+        }
+
+        #endregion
 
 #if DEBUG
         public override string ToString()

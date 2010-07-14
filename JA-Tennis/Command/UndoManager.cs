@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
-using JA_Tennis.Command;
 using JA_Tennis.ComponentModel;
 
 namespace JA_Tennis.Command
 {
     public class UndoManager : BindableType
     {
-        Stack<UndoRedoActions> UndoStack = new Stack<UndoRedoActions>();
-        Stack<UndoRedoActions> RedoStack = new Stack<UndoRedoActions>();
+        Stack<IUndoRedo> UndoStack = new Stack<IUndoRedo>();
+        Stack<IUndoRedo> RedoStack = new Stack<IUndoRedo>();
+
+        public bool IsUndoing { get; protected set; }
 
         public UndoManager()
         {
@@ -18,18 +19,14 @@ namespace JA_Tennis.Command
             RedoCommand = new DelegateCommand(Redo, CanRedo);
         }
 
-        public void Do(Action doAction, Action undoAction, string description, bool IsAllreadyDone)
-        {
-            Do(new UndoRedoActions(doAction, undoAction, description), IsAllreadyDone);
-        }
-
-        public void Do(UndoRedoActions actions, bool IsAllreadyDone)
+        public void Do(IUndoRedo actions, bool IsAllreadyDone)
         {
             UndoStack.Push(actions);
+            RedoStack.Clear();
 
             if (!IsAllreadyDone)
             {
-                actions.DoAction();
+                actions.Redo();
             }
 
             OnPropertyChanged(() => UndoDescription);
@@ -58,8 +55,11 @@ namespace JA_Tennis.Command
 
         private void Undo(object param)
         {
-            UndoRedoActions undoredo = UndoStack.Pop();
-            undoredo.UndoAction();
+            IUndoRedo undoredo = UndoStack.Pop();
+
+            IsUndoing = true;
+            undoredo.Undo();
+            IsUndoing = false;
 
             RedoStack.Push(undoredo);
         }
@@ -75,8 +75,11 @@ namespace JA_Tennis.Command
 
         private void Redo(object param)
         {
-            UndoRedoActions undoredo = RedoStack.Pop();
-            undoredo.DoAction();
+            IUndoRedo undoredo = RedoStack.Pop();
+
+            IsUndoing = true;
+            undoredo.Redo();
+            IsUndoing = false;
 
             UndoStack.Push(undoredo);
         }
@@ -86,23 +89,19 @@ namespace JA_Tennis.Command
         }
         #endregion RedoCommand
 
-    }
 
-    public class UndoRedoActions
-    {
-        public Action DoAction;
-        public Action UndoAction;
-        public string Description;
-
-        internal UndoRedoActions()
+        public void Clear()
         {
+            UndoStack.Clear();
+            RedoStack.Clear();
         }
 
-        public UndoRedoActions(Action doAction, Action undoAction, string description)
+#if DEBUG
+        public override string ToString()
         {
-            this.DoAction = doAction;
-            this.UndoAction = undoAction;
-            this.Description = description;
+            return "Undo=[" + (UndoStack.Count > 0 ? UndoStack.Select(a => a.ToString()).Aggregate((a, b) => a + ", " + b) : "") + "]"
+                + " Redo=[" + (RedoStack.Count > 0 ? RedoStack.Select(a => a.ToString()).Aggregate((a, b) => a + ", " + b) : "") + "]";
         }
+#endif //DEBUG
     }
 }

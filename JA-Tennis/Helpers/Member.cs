@@ -81,6 +81,7 @@ namespace JA_Tennis.Helpers
         /// Returns the current member name as the string representation of a <see cref="Member"/>.
         /// </summary>
         /// <returns>The name of the current member <see cref="Info"/>.</returns>
+        [DebuggerNonUserCode]
         public override string ToString()
         {
             return Info.Name;
@@ -92,6 +93,7 @@ namespace JA_Tennis.Helpers
         /// </summary>
         /// <param name="member">The <see cref="Member"/> to cast to a string.</param>
         /// <returns>The name of the current member <see cref="Info"/>.</returns>
+        [DebuggerNonUserCode]
         public static implicit operator string(Member member)
         {
             return member.ToString();

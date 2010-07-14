@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Command_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
   <data name="Command_Close" xml:space="preserve">
     <value>Close</value>
+  </data>
+  <data name="Command_Ok" xml:space="preserve">
+    <value>OK</value>
   </data>
   <data name="Command_Open" xml:space="preserve">
     <value>Load</value>

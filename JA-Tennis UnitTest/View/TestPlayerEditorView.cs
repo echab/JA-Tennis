@@ -19,13 +19,19 @@ namespace JA_Tennis_UnitTest.View
         {
             viewModel = new PlayerEditorViewModel(null)
             {
-                //Player = new Player()
-                //{
+#if WITH_SUBPLAYER
+                Player = new Player()
+                {
                     Id = "J1",
                     Name = "Toto"
-                //}
+                }
+#else
+                Id = "J1",
+                Name = "Toto"
+#endif
             };
 
+            //TODO Test View: Cannot find ResourceWrapper
             view = new PlayerEditorView()
             {
                 ViewModel = viewModel
@@ -43,6 +49,7 @@ namespace JA_Tennis_UnitTest.View
             view = null;
         }
 
+        //*
         [TestMethod]
         public void TestConstructor()
         {
@@ -63,15 +70,24 @@ namespace JA_Tennis_UnitTest.View
             Assert.AreSame(viewModelEmpty, view.DataContext);
             Assert.AreSame(viewModelEmpty, view.ViewModel);
             Assert.IsFalse(view.ViewModel.IsPlayer);
+#if WITH_SUBPLAYER
             Assert.IsNull(view.ViewModel.Player);
+#else
+            Assert.IsNull(view.ViewModel.Name);
+#endif
 
             view.ViewModel = viewModel;
 
             Assert.AreSame(viewModel, view.DataContext);
             Assert.AreSame(viewModel, view.ViewModel);
             Assert.IsTrue(view.ViewModel.IsPlayer);
+#if WITH_SUBPLAYER
             Assert.IsNotNull(view.ViewModel.Player);
+#else
+            Assert.IsNotNull(view.ViewModel.Name);
+#endif
         }
+        //*/
 
         /*
         // http://www.wintellect.com/CS/blogs/jlikness/archive/2010/01/07/silverlight-unit-testing-framework-asynchronous-testing-of-behaviors.aspx

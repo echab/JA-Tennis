@@ -1,30 +1,15 @@
-﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using JA_Tennis.ViewModel;
-using JA_Tennis.Command;
-using JA_Tennis.Model;
+﻿using JA_Tennis.Command;
 using JA_Tennis.Helpers;
+using JA_Tennis.Model;
+using JA_Tennis.ViewModel;
 using Microsoft.Silverlight.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JA_Tennis_UnitTest.ViewModel
 {
     [TestClass]
     public class TestUndoManager
     {
-        class VM
-        {
-            public string Name { get; set; }
-        }
-
         [TestMethod]
         [Tag("undo")]
         public void TestUndo()
@@ -39,8 +24,9 @@ namespace JA_Tennis_UnitTest.ViewModel
             Assert.AreEqual("Toto", vm.Name, "Initial Name");
 
             //vm.Name = "Dudu";
-            undoManager.Do(() => vm.Name = "Dudu", () => vm.Name = "Toto", "Set name by hand", false);
+            //undoManager.Do(() => vm.Name = "Dudu", () => vm.Name = "Toto", "Set name by hand", false);
             //undoManager.Do(new UndoablePropertySet<string>(vm, "Dudu", Member.Of(() => vm.Name)), false);
+            undoManager.Do(new UndoableProperty<object, string>(vm, Member.Of(() => vm.Name), vm.Name, "Dudu"), false);
 
             Assert.IsTrue(undoManager.UndoCommand.CanExecute(null), "Undo after Name change");
             Assert.AreEqual("Dudu", vm.Name, "Changed Name");
@@ -53,29 +39,53 @@ namespace JA_Tennis_UnitTest.ViewModel
         }
 
         [TestMethod]
-        [Tag("undo")]
+        [Tag("undo0")]
         public void TestUndo1()
         {
             UndoManager undoManager = new UndoManager();
 
             Assert.IsFalse(undoManager.UndoCommand.CanExecute(null), "Initially no undo");
 
-            PlayerEditorViewModel vm = new PlayerEditorViewModel(undoManager);
-            vm.Player = new Player() { Id = "J1",Name = "Toto" };
+            PlayerEditorViewModel vm = new PlayerEditorViewModel(undoManager)
+#if WITH_SUBPLAYER
+            { Player = new Player() { Id = "J1", Name = "Toto" } }
+#else
+            { Id = "J1", Name = "Toto" }
+#endif
+            ;
+
+            undoManager.Clear();    //TODO virer undoManager.Clear()
 
             Assert.IsFalse(undoManager.UndoCommand.CanExecute(null), "No undo after ViewModel creation");
+#if WITH_SUBPLAYER
+            Assert.AreEqual("Toto", vm.Player.Name, "Initial Name");
+#else
             Assert.AreEqual("Toto", vm.Name, "Initial Name");
+#endif
 
-            //vm.Name = "Dudu";
-            undoManager.Do(() => vm.Name = "Dudu", () => vm.Name = "Toto", "Set name by hand", false);
+#if WITH_SUBPLAYER
+            vm.Player.Name = "Dudu";
+#else
+            vm.Name = "Dudu";
+#endif
+            //undoManager.Do(() => vm.Name = "Dudu", () => vm.Name = "Toto", "Set name by hand", false);
+            //undoManager.Do(new UndoableProperty<PlayerEditorViewModel, string>(vm, Member.Of(() => vm.Name), vm.Name, "Dudu", "Set name by hand"), true);
 
             Assert.IsTrue(undoManager.UndoCommand.CanExecute(null), "Undo after Name change");
+#if WITH_SUBPLAYER
+            Assert.AreEqual("Dudu", vm.Player.Name, "Changed Name");
+#else
             Assert.AreEqual("Dudu", vm.Name, "Changed Name");
+#endif
 
             undoManager.UndoCommand.Execute(null);
 
             Assert.IsFalse(undoManager.UndoCommand.CanExecute(null), "No more undo.");
+#if WITH_SUBPLAYER
+            Assert.AreEqual("Toto", vm.Player.Name, "Name undo");
+#else
             Assert.AreEqual("Toto", vm.Name, "Name undo");
+#endif
         }
 
     }

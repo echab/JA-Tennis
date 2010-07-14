@@ -36,6 +36,8 @@ namespace JA_Tennis_UnitTest.Model
             Assert.IsNotNull(player);
             Assert.AreEqual("J2",player.Id);
             Assert.AreEqual("Toto",player.Name);
+
+            player.Dispose();
         }
 
         //delegate void delegatePropertyChanged(object sender, PropertyChangedEventArgs e);
@@ -93,6 +95,7 @@ namespace JA_Tennis_UnitTest.Model
             //object handler = player.PropertyChanged;
             //Assert.IsNull(handler);
 
+            //player.Dispose();   
             player = null;
         }
 
