@@ -71,13 +71,13 @@ namespace JA_Tennis_UnitTest
             Assert.IsNotNull(actual, "Missing Element {0}", expected.ToXPathString());
 
             //Node name
-            Assert.AreEqual<string>(expected.Name.LocalName, actual.Name.LocalName, "Name of {0}", expected.ToXPathString());
-            Assert.AreEqual<string>(expected.Name.NamespaceName, actual.Name.NamespaceName, "Namespace of {0}", expected.ToXPathString());
+            Assert.AreEqual(expected.Name.LocalName, actual.Name.LocalName, "Name of {0}", expected.ToXPathString());
+            Assert.AreEqual(expected.Name.NamespaceName, actual.Name.NamespaceName, "Namespace of {0}", expected.ToXPathString());
 
             //Attributes
             var expectedAttributes = expected.Attributes().Where((x) => !x.IsNamespaceDeclaration && x.Name != XmlSpaceName);
             var actualAttributes = actual.Attributes().Where((x) => !x.IsNamespaceDeclaration && x.Name != XmlSpaceName);
-            Assert.AreEqual<int>(expectedAttributes.Count(), actualAttributes.Count(), "Attribute count of {0}", expected.ToXPathString());
+            Assert.AreEqual(expectedAttributes.Count(), actualAttributes.Count(), "Attribute count of {0}", expected.ToXPathString());
             foreach (XAttribute expectedAttribute in expectedAttributes)
             {
                 XAttribute actualAttribute = actual.Attribute(expectedAttribute.Name);
@@ -87,8 +87,8 @@ namespace JA_Tennis_UnitTest
             if (bRecursively)
             {
                 //Child Elements and Texts
-                Assert.AreEqual<bool>(expected.HasElements, actual.HasElements, "HasElements of {0}", expected.ToXPathString());
-                Assert.AreEqual<int>(expected.Elements().Count(), actual.Elements().Count(), "Child Element count of {0}", expected.ToXPathString());
+                Assert.AreEqual(expected.HasElements, actual.HasElements, "HasElements of {0}", expected.ToXPathString());
+                Assert.AreEqual(expected.Elements().Count(), actual.Elements().Count(), "Child Element count of {0}", expected.ToXPathString());
 
                 Predicate<XNode> IsElementOrTextNotEmpty = (x) => x.NodeType == XmlNodeType.Element
                        || (x.NodeType == XmlNodeType.Text && !string.IsNullOrWhiteSpace((x as XText).Value));
@@ -126,9 +126,9 @@ namespace JA_Tennis_UnitTest
         {
             Assert.IsNotNull(expected);
             Assert.IsNotNull(actual, "Missing Attribute {0}", expected.ToXPathString());
-            Assert.AreEqual<string>(expected.Name.LocalName, actual.Name.LocalName, "Attribute Name of {0}", expected.ToXPathString());
-            Assert.AreEqual<string>(expected.Name.NamespaceName, actual.Name.NamespaceName, "Attribute Namespace of {0}", expected.ToXPathString());
-            Assert.AreEqual<string>(expected.Value, actual.Value, "Attribute Value of {0}", expected.ToXPathString());
+            Assert.AreEqual(expected.Name.LocalName, actual.Name.LocalName, "Attribute Name of {0}", expected.ToXPathString());
+            Assert.AreEqual(expected.Name.NamespaceName, actual.Name.NamespaceName, "Attribute Namespace of {0}", expected.ToXPathString());
+            Assert.AreEqual(expected.Value, actual.Value, "Attribute Value of {0}", expected.ToXPathString());
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace JA_Tennis_UnitTest
                 actualText = actualText.Trim();
             }
 
-            Assert.AreEqual<string>(expectedText, actualText, "Text content of {0}", expected.ToXPathString());
+            Assert.AreEqual(expectedText, actualText, "Text content of {0}", expected.ToXPathString());
         }
 
         /// <summary>

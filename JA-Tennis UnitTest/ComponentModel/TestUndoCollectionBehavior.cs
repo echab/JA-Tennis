@@ -44,7 +44,7 @@ namespace JA_Tennis_UnitTest.ComponentModel
                 {
                     get { return _Name; }
                     set { _Name = value; }
-                    //set { Set<string>(ref _Name, value, () => Name); }
+                    //set { Set(ref _Name, value, () => Name); }
                 }
 
                 public override string ToString() { return Name; }
@@ -63,28 +63,28 @@ namespace JA_Tennis_UnitTest.ComponentModel
             UndoPropertyBehavior undoPropertyBehavior = new UndoPropertyBehavior(undoManager);
 
             Assert.IsFalse(undoManager.UndoCommand.CanExecute(null), "Initial state");
-            Assert.AreEqual<int>(0, vm.Pets.Count);
+            Assert.AreEqual(0, vm.Pets.Count);
 
             //vm.Pets.Add( cat);
             vm.AddPet(cat);
 
             Assert.IsTrue(undoManager.UndoCommand.CanExecute(null));
-            Assert.AreEqual<int>(1, vm.Pets.Count);
+            Assert.AreEqual(1, vm.Pets.Count);
 
             undoManager.UndoCommand.Execute(null);
 
             Assert.IsFalse(undoManager.UndoCommand.CanExecute(null));
-            Assert.AreEqual<int>(0, vm.Pets.Count);
+            Assert.AreEqual(0, vm.Pets.Count);
 
             undoManager.RedoCommand.Execute(null);
 
             Assert.IsTrue(undoManager.UndoCommand.CanExecute(null));
-            Assert.AreEqual<int>(1, vm.Pets.Count);
+            Assert.AreEqual(1, vm.Pets.Count);
 
             undoManager.UndoCommand.Execute(null);
 
             Assert.IsFalse(undoManager.UndoCommand.CanExecute(null));
-            Assert.AreEqual<int>(0, vm.Pets.Count);
+            Assert.AreEqual(0, vm.Pets.Count);
         }
     }
 }

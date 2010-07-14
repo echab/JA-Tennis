@@ -13,6 +13,12 @@ namespace JA_Tennis.Model
     public class Player : BindableType, IIdentifiable, INotifyDataErrorInfo //, IDirtyAware //NotifyPropertyChangedBase //, IXmlSerializable
     {
         public Player()
+            : this(null)
+        {
+        }
+
+        public Player(params IPropertyChangedBehavior[] changedBehaviors)
+            : base(changedBehaviors)
         {
             _errMgr = new ValidationErrorManager(this, s => OnErrorsChanged(s));
 
@@ -21,16 +27,17 @@ namespace JA_Tennis.Model
 
         private string _Id;
         [XmlAttribute]
+        [Id]
         public string Id
         {
             get { return _Id; }
             set
             {
-                if (_errMgr.Validate(() => Id, new Check( !string.IsNullOrWhiteSpace(value), "Id cannot be empty")))
+                if (_errMgr.Validate(() => Id, new Check(!string.IsNullOrWhiteSpace(value), "Id cannot be empty")))
                 {
-                    IdManager.FreeId(_Id);
-                    IdManager.DeclareId(value);
-                    Set<string>(ref _Id, value, () => Id);
+                    //IdManager.FreeId(_Id);
+                    //IdManager.DeclareId(value);
+                    Set(ref _Id, value, () => Id);
                 }
             }
         }
@@ -42,40 +49,40 @@ namespace JA_Tennis.Model
             get { return _Name; }
             set
             {
-                if (_errMgr.Validate(() => Name, new Check( !string.IsNullOrWhiteSpace(value), "Name cannot be empty")))
+                if (_errMgr.Validate(() => Name, new Check(!string.IsNullOrWhiteSpace(value), "Name cannot be empty")))
                 {
-                    Set<string>(ref _Name, value.Trim(), () => Name);
+                    Set(ref _Name, value.Trim(), () => Name);
                 }
             }
         }
 
-/*      #region IXmlSerializable Members
+        /*      #region IXmlSerializable Members
 
-        public XmlSchema GetSchema()
-        {
-            return null;    //Not supported by Silverlight
-        }
+                public XmlSchema GetSchema()
+                {
+                    return null;    //Not supported by Silverlight
+                }
 
-        public void ReadXml(XmlReader reader)
-        {
-            if (reader.IsStartElement("Player"))
-            {
-                Id = reader.GetAttribute("Id");
-                Name = reader.GetAttribute("Name");
-                reader.ReadStartElement();
-            }
-        }
+                public void ReadXml(XmlReader reader)
+                {
+                    if (reader.IsStartElement("Player"))
+                    {
+                        Id = reader.GetAttribute("Id");
+                        Name = reader.GetAttribute("Name");
+                        reader.ReadStartElement();
+                    }
+                }
 
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteAttributeString("Id", Id);
-            writer.WriteAttributeString("Name", Name);
-        }
+                public void WriteXml(XmlWriter writer)
+                {
+                    writer.WriteAttributeString("Id", Id);
+                    writer.WriteAttributeString("Name", Name);
+                }
 
-        #endregion
-        //*/
+                #endregion
+                //*/
 
-      #region INotifyDataErrorInfo Members
+        #region INotifyDataErrorInfo Members
         ValidationErrorManager _errMgr;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
@@ -94,7 +101,7 @@ namespace JA_Tennis.Model
         }
         #endregion
 
-/*      #region IDirtyAware Members
+        /*      #region IDirtyAware Members
 
         [XmlIgnore]
         public bool IsDirty { get; set; }

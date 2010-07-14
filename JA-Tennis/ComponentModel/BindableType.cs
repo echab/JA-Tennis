@@ -6,6 +6,8 @@ using System;
 using JA_Tennis.Helpers;
 using System.Xml.Serialization;
 using System.Collections.Specialized;
+using JA_Tennis.Model;
+using System.Linq;
 
 namespace JA_Tennis.ComponentModel
 {
@@ -16,12 +18,16 @@ namespace JA_Tennis.ComponentModel
     /// </summary>
     public class BindableType : INotifyPropertyChanged
     {
-        public BindableType()
+        public BindableType( params IPropertyChangedBehavior[] changedBehaviors)
         {
             SuspendChangeNotification = false;
             ChangeBehaviors = new List<IPropertyChangedBehavior> { 
                 new NotifyPropertyBehavior(this, s => OnPropertyChanged(s)) 
             };
+            if (changedBehaviors != null)
+            {
+                changedBehaviors.ForEach(b => ChangeBehaviors.Add(b));
+            }
         }
 
         protected List<IPropertyChangedBehavior> ChangeBehaviors;
@@ -62,18 +68,48 @@ namespace JA_Tennis.ComponentModel
         [DebuggerStepThrough]
         protected void Set<T>(ref T local, T newVal, Expression<Func<object>> member)
         {
-            Set<T>(ref local, newVal, Member.Of(member));
+            Set(ref local, newVal, Member.Of(member));
         }
         private void Set<T>(ref T local, T newVal, string name)
         {
             T localCopy = local;
+
+            //if( typeof(T).GetCustomAttributes(true).Count(a=> a is IdAttribute) >= 1) //TODO use IdAttribute
+            if (name=="Id" && typeof(T)==typeof(string) && !newVal.Equals( local))    
+            {
+                IdManager.FreeId(localCopy as string);
+                IdManager.DeclareId(newVal as string);
+            }
+
             local = newVal;
 
+            RaisePropertyChanged(localCopy, newVal, name);
+            //if (null != ChangeBehaviors)
+            //{
+            //    foreach (var behavior in ChangeBehaviors)
+            //    {
+            //        bool @continue = behavior.PropertyChanged(this, localCopy, newVal, name);
+            //        if (!@continue) { break; }
+            //    }
+            //}
+            //else
+            //{
+            //    //no behaviors, just carry on with the old way
+            //    OnPropertyChanged(name);
+            //}
+        }
+
+        protected void RaisePropertyChanged<T>(T oldVal, T newVal, Expression<Func<object>> member)
+        {
+            RaisePropertyChanged(oldVal, newVal, Member.Of(member));
+        }
+        private void RaisePropertyChanged<T>(T oldVal, T newVal, string name)
+        {
             if (null != ChangeBehaviors)
             {
                 foreach (var behavior in ChangeBehaviors)
                 {
-                    bool @continue = behavior.PropertyChanged<T>(this, localCopy, newVal, name);
+                    bool @continue = behavior.PropertyChanged(this, oldVal, newVal, name);
                     if (!@continue) { break; }
                 }
             }
@@ -83,6 +119,8 @@ namespace JA_Tennis.ComponentModel
                 OnPropertyChanged(name);
             }
         }
+
+        
 
         #region CollectionChange
         protected void Add<T>(ref ICollection<T> local, T newItem, string name)

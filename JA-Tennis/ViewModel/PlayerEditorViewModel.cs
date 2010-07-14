@@ -1,13 +1,9 @@
-﻿using JA_Tennis.Model;
-using JA_Tennis.Assets.Resources;
-using System.ComponentModel;
-using JA_Tennis.Helpers;
-using JA_Tennis.ComponentModel;
-using System.Xml.Serialization;
-using System;
-using System.Collections;
-using JA_Tennis.Command;
+﻿using System;
 using System.Windows.Input;
+using JA_Tennis.Command;
+using JA_Tennis.ComponentModel;
+using JA_Tennis.Helpers;
+using JA_Tennis.Model;
 
 namespace JA_Tennis.ViewModel
 {
@@ -25,9 +21,18 @@ namespace JA_Tennis.ViewModel
                 ChangeBehaviors.Add(new UndoPropertyBehavior(undoManager));
             }
 
-#if !WITH_SUBPLAYER
+#if WITH_SUBPLAYER
+            if (undoManager != null)
+            {
+                _Player = new Player(new UndoPropertyBehavior(undoManager));
+            }
+            else
+            {
+                _Player = new Player();
+            }
+#else
             //TODO dependent property IsPlayer
-            this.PropertyChanged += (s, args) => Set<bool>(ref _IsPlayer, !string.IsNullOrWhiteSpace(Name), () => IsPlayer);
+            this.PropertyChanged += (s, args) => Set(ref _IsPlayer, !string.IsNullOrWhiteSpace(Name), () => IsPlayer);
 #endif
 
             //Init commands
@@ -41,12 +46,12 @@ namespace JA_Tennis.ViewModel
         //    get
         //    {
         //        Player player = new Player();
-        //        PropertyHelper.SetProperties(player, this);
+        //        PropertyHelper.Copy(player, this);
         //        return player;
         //    }
         //    set
         //    {
-        //        PropertyHelper.SetProperties(this, value);
+        //        PropertyHelper.Copy(this, value);
         //    }
         //}
 
@@ -56,41 +61,31 @@ namespace JA_Tennis.ViewModel
             get { return _Player; }
             set
             {
-                //if (_Player != null)
-                //{
-                //    _Player.PropertyChanged -= Player_PropertyChanged;
-                //}
+                //if (value == null) { throw new ArgumentNullException("Player"); }
 
                 //Set<Player>(ref _Player, value, () => Player);
-                Set<Player>(ref _Player, PropertyHelper.Clone(value), () => Player);
 
-                //if (_Player != null)
-                //{
-                //    _Player.PropertyChanged += Player_PropertyChanged;
-                //}
+                var oldValue = _Player;
+                PropertyHelper.Copy(_Player, value);
+                RaisePropertyChanged(oldValue, value, () => Player);
 
-                Set<bool>(ref _IsPlayer, _Player != null, () => IsPlayer);
+                Set(ref _IsPlayer, !_Player.HasErrors, () => IsPlayer);
             }
         }
-
-        //void Player_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    this.OnPropertyChanged(Member.Of(() => Player) + "." + e.PropertyName);
-        //}
 #else
         //Player members
         string _Name;
         public string Name
         {
             get { return _Name; }
-            set { Set<string>(ref _Name, value, () => Name); }
+            set { Set(ref _Name, value, () => Name); }
         }
 
         string _Id;
         public string Id
         {
             get { return _Id; }
-            set { Set<string>(ref _Id, value, () => Id); }
+            set { Set(ref _Id, value, () => Id); }
         }
 #endif
 

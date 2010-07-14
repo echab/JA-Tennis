@@ -23,7 +23,7 @@ namespace JA_Tennis_UnitTest.ComponentModel
             public string Name
             {
                 get { return _Name; }
-                set { Set<string>(ref _Name, value, () => Name); }
+                set { Set(ref _Name, value, () => Name); }
             }
         }
 
@@ -40,7 +40,7 @@ namespace JA_Tennis_UnitTest.ComponentModel
             Assert.AreEqual("Toto", vm.Name);
 
             vm.Name = "Dudu";
-            bool b = undoPropertyBehavior.PropertyChanged<string>(vm, "Toto", vm.Name, Member.Of(() => vm.Name));
+            bool b = undoPropertyBehavior.PropertyChanged(vm, "Toto", vm.Name, Member.Of(() => vm.Name));
             Assert.IsTrue(b);
 
             Assert.IsTrue(undoManager.UndoCommand.CanExecute(null));
@@ -52,20 +52,17 @@ namespace JA_Tennis_UnitTest.ComponentModel
             Assert.AreEqual("Toto", vm.Name);
         }
 
-        [TestMethod]
-        [Ignore]
-        public void TestUndoManagerNoUndoOnInit()
-        {
-            undoManager.Clear();
+        //[TestMethod]     //TODO désactiver undo on init
+        //public void TestUndoManagerNoUndoOnInit()
+        //{
+        //    undoManager.Clear();
 
-            VMUndo vm = new VMUndo() { Name = "Toto" };
+        //    VMUndo vm = new VMUndo() { Name = "Toto" };
 
-            //TODO désactiver undo on init
-
-            Assert.IsFalse(undoManager.UndoCommand.CanExecute(null), "Initial state");
-            Assert.IsFalse(undoManager.RedoCommand.CanExecute(null), "Initial state");
-            Assert.AreEqual("Toto", vm.Name, "Initial state");
-        }
+        //    Assert.IsFalse(undoManager.UndoCommand.CanExecute(null), "Initial state");
+        //    Assert.IsFalse(undoManager.RedoCommand.CanExecute(null), "Initial state");
+        //    Assert.AreEqual("Toto", vm.Name, "Initial state");
+        //}
 
         [TestMethod]
         [Tag("undo")]

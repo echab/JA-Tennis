@@ -98,7 +98,6 @@
     </Compile>
     <Compile Include="ComponentModel\TestUndoCollectionBehavior.cs" />
     <Compile Include="ComponentModel\TestUndoPropertyBehavior.cs" />
-    <Compile Include="ComponentModel\VMB.cs" />
     <Compile Include="Helpers\XmlAssert.cs" />
     <Compile Include="Model\TestIdManager.cs" />
     <Compile Include="Model\TestPlayer.cs" />

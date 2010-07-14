@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace JA_Tennis.Model
 {
@@ -10,9 +9,16 @@ namespace JA_Tennis.Model
         public IdException(string message) : base(message) { }
     }
 
+    //TODO Define IdAttribute and IdRefAttribute to decorate class member
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class IdAttribute : Attribute { }
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class IdRefAttribute : Attribute { }
+
     public static class IdManager
     {
 #if DEBUG
+        //For debug, keep trace of the creation of each Id
         private static Dictionary<string, StackTrace> Ids = new Dictionary<string, StackTrace>();
 #else
         private static Collection<string> Ids = new Collection<string>();
@@ -25,7 +31,7 @@ namespace JA_Tennis.Model
             if (Ids.ContainsKey(id))
             {
                 StackTrace stackTrace = Ids[id];
-                throw new IdException( string.Format("Duplicated id [{0}], allready declared at:\n{1}", id, stackTrace.ToString()));
+                throw new IdException(string.Format("Duplicated id [{0}], allready declared at:\n{1}", id, stackTrace.ToString()));
             }
             Ids.Add(id, new StackTrace());
 #else
@@ -78,11 +84,11 @@ namespace JA_Tennis.Model
             while (Ids.Contains(id));
 #endif
 
-//#if DEBUG
-//            Ids.Add(id, new StackTrace());
-//#else
-//            Ids.Add(id);
-//#endif
+            //#if DEBUG
+            //            Ids.Add(id, new StackTrace());
+            //#else
+            //            Ids.Add(id);
+            //#endif
 
             return id;
         }
@@ -90,7 +96,7 @@ namespace JA_Tennis.Model
         public static bool Contains(string id)
         {
 #if DEBUG
-            return Ids.ContainsKey( id);
+            return Ids.ContainsKey(id);
 #else
             return Ids.Contains(id);
 #endif

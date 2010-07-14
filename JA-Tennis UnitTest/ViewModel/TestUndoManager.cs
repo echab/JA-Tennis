@@ -24,8 +24,6 @@ namespace JA_Tennis_UnitTest.ViewModel
             Assert.AreEqual("Toto", vm.Name, "Initial Name");
 
             //vm.Name = "Dudu";
-            //undoManager.Do(() => vm.Name = "Dudu", () => vm.Name = "Toto", "Set name by hand", false);
-            //undoManager.Do(new UndoablePropertySet<string>(vm, "Dudu", Member.Of(() => vm.Name)), false);
             undoManager.Do(new UndoableProperty<object, string>(vm, Member.Of(() => vm.Name), vm.Name, "Dudu"), false);
 
             Assert.IsTrue(undoManager.UndoCommand.CanExecute(null), "Undo after Name change");
@@ -48,9 +46,9 @@ namespace JA_Tennis_UnitTest.ViewModel
 
             PlayerEditorViewModel vm = new PlayerEditorViewModel(undoManager)
 #if WITH_SUBPLAYER
-            { Player = new Player() { Id = "J1", Name = "Toto" } }
+            { Player = new Player() { Id = "J10", Name = "Toto" } }
 #else
-            { Id = "J1", Name = "Toto" }
+            { Id = "J10", Name = "Toto" }
 #endif
             ;
 

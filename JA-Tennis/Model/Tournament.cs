@@ -10,31 +10,6 @@ namespace JA_Tennis.Model
 {
     public class Tournament : BindableType, IIdentifiable  //NotifyPropertyChangedBase //:IXmlSerializable
     {
-        private string _Id;
-        [XmlAttribute]
-        public string Id
-        {
-            get { return _Id; }
-            set {
-                IdManager.FreeId(_Id);
-                IdManager.DeclareId(value);
-
-                Set<string>(ref _Id, value, () => Id); 
-            }
-        }
-
-        private string _Name;
-        public string Name
-        {
-            get { return _Name; }
-            set { Set<string>(ref _Name, value.Trim(), () => Name); }
-        }
-
-        //public ObservableCollection<Player> Players { get; private set; }
-        public PlayerCollection Players { get; private set; }
-
-
-
         public Tournament()
         {
             //Players = new ObservableCollection<Player>();
@@ -42,6 +17,32 @@ namespace JA_Tennis.Model
 
             Players.CollectionChanged += Players_CollectionChanged;
         }
+
+        private string _Id;
+        [XmlAttribute]
+        [Id]
+        public string Id
+        {
+            get { return _Id; }
+            set
+            {
+                //IdManager.FreeId(_Id);
+                //IdManager.DeclareId(value);
+
+                Set(ref _Id, value, () => Id);
+            }
+        }
+
+        private string _Name;
+        public string Name
+        {
+            get { return _Name; }
+            set { Set(ref _Name, value.Trim(), () => Name); }
+        }
+
+        //public ObservableCollection<Player> Players { get; private set; }
+        public PlayerCollection Players { get; private set; }
+
 
         #region Serialization
         public const string Namespace = @"http://jatennis.free.fr/schema";

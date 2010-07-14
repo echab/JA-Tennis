@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using JA_Tennis.Model;
+using System.Diagnostics;
 
 namespace JA_Tennis.Helpers
 {
@@ -23,21 +24,21 @@ namespace JA_Tennis.Helpers
         /// </summary>
         /// <param name="toRecord"></param>
         /// <param name="fromRecord"></param>
-        /// <param name="fromFields"></param>
+        /// <param name="fields"></param>
         public static void Copy(
             object toRecord,
             object fromRecord,
-            PropertyInfo[] fromFields
+            PropertyInfo[] fields
         )
         {
-            if (fromFields == null)
+            if (fields == null)
             {
                 return;
             }
 
             Type toType = toRecord.GetType();
 
-            foreach (PropertyInfo fromField in fromFields)
+            foreach (PropertyInfo fromField in fields)
             {
                 if (fromField.CanRead)
                 {
@@ -61,11 +62,48 @@ namespace JA_Tennis.Helpers
 
         public static void Copy(object toRecord, object fromRecord)
         {
-            PropertyInfo[] fromFields = fromRecord.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public);
+            if (toRecord == null) { throw new ArgumentNullException("toRecord"); }
 
-            Copy(toRecord, fromRecord, fromFields);
+            PropertyInfo[] fields;
+
+            if (fromRecord != null)
+            {
+                fields = fromRecord.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public);
+                Copy(toRecord, fromRecord, fields);
+            }
+            else
+            {
+                Clear(toRecord, null);
+            }
         }
         #endregion
+
+        /// <summary>
+        /// Clear all writable properties of the record, setting them to null.
+        /// </summary>
+        /// <param name="toRecord"></param>
+        /// <param name="fields">Fields to clear or <c>null</c> for all fields.</param>
+        public static void Clear(
+            object toRecord,
+            PropertyInfo[] fields
+        )
+        {
+            if (fields == null)
+            {
+                fields = toRecord.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public);
+            }
+
+            Type toType = toRecord.GetType();
+
+            foreach (PropertyInfo field in fields)
+            {
+                PropertyInfo toField = toType.GetProperty(field.Name, field.PropertyType);
+                if (toField != null && toField.CanWrite)
+                {
+                    toField.SetValue(toRecord, null, null);
+                }
+            }
+        }
 
         /// <summary>
         /// Return property info from a full property path.
