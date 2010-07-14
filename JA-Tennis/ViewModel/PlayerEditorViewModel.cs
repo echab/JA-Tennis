@@ -22,14 +22,7 @@ namespace JA_Tennis.ViewModel
             }
 
 #if WITH_SUBPLAYER
-            if (undoManager != null)
-            {
-                _Player = new Player(new UndoPropertyBehavior(undoManager));
-            }
-            else
-            {
-                _Player = new Player();
-            }
+            _Player = new Player(this);
 #else
             //TODO dependent property IsPlayer
             this.PropertyChanged += (s, args) => Set(ref _IsPlayer, !string.IsNullOrWhiteSpace(Name), () => IsPlayer);
@@ -55,6 +48,8 @@ namespace JA_Tennis.ViewModel
         //    }
         //}
 
+        private bool _IsPlayerSet = false;
+
         Player _Player;
         public Player Player
         {
@@ -67,9 +62,12 @@ namespace JA_Tennis.ViewModel
 
                 var oldValue = _Player;
                 PropertyHelper.Copy(_Player, value);
+                _IsPlayerSet = value != null;
                 RaisePropertyChanged(oldValue, value, () => Player);
 
                 Set(ref _IsPlayer, !_Player.HasErrors, () => IsPlayer);
+
+                IsDirty = false;
             }
         }
 #else
@@ -106,7 +104,7 @@ namespace JA_Tennis.ViewModel
         }
         private bool CanOk(object param)
         {
-            return IsDirty; //TODO && no errors
+            return IsDirty && !Player.HasErrors;
         }
         #endregion OkCommand
 
@@ -125,7 +123,7 @@ namespace JA_Tennis.ViewModel
         }
         private bool CanCancel(object param)
         {
-            return true;
+            return _IsPlayerSet;
         }
         #endregion CancelCommand
 

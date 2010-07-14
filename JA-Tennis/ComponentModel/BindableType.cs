@@ -18,15 +18,18 @@ namespace JA_Tennis.ComponentModel
     /// </summary>
     public class BindableType : INotifyPropertyChanged
     {
-        public BindableType( params IPropertyChangedBehavior[] changedBehaviors)
+        public BindableType() : this(null)
+        {
+        }
+        public BindableType(BindableType parent)
         {
             SuspendChangeNotification = false;
             ChangeBehaviors = new List<IPropertyChangedBehavior> { 
                 new NotifyPropertyBehavior(this, s => OnPropertyChanged(s)) 
             };
-            if (changedBehaviors != null)
+            if (parent != null)
             {
-                changedBehaviors.ForEach(b => ChangeBehaviors.Add(b));
+                parent.ChangeBehaviors.ForEach(b => ChangeBehaviors.Add(b));
             }
         }
 
@@ -75,7 +78,7 @@ namespace JA_Tennis.ComponentModel
             T localCopy = local;
 
             //if( typeof(T).GetCustomAttributes(true).Count(a=> a is IdAttribute) >= 1) //TODO use IdAttribute
-            if (name=="Id" && typeof(T)==typeof(string) && !newVal.Equals( local))    
+            if (name == "Id" && typeof(T) == typeof(string) && !newVal.Equals(local))
             {
                 IdManager.FreeId(localCopy as string);
                 IdManager.DeclareId(newVal as string);
@@ -83,7 +86,7 @@ namespace JA_Tennis.ComponentModel
 
             local = newVal;
 
-            RaisePropertyChanged(localCopy, newVal, name);
+            CallChangeBehaviors(localCopy, newVal, name);
             //if (null != ChangeBehaviors)
             //{
             //    foreach (var behavior in ChangeBehaviors)
@@ -101,9 +104,9 @@ namespace JA_Tennis.ComponentModel
 
         protected void RaisePropertyChanged<T>(T oldVal, T newVal, Expression<Func<object>> member)
         {
-            RaisePropertyChanged(oldVal, newVal, Member.Of(member));
+            CallChangeBehaviors(oldVal, newVal, Member.Of(member));
         }
-        private void RaisePropertyChanged<T>(T oldVal, T newVal, string name)
+        private void CallChangeBehaviors<T>(T oldVal, T newVal, string name)
         {
             if (null != ChangeBehaviors)
             {
@@ -120,18 +123,18 @@ namespace JA_Tennis.ComponentModel
             }
         }
 
-        
+
 
         #region CollectionChange
         protected void Add<T>(ref ICollection<T> local, T newItem, string name)
         {
-            local.Add( newItem);
+            local.Add(newItem);
 
             if (null != ChangeBehaviors)
             {
                 foreach (var behavior in ChangeBehaviors)
                 {
-                    bool @continue = behavior.CollectionChanged( this, NotifyCollectionChangedAction.Add, newItem, name);
+                    bool @continue = behavior.CollectionChanged(this, NotifyCollectionChangedAction.Add, newItem, name);
                     if (!@continue) { break; }
                 }
             }

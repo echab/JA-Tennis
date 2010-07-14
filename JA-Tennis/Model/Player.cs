@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Collections;
 using System;
 using JA_Tennis.ComponentModel;
+using System.Collections.Generic;
 
 namespace JA_Tennis.Model
 {
@@ -17,8 +18,8 @@ namespace JA_Tennis.Model
         {
         }
 
-        public Player(params IPropertyChangedBehavior[] changedBehaviors)
-            : base(changedBehaviors)
+        public Player(BindableType parent)
+            : base(parent)
         {
             _errMgr = new ValidationErrorManager(this, s => OnErrorsChanged(s));
 

@@ -96,6 +96,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ComponentModel\TestIsDirty.cs" />
     <Compile Include="ComponentModel\TestUndoCollectionBehavior.cs" />
     <Compile Include="ComponentModel\TestUndoPropertyBehavior.cs" />
     <Compile Include="Helpers\XmlAssert.cs" />

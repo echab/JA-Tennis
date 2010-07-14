@@ -162,5 +162,25 @@ namespace JA_Tennis_UnitTest.ViewModel
             Assert.IsTrue( idChanged);
         }
 #endif
+
+        [TestMethod, Tag("cmd")]
+        public void TestOkCommand()
+        {
+            PlayerEditorViewModel vm = new PlayerEditorViewModel(null)
+            {
+                Player = player1
+            };
+
+            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(vm.CancelCommand.CanExecute(null));
+            Assert.IsFalse(vm.IsDirty);
+
+            vm.Player.Name = "Dudu";
+
+            Assert.IsTrue(vm.IsDirty);
+
+            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(vm.CancelCommand.CanExecute(null));
+        }
     }
 }
