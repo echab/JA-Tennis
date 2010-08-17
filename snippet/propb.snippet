@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>BindableType property</Title>
+            <Shortcut>propb</Shortcut>
+            <Description>Change-notify property for type extending BindableType</Description>
+            <Author>DamonPayne.com</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal>
+                    <ID>type</ID>
+                    <ToolTip>Property Type</ToolTip>
+                    <Default>string</Default>
+                </Literal>
+                <Literal>
+                    <ID>property</ID>
+                    <ToolTip>Property Name</ToolTip>
+                    <Default>BindingProperty</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="csharp">
+ <![CDATA[
+#region $property$ property
+$type$ _$property$;
+public $type$ $property$
+{
+    get { return _$property$; }
+    set { Set(ref _$property$, value, ()=>$property$); }
+}
+#endregion $property$
+
+$end$]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

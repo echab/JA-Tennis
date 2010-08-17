@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace JA_Tennis_UnitTest.ViewModel
 {
-    [TestClass]
+    [TestClass, Tag("vm")]
     public class TestPlayerEditorViewModel : WorkItemTest   //inherit for asynchronous tests
     {
         private Player player1;
@@ -30,9 +30,9 @@ namespace JA_Tennis_UnitTest.ViewModel
         [TestCleanup]
         public void CleanupModel()
         {
-            IdManager.FreeId(player1);
+            //IdManager.FreeId(player1);
             player1 = null;
-            IdManager.FreeId(player2.Id);
+            //IdManager.FreeId(player2.Id);
             player2 = null;
         }
 

@@ -1,0 +1,307 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="JA_Tennis.Model.Player">
+    <Position X="6.5" Y="0.75" Width="2.5" />
+    <Members>
+      <Field Name="_ErrorManager" Hidden="true" />
+      <Field Name="_Id" Hidden="true" />
+      <Field Name="_Name" Hidden="true" />
+      <Field Name="_Rank" Hidden="true" />
+      <Field Name="_Tournament" Hidden="true" />
+      <Method Name="OnErrorsChanged" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Registration" Type="JA_Tennis.Model.Event" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6.5" Y="2.307" />
+        <Point X="3.5" Y="2.307" />
+        <Point X="3.5" Y="4.417" />
+        <Point X="3" Y="4.417" />
+        <Point X="3" Y="5.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.963" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AgADIAAAACAAAABFAAAAIAUCAABAAAAIAAAAgAAFIAA=</HashCode>
+      <FileName>Model\Player.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Rank" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Registration" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Tournament">
+    <Position X="0.75" Y="0.75" Width="2.5" />
+    <Members>
+      <Field Name="_Dates" Hidden="true" />
+      <Field Name="_Id" Hidden="true" />
+      <Field Name="_Name" Hidden="true" />
+      <Method Name="Events_CollectionChanged" Hidden="true" />
+      <Method Name="Players_CollectionChanged" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Events" Type="JA_Tennis.Model.Event" FixedFromPoint="true">
+      <Path>
+        <Point X="2.375" Y="4.167" />
+        <Point X="2.375" Y="5.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.335" Y="0.774" Height="0.16" Width="1.139" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAIAAACAAIAAEAAAAIAQCAgBiIBAQBAAAgAAGAAA=</HashCode>
+      <FileName>Model\Tournament.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Events" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Event">
+    <Position X="0.75" Y="5.25" Width="2.5" />
+    <Members>
+      <Field Name="_Color" Hidden="true" />
+      <Field Name="_DateMaj" Hidden="true" />
+      <Field Name="_Dates" Hidden="true" />
+      <Field Name="_ErrorManager" Hidden="true" />
+      <Field Name="_Id" Hidden="true" />
+      <Field Name="_IsConsolation" Hidden="true" />
+      <Field Name="_MatchFormat" Hidden="true" />
+      <Field Name="_Name" Hidden="true" />
+      <Field Name="_Ranks" Hidden="true" />
+      <Field Name="_Sexe" Hidden="true" />
+      <Field Name="_Tournament" Hidden="true" />
+      <Method Name="OnErrorsChanged" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BBACIAAAQCABAgBBACAg4AUCAgBoAACIjCAAgKAHJAA=</HashCode>
+      <FileName>Model\Event.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Draws" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Draw">
+    <Position X="6" Y="8" Width="1.75" />
+    <Members>
+      <Field Name="_DrawType" Hidden="true" />
+      <Method Name="isBox" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="JA_Tennis.Model.Draw.DrawTypeEnum" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Model\Draw.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ASIAAAwAAEAAEAIAISEAAICggRQCgAAQAAAAAEAAgpg=</HashCode>
+      <FileName>Model\Draw.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JA_Tennis.Model.Match">
+    <Position X="15.25" Y="7.75" Width="2" />
+    <Members>
+      <Field Name="_Date" Hidden="true" />
+      <Field Name="_MatchFormat" Hidden="true" />
+      <Field Name="_Note" Hidden="true" />
+      <Field Name="_OutgoingQualifier" Hidden="true" />
+      <Field Name="_Place" Hidden="true" />
+      <Field Name="_Score" Hidden="true" />
+      <Method Name="OnPropertyChanged" Hidden="true" />
+      <Property Name="PositionPlayer1" Hidden="true" />
+      <Property Name="PositionPlayer2" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Score" Type="JA_Tennis.Model.Score">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.266" Y="0.06" Height="0.16" Width="0.629" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAggA4AIQAAACgAAgAiABBEAAgAEAAAA=</HashCode>
+      <FileName>Model\Match.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Score" />
+      <Property Name="Player1" />
+      <Property Name="Player2" />
+      <Property Name="MatchFormat" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Score">
+    <Position X="18.25" Y="6.75" Width="2" />
+    <Members>
+      <Field Name="_ErrorManager" Hidden="true" />
+      <Field Name="_IsBadWinner" Hidden="true" />
+      <Field Name="_IsFirstWinner" Hidden="true" />
+      <Field Name="_IsSurrender" Hidden="true" />
+      <Field Name="_IsWO" Hidden="true" />
+      <Field Name="_Value" Hidden="true" />
+      <Method Name="OnErrorsChanged" Hidden="true" />
+      <Method Name="ParseScore" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AABAIESAABIAABAFAIAAAAACAARAAAAIAAAggAABIAA=</HashCode>
+      <FileName>Model\Score.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Rank">
+    <Position X="13.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAQEgAAAAAAAAhAACIAAAAAgCAAAAAA=</HashCode>
+      <FileName>Model\Rank.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.MatchPlayer">
+    <Position X="15.25" Y="4.5" Width="2" />
+    <Members>
+      <Field Name="_ComingQualified" Hidden="true" />
+      <Field Name="_Order" Hidden="true" />
+      <Field Name="_Prevenu" Hidden="true" />
+      <Field Name="_SeededPlayer" Hidden="true" />
+      <Method Name="OnPropertyChanged" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Enum Name="JA_Tennis.Model.MatchPlayer.PrevenuEnum" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Model\MatchPlayer.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABFAAAAAAAAAAIAAIAAAAAACAoAAAAAAAAAAgAAAAQQ=</HashCode>
+      <FileName>Model\MatchPlayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Box">
+    <Position X="11.5" Y="5.25" Width="1.75" />
+    <Members>
+      <Field Name="_ErrorManager" Hidden="true" />
+      <Field Name="_Parent" Hidden="true" />
+      <Field Name="_Player" Hidden="true" />
+      <Field Name="_Position" Hidden="true" />
+      <Field Name="_Tournament" Hidden="true" />
+      <Method Name="OnErrorsChanged" Hidden="true" />
+      <Method Name="OnPropertyChanging" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AgBAKAAAAIAAABBhAEAAwAADAgBAACAMAAAAgQARIAI=</HashCode>
+      <FileName>Model\Box.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.DrawBase">
+    <Position X="7.25" Y="5.25" Width="1.5" />
+    <Members>
+      <Field Name="_Boxes" Hidden="true" />
+      <Field Name="_DateMaj" Hidden="true" />
+      <Field Name="_Dates" Hidden="true" />
+      <Field Name="_ErrorManager" Hidden="true" />
+      <Field Name="_Id" Hidden="true" />
+      <Field Name="_IsLock" Hidden="true" />
+      <Field Name="_MatchFormat" Hidden="true" />
+      <Field Name="_Name" Hidden="true" />
+      <Field Name="_Orientation" Hidden="true" />
+      <Field Name="_OutgoingCount" Hidden="true" />
+      <Field Name="_Parent" Hidden="true" />
+      <Field Name="_Precedent" Hidden="true" />
+      <Field Name="_Ranks" Hidden="true" />
+      <Field Name="_RoundCount" Hidden="true" />
+      <Field Name="_Suivant" Hidden="true" />
+      <Field Name="_Tournament" Hidden="true" />
+      <Field Name="m_nBox" Hidden="true" />
+      <Method Name="OnErrorsChanged" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="MatchFormat" Type="JA_Tennis.Model.MatchFormat" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.75" Y="6.5" />
+        <Point X="10.25" Y="6.5" />
+        <Point X="10.25" Y="10.95" />
+        <Point X="15.25" Y="10.95" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>B9KCIAAABSEEAhBFQAAgYAWSAgBiABCIjCAQgOI3IAA=</HashCode>
+      <FileName>Model\DrawBase.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="MatchFormat" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Boxes" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Pool">
+    <Position X="8.25" Y="8" Width="1.75" />
+    <Members>
+      <Field Name="_PoolType" Hidden="true" />
+      <Field Name="MAX_COL_POULE" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="JA_Tennis.Model.Pool.PoolTypeEnum" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Model\Pool.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>gUIAAAAAAEAAEAAAACMAAACAABACgAAAAAAEAEAAAxg=</HashCode>
+      <FileName>Model\Pool.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JA_Tennis.Model.DrawGroup">
+    <Position X="4" Y="7.25" Width="1.5" />
+    <Members>
+      <Field Name="_Dates" Hidden="true" />
+      <Field Name="_MatchFormat" Hidden="true" />
+      <Field Name="_Parent" Hidden="true" />
+      <Field Name="_Precedent" Hidden="true" />
+      <Field Name="_Ranks" Hidden="true" />
+      <Field Name="_Suivant" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BFAAAAAAQAAAAgAAAAAAQAECAgAgAACAjAAAAAISAAA=</HashCode>
+      <FileName>Model\DrawGroup.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="MatchFormat" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JA_Tennis.Model.MatchFormat">
+    <Position X="15.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Model\MatchFormat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="JA_Tennis.Model.IDraw" Collapsed="true">
+    <Position X="4.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAgAAAAAAQAACAgAgAACAiAAAAAACAAA=</HashCode>
+      <FileName>Model\IDraw.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="System" Size="8.01" />
+</ClassDiagram>

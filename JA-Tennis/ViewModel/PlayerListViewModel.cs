@@ -4,6 +4,7 @@ using JA_Tennis.Command;
 using JA_Tennis.ComponentModel;
 using JA_Tennis.Helpers;
 using JA_Tennis.Model;
+using System.Collections.ObjectModel;
 
 namespace JA_Tennis.ViewModel
 {
@@ -56,7 +57,8 @@ namespace JA_Tennis.ViewModel
             get { return Selection != null ? Selection.Tournament : null; }
         }
 
-        public PlayerCollection Players
+        public ObservableCollection<Player> Players
+        //public PlayerCollection Players
         {
             get { return Tournament != null ? Tournament.Players : null; }
         }

@@ -45,19 +45,28 @@ namespace JA_Tennis.Helpers
                     PropertyInfo toField = toType.GetProperty(fromField.Name, fromField.PropertyType);
                     if (toField != null && toField.CanWrite)
                     {
-                        object v = fromField.GetValue(fromRecord, null);
-
-                        //if (toField == typeof(IIdentifiable).GetProperty("Id"))
-                        if (toField.Name == "Id" && v is string)
+                        //TODO copy IdRef or IdRefs by string
+                        //if (toField.PropertyType.Name == @"IdRefs`1")
+                        //{
+                        //    //PropertyInfo toField2 = toField.PropertyType.GetProperty("Ids");
+                        //    //string ids = toField2.GetValue();
+                        //    //Debug.Assert(false);
+                        //}
+                        //else
                         {
-                            v = IdManager.CreateId((v as string).Substring(0, 1));
-                        }
+                            object v = fromField.GetValue(fromRecord, null);
 
-                        toField.SetValue(toRecord, v, null);
+                            ////if (toField == typeof(IIdentifiable).GetProperty("Id"))
+                            //if (toField.Name == "Id" && v is string)
+                            //{
+                            //    v = IdManager.CreateId((v as string).Substring(0, 1));
+                            //}
+
+                            toField.SetValue(toRecord, v, null);
+                        }
                     }
                 }
             }
-
         }
 
         public static void Copy(object toRecord, object fromRecord)

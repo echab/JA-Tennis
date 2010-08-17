@@ -22,7 +22,7 @@ namespace JA_Tennis.ViewModel
             }
 
 #if WITH_SUBPLAYER
-            _Player = new Player(this);
+            _Player = new Player(null, this);
 #else
             //TODO dependent property IsPlayer
             this.PropertyChanged += (s, args) => Set(ref _IsPlayer, !string.IsNullOrWhiteSpace(Name), () => IsPlayer);

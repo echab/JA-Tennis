@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8F9EEE41-01A2-4E66-AE51-65491A644D9C}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JA_Tennis</RootNamespace>
+    <AssemblyName>JA-Tennis.Model</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <SupportedCultures>fr;en</SupportedCultures>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT WITH_SUBPLAYER</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Resources\Model\Strings.Designer.cs">
+      <DependentUpon>Strings.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ComponentModel\BindableType.cs" />
+    <Compile Include="ComponentModel\IDatable.cs" />
+    <Compile Include="ComponentModel\IDirtyAware.cs" />
+    <Compile Include="ComponentModel\IdManager.cs" />
+    <Compile Include="ComponentModel\IdRef.cs" />
+    <Compile Include="ComponentModel\IdRefs.cs" />
+    <Compile Include="ComponentModel\IIdentifiable.cs" />
+    <Compile Include="ComponentModel\INotifyPropertyChanging.cs" />
+    <Compile Include="ComponentModel\IPropertyChangedBehavior.cs" />
+    <Compile Include="ComponentModel\NotifyPropertyBehavior.cs" />
+    <Compile Include="ComponentModel\NotifyPropertyChangingBehavior.cs" />
+    <Compile Include="ComponentModel\Range.cs" />
+    <Compile Include="ComponentModel\ValidationErrorManager.cs" />
+    <Compile Include="Helpers\Member.cs" />
+    <Compile Include="Helpers\XmlSerializationExtension.cs" />
+    <Compile Include="Model\Box.cs" />
+    <Compile Include="Model\BoxArray.cs" />
+    <Compile Include="Model\DrawBase.cs" />
+    <Compile Include="Model\DateHour.cs" />
+    <Compile Include="Model\Draw.cs" />
+    <Compile Include="Model\DrawGroup.cs" />
+    <Compile Include="Model\Event.cs" />
+    <Compile Include="Model\IDraw.cs" />
+    <Compile Include="Model\Match.cs" />
+    <Compile Include="Model\MatchFormat.cs" />
+    <Compile Include="Model\MatchPlayer.cs" />
+    <Compile Include="Model\Player.cs" />
+    <Compile Include="Model\Pool.cs" />
+    <Compile Include="Model\Rank.cs" />
+    <Compile Include="Model\Score.cs" />
+    <Compile Include="Model\SexeEnum.cs" />
+    <Compile Include="Model\Tournament.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\jatennis\jatengl\_Traduit_1_12.js">
+      <Link>Data\_Traduit_1_12.js</Link>
+    </None>
+    <None Include="ClassDiagram.cd" />
+    <None Include="Data\jat.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data\jatFFT.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Data\jeu2test.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Resources\Model\Strings.en.resx" />
+    <EmbeddedResource Include="Assets\Resources\Model\Strings.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

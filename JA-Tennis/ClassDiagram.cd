@@ -1,47 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
-  <Comment CommentText="Model">
-    <Position X="0.528" Y="6.002" Height="3.011" Width="0.835" />
-  </Comment>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
   <Comment CommentText="ViewModel">
     <Position X="0.5" Y="2.228" Height="3.61" Width="0.867" />
   </Comment>
   <Comment CommentText="View">
     <Position X="0.5" Y="0.5" Height="1.623" Width="0.867" />
   </Comment>
-  <Class Name="JA_Tennis.Model.Player">
-    <Position X="9.75" Y="6" Width="2.5" />
-    <Members>
-      <Field Name="_Id" Hidden="true" />
-      <Field Name="_Name" Hidden="true" />
-    </Members>
-    <TypeIdentifier>
-      <HashCode>AAACACAAAAAAAAAFAAAAIAQAAAAAAAAIAAABAAAFIAA=</HashCode>
-      <FileName>Model\Player.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="JA_Tennis.Model.Tournament">
-    <Position X="4" Y="6" Width="2.5" />
-    <Members>
-      <Field Name="_Id" Hidden="true" />
-      <Field Name="_Name" Hidden="true" />
-      <Method Name="Players_CollectionChanged" Hidden="true" />
-    </Members>
-    <AssociationLine Name="Players" Type="JA_Tennis.Model.Player" FixedFromPoint="true">
-      <Path>
-        <Point X="6.5" Y="7.938" />
-        <Point X="9.75" Y="7.938" />
-      </Path>
-    </AssociationLine>
-    <TypeIdentifier>
-      <HashCode>AAACAIAAAAAAIAAEAAAAIAQAAAAiIAAAAAAAAAAEAAA=</HashCode>
-      <FileName>Model\Tournament.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsCollectionAssociation>
-      <Property Name="Players" />
-    </ShowAsCollectionAssociation>
-  </Class>
+  <Comment CommentText="Model">
+    <Position X="0.5" Y="5.978" Height="3.61" Width="0.867" />
+  </Comment>
   <Class Name="JA_Tennis.ViewModel.MainFrameViewModel">
     <Position X="1.75" Y="2.25" Width="2.5" />
     <Members>
@@ -55,15 +22,28 @@
       <Method Name="Selection_PropertyChanged" Hidden="true" />
       <Method Name="Tournaments_CollectionChanged" Hidden="true" />
     </Members>
+    <AssociationLine Name="Selection" Type="JA_Tennis.ViewModel.Selection">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.277" Y="0.591" />
+      </MemberNameLabel>
+    </AssociationLine>
     <AssociationLine Name="PlayerListViewModel" Type="JA_Tennis.ViewModel.PlayerListViewModel" FixedFromPoint="true">
       <Path>
-        <Point X="4.25" Y="2.597" />
-        <Point X="8.898" Y="2.597" />
-        <Point X="8.898" Y="3.25" />
+        <Point X="4.25" Y="2.569" />
+        <Point X="8.992" Y="2.569" />
+        <Point X="8.992" Y="3.25" />
       </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="3.173" Y="0.747" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="PlayerEditorViewModel" Type="JA_Tennis.ViewModel.PlayerEditorViewModel">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="5.672" Y="0.081" />
+      </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAgAAAAEAAABQIABEAAQABAAMAAAAAQAAAAAAAAAUCA=</HashCode>
+      <HashCode>AAgAAAgEAAABQIABEAAQABAAMAAAAAQAAAAAAAAAUCA=</HashCode>
       <FileName>ViewModel\MainFrameViewModel.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -88,24 +68,12 @@
     </Members>
     <AssociationLine Name="Tournament" Type="JA_Tennis.Model.Tournament" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="8.875" Y="4.797" />
-        <Point X="8.875" Y="5.172" />
-        <Point X="6.99" Y="5.172" Type="JumpStart" />
-        <Point X="6.823" Y="5.172" Type="JumpEnd" />
-        <Point X="6.083" Y="5.172" Type="JumpStart" />
-        <Point X="5.917" Y="5.172" Type="JumpEnd" />
-        <Point X="4.875" Y="5.172" />
-        <Point X="4.875" Y="6" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="Players" Type="JA_Tennis.Model.Player" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="10.75" Y="4.438" />
-        <Point X="11.25" Y="4.438" />
-        <Point X="11.25" Y="6" />
+        <Point X="9" Y="4.797" />
+        <Point X="9" Y="6.812" />
+        <Point X="4" Y="6.812" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.189" Y="0.623" />
+        <Position X="2.279" Y="1.735" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
@@ -113,8 +81,8 @@
       <FileName>ViewModel\PlayerListViewModel.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="Tournament" />
       <Property Name="Selection" />
+      <Property Name="Tournament" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="Players" />
@@ -124,20 +92,21 @@
     <Position X="11.5" Y="2.25" Width="2" />
     <Members>
       <Field Name="_IsPlayer" Hidden="true" />
+      <Field Name="_IsPlayerSet" Hidden="true" />
       <Field Name="_Player" Hidden="true" />
+      <Method Name="CanCancel" Hidden="true" />
+      <Method Name="Cancel" Hidden="true" />
+      <Method Name="CanOk" Hidden="true" />
+      <Method Name="Ok" Hidden="true" />
     </Members>
-    <AssociationLine Name="Player" Type="JA_Tennis.Model.Player">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.661" Y="0.143" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAACAAAAAAAABAAAAAAAAQAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <HashCode>QAAACCAAQAABABAAAAAAAAQQAAAAAQAIAAABAQAAAAQ=</HashCode>
       <FileName>ViewModel\PlayerEditorViewModel.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Player" />
     </ShowAsAssociation>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="JA_Tennis.ViewModel.Selection">
     <Position X="5.5" Y="4" Width="1.75" />
@@ -145,21 +114,10 @@
       <Field Name="_Player" Hidden="true" />
       <Field Name="_Tournament" Hidden="true" />
     </Members>
-    <AssociationLine Name="Player" Type="JA_Tennis.Model.Player" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="6.906" Y="4.869" />
-        <Point X="6.906" Y="6.875" />
-        <Point X="9.75" Y="6.875" />
-      </Path>
-    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AgAACAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
       <FileName>ViewModel\Selection.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="Tournament" />
-      <Property Name="Player" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="JA_Tennis.View.MainFrameView">
     <Position X="1.75" Y="0.5" Width="2.5" />
@@ -173,6 +131,15 @@
   </Class>
   <Class Name="JA_Tennis.View.PlayerEditorView">
     <Position X="11.75" Y="0.5" Width="1.5" />
+    <AssociationLine Name="ViewModel" Type="JA_Tennis.ViewModel.PlayerEditorViewModel" FixedFromPoint="true">
+      <Path>
+        <Point X="12.938" Y="1.544" />
+        <Point X="12.938" Y="2.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.152" Y="0.466" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>View\PlayerEditorView.xaml.cs</FileName>
@@ -185,7 +152,7 @@
     <Position X="8.75" Y="0.5" Width="1.5" />
     <AssociationLine Name="ViewModel" Type="JA_Tennis.ViewModel.PlayerListViewModel">
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.098" Y="0.97" />
+        <Position X="0.129" Y="1.47" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
@@ -195,6 +162,16 @@
     <ShowAsAssociation>
       <Property Name="ViewModel" />
     </ShowAsAssociation>
+  </Class>
+  <Class Name="JA_Tennis.Model.Player" Collapsed="true">
+    <Position X="10.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Orientation="Bottom" Position="0.1" />
+  </Class>
+  <Class Name="JA_Tennis.Model.Tournament" Collapsed="true">
+    <Position X="2.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Orientation="Left" Position="0.1" />
   </Class>
   <Font Name="System" Size="8.01" />
 </ClassDiagram>

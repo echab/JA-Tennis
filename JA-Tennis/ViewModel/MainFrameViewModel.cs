@@ -7,44 +7,18 @@ using JA_Tennis.Command;
 using JA_Tennis.ComponentModel;
 using JA_Tennis.Helpers;
 using JA_Tennis.Model;
+using System.Collections.ObjectModel;
 
 namespace JA_Tennis.ViewModel
 {
     public class MainFrameViewModel : BindableType //NotifyPropertyChangedBase
     {
-        public UndoManager UndoManager { get; private set; }
-
-        public TournamentCollection Tournaments { get; private set; }
-
-        private Selection _Selection;
-        public Selection Selection
-        {
-            get { return _Selection; }
-            set { Set<Selection>(ref _Selection, value, () => Selection); }
-        }
-
-        #region Child ViewModels
-        //Silverlight View Model Communication http://www.codeproject.com/KB/silverlight/VMCommunication.aspx
-        private PlayerListViewModel _PlayerListViewModel;
-        public PlayerListViewModel PlayerListViewModel
-        {
-            get { return _PlayerListViewModel; }
-            private set { Set<PlayerListViewModel>(ref _PlayerListViewModel, value, () => PlayerListViewModel); }
-        }
-
-        private PlayerEditorViewModel _PlayerEditorViewModel;
-        public PlayerEditorViewModel PlayerEditorViewModel
-        {
-            get { return _PlayerEditorViewModel; }
-            private set { Set<PlayerEditorViewModel>(ref _PlayerEditorViewModel, value, () => PlayerEditorViewModel); }
-        }
-        #endregion Child ViewModels
-
+        #region Constructor
         public MainFrameViewModel()
         {
             UndoManager = new UndoManager();
 
-            Tournaments = new TournamentCollection();
+            Tournaments = new ObservableCollection<Tournament>();
             Tournaments.CollectionChanged += (s, args) => OnPropertyChanged(() => Tournaments);
 
             Selection = new Selection();
@@ -88,6 +62,42 @@ namespace JA_Tennis.ViewModel
             //OpenDocument(null); //TODO
 #endif //DEBUG
         }
+        #endregion Constructor
+
+        public UndoManager UndoManager { get; private set; }
+
+        #region Tournaments
+        public ObservableCollection<Tournament> Tournaments { get; private set; }
+
+        private void Tournaments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    Selection.Tournament = e.NewItems[0] as Tournament; //TODO Multi tournament selection ?
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Replace:
+                    if (e.OldItems.Contains(Selection.Tournament))
+                    {
+                        ObservableCollection<Tournament> tournaments = sender as ObservableCollection<Tournament>;
+                        Selection.Tournament = tournaments.Count > 0 ? tournaments[tournaments.Count - 1] : null;   //Last one
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    Selection.Tournament = null;
+                    break;
+            }
+        }
+        #endregion Tournaments
+
+        #region Selection property
+        private Selection _Selection;
+        public Selection Selection
+        {
+            get { return _Selection; }
+            set { Set<Selection>(ref _Selection, value, () => Selection); }
+        }
 
         void Selection_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -106,27 +116,24 @@ namespace JA_Tennis.ViewModel
 #endif
             }
         }
+        #endregion
 
-        private void Tournaments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        #region Child ViewModels
+        //Silverlight View Model Communication http://www.codeproject.com/KB/silverlight/VMCommunication.aspx
+        private PlayerListViewModel _PlayerListViewModel;
+        public PlayerListViewModel PlayerListViewModel
         {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    Selection.Tournament = e.NewItems[0] as Tournament; //TODO Multi tournament selection ?
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                    if (e.OldItems.Contains(Selection.Tournament))
-                    {
-                        TournamentCollection tournaments = sender as TournamentCollection;
-                        Selection.Tournament = tournaments.Count > 0 ? tournaments[tournaments.Count - 1] : null;   //Last one
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    Selection.Tournament = null;
-                    break;
-            }
+            get { return _PlayerListViewModel; }
+            private set { Set<PlayerListViewModel>(ref _PlayerListViewModel, value, () => PlayerListViewModel); }
         }
+
+        private PlayerEditorViewModel _PlayerEditorViewModel;
+        public PlayerEditorViewModel PlayerEditorViewModel
+        {
+            get { return _PlayerEditorViewModel; }
+            private set { Set<PlayerEditorViewModel>(ref _PlayerEditorViewModel, value, () => PlayerEditorViewModel); }
+        }
+        #endregion Child ViewModels
 
         #region OpenDocumentCommand
         //Referenced into View like this: 

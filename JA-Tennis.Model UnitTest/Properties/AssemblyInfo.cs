@@ -1,16 +1,18 @@
-﻿using System.Reflection;
+﻿// Copyright © European Aeronautic Defense and Space Company 2010
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("JA-Tennis")]
+[assembly: AssemblyTitle("JA_Tennis.Model_UnitTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("EC")]
-[assembly: AssemblyProduct("JA-Tennis")]
-[assembly: AssemblyCopyright("Copyright ©  2010")]
+[assembly: AssemblyProduct("JA_Tennis.Model_UnitTest")]
+[assembly: AssemblyCopyright("Copyright © 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("466bede7-def0-472a-92b7-5b310c1a3c79")]
+[assembly: Guid("9a8c35b5-e0eb-4704-a038-405bd275df73")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,11 +33,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("2.0.0")]
-[assembly: AssemblyFileVersion("2.0.0")]
-
-#if DEBUG
-//For UnitTest
-[assembly: InternalsVisibleTo("JA-Tennis_UnitTest")]
-[assembly: InternalsVisibleTo("JA-Tennis UnitTest")]
-#endif //DEBUG
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

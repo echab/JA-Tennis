@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("JA-Tennis")]
+[assembly: AssemblyTitle("JA-Tennis.Model")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("EC")]
-[assembly: AssemblyProduct("JA-Tennis")]
-[assembly: AssemblyCopyright("Copyright ©  2010")]
+[assembly: AssemblyProduct("JA-Tennis.Model")]
+[assembly: AssemblyCopyright("Copyright © 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("466bede7-def0-472a-92b7-5b310c1a3c79")]
+[assembly: Guid("56aefea7-aacf-4361-be80-cb6c81c6c0cb")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -36,6 +36,6 @@ using System.Runtime.InteropServices;
 
 #if DEBUG
 //For UnitTest
-[assembly: InternalsVisibleTo("JA-Tennis_UnitTest")]
 [assembly: InternalsVisibleTo("JA-Tennis UnitTest")]
+[assembly: InternalsVisibleTo("JA-Tennis.Model UnitTest")]
 #endif //DEBUG

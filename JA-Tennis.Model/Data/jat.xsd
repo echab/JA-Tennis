@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="JATennis.Tournament.FFT" xmlns:jat="JATennis.Tournament.FFT">
+  <xsd:element name="jat">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="jat:Tournament"  minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="jat:Courts"   minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="jat:Events" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="jat:Players"  minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="jat:Days"    minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="version" type="xsd:string" />
+      <xsd:attribute name="dateFile" type="xsd:date" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Tournament">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"  />
+        <xsd:element name="ligue" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="Cluborg" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="Name" type="xsd:string" />
+              <xsd:element ref="jat:Adress" minOccurs="0" maxOccurs="1" />
+            </xsd:sequence>
+            <xsd:attribute name="Number" type="xsd:string" />
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="Referee" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="Name" type="xsd:string" />
+              <xsd:element ref="jat:Adress" minOccurs="0" maxOccurs="1" />
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="Id" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:ID">
+            <xsd:pattern value ="H[0-9A-Z]{1,4}" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="type" type="xsd:string" default="FFT" />
+      <xsd:attribute name="Homologation" type="xsd:string" use="optional" />
+      <xsd:attribute name="Start" type="jat:Date" use="optional" />
+      <xsd:attribute name="End" type="jat:Date" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Players">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+          <xsd:element ref="jat:Player" />
+          <xsd:element ref="jat:Team" />
+        </xsd:choice>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Player">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="jat:Adress" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="Phone" type="xsd:string" minOccurs="0" maxOccurs="3" />
+        <xsd:element name="Mail" type="xsd:string" minOccurs="0" maxOccurs="2" />
+        <xsd:element name="Comment" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        <!--
+        TODO Availability
+        -->
+      </xsd:sequence>
+
+      <xsd:attribute name="Id" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:ID">
+            <xsd:pattern value ="J[0-9A-Z]{1,4}" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="Sexe" type="jat:Sexe" default="H" />
+      <xsd:attribute name="Name" type="xsd:string" use="required" />
+      <xsd:attribute name="FirstName" type="xsd:string" />
+      <xsd:attribute name="Licence" type="jat:Licence" />
+      <xsd:attribute name="Club" type="xsd:string" />
+
+      <xsd:attribute name="Registration" type="jat:EventsRef" />
+      <xsd:attribute name="Rank" type="jat:Rank" />
+      <xsd:attribute name="RankDouble" type="jat:Rank" />
+      <xsd:attribute name="Date" type="jat:Date" />
+      <xsd:attribute name="Nationality" type="xsd:string" />
+      <xsd:attribute name="solde" type="xsd:decimal" />
+      <xsd:attribute name="espece" type="xsd:decimal" />
+      <xsd:attribute name="cheque" type="xsd:decimal" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Team">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="jat:Adress" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="Phone" type="xsd:string" minOccurs="0" maxOccurs="3" />
+        <xsd:element name="Mail" type="xsd:string" minOccurs="0" maxOccurs="2" />
+        <xsd:element name="Comment" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+
+      <xsd:attribute name="Id" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:ID">
+            <xsd:pattern value ="J[0-9A-Z]{1,4}" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="Sexe" type="jat:Sexe" />
+      <xsd:attribute name="Name" type="xsd:string" />
+      <xsd:attribute name="TeamMembers" type="jat:PlayersRef" />
+      <xsd:attribute name="Club" type="xsd:string" />
+
+      <xsd:attribute name="Registration" type="jat:EventsRef" />
+      <xsd:attribute name="Rank" type="jat:Rank" />
+      <xsd:attribute name="Date" type="xsd:string" />
+      <xsd:attribute name="Nationality" type="xsd:string" />
+      <xsd:attribute name="solde" type="xsd:decimal" />
+      <xsd:attribute name="espece" type="xsd:decimal" />
+      <xsd:attribute name="cheque" type="xsd:decimal" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Events">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="1" maxOccurs="32" ref="jat:Event" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Event">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="32" ref="jat:Draw" />
+      </xsd:sequence>
+      <xsd:attribute name="Name" type="xsd:string" use="required" />
+      <xsd:attribute name="Id" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:ID">
+            <xsd:pattern value ="E[0-9A-Z]{1,4}" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="type" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="simple" />
+            <xsd:enumeration value="double" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="Sexe" type="jat:Sexe"/>
+      <xsd:attribute name="Category" type="xsd:string" />
+      <xsd:attribute name="consolation" type="xsd:boolean" default="false" />
+      <xsd:attribute name="RankMax" type="jat:Rank" />
+      <xsd:attribute name="Start" type="jat:Date" />
+      <xsd:attribute name="End" type="jat:Date" />
+      <xsd:attribute name="formatMatch" type="jat:formatMatch" />
+      <xsd:attribute name="Color" type="jat:Color" default="#FFFFFF" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Draw">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="256" ref="jat:Match" />
+      </xsd:sequence>
+      <xsd:attribute name="Name" type="xsd:string" use="required" />
+      <xsd:attribute name="Id" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:ID">
+            <xsd:pattern value ="T[0-9A-Z]{1,4}" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="type" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="normal" />
+            <xsd:enumeration value="final" />
+            <xsd:enumeration value="poule" />
+            <xsd:enumeration value="poulear" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="Column" type="xsd:int" use="required" />
+      <xsd:attribute name="qualifie" type="xsd:int" use="required" />
+      <xsd:attribute name="suite" type="xsd:int" default="0" />
+      <xsd:attribute name="RankMin" type="jat:Rank" />
+      <xsd:attribute name="RankMax" type="jat:Rank" />
+      <xsd:attribute name="Orientation" use="optional">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="portrait" />
+            <xsd:enumeration value="landscape" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="Lock" use="optional" default="0">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="0" />
+            <xsd:enumeration value="1" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Match">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Player1" type="jat:MatchPlayer" />
+        <xsd:element name="Player2" type="jat:MatchPlayer" />
+        <!--
+        <xsd:element name="adversaire" minOccurs="2" maxOccurs="2">
+          <xsd:complexType>
+            <xsd:attribute name="ref" type="jat:PlayerRef" use="optional" />
+            <xsd:attribute name="Order" type="xsd:int" use="optional" />
+            <xsd:attribute name="teteDeSerie" type="xsd:int" use="optional" />
+            <xsd:attribute name="qualifieEntrant" type="xsd:int" use="optional" />
+            <xsd:attribute name="prevenu" use="optional">
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="Rep" />
+                  <xsd:enumeration value="P" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:attribute>
+          </xsd:complexType>
+        </xsd:element>
+        -->
+        <xsd:element name="Note" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="Position" type="xsd:int" use="required" />
+      <xsd:attribute name="Date" type="jat:Date" use="optional" />
+      <xsd:attribute name="Hour" type="jat:Hour" use="optional" />
+      <xsd:attribute name="Court" type="xsd:string" use="optional" />
+      <xsd:attribute name="Receive" use="optional" default="1">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="1" />
+            <xsd:enumeration value="2" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="formatMatch" type="jat:formatMatch" use="optional" />
+      <xsd:attribute name="Winner" type="jat:PlayerRef" use="optional" />
+      <xsd:attribute name="Score" type="xsd:string" use="optional" />
+      <xsd:attribute name="qualifieSortant" type="xsd:int" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="MatchPlayer">
+    <xsd:attribute name="ref" type="jat:PlayerRef" use="optional" />
+    <xsd:attribute name="Order" type="xsd:int" use="optional" />
+    <xsd:attribute name="teteDeSerie" type="xsd:int" use="optional" />
+    <xsd:attribute name="qualifieEntrant" type="xsd:int" use="optional" />
+    <xsd:attribute name="prevenu" use="optional">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:NMTOKEN">
+          <xsd:enumeration value="Rep" />
+          <xsd:enumeration value="P" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:element name="Days">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Day" minOccurs="0" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:attribute name="Date" type="jat:Date" />
+            <xsd:attribute name="Day" type="xsd:gDay" />
+            <xsd:attribute name="Daylong" type="xsd:gMonthDay" />
+            <xsd:attribute name="Month" type="xsd:gMonth" />
+            <xsd:attribute name="Monthlong" type="xsd:gYearMonth" />
+            <xsd:attribute name="Year" type="xsd:gYear" />
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Courts">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Court" minOccurs="1" maxOccurs="64">
+          <xsd:complexType>
+            <xsd:attribute name="Name" type="xsd:string" use="required" />
+          </xsd:complexType>
+        </xsd:element>
+        <!--
+        TODO Availability
+        -->
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="Adress">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Adress" type="xsd:string" minOccurs="0" maxOccurs="2" />
+        <xsd:element name="codep" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="ville" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:simpleType name="EventsRef">
+    <xsd:restriction base="xsd:IDREFS"/>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="PlayerRef">
+    <xsd:restriction base="xsd:IDREF"/>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="PlayersRef">
+    <xsd:restriction base="xsd:IDREFS"/>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Sexe">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="H" />
+      <xsd:enumeration value="F" />
+      <xsd:enumeration value="M" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Rank">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="NC" />
+      <xsd:enumeration value="40" />
+      <xsd:enumeration value="30/5" />
+      <xsd:enumeration value="30/4" />
+      <xsd:enumeration value="30/3" />
+      <xsd:enumeration value="30/2" />
+      <xsd:enumeration value="30/1" />
+      <xsd:enumeration value="30" />
+      <xsd:enumeration value="15/5" />
+      <xsd:enumeration value="15/4" />
+      <xsd:enumeration value="15/3" />
+      <xsd:enumeration value="15/2" />
+      <xsd:enumeration value="15/1" />
+      <xsd:enumeration value="15" />
+      <xsd:enumeration value="5/6" />
+      <xsd:enumeration value="4/6" />
+      <xsd:enumeration value="3/6" />
+      <xsd:enumeration value="2/6" />
+      <xsd:enumeration value="1/6" />
+      <xsd:enumeration value="0" />
+      <xsd:enumeration value="-1/6" />
+      <xsd:enumeration value="-2/6" />
+      <xsd:enumeration value="-4/6" />
+      <xsd:enumeration value="-15" />
+      <xsd:enumeration value="-30" />
+      <xsd:enumeration value="P" />
+      <xsd:enumeration value="N55" />
+      <xsd:enumeration value="N54" />
+      <xsd:enumeration value="N53" />
+      <xsd:enumeration value="N52" />
+      <xsd:enumeration value="N51" />
+      <xsd:enumeration value="N50" />
+      <xsd:enumeration value="N49" />
+      <xsd:enumeration value="N48" />
+      <xsd:enumeration value="N47" />
+      <xsd:enumeration value="N46" />
+      <xsd:enumeration value="N45" />
+      <xsd:enumeration value="N44" />
+      <xsd:enumeration value="N43" />
+      <xsd:enumeration value="N42" />
+      <xsd:enumeration value="N41" />
+      <xsd:enumeration value="N40" />
+      <xsd:enumeration value="N39" />
+      <xsd:enumeration value="N38" />
+      <xsd:enumeration value="N37" />
+      <xsd:enumeration value="N36" />
+      <xsd:enumeration value="N35" />
+      <xsd:enumeration value="N34" />
+      <xsd:enumeration value="N33" />
+      <xsd:enumeration value="N32" />
+      <xsd:enumeration value="N31" />
+      <xsd:enumeration value="N30" />
+      <xsd:enumeration value="N29" />
+      <xsd:enumeration value="N28" />
+      <xsd:enumeration value="N27" />
+      <xsd:enumeration value="N26" />
+      <xsd:enumeration value="N25" />
+      <xsd:enumeration value="N24" />
+      <xsd:enumeration value="N23" />
+      <xsd:enumeration value="N22" />
+      <xsd:enumeration value="N21" />
+      <xsd:enumeration value="N20" />
+      <xsd:enumeration value="N19" />
+      <xsd:enumeration value="N18" />
+      <xsd:enumeration value="N17" />
+      <xsd:enumeration value="N16" />
+      <xsd:enumeration value="N15" />
+      <xsd:enumeration value="N14" />
+      <xsd:enumeration value="N13" />
+      <xsd:enumeration value="N12" />
+      <xsd:enumeration value="N11" />
+      <xsd:enumeration value="N10" />
+      <xsd:enumeration value="N9" />
+      <xsd:enumeration value="N8" />
+      <xsd:enumeration value="N7" />
+      <xsd:enumeration value="N6" />
+      <xsd:enumeration value="N5" />
+      <xsd:enumeration value="N4" />
+      <xsd:enumeration value="N3" />
+      <xsd:enumeration value="N2" />
+      <xsd:enumeration value="N1" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="formatMatch">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="A" />
+      <xsd:enumeration value="B" />
+      <xsd:enumeration value="C" />
+      <xsd:enumeration value="D" />
+      <xsd:enumeration value="E" />
+      <xsd:enumeration value="F" />
+      <xsd:enumeration value="G" />
+      <xsd:enumeration value="H" />
+      <xsd:enumeration value="I" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Licence">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[0-9]{7}[A-HJ-NP-Z]" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Date">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="([0-9]{1,2}/[0-9]{1,2}/)?[0-9]{4}" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Hour">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[0-9]{1,2}h[0-9]{0,2}" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Color">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="#[0-9A-F]{6}" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>
