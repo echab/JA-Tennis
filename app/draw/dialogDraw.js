@@ -7,10 +7,11 @@ var jat;
             //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
             //}
             function dialogDrawCtrl(title, draw, //private selection: jat.service.Selection,
-            rank, category, drawLib) {
+            rank, category, drawLib, tournamentLib) {
                 this.title = title;
                 this.draw = draw;
                 this.drawLib = drawLib;
+                this.tournamentLib = tournamentLib;
                 this.drawTypes = [];
                 for (var i = 0; i < 4; i++) {
                     this.drawTypes[i] = { value: i, label: models.DrawType[i] };
@@ -20,8 +21,9 @@ var jat;
                 this.categories = category.list();
             }
             dialogDrawCtrl.prototype.getRegisteredCount = function () {
-                var players = this.drawLib.GetJoueursInscrit(this.draw);
-                return players.length;
+                var players = this.tournamentLib.GetJoueursInscrit(this.draw);
+                var qualifs = this.drawLib.FindAllQualifieSortant(this.draw);
+                return players.length + qualifs.length;
             };
             return dialogDrawCtrl;
         })();

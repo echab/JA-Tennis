@@ -10,6 +10,7 @@ module jat.service {
 
         constructor(
             private drawLib: jat.service.DrawLib,
+            private tournamentLib: jat.service.TournamentLib,
             private rank: ServiceRank,
             private find: Find
             ) {
@@ -63,7 +64,15 @@ module jat.service {
         public generateDraw(draw: models.Draw, generate: number): models.Draw[] {
             if (generate === 1) {   //from registred players
                 var m_nMatchCol = filledArray(MAX_COL, 0);
-                var players = this.drawLib.GetJoueursInscrit(draw);
+
+                var players = this.tournamentLib.GetJoueursInscrit(draw);
+
+                //Récupère les qualifiés sortants du tableau précédent
+                var prev = this.drawLib.previousGroup(draw);
+                if (prev) {
+                    players = players.concat(<any>this.drawLib.FindAllQualifieSortant(prev, true));
+                }
+
                 this.drawLib.resetDraw(draw, players.length);
                 this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
             } else {    //from existing players
@@ -332,7 +341,7 @@ module jat.service {
                 }
             }
 
-            this.drawLib.TriJoueurs(players);
+            this.tournamentLib.TriJoueurs(players);
 
             //Nombre de Tête de série
             var nTeteSerie = draw.nbOut;
@@ -452,7 +461,7 @@ module jat.service {
             if (draw.type !== models.DrawType.Final) {
 
                 //Find the first unused qualif number
-                var group = this.drawLib.groupBegin(draw);
+                var group = this.drawLib.currentGroup(draw);
                 if (group) {
                     for (i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
                         if (!this.drawLib.FindQualifieSortant(group, i)) {
@@ -559,8 +568,8 @@ module jat.service {
             var boxIn = <models.PlayerIn> box;
 
             if (inNumber) {	//Ajoute un qualifié entrant
-                var prev: models.Draw = this.drawLib.prevGroup(draw);
-                if (!player && prev && prev.boxes && inNumber !== QEMPTY) {
+                var prev = this.drawLib.previousGroup(draw);
+                if (!player && prev && inNumber !== QEMPTY) {
                     //Va chercher le joueur dans le tableau précédent
                     var boxOut = this.drawLib.FindQualifieSortant(prev, inNumber);
                     if (angular.isObject(boxOut)) {	//V0997
@@ -595,7 +604,7 @@ module jat.service {
 
                 boxIn.qualifIn = 0;
 
-                if (this.drawLib.prevGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
+                if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                     ASSERT(false);
                 }
 
@@ -611,7 +620,7 @@ module jat.service {
         public SetQualifieSortant(box: models.Box, outNumber?: number): boolean { //setPlayerOut
             // outNumber=0 => enlève qualifié
 
-            var next: models.Draw = this.drawLib.nextGroup(box._draw);
+            var next = this.drawLib.nextGroup(box._draw);
 
             //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
 
@@ -619,7 +628,7 @@ module jat.service {
                 var boxOut = <models.Match>box;
 
                 //Met à jour le tableau suivant
-                if (next && next.boxes && boxOut.playerId && boxOut.qualifOut) {
+                if (next && boxOut.playerId && boxOut.qualifOut) {
                     var boxIn = this.drawLib.FindQualifieEntrant(next, outNumber);
                     if (boxIn) {
                         ASSERT(boxIn.playerId === box.playerId);
@@ -666,6 +675,11 @@ module jat.service {
         public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn {
 
             ASSERT(iQualifie >= 0);
+
+            if (!draw.boxes) {
+                return;
+            }
+
             for (var i = draw.boxes.length - 1; i >= 0; i--) {
                 var boxIn = <models.PlayerIn>draw.boxes[i];
                 if (!boxIn) {
@@ -676,27 +690,19 @@ module jat.service {
                     return boxIn;
                 }
             }
-
-            if (draw._next && draw._next.suite) {
-                return this.drawLib.FindQualifieEntrant(draw._next, iQualifie);
-            }
         }
 
         public FindQualifieSortant(draw: models.Draw, iQualifie: number): models.Match {
 
             ASSERT(0 < iQualifie);
 
-            if (iQualifie === QEMPTY) {
+            if (iQualifie === QEMPTY || !draw.boxes) {
                 return;
             }
 
             var boxOut = <models.Match>this.find.by(draw.boxes, "qualifOut", iQualifie);
             if (boxOut) {
                 return boxOut;
-            }
-
-            if (draw._next && draw._next.suite) {
-                return this.drawLib.FindQualifieSortant(draw._next, iQualifie);
             }
         }
 
@@ -988,7 +994,7 @@ module jat.service {
     }
 
     angular.module('jat.services.knockoutLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
-        .factory('knockoutLib', (drawLib: jat.service.DrawLib, rank: ServiceRank, find: Find) => {
-            return new KnockoutLib(drawLib, rank, find);
+        .factory('knockoutLib', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, find: Find) => {
+            return new KnockoutLib(drawLib, tournamentLib, rank, find);
         });
 }

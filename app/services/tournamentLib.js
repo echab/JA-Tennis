@@ -3,8 +3,9 @@ var jat;
 (function (jat) {
     (function (service) {
         var TournamentLib = (function () {
-            function TournamentLib(drawLib) {
+            function TournamentLib(drawLib, rank) {
                 this.drawLib = drawLib;
+                this.rank = rank;
             }
             TournamentLib.prototype.newTournament = function (source) {
                 var tournament = {};
@@ -75,12 +76,71 @@ var jat;
                 }
                 return a;
             };
+
+            TournamentLib.prototype.TriJoueurs = function (players) {
+                var _this = this;
+                //Tri les joueurs par classement
+                var compare1 = function (p1, p2) {
+                    //if numbers, p1 or p2 are PlayerIn
+                    var isNumber1 = 'number' === typeof p1, isNumber2 = 'number' === typeof p2;
+                    if (isNumber1 && isNumber2) {
+                        return 0;
+                    }
+                    if (isNumber1) {
+                        return -1;
+                    }
+                    if (isNumber2) {
+                        return 1;
+                    }
+                    return _this.rank.compare(p1.rank, p2.rank);
+                };
+                players.sort(compare1);
+
+                for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
+                    if (r1 === players.length || compare1(players[r0], players[r1])) {
+                        //nouvelle plage de classement
+                        r1--;
+
+                        for (var i = r0; i < r1; i++) {
+                            //echange deux joueurs p et q
+                            var p = Math.round(r0 + Math.random() * (r1 - r0));
+                            var q = Math.round(r0 + Math.random() * (r1 - r0));
+                            if (p != q) {
+                                var t = players[p];
+                                players[p] = players[q];
+                                players[q] = t;
+                            }
+                        }
+
+                        r0 = ++r1;
+                    }
+                }
+            };
+
+            TournamentLib.prototype.GetJoueursInscrit = function (draw) {
+                function isInscrit(player, event) {
+                    return player.registration.indexOf(event.id) != -1;
+                }
+
+                //Récupère les joueurs inscrits
+                var players = draw._event._tournament.players, ppJoueur = [], nPlayer = 0;
+                for (var i = 0; i < players.length; i++) {
+                    var pJ = players[i];
+                    if (isInscrit(pJ, draw._event)) {
+                        if (!pJ.rank || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
+                            ppJoueur.push(pJ); //no du joueur
+                        }
+                    }
+                }
+
+                return ppJoueur;
+            };
             return TournamentLib;
         })();
         service.TournamentLib = TournamentLib;
 
-        angular.module('jat.services.tournamentLib', ['jat.services.drawLib']).factory('tournamentLib', function (drawLib) {
-            return new TournamentLib(drawLib);
+        angular.module('jat.services.tournamentLib', ['jat.services.drawLib']).factory('tournamentLib', function (drawLib, rank) {
+            return new TournamentLib(drawLib, rank);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

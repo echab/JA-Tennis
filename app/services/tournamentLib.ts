@@ -5,7 +5,8 @@ module jat.service {
     export class TournamentLib {
 
         constructor(
-            private drawLib: jat.service.DrawLib
+            private drawLib: jat.service.DrawLib,
+            private rank: ServiceRank
             ) { }
 
         public newTournament(source?: models.Tournament): models.Tournament {
@@ -79,8 +80,77 @@ module jat.service {
             }
             return a;
         }
+
+        public TriJoueurs(players: models.Player[]): void {
+
+            //Tri les joueurs par classement
+            var compare1 = (p1: models.Player, p2: models.Player): number => {
+                //if numbers, p1 or p2 are PlayerIn
+                var isNumber1 = 'number' === typeof p1,
+                    isNumber2 = 'number' === typeof p2;
+                if (isNumber1 && isNumber2) {
+                    return 0;
+                }
+                if (isNumber1) {
+                    return -1;
+                }
+                if (isNumber2) {
+                    return 1;
+                }
+                return this.rank.compare(p1.rank, p2.rank);
+            };
+            players.sort(compare1);
+
+            //Mélange les joueurs de même classement
+            for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
+                if (r1 === players.length || compare1(players[r0], players[r1])) {
+                    //nouvelle plage de classement
+                    r1--;
+
+                    //r0: premier joueur de l'intervalle
+                    //r1: dernier joueur de même classement
+                    for (var i = r0; i < r1; i++) {
+                        //echange deux joueurs p et q
+                        var p = Math.round(r0 + Math.random() * (r1 - r0));
+                        var q = Math.round(r0 + Math.random() * (r1 - r0));
+                        if (p != q) {
+                            var t = players[p];
+                            players[p] = players[q];
+                            players[q] = t;
+                        }
+                    }
+
+                    r0 = ++r1;
+                }
+            }
+        }
+
+        public GetJoueursInscrit(draw: models.Draw): models.Player[] {
+
+            function isInscrit(player: models.Player, event: models.Event): boolean {
+                return player.registration.indexOf(event.id) != -1;
+            }
+
+            //Récupère les joueurs inscrits
+            var players = draw._event._tournament.players,
+                ppJoueur: models.Player[] = [], //new short[nPlayer],
+                nPlayer = 0;
+            for (var i = 0; i < players.length; i++) {
+                var pJ = players[i];
+                if (isInscrit(pJ, draw._event)) {
+                    if (!pJ.rank
+                        || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
+                        ppJoueur.push(pJ);	//no du joueur
+                    }
+                }
+            }
+
+            return ppJoueur;
+        }
     }
 
     angular.module('jat.services.tournamentLib', ['jat.services.drawLib'])
-        .factory('tournamentLib', (drawLib:jat.service.DrawLib) => { return new TournamentLib(drawLib); });
+        .factory('tournamentLib', (drawLib: jat.service.DrawLib, rank: ServiceRank) => {
+            return new TournamentLib(drawLib, rank);
+        });
 }

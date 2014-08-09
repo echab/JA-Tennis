@@ -6,58 +6,34 @@ module jat.main {
 
         constructor(
             private $log: ng.ILogService,
-            private $http: ng.IHttpService,
             private $modal: uib.IModalService<string>,
             private selection: jat.service.Selection,
+            private mainLib: jat.service.MainLib,
             private tournamentLib: jat.service.TournamentLib,
             private drawLib: jat.service.DrawLib,
-            private knockoutLib: jat.service.KnockoutLib,
-            private roundrobinLib: jat.service.RoundrobinLib,
-            private undo: jat.service.Undo,
-            private find: jat.service.Find
+            private undo: jat.service.Undo
             ) {
 
-            selection.tournament = this.tournamentLib.newTournament();
+            this.selection.tournament = this.tournamentLib.newTournament();
 
-            this.loadTournament('/data/tournament4.json');
+            this.mainLib.loadTournament('/data/tournament4.json').then((data) => {
+                this.selection.tournament = data;
+                this.selection.event = data.events[0];
+                this.selection.draw = data.events[0].draws[0];
+                this.selection.player = undefined;
+                this.selection.match = undefined;
+            });
         }
 
-        loadTournament(url: string): void {
-            //console.info("Loading tournament1...");
-            this.$http.get(url)
-                .success((data: models.Tournament, status: number) => {
-                    this.tournamentLib.initTournament(data);
-
-                    this.selection = {
-                        tournament: data,
-                        event: data.events[0],
-                        draw: data.events[0].draws[1],
-                        player: undefined,
-                        match: undefined
-                    };
-
-                    //console.info("Tournament loaded.");
-                })
-                .error((data: any, status: number) => {
-                    //TODO
-                });
+        //#region tournament
+        loadTournament(): void {
+            //TODO browse for file
+            //this.mainLib.loadTournament('xxx.json');
         }
-
-        saveTournament(url: string): void {
-            var data = {};
-            models.copy(this.selection.tournament, data);
-            if (!url) {
-                this.$log.info(angular.toJson(data, true));
-                return;
-            }
-            this.$http.post(url, data)
-                .success((data: any, status: number) => {
-                    //TODO
-                })
-                .error((data: any, status: number) => {
-                    //TODO
-                });
+        saveTournament(): void {
+            this.mainLib.saveTournament(this.selection.tournament, 'xxx');
         }
+        //#endregion tournament
 
         //#region player
         addPlayer(player?: models.Player): void {
@@ -74,7 +50,7 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.doAddPlayer(newPlayer);
+                        this.mainLib.addPlayer(this.selection.tournament, newPlayer);
                     }
                 });
         }
@@ -93,38 +69,14 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.doEditPlayer(editedPlayer, player);
+                        this.mainLib.editPlayer(editedPlayer, player);
                     } else if ('Del' === result) {
-                        this.removePlayer(player)
+                        this.mainLib.removePlayer(player)
                 }
                 });
         }
-
-        private doAddPlayer(newPlayer: models.Player): void {
-            var c = this.selection.tournament.players;
-            newPlayer.id = 'P' + c.length;    //TODO generate id
-
-            this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name); //c.push( newPlayer);
-            this.selection.player = newPlayer;
-        }
-
-        private doEditPlayer(editedPlayer: models.Player, player: models.Player): void {
-            var isSelected = this.selection.player === player;
-            var c = this.selection.tournament.players;
-            var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
-            this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i); //c[i] = editedPlayer;
-            if (isSelected) {
-                this.selection.player = editedPlayer;
-            }
-        }
-
         removePlayer(player: models.Player): void {
-            if (this.selection.player === player) {
-                this.selection.player = undefined;
-            }
-            var c = this.selection.tournament.players;
-            var i = this.find.indexOf(c, "id", player.id, "Player to remove not found");
-            this.undo.remove(c, i, "Delete " + player.name + " " + i);   //c.splice( i, 1);
+            this.mainLib.removePlayer(player);
         }
         //#endregion player
 
@@ -142,7 +94,7 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.doAddEvent(newEvent);
+                        this.mainLib.addEvent(this.selection.tournament, newEvent);
                     }
                 });
         }
@@ -160,36 +112,15 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.doEditEvent(editedEvent, event);
+                        this.mainLib.editEvent(editedEvent, event);
                     } else if ('Del' === result) {
-                        this.removeEvent(event)
+                        this.mainLib.removeEvent(event)
                 }
                 });
         }
 
-        private doAddEvent(newEvent: models.Event): void {
-            var c = this.selection.tournament.events;
-            newEvent.id = 'E' + c.length;    //TODO generate id
-            this.undo.insert(c, -1, newEvent, "Add " + newEvent.name);   //c.push( newEvent);
-            this.selection.event = newEvent;
-        }
-        private doEditEvent(editedEvent: models.Event, event: models.Event): void {
-            var isSelected = this.selection.event === event;
-            var c = this.selection.tournament.events;
-            var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
-            this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i);   //c[i] = editedEvent;
-            if (isSelected) {
-                this.selection.event = editedEvent;
-            }
-        }
-
         removeEvent(event: models.Event): void {
-            if (this.selection.event === event) {
-                this.selection.event = undefined;
-            }
-            var c = this.selection.tournament.events;
-            var i = this.find.indexOf(c, "id", event.id, "Event to remove not found");
-            this.undo.remove(c, i, "Delete " + c[i].name + " " + i); //c.splice( i, 1);
+            this.mainLib.removeEvent(event);
         }
         //#endregion event
 
@@ -207,9 +138,9 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.updateDraw(newDraw, draw);
+                        this.mainLib.updateDraw(newDraw, draw);
                     } else if ('Generate' === result) {
-                        this.updateDraw(newDraw, draw, 1);
+                        this.mainLib.updateDraw(newDraw, draw, 1);
                     }
                 });
         }
@@ -227,59 +158,24 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.updateDraw(editedDraw, draw);
+                        this.mainLib.updateDraw(editedDraw, draw);
                     } else if ('Generate' === result) {
-                        this.updateDraw(editedDraw, draw, 1);
+                        this.mainLib.updateDraw(editedDraw, draw, 1);
                     } else if ('Del' === result) {
-                        this.removeDraw(event, draw);
+                        this.mainLib.removeDraw(draw);
                     }
                 });
         }
 
-        public refresh(draw: models.Draw): void {
-            draw._refresh = new Date(); //force angular refresh
+        generateDraw(draw: models.Draw, generate?: number): void {
+            if (!draw) {
+                return;
+            }
+            this.mainLib.updateDraw(draw, undefined, generate || 1);
         }
 
-        public updateDraw(draw: models.Draw, oldDraw: models.Draw, generate?: number): void {
-            var isSelected = this.selection.draw === oldDraw;
-            if (generate) {
-                var nOldDraw = this.drawLib.getnSuite(oldDraw || draw);
-                var draws = this.drawLib.generateDraw(draw, generate)
-                if (!draws || !draws.length) {
-                    return;
-                }
-            } else {
-                this.drawLib.resize(draw, oldDraw);
-            }
-            var c = draw._event.draws;
-            if (nOldDraw && draws && draws.length) {
-                var first = this.drawLib.groupBegin(oldDraw || draw);
-                var i = this.find.indexOf(c, "id", first.id, "Draw to edit not found");
-                this.undo.splice(c, i, nOldDraw, draws, "Replace " + draw.name);
-                for (var i = 0; i < draws.length; i++) {
-                    this.drawLib.initDraw(draws[i], draw._event);
-                }
-                draw = draws[0];
-            } else if (!draw.id) {   //new draw
-                draw.id = 'D' + c.length;    //TODO generate id
-                this.undo.insert(c, -1, draw, "Add " + draw.name); //c.push( draw);
-            } else {    //edit draw
-                var i = this.find.indexOf(c, "id", draw.id, "Draw to edit not found");
-                this.undo.update(c, i, draw, "Edit " + draw.name + " " + i); //c[i] = draw;
-            }
-            if (isSelected || generate) {
-                this.selection.draw = draw;
-                this.refresh(draw);  //force angular refresh
-            }
-        }
-
-        removeDraw(event: models.Event, draw: models.Draw): void {
-            if (this.selection.draw === draw) {
-                this.selection.draw = undefined;
-            }
-            var c = event.draws;
-            var i = this.find.indexOf(c, "id", draw.id, "Draw to remove not found");
-            this.undo.remove(c, i, "Delete " + draw.name + " " + i); //c.splice( i, 1);
+        removeDraw(draw: models.Draw): void {
+            this.mainLib.removeDraw(draw);
         }
         //#endregion draw
 
@@ -297,65 +193,25 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.doEditMatch(editedMatch, match);
+                        this.mainLib.editMatch(editedMatch, match);
                     }
                 });
-        }
-
-        private doEditMatch(editedMatch: models.Box, match: models.Box): void {
-            var c = match._draw.boxes;
-            var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
-            this.undo.newGroup("Edit match");
-            this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i); //c[i] = editedMatch;
-            //if (!match.playerId && editedMatch.playerId) {
-            //    var nextMatch = drawLib.positionMatch(match.position);
-            //    //TODO
-            //}
-            this.undo.endGroup();
         }
         //#endregion match
 
         public doUndo() {
-            this.select(this.undo.undo());
+            this.mainLib.select(this.undo.undo());
         }
         public doRedo() {
-            this.select(this.undo.redo());
+            this.mainLib.select(this.undo.redo());
         }
-        public select(r: any): void {
-            if (!r) {
-                return;
-            }
-            if (r.players && r.events) { //tournament
-                this.selection.tournament = r;
-                this.selection.event = undefined;
-                this.selection.draw = undefined;
 
-            } else if (r.draws && r._tournament) { //event
-                this.selection.tournament = r._tournament;
-                this.selection.event = r;
-                this.selection.draw = r.draws[0];
-
-            } else if (r.boxes && r._event) { //draw
-                this.selection.tournament = r._event._tournament;
-                this.selection.event = r._event;
-                this.selection.draw = r;
-
-            } else if (r.playerId && r._draw) { //box
-                this.selection.tournament = r._draw._event._tournament;
-                this.selection.event = r._draw._event;
-                this.selection.draw = r._draw;
-            } else if (r.name && r._tournament) {   //player
-                this.selection.tournament = r._tournament;
-                this.selection.player = r;
-            }
-        }
     }
 
     angular.module('jat.main', [
+        'jat.services.mainLib',
         'jat.services.selection',
-        'jat.services.find',
         'jat.services.undo',
-        'jat.services.type',
         'jat.services.tournamentLib',
         'jat.services.drawLib',
         'jat.services.knockoutLib',

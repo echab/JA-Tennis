@@ -28,11 +28,15 @@ module jat.draw {
 
         constructor(
             private drawLib: jat.service.DrawLib,
+            private knockoutLib: jat.service.KnockoutLib, private roundrobinLib: jat.service.RoundrobinLib, //for dependencies
             private find: jat.service.Find
             ) {
         }
 
         computeCoordinates(): void {
+            if (!this.draw) {
+                return;
+            }
             var size = this.drawLib.getSize(this.draw, this);
             this.width = size.width;
             this.height = size.height;
@@ -157,7 +161,7 @@ module jat.draw {
         };
     }
 
-    angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.find'])
+    angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockoutLib', 'jat.services.roundrobinLib', 'jat.services.find'])
         .directive('draw', drawDirective)
         .directive('drawLines', drawLinesDirective);
 }

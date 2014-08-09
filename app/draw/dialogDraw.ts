@@ -6,8 +6,9 @@ module jat.draw {
         drawTypes: { value: number; label: string; }[];
 
         getRegisteredCount(): number {
-            var players = this.drawLib.GetJoueursInscrit(this.draw);
-            return players.length;
+            var players = this.tournamentLib.GetJoueursInscrit(this.draw);
+            var qualifs = this.drawLib.FindAllQualifieSortant(this.draw);
+            return players.length + qualifs.length;
         }
         //getNbEntry(): number {
         //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
@@ -19,7 +20,8 @@ module jat.draw {
             //private selection: jat.service.Selection,
             rank: ServiceRank,
             category: ServiceCategory,
-            private drawLib: jat.service.DrawLib
+            private drawLib: jat.service.DrawLib,
+            private tournamentLib: jat.service.TournamentLib
             ) {
 
             this.drawTypes = [];

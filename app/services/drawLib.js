@@ -3,48 +3,11 @@
 var jat;
 (function (jat) {
     (function (service) {
-        var MAX_QUALIF_ENTRANT = 32;
-        var QEMPTY = -1;
-
-        function isMatch(box) {
-            return box && ('score' in box);
-        }
-
-        function isTypePoule(draw) {
-            return draw.type === 2 /* PouleSimple */ || draw.type === 3 /* PouleAR */;
-        }
-
-        function iDiagonale(box) {
-            var draw = box._draw;
-            return isTypePoule(box._draw) ? (box.position % draw.nbColumn) * (draw.nbColumn + 1) : box.position;
-        }
-        function isGauchePoule(box) {
-            return isTypePoule(box._draw) ? (box.position >= (box._draw.nbColumn * box._draw.nbColumn)) : false;
-        }
-
-        function ADVERSAIRE1(box) {
-            if (isTypePoule(box._draw)) {
-                var n = box._draw.nbColumn;
-                return box.position % n + n * n;
-            } else {
-                return (box.position << 1) + 2;
-            }
-        }
-        ;
-        function ADVERSAIRE2(box) {
-            if (isTypePoule(box._draw)) {
-                var n = box._draw.nbColumn;
-                return box.position / n + n * n;
-            } else {
-                return (box.position << 1) + 1;
-            }
-        }
-        ;
+        var MAX_TETESERIE = 32, MAX_QUALIF_ENTRANT = 32, QEMPTY = -1;
 
         var DrawLib = (function () {
-            function DrawLib(find, rank) {
+            function DrawLib(find) {
                 this.find = find;
-                this.rank = rank;
                 this._drawLibs = {};
             }
             DrawLib.prototype.newDraw = function (parent, source) {
@@ -89,17 +52,29 @@ var jat;
             };
 
             DrawLib.prototype.resetDraw = function (draw, nPlayer) {
+                var _this = this;
                 //remove qualif out
                 var next = this.nextGroup(draw);
-                if (next && next.boxes && draw.boxes) {
-                    for (var i = draw.boxes.length - 1; i >= 0; i--) {
-                        var box = draw.boxes[i];
-                        if (box && box.qualifOut) {
-                            this.SetQualifieSortant(box);
+                if (next && draw.boxes) {
+                    angular.forEach(next, function (d) {
+                        if (d.boxes) {
+                            angular.forEach(next, function (box) {
+                                if (box && box.qualifOut) {
+                                    _this.SetQualifieSortant(box);
+                                }
+                            });
                         }
-                    }
+                    });
                 }
 
+                //if (next && next.boxes && draw.boxes) {
+                //    for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                //        var box = <models.Match> draw.boxes[i];
+                //        if (box && box.qualifOut) {
+                //            this.SetQualifieSortant(box);
+                //        }
+                //    }
+                //}
                 //reset boxes
                 draw.boxes = [];
                 draw.nbColumn = this._drawLibs[draw.type].nbColumnForPlayers(draw, nPlayer);
@@ -169,7 +144,7 @@ var jat;
                 return p;
             };
 
-            DrawLib.prototype.groupDraws = function (draw) {
+            DrawLib.prototype.currentGroup = function (draw) {
                 var draws = [];
                 var d = this.groupBegin(draw);
                 while (d) {
@@ -182,49 +157,16 @@ var jat;
                 return draws;
             };
 
-            //public group(draw: models.Draw, callback: (draw: models.Draw) => boolean, reverse?: boolean): void {
-            //    if (!reverse) {
-            //        var d = this.groupBegin(draw);
-            //        while (d) {
-            //            if (!callback(d)) {
-            //                return;
-            //            }
-            //            d = d._next;
-            //            if (d && !d.suite) {
-            //                break;
-            //            }
-            //        }
-            //    } else {
-            //        var d = this.groupEnd(draw);
-            //        while (d) {
-            //            if (!callback(d)) {
-            //                return;
-            //            }
-            //        }
-            //    }
-            //}
-            DrawLib.prototype.prevGroup = function (draw) {
-                //return the first Draw of the previous suite
+            DrawLib.prototype.previousGroup = function (draw) {
+                //return the draws of the previous suite
                 var p = this.groupBegin(draw);
-                return p && p._previous ? this.groupBegin(p._previous) : null;
+                return p && p._previous ? this.currentGroup(p._previous) : null;
             };
 
             DrawLib.prototype.nextGroup = function (draw) {
-                //return the first Draw of the next suite
-                var p = draw._next;
-                while (p && p.suite) {
-                    p = p._next;
-                }
-                return p;
-            };
-
-            DrawLib.prototype.getnSuite = function (draw) {
-                //return the Draw count in the current suite
-                var p = this.groupBegin(draw);
-                for (var n = 0; p && (!n || p.suite); n++) {
-                    p = p._next;
-                }
-                return n;
+                //return the draws of the next suite
+                var p = this.groupEnd(draw);
+                return p ? this.currentGroup(p) : null;
             };
 
             //public setType(BYTE iType) {
@@ -244,22 +186,9 @@ var jat;
                 return box && ('score' in box) && ((box.place) || box.date);
             };
 
-            //public FindJoueurSuite(short iJoueur, const CTableau** ppSuite): models.Box {
-            //    //ASSERT(0 <= iJoueur);
-            //    for( short i = iBoiteMin(); i <= iBoiteMax(); i++) {
-            //        if (draw.boxes[i]. m_iJoueur == iJoueur) {
-            //            if (ppSuite)
-            //		*ppSuite = (CTableau*) this;
-            //            return i;
-            //        }
-            //    }
-            //    if (draw._next && draw._next. suite) {
-            //        if ((i = draw._next. FindJoueurSuite(iJoueur, ppSuite)) != -1)
-            //            return i;
-            //    }
-            //    return -1;
-            //}
             DrawLib.prototype.FindTeteSerie = function (draw, iTeteSerie) {
+                ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
+
                 for (var i = 0; i <= draw.boxes.length; i++) {
                     var boxIn = draw.boxes[i];
                     if (!boxIn) {
@@ -279,30 +208,52 @@ var jat;
                 }
             };
 
-            DrawLib.prototype.FindQualifieEntrant = function (draw, iQualifie) {
-                return this._drawLibs[draw.type].FindQualifieEntrant(draw, iQualifie);
+            DrawLib.prototype.FindQualifieEntrant = function (origin, iQualifie) {
+                var _this = this;
+                var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
+                angular.forEach(group, function (d) {
+                    var playerIn = _this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
+                    if (playerIn) {
+                        return playerIn;
+                    }
+                });
+                return null;
             };
 
-            DrawLib.prototype.FindQualifieSortant = function (draw, iQualifie) {
-                var boxOut = this._drawLibs[draw.type].FindQualifieSortant(draw, iQualifie);
-                if (boxOut) {
-                    return boxOut;
-                }
+            DrawLib.prototype.FindQualifieSortant = function (origin, iQualifie) {
+                var _this = this;
+                var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
+                angular.forEach(group, function (d) {
+                    var boxOut = _this._drawLibs[d.type].FindQualifieSortant(d, iQualifie);
+                    if (boxOut) {
+                        return boxOut;
+                    }
+                });
 
                 //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
-                if (!draw.suite || !draw._previous) {
-                    var nSomme = 0;
-                    var pT = draw;
-                    do {
-                        if (isTypePoule(pT)) {
-                            nSomme += pT.nbOut;
-                        }
-                        pT = pT._next;
-                    } while(pT && pT.suite);
-
-                    if (iQualifie <= nSomme) {
-                        return -2;
+                var outCount = 0;
+                angular.forEach(group, function (d) {
+                    if (d.type >= 2) {
+                        outCount += d.nbOut;
                     }
+                });
+                if (iQualifie <= outCount) {
+                    return -2;
+                }
+                return null;
+            };
+
+            DrawLib.prototype.FindAllQualifieSortant = function (origin, hideNumbers) {
+                //Récupère les qualifiés sortants du tableau
+                var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
+                if (group) {
+                    var a = [];
+                    for (var i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
+                        if (this.FindQualifieSortant(group, i)) {
+                            a.push(hideNumbers ? QEMPTY : i);
+                        }
+                    }
+                    return a;
                 }
             };
 
@@ -346,7 +297,7 @@ var jat;
                 var next = this.nextGroup(box._draw);
                 var boxOut = box;
                 var e;
-                if ((e = boxOut.qualifOut) && next && next.boxes) {
+                if ((e = boxOut.qualifOut) && next) {
                     var boxIn = this.FindQualifieEntrant(next, e);
                     if (boxIn) {
                         if (!boxIn.playerId && !this.MetJoueur(boxIn, player, true)) {
@@ -423,7 +374,8 @@ var jat;
 
             //Planification d'un match : met le court, la date et l'heure
             DrawLib.prototype.MetCreneau = function (box, boite) {
-                //ASSERT(isMatch(box));
+                ASSERT(isMatch(box));
+
                 //ASSERT(MetCreneauOk(box, boite));
                 box.place = boite.place;
                 box.date = boite.date;
@@ -432,7 +384,8 @@ var jat;
             };
 
             DrawLib.prototype.EnleveCreneau = function (box) {
-                //ASSERT(isMatch(box));
+                ASSERT(isMatch(box));
+
                 //ASSERT(EnleveCreneauOk(box));
                 box.place = undefined;
                 box.date = undefined;
@@ -460,7 +413,7 @@ var jat;
                 var next = this.nextGroup(box._draw);
                 var boxOut = box;
                 var i;
-                if ((i = boxOut.qualifOut) && next && next.boxes) {
+                if ((i = boxOut.qualifOut) && next) {
                     var boxIn = this.FindQualifieEntrant(next, i);
                     if (boxIn) {
                         if (!this.EnleveJoueur(boxIn, true)) {
@@ -545,21 +498,23 @@ var jat;
 
             //Avec report sur le tableau suivant
             DrawLib.prototype.LockBoite = function (box) {
-                //ASSERT(isBoite(box));
+                ASSERT(!!box);
+
                 if (iDiagonale(box) === box.position) {
                     ///TODO box = ADVERSAIRE1(box);
                 }
 
-                //ASSERT(isBoite(box));
-                //ASSERT(box. isJoueur());
+                ASSERT(!!box);
+
+                //ASSERT(box.isJoueur());
                 if (box.hidden) {
                     return true;
                 }
 
                 box.locked = true;
 
-                var prev = this.prevGroup(box._draw);
-                if (prev && prev.boxes) {
+                var prev = this.previousGroup(box._draw);
+                if (prev) {
                     var boxIn = box;
                     if (boxIn.qualifIn) {
                         var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
@@ -580,8 +535,8 @@ var jat;
 
                 delete box.locked;
 
-                var prev = this.prevGroup(box._draw);
-                if (prev && prev.boxes) {
+                var prev = this.previousGroup(box._draw);
+                if (prev) {
                     var boxIn = box;
                     if (boxIn.qualifIn) {
                         var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
@@ -698,75 +653,6 @@ var jat;
                 return true;
             };
 
-            DrawLib.prototype.TriJoueurs = function (players) {
-                var _this = this;
-                //Tri les joueurs par classement
-                var compare1 = function (p1, p2) {
-                    //if numbers, p1 or p2 are PlayerIn
-                    var isNumber1 = 'number' === typeof p1, isNumber2 = 'number' === typeof p2;
-                    if (isNumber1 && isNumber2) {
-                        return 0;
-                    }
-                    if (isNumber1) {
-                        return -1;
-                    }
-                    if (isNumber2) {
-                        return 1;
-                    }
-                    return _this.rank.compare(p1.rank, p2.rank);
-                };
-                players.sort(compare1);
-
-                for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
-                    if (r1 === players.length || compare1(players[r0], players[r1])) {
-                        //nouvelle plage de classement
-                        r1--;
-
-                        for (var i = r0; i < r1; i++) {
-                            //echange deux joueurs p et q
-                            var p = Math.round(r0 + Math.random() * (r1 - r0));
-                            var q = Math.round(r0 + Math.random() * (r1 - r0));
-                            if (p != q) {
-                                var t = players[p];
-                                players[p] = players[q];
-                                players[q] = t;
-                            }
-                        }
-
-                        r0 = ++r1;
-                    }
-                }
-            };
-
-            DrawLib.prototype.GetJoueursInscrit = function (draw) {
-                function isInscrit(player, event) {
-                    return player.registration.indexOf(event.id) != -1;
-                }
-
-                //Récupère les joueurs inscrits
-                var players = draw._event._tournament.players, ppJoueur = [], nPlayer = 0;
-                for (var i = 0; i < players.length; i++) {
-                    var pJ = players[i];
-                    if (isInscrit(pJ, draw._event)) {
-                        if (!pJ.rank || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
-                            ppJoueur.push(pJ); //no du joueur
-                        }
-                    }
-                }
-
-                //Récupère les qualifiés sortants du tableau précédent
-                var prev = this.prevGroup(draw);
-                if (prev && prev.boxes) {
-                    for (i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
-                        if (this.FindQualifieSortant(prev, i)) {
-                            ppJoueur.push(QEMPTY);
-                        }
-                    }
-                }
-
-                return ppJoueur;
-            };
-
             DrawLib.prototype.boxesOpponents = function (match) {
                 return this._drawLibs[match._draw.type].boxesOpponents(match);
             };
@@ -774,8 +660,50 @@ var jat;
         })();
         service.DrawLib = DrawLib;
 
-        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find, rank) {
-            return new DrawLib(find, rank);
+        function isMatch(box) {
+            return box && ('score' in box);
+        }
+
+        function isTypePoule(draw) {
+            return draw.type === 2 /* PouleSimple */ || draw.type === 3 /* PouleAR */;
+        }
+
+        function iDiagonale(box) {
+            var draw = box._draw;
+            return isTypePoule(box._draw) ? (box.position % draw.nbColumn) * (draw.nbColumn + 1) : box.position;
+        }
+        function isGauchePoule(box) {
+            return isTypePoule(box._draw) ? (box.position >= (box._draw.nbColumn * box._draw.nbColumn)) : false;
+        }
+
+        function ADVERSAIRE1(box) {
+            if (isTypePoule(box._draw)) {
+                var n = box._draw.nbColumn;
+                return box.position % n + n * n;
+            } else {
+                return (box.position << 1) + 2;
+            }
+        }
+        ;
+        function ADVERSAIRE2(box) {
+            if (isTypePoule(box._draw)) {
+                var n = box._draw.nbColumn;
+                return box.position / n + n * n;
+            } else {
+                return (box.position << 1) + 1;
+            }
+        }
+        ;
+
+        function ASSERT(b, message) {
+            if (!b) {
+                debugger;
+                throw message || 'Assertion is false';
+            }
+        }
+
+        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find) {
+            return new DrawLib(find);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

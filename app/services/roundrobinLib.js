@@ -4,8 +4,9 @@ var jat;
         var MIN_COL = 0, MAX_COL_POULE = 22, MAX_JOUEUR = 8191, MAX_TABLEAU = 63, QEMPTY = -1;
 
         var RoundrobinLib = (function () {
-            function RoundrobinLib(drawLib, ranking, find) {
+            function RoundrobinLib(drawLib, tournamentLib, ranking, find) {
                 this.drawLib = drawLib;
+                this.tournamentLib = tournamentLib;
                 this.ranking = ranking;
                 this.find = find;
                 drawLib._drawLibs[2 /* PouleSimple */] = drawLib._drawLibs[3 /* PouleAR */] = this;
@@ -32,7 +33,7 @@ var jat;
             };
 
             RoundrobinLib.prototype.getSize = function (draw, dimensions) {
-                if (!draw || !draw.nbColumn) {
+                if (!draw.nbColumn) {
                     return { width: 10, height: 10 };
                 }
 
@@ -152,6 +153,11 @@ var jat;
 
             RoundrobinLib.prototype.FindQualifieEntrant = function (draw, iQualifie) {
                 ASSERT(iQualifie >= 0);
+
+                if (!draw.boxes) {
+                    return;
+                }
+
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var boxIn = draw.boxes[i];
                     if (!boxIn) {
@@ -162,16 +168,12 @@ var jat;
                         return boxIn;
                     }
                 }
-
-                if (draw._next && draw._next.suite) {
-                    return this.drawLib.FindQualifieEntrant(draw._next, iQualifie);
-                }
             };
 
             RoundrobinLib.prototype.FindQualifieSortant = function (draw, iQualifie) {
                 ASSERT(0 < iQualifie);
 
-                if (iQualifie === QEMPTY) {
+                if (iQualifie === QEMPTY || !draw.boxes) {
                     return;
                 }
 
@@ -180,10 +182,6 @@ var jat;
                     if (boxOut && boxOut.qualifOut === iQualifie) {
                         return boxOut;
                     }
-                }
-
-                if (draw._next && draw._next.suite) {
-                    return this.drawLib.FindQualifieSortant(draw._next, iQualifie);
                 }
             };
 
@@ -195,8 +193,8 @@ var jat;
                 var boxIn = box;
 
                 if (inNumber) {
-                    var prev = this.drawLib.prevGroup(draw);
-                    if (!player && prev && prev.boxes && inNumber != QEMPTY) {
+                    var prev = this.drawLib.previousGroup(draw);
+                    if (!player && prev && inNumber != QEMPTY) {
                         //Va chercher le joueur dans le tableau précédent
                         var boxOut = this.drawLib.FindQualifieSortant(prev, inNumber);
                         if (angular.isObject(boxOut)) {
@@ -223,7 +221,7 @@ var jat;
                 } else {
                     boxIn.qualifIn = 0;
 
-                    if (this.drawLib.prevGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
+                    if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                         ASSERT(false);
                     }
                 }
@@ -244,7 +242,7 @@ var jat;
                     var boxOut = box;
 
                     //Met à jour le tableau suivant
-                    if (next && next.boxes && box.playerId && boxOut.qualifOut) {
+                    if (next && box.playerId && boxOut.qualifOut) {
                         var boxIn = this.drawLib.FindQualifieEntrant(box._draw, outNumber);
                         if (boxIn) {
                             ASSERT(boxIn.playerId === box.playerId);
@@ -304,7 +302,7 @@ var jat;
             RoundrobinLib.prototype.GetJoueursTableau = function (draw) {
                 //Récupère les joueurs du tableau
                 var ppJoueur = [];
-                var draws = this.drawLib.groupDraws(draw);
+                var draws = this.drawLib.currentGroup(draw);
                 for (var j = 0; j < draws.length; j++) {
                     var d = draws[j];
                     var first = positionFirstIn(d.nbColumn), last = positionLastIn(d.nbColumn);
@@ -327,14 +325,20 @@ var jat;
             };
 
             RoundrobinLib.prototype.generateDraw = function (draw, generate) {
-                var oldDraws = this.drawLib.groupDraws(draw);
+                var oldDraws = this.drawLib.currentGroup(draw);
                 var t = this.find.indexOf(draw._event.draws, 'id', oldDraws[0].id);
 
                 //this.drawLib.resetDraw(draw, draw.nbColumn);
-                var players = this.drawLib.GetJoueursInscrit(draw);
+                var players = this.tournamentLib.GetJoueursInscrit(draw);
+
+                //Récupère les qualifiés sortants du tableau précédent
+                var prev = this.drawLib.previousGroup(draw);
+                if (prev) {
+                    players = players.concat(this.drawLib.FindAllQualifieSortant(prev, true));
+                }
 
                 //Tri et Mélange les joueurs de même classement
-                this.drawLib.TriJoueurs(players);
+                this.tournamentLib.TriJoueurs(players);
 
                 ////Delete previous tableau
                 //draw._event.draws.splice(t, oldDraws.length);
@@ -519,8 +523,8 @@ var jat;
         }
         ;
 
-        angular.module('jat.services.roundrobinLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find']).factory('roundrobinLib', function (drawLib, ranking, find) {
-            return new RoundrobinLib(drawLib, ranking, find);
+        angular.module('jat.services.roundrobinLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find']).factory('roundrobinLib', function (drawLib, tournamentLib, ranking, find) {
+            return new RoundrobinLib(drawLib, tournamentLib, ranking, find);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

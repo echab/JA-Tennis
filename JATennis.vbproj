@@ -94,6 +94,7 @@
     <Content Include="app\services\drawLib.js">
       <DependentUpon>drawLib.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="app\services\mainLib.ts" />
     <TypeScriptCompile Include="app\services\type.ts" />
     <TypeScriptCompile Include="app\services\tournamentLib.ts" />
     <TypeScriptCompile Include="app\services\knockoutLib.ts" />
@@ -197,6 +198,7 @@
     <TypeScriptCompile Include="test\unit\services\fft.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\find.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\knockoutLib.Spec.ts" />
+    <TypeScriptCompile Include="test\unit\services\mainLib.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\roundrobin.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\undo.Spec.ts" />
   </ItemGroup>
@@ -268,6 +270,7 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>-->
     <Content Include="package.json" />
+    <Content Include=".gitattributes" />
     <None Include="test\karma.config.js" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />

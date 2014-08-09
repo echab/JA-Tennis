@@ -1,16 +1,22 @@
 ﻿'use strict';
 
-describe('main controller', () => {
+describe('services.mainLib', () => {
 
-    var main: jat.main.mainCtrl, $modal: uib.mock.IModalService<string>;
+    var main: jat.service.MainLib;
 
-    beforeEach(module('jat.main'));
-    beforeEach(module('ui.bootstrap.mock'));    //for $modal mock
+    beforeEach(module('jat.services.mainLib'));
 
-    beforeEach(inject(($controller: ng.IControllerService, _$modal_: uib.mock.IModalService<string>) => {
-        main = $controller('mainCtrl');
-        $modal = _$modal_;
+    beforeEach(inject((_mainLib_:jat.service.MainLib) => {
+        main = _mainLib_;
     }));
+
+    describe('Load/save', () => {
+
+        it('should load a tournament from url', () => {
+
+        });
+
+    });
 
     describe('Players management', () => {
 
@@ -21,6 +27,7 @@ describe('main controller', () => {
         };
 
         var player1: models.Player = { id: 'p1', name: 'Eloi', rank: '30/3', registration: [] };
+        var player2: models.Player = { id: 'p2', name: 'Denis', rank: '4/6', registration: [] };
 
         //clean tournament1
         afterEach(() => tournament1.players.splice(0, tournament1.players.length));
@@ -30,36 +37,32 @@ describe('main controller', () => {
 
             //main.select(tournament1);
             //main.addPlayer();
-            //$modal.close('Ok');
             //expect(tournament1.players.length).toBe(1);
             //expect(tournament1.players[0].id).toBe('P0');
 
-            //main.addPlayer(player1);
-            //$modal.close('Ok');
-            //expect(tournament1.players.length).toBe(2);
-            //expect(tournament1.players[1].id).toBe('P1');
-            //expect(tournament1.players[1].name).toBe('Eloi');
-            //expect(tournament1.players[1].rank).toBe('30/3');
+            main.addPlayer(tournament1, player1);
+            expect(tournament1.players.length).toBe(1);
+            expect(tournament1.players[0].id).toBe('P0');
+            expect(tournament1.players[0].name).toBe('Eloi');
+            expect(tournament1.players[0].rank).toBe('30/3');
         });
 
         it('should remove player', function () {
-            //main.select(tournament1);
-            //tournament1.players.push(player1);
+            main.select(tournament1);
+            tournament1.players.push(player1);
 
-            //main.removePlayer(player1);
+            main.removePlayer(player1);
 
             expect(tournament1.players.length).toBe(0);
         });
 
         it('should edit player', function () {
-            //main.select(tournament1);
-            //tournament1.players.push(player1);
+            main.select(tournament1);
+            tournament1.players.push(player1);
 
-            //main.editPlayer(player1);
-            //player1.name = 'Denis';
-            //$modal.close('Ok');
+            main.editPlayer(player1, player2);
 
-            //expect(tournament1.players[0].name).toBe('Eloi');
+            expect(tournament1.players[0].name).toBe('Eloi');
 
             //main.doUndo();
             //expect(tournament1.players[0].name).toBe('Denis');

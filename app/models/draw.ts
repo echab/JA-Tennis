@@ -22,6 +22,8 @@ module models {
         //matches: Match[];
         boxes: Box[];
 
+        locked?: boolean;
+
         //group/suite
         _previous?: models.Draw;
         _next?: models.Draw;
