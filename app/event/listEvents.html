@@ -1,0 +1,38 @@
+﻿<div ng-init="expand=false">
+    <h4 ng-click="expand=!expand"><i ng-class="{'icon-plus-sign':!expand, 'icon-minus-sign':expand}"></i> The events:</h4>
+    <table class="table table-hover table-condensed" ng-show="expand">
+        <!--<caption>Events</caption>-->
+        <thead>
+            <tr>
+                <th class="span1"><input type="checkbox" /></th>
+                <th>Event name</th>
+                <th>Draws</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="evt in list.events" ng-class="{info:evt === main.selection.event}">
+                <td><input type="checkbox" /> <small>{{evt.id}}</small></td>
+                <td>
+                    <i class="icon2-info" ng-click="main.editEvent(evt)"></i>
+                    <span ng-click="main.selection.event = evt; main.selection.draw = null">{{evt.name}}</span>
+                </td>
+                <td>
+                    <div ng-repeat="draw in evt.draws" class="inline" style="border-left: solid 1px blue; padding-left: 3px;">
+                        <i class="icon2-info" ng-click="main.editDraw(evt, draw)"></i>
+                        <span ng-click="main.selection.event = evt; main.selection.draw = draw">{{draw.name}}</span>
+                        <i class="icon-trash" ng-click="main.removeDraw(evt, draw)"></i>
+                        <div draw="draw" simple="true" box-width="12" box-height="2" inter-box-width="2" inter-box-height="0"
+                             ng-click="main.selection.event = evt; main.selection.draw = draw">
+                        </div>
+                    </div>
+                </td>
+                <td><i class="icon-trash" ng-click="main.removeEvent(evt)"></i></td>
+            </tr>
+            <tr ng-show="list.events.length == 0">
+                <td colspan="3">No event</td>
+            </tr>
+        </tbody>
+    </table>
+    <!--<input type="button" value="Add event" ng-click="addEvent({name:''})" />-->
+</div>

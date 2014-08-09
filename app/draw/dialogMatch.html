@@ -1,0 +1,64 @@
+﻿<form name="matchForm" ng-submit="$close('Ok')" class="modal-form">
+    <div class="modal-header">
+        <button type="button" class="cclose" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <small>Id: {{dlg.match.id}}</small></h3>
+    </div>
+    <div class="modal-body Zform-horizontal">
+
+        <fieldset>
+            <legend>Result:</legend>
+
+            <div style="display:inline-block; vertical-align:top;">
+                <label>Winner:</label>
+                <div style="display:inline-block; vertical-align:top;">
+                    <label><input type="radio" ng-model="dlg.match.playerId" ng-value="dlg.player1.id" /> {{dlg.player1.name}} {{dlg.player1.rank}}</label><br />
+                    <label><input type="radio" ng-model="dlg.match.playerId" ng-value="dlg.player2.id" /> {{dlg.player2.name}} {{dlg.player2.rank}}</label>
+                </div>
+            </div>
+
+            <div style="display:inline-block; vertical-align:top;">
+                <label>
+                    Score:
+                    <input type="text" name="score" ng-model="dlg.match.score" class="span2" /></label>
+                <!--<span class="error" ng-show="matchForm.name.$error.required">Required!</span>-->
+                <label><input type="checkbox" ng-model="dlg.match.wo" /> WO</label>
+                </div>
+            <div style="display:inline-block; vertical-align:top;">
+                <div>
+                    <label><input type="checkbox" ng-model="dlg.match.canceled" /> Canceled</label>
+                </div>
+                <div>
+                    <label><input type="checkbox" ng-model="dlg.match.vainqDef" /> Vainqueur defaillant</label>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Planning:</legend>
+            <div>
+                <label>Court: <select ng-model="dlg.match.place" ng-options="place for place in dlg.places"></select></label>
+                <label>Day and time: <input type="date" ng-model="dlg.match.date"></input></label>
+            </div>
+            <div>
+                <label>Receive: <input type="checkbox" ng-model="dlg.match.receive1" /></label>
+                <label>Aware: <input type="checkbox" ng-model="dlg.match.aware1" /> 
+                {{dlg.player1.name}}</label><br />
+                <label>Receive: <input type="checkbox" ng-model="dlg.match.receive2" /></label>
+                <label>Aware: <input type="checkbox" ng-model="dlg.match.aware2" /> 
+                {{dlg.player2.name}}</label>
+            </div>
+        </fieldset>
+
+        <div>
+            <label>Format:<select ng-model="dlg.match.matchFormat" ng-options="key as matchFormat.name for (key,matchFormat) in dlg.matchFormats"></select></label>
+        </div>
+
+        <div>
+            <label>Note:<textarea ng-model="dlg.match.note"></textarea></label>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!matchForm.$error.required" ng-class="{'disabled': !!matchForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i> OK</button>
+        <!--<a href="#" ng-click="$close('Del')"><i class="icon-trash"></i></a>-->
+    </div>
+</form>

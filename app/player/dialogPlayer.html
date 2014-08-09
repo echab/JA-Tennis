@@ -1,0 +1,93 @@
+<form  name="playerForm" ng-submit="$close('Ok')" ZZZng-controller="dialogPlayerCtrl as dlg" class="modal-form">
+
+    <div class="modal-header">
+        <button type="button" class="cclose" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <small>Id: {{dlg.player.id}}</small></h3>
+    </div>
+    <div class="modal-body Zform-horizontal" >
+
+        <!--<div class="control-group">
+            <label for="name" class="control-label">Name:</label>
+            <div class="controls">
+                <input type="text" id="name" name="name" ng-model="player.name" required />*
+            </div>
+        </div>-->
+
+        <div>
+            <label>
+                Name:
+                <input type="text" ng-model="dlg.player.name" required class="span2" /></label>
+            <!--<span class="error" ng-show="playerForm.name.$error.required">Required!</span>-->
+            <label>
+                Surname:
+                <input type="text" ng-model="dlg.player.surname" class="span2" /></label>
+        </div>
+        <div>
+            <label>
+                Rank:
+                    <select type="text" name="rank" ng-model="dlg.player.rank" ng-options="value for value in dlg.ranks" class="span2"></select></label>
+        </div>
+
+        <tabset>
+            <tab heading="General">
+                <label>
+                    Birth:
+                <input type="date" ng-model="dlg.player.birth" class="span2" /></label>
+                <label>
+                    Club:
+                <input type="text" ng-model="dlg.player.club" class="span2" /></label>
+                <label>
+                    Licence:
+                <input type="text" ng-model="dlg.player.licence" class="span2" /></label>
+            </tab>
+            <tab heading="Registration">
+                <label>Events:</label>
+                <ul>
+                    <li ng-repeat="event in dlg.events">
+                        <label><input type="checkbox" check-list="dlg.player.registration" value="{{event.id}}" /> {{event.name}}</label>
+                    </li>
+                </ul>
+            </tab>
+            <tab heading="Coordinates">
+                <label>Adress:</label>
+                <input type="text" ng-model="dlg.player.adress1" class="span3" /><br />
+                <input type="text" ng-model="dlg.player.adress2" class="span3" /><br />
+                <input type="text" ng-model="dlg.player.zipcode" class="span1" />
+                <input type="text" ng-model="dlg.player.city" class="span2" />
+
+                <label>
+                    Phones:
+                    <input type="text" ng-model="dlg.player.phone1" class="span2" />
+                    <input type="text" ng-model="dlg.player.phone2" class="span2" /></label>
+                <label>
+                    eMail:
+                <input type="text" ng-model="dlg.player.email" class="span2" /></label>
+            </tab>
+            <tab heading="Team">
+            </tab>
+            <tab heading="Comment">
+                <label>
+                    Note:
+                <textarea ng-model="dlg.player.note" class="span6"></textarea></label>
+            </tab>
+        </tabset>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!playerForm.$error.required" ng-class="{'disabled': !!playerForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+        <a href="#" ng-click="$close('Del')">
+            <i class="icon-trash"></i>
+        </a>
+    </div>
+    <!--<fieldset>
+            <legend>Coordinate</legend>
+            <div>
+            </div>
+
+            <div>
+                <label>
+                    Rank:
+            <select type="text" name="rank" ng-model="player.rank" ng-options="value for value in ranks"></select></label>
+            </div>
+        </fieldset>-->
+    <!--{{ playerForm.$error }}-->
+</form>

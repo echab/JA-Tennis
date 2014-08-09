@@ -1,0 +1,21 @@
+﻿<div ng-if="ctrlDraw.isKnockout" class="draw knockout" ng-style="{width: ctrlDraw.width +'px', height: ctrlDraw.height +'px'}">
+    <canvas draw-lines="ctrlDraw.positions._refresh"></canvas>
+    <div ng-repeat="box in ctrlDraw.draw.boxes" ng-if="!ctrlDraw.simple">
+        <div draw-box="box" pos="ctrlDraw.positions[box.position]"></div>
+    </div>
+</div>
+<table ng-if="!ctrlDraw.isKnockout" class="draw roundrobin">
+    <tbody>
+        <tr ng-style="{height: ctrlDraw.boxHeight +'px'}">
+            <td ng-style="{width: ctrlDraw.boxWidth +'px'}"></td>
+            <td ng-repeat="row in ctrlDraw.rows" ng-style="{width: ctrlDraw.boxWidth +'px'}">
+                <div draw-box="ctrlDraw.getBox(row[0])" ng-if="!ctrlDraw.simple"></div>
+            </td>
+        </tr>
+        <tr ng-repeat="row in ctrlDraw.rows" ng-style="{height: ctrlDraw.boxHeight +'px'}">
+            <td ng-repeat="col in row" ng-class="{diag: ctrlDraw.isDiag(col)}">
+                <div draw-box="ctrlDraw.getBox(col)" ng-if="!ctrlDraw.simple"></div>
+            </td>
+        </tr>
+    </tbody>
+</table>

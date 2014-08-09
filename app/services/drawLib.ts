@@ -1,0 +1,854 @@
+﻿interface IDrawLib {
+    getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize;
+    computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[];
+    resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void;
+    nbColumnForPlayers(draw: models.Draw, nJoueur: number): number;
+    generateDraw(draw: models.Draw, generate: number): models.Draw[];
+    SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean;    //setPlayerIn
+    SetQualifieSortant(box: models.Box, outNumber?: number): boolean;    //setPlayerOut
+    FindQualifieEntrant(draw: models.Draw, inNumber: number): models.PlayerIn;  //findPlayerIn
+    FindQualifieSortant(draw: models.Draw, outNumber: number): models.Match;    //findPlayerOut
+    CalculeScore(draw: models.Draw): boolean;
+    boxesOpponents(match: models.Match): { box1: models.Box; box2: models.Box };
+}
+
+interface IDrawDimensions {
+    boxWidth: number;
+    boxHeight: number;
+    interBoxWidth: number;
+    interBoxHeight: number;
+}
+interface IPosition {
+    x: number;
+    y: number
+};
+interface ISize {
+    width: number;
+    height: number;
+}
+
+module jat.service {
+
+    var MAX_QUALIF_ENTRANT = 32;
+    var QEMPTY = - 1;
+
+    function isMatch(box: models.Box): boolean {
+        return box && ('score' in box);
+    }
+
+    function isTypePoule(draw: models.Draw): boolean {
+        return draw.type === models.DrawType.PouleSimple || draw.type === models.DrawType.PouleAR;
+    }
+
+    function iDiagonale(box: models.Box): number {
+        var draw = box._draw;
+        return isTypePoule(box._draw) ? (box.position % draw.nbColumn) * (draw.nbColumn + 1) : box.position;
+    }
+    function isGauchePoule(box: models.Box): boolean {
+        return isTypePoule(box._draw) ? (box.position >= (box._draw.nbColumn * box._draw.nbColumn)) : false;
+    }
+
+    function ADVERSAIRE1(box: models.Box): number {
+        if (isTypePoule(box._draw)) {
+            var n = box._draw.nbColumn;
+            return box.position % n + n * n;
+        } else {
+            return (box.position << 1) + 2;
+        }
+    };
+    function ADVERSAIRE2(box: models.Box): number {
+        if (isTypePoule(box._draw)) {
+            var n = box._draw.nbColumn;
+            return box.position / n + n * n;
+        } else {
+            return (box.position << 1) + 1;
+        }
+    };
+
+
+    export class DrawLib implements IDrawLib {
+
+        _drawLibs: { [name: string]: IDrawLib } = {};
+
+        constructor(
+            private find: jat.service.Find,
+            private rank: ServiceRank
+            ) {
+        }
+
+        public newDraw(parent: models.Event, source?: models.Draw): models.Draw {
+            var draw: models.Draw = <any>{};
+            if (angular.isObject(source)) {
+                angular.extend(draw, source);
+            }
+            this.initDraw(draw, parent);
+            return draw;
+        }
+
+        public initDraw(draw: models.Draw, parent: models.Event): void {
+            draw._event = parent;
+
+            draw.type = draw.type || 0;
+            draw.nbColumn = draw.nbColumn || 0;
+            draw.nbOut = draw.nbOut || 0;
+
+            //init group linked list
+            var i = this.find.indexOf(parent.draws, 'id', draw.id);
+            if (i > 0) {
+                var d = parent.draws[i - 1];
+                draw._previous = d;
+                d._next = draw;
+            } else {
+                draw._previous = null;
+            }
+            if (i < parent.draws.length - 1) {
+                var d = parent.draws[i + 1];
+                draw._next = d;
+                d._previous = draw;
+            }
+
+            //init boxes
+            if (!draw.boxes) {
+                return;
+            }
+            for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                var box = draw.boxes[i];
+                this.initBox(box, draw);
+            }
+        }
+
+        public resetDraw(draw: models.Draw, nPlayer: number): void {
+            //remove qualif out
+            var next = this.nextGroup(draw);
+            if (next && next.boxes && draw.boxes) {
+                for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                    var box = <models.Match> draw.boxes[i];
+                    if (box && box.qualifOut) {
+                        this.SetQualifieSortant(box);
+                    }
+                }
+            }
+            //reset boxes
+            draw.boxes = [];
+            draw.nbColumn = this._drawLibs[draw.type].nbColumnForPlayers(draw, nPlayer);
+        }
+
+        public newBox(parent: models.Draw, matchFormat?: string, position?: number): models.Box;
+        public newBox(parent: models.Draw, source?: models.Box, position?: number): models.Box;
+        public newBox(parent: models.Draw, source?: any, position?: number): models.Box {
+            var box: models.Box = <any>{};
+            if (angular.isObject(source)) {
+                angular.extend(box, source);
+                //box.id = undefined;
+                //box.position= undefined;
+            } else if (angular.isString(source)) {
+                var match: models.Match = <models.Match>box;
+                match.score = undefined;
+                match.matchFormat = source;
+            }
+            if (angular.isNumber(position)) {
+                box.position = position;
+            }
+            this.initBox(box, parent);
+            return box;
+        }
+
+        public initBox(box: models.Box, parent: models.Draw): void {
+            box._draw = parent;
+            box._player = this.getPlayer(box);
+        }
+
+        public nbColumnForPlayers(draw: models.Draw, nJoueur: number): number {
+            return this._drawLibs[draw.type].nbColumnForPlayers(draw, nJoueur);
+        }
+        public getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize {
+            return this._drawLibs[draw.type].getSize(draw, dimensions);
+        }
+        public computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[] {
+            return this._drawLibs[draw.type].computePositions(draw, dimensions);
+        }
+        public resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void {
+            this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);
+        }
+
+        public generateDraw(draw: models.Draw, generate: number): models.Draw[] {
+            return this._drawLibs[draw.type].generateDraw(draw, generate);
+        }
+
+        public getPlayer(box: models.Box): models.Player {
+            return this.find.byId(box._draw._event._tournament.players, box.playerId);
+        }
+
+        //Group functions
+        public groupBegin(draw: models.Draw): models.Draw {   //getDebut
+            //return the first Draw of the suite
+            var p = draw;
+            while (p && p.suite) {
+                if (!p._previous)
+                    break;
+                p = p._previous;
+            }
+            return p;
+        }
+
+        public groupEnd(draw: models.Draw): models.Draw { //getFin
+            //return the last Draw of the suite
+            var p = this.groupBegin(draw);
+            while (p && p._next && p._next.suite)
+                p = p._next;
+            return p;
+        }
+
+        public groupDraws(draw: models.Draw): models.Draw[] {
+            var draws: models.Draw[] = [];
+            var d = this.groupBegin(draw);
+            while (d) {
+                draws.push(d);
+                d = d._next;
+                if (d && !d.suite) {
+                    break;
+                }
+            }
+            return draws;
+        }
+
+        //public group(draw: models.Draw, callback: (draw: models.Draw) => boolean, reverse?: boolean): void {
+        //    if (!reverse) {
+        //        var d = this.groupBegin(draw);
+        //        while (d) {
+        //            if (!callback(d)) {
+        //                return;
+        //            }
+        //            d = d._next;
+        //            if (d && !d.suite) {
+        //                break;
+        //            }
+        //        }
+        //    } else {
+        //        var d = this.groupEnd(draw);
+        //        while (d) {
+        //            if (!callback(d)) {
+        //                return;
+        //            }
+
+        //        }
+        //    }
+        //}
+
+        public prevGroup(draw: models.Draw): models.Draw {	//getPrecedent
+            //return the first Draw of the previous suite
+            var p = this.groupBegin(draw);
+            return p && p._previous ? this.groupBegin(p._previous) : null;
+        }
+
+        public nextGroup(draw: models.Draw): models.Draw {	    //getSuivant
+            //return the first Draw of the next suite
+            var p = draw._next;
+            while (p && p.suite) {
+                p = p._next;
+            }
+            return p;
+        }
+
+        public getnSuite(draw: models.Draw): number {   //getnSuite
+            //return the Draw count in the current suite
+            var p = this.groupBegin(draw);
+            for (var n = 0; p && (!n || p.suite); n++) {
+                p = p._next;
+            }
+            return n;
+        }
+
+        //public setType(BYTE iType) {
+        //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
+        //    if ((m_iType & TABLEAU_POULE ? 1 : 0) != (iType & TABLEAU_POULE ? 1 : 0)) {
+
+        //        //Efface les boites si poule et plus poule ou l'inverse
+        //        for (; m_nBoite > 0; m_nBoite--) {
+        //            delete draw.boxes[m_nBoite - 1];
+        //            draw.boxes[m_nBoite - 1] = NULL;
+        //        }
+        //        m_nColonne = 0;
+        //        m_nQualifie = 0;
+        //    }
+
+        //    m_iType = iType;
+        //}
+
+        public isCreneau(box: models.Match): boolean {
+            return box && ('score' in box) && (<any>(box.place) || box.date);
+        }
+
+        //public FindJoueurSuite(short iJoueur, const CTableau** ppSuite): models.Box {
+        //    //ASSERT(0 <= iJoueur);
+
+        //    for( short i = iBoiteMin(); i <= iBoiteMax(); i++) {
+        //        if (draw.boxes[i]. m_iJoueur == iJoueur) {
+        //            if (ppSuite)
+        //		*ppSuite = (CTableau*) this;
+        //            return i;
+        //        }
+        //    }
+
+        //    if (draw._next && draw._next. suite) {
+        //        if ((i = draw._next. FindJoueurSuite(iJoueur, ppSuite)) != -1)
+        //            return i;
+        //    }
+
+        //    return -1;
+        //}
+
+        public FindTeteSerie(draw: models.Draw, iTeteSerie: number): models.PlayerIn {
+
+            //ASSERT(0 < iTeteSerie && iTeteSerie <= MAX_TETESERIE);
+            //i =  isTypePoule() ? iBasColQ(m_nColonne): iBoiteMin();
+            for (var i = 0; i <= draw.boxes.length; i++) {
+                var boxIn = <models.PlayerIn>draw.boxes[i];
+                if (!boxIn) {
+                    continue;
+                }
+                var e = boxIn.seeded;
+                if (e === iTeteSerie || (!iTeteSerie && e)) {
+                    return boxIn;
+                }
+
+                if (draw._next && draw._next.suite) {
+                    boxIn = this.FindTeteSerie(draw._next, iTeteSerie);
+                    if (boxIn) {
+                        return boxIn;
+                    }
+                }
+            }
+        }
+
+        public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn {
+            return this._drawLibs[draw.type].FindQualifieEntrant(draw, iQualifie);
+        }
+
+        public FindQualifieSortant(draw: models.Draw, iQualifie: number): models.Match {
+            var boxOut = this._drawLibs[draw.type].FindQualifieSortant(draw, iQualifie);
+            if (boxOut) {
+                return boxOut;
+            }
+
+            //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
+            if (!draw.suite || !draw._previous) {
+                var nSomme = 0;
+                var pT = draw;
+                do {
+                    if (isTypePoule(pT)) {
+                        nSomme += pT.nbOut;
+                    }
+                    pT = pT._next;
+                } while (pT && pT.suite);
+
+                if (iQualifie <= nSomme) {
+                    return <any> -2;    //TODO
+                }
+            }
+        }
+
+        public SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean {
+            // inNumber=0 => enlève qualifié
+            return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);
+        }
+
+        public SetQualifieSortant(box: models.Box, outNumber?: number): boolean { //setPlayerOut
+            // iQualifie=0 => enlève qualifié
+            return this._drawLibs[box._draw.type].SetQualifieSortant(box, outNumber);
+        }
+
+        public CalculeScore(draw: models.Draw): boolean {
+            return this._drawLibs[draw.type].CalculeScore(draw);
+        }
+
+        //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
+        public MetJoueur(box: models.Box, player: models.Player, bForce?: boolean): boolean {
+
+            //ASSERT(MetJoueurOk(box, iJoueur, bForce));
+
+            if (box.playerId !== player.id && box.playerId) {
+                if (!this.EnleveJoueur(box)) {		//Enlève le joueur précédent
+                    throw 'Error';
+                }
+            }
+
+            var boxIn = <models.PlayerIn>box;
+            var match = <models.Match>box;
+            box.playerId = player.id;
+            this.initBox(box, box._draw);
+            //boxIn.order = 0;
+            //match.score = '';
+
+            if (isGauchePoule(box)) {
+                //TODO boxIn.rank = 0;   //classement de la poule
+            } else if ('score' in match) {
+                match.date = undefined;
+                match.place = undefined;
+            }
+
+            var next: models.Draw = this.nextGroup(box._draw);
+            var boxOut = <models.Match>box;
+            var e: number;
+            if ((e = boxOut.qualifOut) && next && next.boxes) {
+                var boxIn = this.FindQualifieEntrant(next, e);
+                if (boxIn) {
+                    if (!boxIn.playerId
+                        && !this.MetJoueur(boxIn, player, true)) {
+                        throw 'Error';
+                    }
+                }
+            }
+
+            ////Lock les adversaires (+ tableau précédent si qualifié entrant)
+            //if( isMatchJoue( box))	//if( isMatchJouable( box))
+            //{
+            //    LockBoite( ADVERSAIRE1(box));
+            //    LockBoite( ADVERSAIRE2(box));
+            //}
+
+            ////Lock les boites du match, si on a ajouter un des deux adversaires aprés le résultat...
+            //if( isTypePoule()) {
+            //    if( isGauchePoule( box)) {
+            //        //matches de la ligne
+            //        for( i=ADVERSAIRE1( box) - GetnColonne(); i>= iBoiteMin(); i -= GetnColonne()) {
+            //            if( i != box && isMatchJoue( i)) {
+            //                LockBoite( box);
+            //                LockBoite( ADVERSAIRE1( i));
+            //                LockBoite( ADVERSAIRE2( i));
+            //            }
+            //        }
+            //        //matches de la colonne
+            //        for( i=iHautCol( iRowPoule( box, GetnColonne())); i>= iBasColQ( iRowPoule( box, GetnColonne())); i --) {
+            //            if( i != box && isMatchJoue( i)) {
+            //                LockBoite( box);
+            //                LockBoite( ADVERSAIRE1( i));
+            //                LockBoite( ADVERSAIRE2( i));
+            //            }
+            //        }
+            //    }
+            //    CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
+            //    //TODO Poule, Lock
+            //} else
+            //if( iBoiteMin() <= IAUTRE( box) 
+            // && iBoiteMin() <= IMATCH( box) 
+            // && boxes[ IAUTRE( box)]->isJoueur()
+            // && boxes[ IMATCH( box)]->isJoueur()) {
+            //    LockBoite( box);
+            //    LockBoite( IAUTRE( box));
+            //}
+
+            return true;
+        }
+
+        //Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la boite
+        public SetResultat(box: models.Match, boite: models.Match): boolean {
+            //ASSERT(SetResultatOk(box, boite));
+
+            //v0998
+            //	//Check changement de vainqueur par vainqueur défaillant
+            //	if( !isTypePoule())
+            //	if( boite.score.isVainqDef()) {
+            //		if( boite.m_iJoueur == boxes[ ADVERSAIRE1(box)]->m_iJoueur)
+            //			boite.m_iJoueur = boxes[ ADVERSAIRE2(box)]->m_iJoueur;
+            //		else
+            //			boite.m_iJoueur = boxes[ ADVERSAIRE1(box)]->m_iJoueur;
+            //	}
+
+            if (boite.playerId) {
+                if (!this.MetJoueur(box, boite._player)) {
+                    throw 'Error';
+                }
+            } else if (!this.EnleveJoueur(box)) {
+                throw 'Error';
+            }
+
+            box.score = boite.score;
+
+            this.CalculeScore(box._draw);
+
+            return true;
+        }
+
+        //Planification d'un match : met le court, la date et l'heure
+        public MetCreneau(box: models.Match, boite: models.Match): boolean {
+            //ASSERT(isMatch(box));
+            //ASSERT(MetCreneauOk(box, boite));
+
+            box.place = boite.place;
+            box.date = boite.date;
+
+            return true;
+        }
+
+        public EnleveCreneau(box: models.Match): boolean {
+            //ASSERT(isMatch(box));
+            //ASSERT(EnleveCreneauOk(box));
+
+            box.place = undefined;
+            box.date = undefined;
+
+            return true;
+        }
+
+        public MetPointage(box: models.Box, boite: models.Box): boolean {
+            //ASSERT(MetPointageOk(box, boite));
+
+            //TODO
+            //box.setPrevenu(box, boite.isPrevenu(box));
+            //box.setPrevenu(box + 1, boite.isPrevenu(box + 1));
+            //box.setRecoit(box, boite.isRecoit(box));
+
+            return true;
+        }
+
+        //Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
+        public EnleveJoueur(box: models.Box, bForce?: boolean): boolean {
+
+            var match = <models.Match>box;
+            if (!match.playerId && !match.score) {
+                return true;
+            }
+
+            //ASSERT(EnleveJoueurOk(box, bForce));
+
+            var next: models.Draw = this.nextGroup(box._draw);
+            var boxOut = <models.Match> box;
+            var i: number;
+            if ((i = boxOut.qualifOut) && next && next.boxes) {
+                var boxIn = this.FindQualifieEntrant(next, i);
+                if (boxIn) {
+                    if (!this.EnleveJoueur(boxIn, true)) {
+                        throw 'Error';
+                    }
+                }
+            }
+
+            box.playerId = undefined;
+            this.initBox(box, box._draw);
+            match.score = '';
+
+            var boxIn = <models.PlayerIn>box;
+            //delete boxIn.order;
+            /*
+                //Delock les adversaires
+                if( isTypePoule()) {
+                    if( isMatch( box)) {
+                        //Si pas d'autre matches dans la ligne, ni dans la colonne
+                        BOOL bMatch = false;
+
+                        //matches de la ligne
+                        for( i=ADVERSAIRE1( box) - GetnColonne(); 
+                            i>= iBoiteMin() && !bMatch; 
+                            i -= GetnColonne()) 
+                        {
+                            if( i != box && boxes[ i]->isLock()) {
+                                bMatch = true;
+                                break;
+                            }
+                        }
+                        //matches de la colonne
+                        for( i=iHautCol( iRowPoule( ADVERSAIRE1( box), GetnColonne())); 
+                            i>= iBasColQ( iRowPoule( ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
+                            i --) 
+                        {
+                            if( i != box && boxes[ i]->isLock()) {
+                                bMatch = true;
+                                break;
+                            }
+                        }
+                        if( !bMatch)
+                            DelockBoite( ADVERSAIRE1(box));
+
+                        bMatch = false;
+                        //matches de la ligne
+                        for( i=ADVERSAIRE2( box) - GetnColonne(); 
+                            i>= iBoiteMin() && !bMatch; 
+                            i -= GetnColonne())
+                        {
+                            if( i != box && boxes[ i]->isLock()) {
+                                bMatch = true;
+                                break;
+                            }
+                        }
+                        //matches de la colonne
+                        for( i=iHautCol( iRowPoule( ADVERSAIRE2( box), GetnColonne())); 
+                            i>= iBasColQ( iRowPoule( ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
+                            i --) 
+                        {
+                            if( i != box && boxes[ i]->isLock()) {
+                                bMatch = true;
+                                break;
+                            }
+                        }
+                        if( !bMatch)
+                            DelockBoite( ADVERSAIRE2(box));
+			
+                    }
+
+                    this.CalculeScore(box._draw);
+                    //TODO Poule, Unlock
+                } else
+                if(  ADVERSAIRE1(box) <= iBoiteMax()) {
+                    DelockBoite( ADVERSAIRE1(box));
+                    DelockBoite( ADVERSAIRE2(box));
+                }
+            */
+            return true;
+        }
+
+        //Avec report sur le tableau suivant
+        public LockBoite(box: models.Box): boolean {
+            //ASSERT(isBoite(box));
+
+            if (iDiagonale(box) === box.position) {
+                ///TODO box = ADVERSAIRE1(box);
+            }
+
+            //ASSERT(isBoite(box));
+            //ASSERT(box. isJoueur());
+
+            if (box.hidden) {
+                return true;
+            }
+
+            box.locked = true;
+
+            var prev: models.Draw = this.prevGroup(box._draw);
+            if (prev && prev.boxes) {
+                var boxIn = <models.PlayerIn>box;
+                if (boxIn.qualifIn) {
+                    var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
+                    if (boxOut) {
+                        boxOut.locked = true;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        //Avec report sur le tableau précédent
+        public DelockBoite(box: models.Box): boolean {
+
+            if (box.hidden) {
+                return true;
+            }
+
+            delete box.locked;
+
+            var prev: models.Draw = this.prevGroup(box._draw);
+            if (prev && prev.boxes) {
+                var boxIn = <models.PlayerIn>box;
+                if (boxIn.qualifIn) {
+                    var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
+                    if (boxOut) {
+                        delete boxOut.locked;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public SetTeteSerie(box: models.PlayerIn, iTeteSerie: number): boolean {
+            //	iTeteSerie=0 => enlève Tête de série
+
+            //ASSERT(SetTeteSerieOk(box, iTeteSerie));
+
+            if (iTeteSerie) {
+                box.seeded = iTeteSerie;
+            } else {
+                delete box.seeded;
+            }
+            return true;
+        }
+
+
+        //Rempli une boite proprement
+        public RempliBoite(box: models.Box, boite: models.Box): boolean {
+            //ASSERT(RempliBoiteOk(box, boite));
+
+            var boxIn = <models.PlayerIn>box;
+            var boiteIn = <models.PlayerIn>boite;
+            var match = <models.Match>box;
+            var boiteMatch = <models.Match>boite;
+
+            if (boxIn.qualifIn
+                && boxIn.qualifIn != boiteIn.qualifIn) {
+
+                if (!this.SetQualifieEntrant(box)) {	//Enlève
+                    throw 'Error';
+                }
+            } else {
+                //Vide la boite écrasée
+                if (!this.EnleveJoueur(box)) {	//enlève le joueur, le score
+                    throw 'Error';
+                }
+
+                delete boxIn.qualifIn;
+                delete boxIn.seeded;
+                delete match.qualifOut;
+
+                if (this.isCreneau(match)) {
+                    if (!this.EnleveCreneau(match)) {
+                        throw 'Error';
+                    }
+                }
+            }
+
+            //Rempli avec les nouvelles valeurs
+            if (boiteIn.qualifIn) {
+                if (!this.SetQualifieEntrant(box, boiteIn.qualifIn, boite._player)) {
+                    throw 'Error';
+                }
+            } else {
+                if (boite.playerId) {
+                    if (!this.MetJoueur(box, boite._player)) {
+                        throw 'Error';
+                    }
+                    match.score = boiteMatch.score;
+                }
+
+                if (boiteMatch.qualifOut) {
+                    if (!this.SetQualifieSortant(box, boiteMatch.qualifOut)) {
+                        throw 'Error';
+                    }
+                }
+                if (!isTypePoule(box._draw) && boiteIn.seeded) {
+                    if (!this.SetTeteSerie(box, boiteIn.seeded)) {
+                        throw 'Error';
+                    }
+                }
+
+                //if( isCreneau( box))
+                //v0998
+                var m = box._draw.boxes.length;
+                if (ADVERSAIRE1(box) < m
+                    && ADVERSAIRE2(box) < m
+                    && (boiteMatch.place || boiteMatch.date)
+                    ) {
+                    if (!this.MetCreneau(match, boiteMatch)) {
+                        throw 'Error';
+                    }
+                }
+
+                if (isMatch(box)) {
+                    if (!this.MetPointage(box, boite)) {
+                        throw 'Error';
+                    }
+                }
+
+                match.matchFormat = boiteMatch.matchFormat;
+
+                match.note = match.note;
+            }
+
+            this.CalculeScore(box._draw);
+
+            return true;
+        }
+
+        public DeplaceJoueur(box: models.Box, boiteSrc: models.Box, pBoite: models.Box): boolean {
+            //ASSERT(DeplaceJoueurOk(box, iBoiteSrc, pBoite));
+
+            boiteSrc = this.newBox(box._draw, boiteSrc);
+
+            if (!this.RempliBoite(boiteSrc, pBoite)) {	//Vide la source
+                throw 'Error';
+            }
+
+            if (!this.RempliBoite(box, boiteSrc)) {	//Rempli la destination
+                throw 'Error';
+            }
+
+            return true;
+        }
+
+        public TriJoueurs(players: models.Player[]): void {
+
+            //Tri les joueurs par classement
+            var compare1 = (p1: models.Player, p2: models.Player): number => {
+                //if numbers, p1 or p2 are PlayerIn
+                var isNumber1 = 'number' === typeof p1,
+                    isNumber2 = 'number' === typeof p2;
+                if (isNumber1 && isNumber2) {
+                    return 0;
+                }
+                if (isNumber1) {
+                    return -1;
+                }
+                if (isNumber2) {
+                    return 1;
+                }
+                return this.rank.compare(p1.rank, p2.rank);
+            };
+            players.sort(compare1);
+
+            //Mélange les joueurs de même classement
+            for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
+                if (r1 === players.length || compare1(players[r0], players[r1])) {
+                    //nouvelle plage de classement
+                    r1--;
+
+                    //r0: premier joueur de l'intervalle
+                    //r1: dernier joueur de même classement
+                    for (var i = r0; i < r1; i++) {
+                        //echange deux joueurs p et q
+                        var p = Math.round(r0 + Math.random() * (r1 - r0));
+                        var q = Math.round(r0 + Math.random() * (r1 - r0));
+                        if (p != q) {
+                            var t = players[p];
+                            players[p] = players[q];
+                            players[q] = t;
+                        }
+                    }
+
+                    r0 = ++r1;
+                }
+            }
+        }
+
+        public GetJoueursInscrit(draw: models.Draw): models.Player[] {
+
+            function isInscrit(player: models.Player, event: models.Event): boolean {
+                return player.registration.indexOf(event.id) != -1;
+            }
+
+            //Récupère les joueurs inscrits
+            var players = draw._event._tournament.players,
+                ppJoueur: models.Player[] = [], //new short[nPlayer],
+                nPlayer = 0;
+            for (var i = 0; i < players.length; i++) {
+                var pJ = players[i];
+                if (isInscrit(pJ, draw._event)) {
+                    if (!pJ.rank
+                        || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
+                        ppJoueur.push(pJ);	//no du joueur
+                    }
+                }
+            }
+
+            //Récupère les qualifiés sortants du tableau précédent
+            var prev = this.prevGroup(draw);
+            if (prev && prev.boxes) {
+                for (i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
+                    if (this.FindQualifieSortant(prev, i)) {
+                        ppJoueur.push(<any> QEMPTY);
+                    }
+                }
+            }
+
+            return ppJoueur;
+        }
+
+        public boxesOpponents(match: models.Match): { box1: models.Box; box2: models.Box } {
+            return this._drawLibs[match._draw.type].boxesOpponents(match);
+        }
+    }
+
+    angular.module('jat.services.drawLib', ['jat.services.find'])
+        .factory('drawLib', (find: jat.service.Find, rank: ServiceRank) => {
+            return new DrawLib(find, rank);
+        });
+}

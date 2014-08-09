@@ -1,0 +1,13 @@
+{
+  "author": "Eloi Chabaud",
+  "name": "JA-Tennis",
+  "version": "0.0.1",
+  "description": "Tennis tournament management system. Offline web application, fully customisable.",
+
+  "homepage": "http://jatennis.free.fr/",
+
+  "devDependencies": {
+    "karma": "~0.10",
+    "karma-jasmine": "~0.2.0"
+  }
+}

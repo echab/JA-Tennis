@@ -1,0 +1,31 @@
+<div ng-init="expand=false">
+    <h4 ng-click="expand=!expand"><i ng-class="{'icon-plus-sign':!expand, 'icon-minus-sign':expand}"></i> The players:</h4>
+<!--    <span class="input-append text-right" style="text-align:right;">
+        <input placeholder="Search player list" type="search" class="span2"/>
+        <button type="submit" class="btn">Search</button>
+    </span>-->
+    <table class="table table-hover table-condensed" ng-show="expand">
+        <!--<caption>Players</caption>-->
+        <thead>
+            <tr>
+                <th class="span1"><input type="checkbox" /></th>
+                <th>Player name</th>
+                <th>Rank</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="player in list.players" ng-class="{info:player === main.selection.player}">
+                <td><input type="checkbox" ng-model="selected"/> <small>{{player.id}}</small></td>
+                <td>{{$index}} <i class="icon2-info" ng-click="main.editPlayer(player)"></i>{{player.name}} {{player.surname}}</td>
+                <td>{{player.rank}}</td>
+                <td><i class="icon-trash" ng-click="main.removePlayer(player)"></i></td>
+            </tr>
+            <tr ng-show="list.players.length == 0">
+                <td colspan="3">No player</td>
+            </tr>
+        </tbody>
+    </table>
+    <!--<input type="button" value="Add player" ng-click="addPlayer({name:''})" />-->
+    <!--<p>Total: {{players.length}}</p>-->
+</div>

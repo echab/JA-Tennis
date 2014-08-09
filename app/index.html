@@ -1,0 +1,54 @@
+﻿<!doctype html>
+<html lang="en" ng-app="jat">
+<head>
+    <meta charset="utf-8">
+    <title>JA-Tennis</title>
+    <link rel="stylesheet" href="../lib/ui-bootstrap/assets/bootstrap.css" />
+    <link rel="stylesheet" href="style/app.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body ng-controller="mainCtrl" class="ng-cloak">
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <button ng-disabled="!undo.canUndo()" ng-click="undo.undo()" class="btn"><i class="icon2-undo" title="Undo {{undo.messageUndo()}}"></i></button>
+            <button ng-disabled="!undo.canRedo()" ng-click="undo.redo()" class="btn"><i class="icon2-redo" title="Redo {{undo.messageRedo()}}"></i></button>
+        </div>
+        <button ng-click="addPlayer()" class="btn"><i class="icon-plus"></i>Add player</button>
+        <button ng-click="addEvent()" class="btn"><i class="icon-plus"></i>Add event</button>
+        <button ng-click="addDraw(selection.event)" class="btn" ng-disabled="!selection.event"><i class="icon-plus"></i>Add draw</button>
+    </div>
+
+    <div list-players="selection.tournament.players"></div>
+
+    <div list-events="selection.tournament.events"></div>
+
+    <div ng-init="expandDraw=true">
+        <i ng-class="{'icon-plus-sign':!expandDraw, 'icon-minus-sign':expandDraw}" ng-click="expandDraw=!expandDraw"></i>
+        <label>
+            Event: <i class="icon2-info" ng-click="editEvent(selection.event)"></i>
+            <select ng-model="selection.event" ng-options="event.name for event in selection.tournament.events"></select></label>
+        <label>
+            Draw: <i class="icon2-info" ng-click="editDraw(selection.event, selection.draw)"></i>
+            <select ng-model="selection.draw" ng-options="draw.name for draw in selection.event.draws"></select></label>
+    </div>
+    <div draw="selection.draw" ng-show="expandDraw" box-width="150" box-height="40" inter-box-width="10" inter-box-height="10">
+        <div class="box" ng-style="{left:positions[position].x+'px', top:positions[position].y+'px'}" title="p{{position}}">
+            <i class="icon2-info" ng-click="editPlayer(player)" ng-show="player"></i>{{player.name}}<br />
+            <i class="icon2-info" ng-click="editMatch(match)"></i><span class="place">{{match.place}}</span> <span class="date">{{match.date}}</span> <span class="score">{{match.score}}</span>
+        </div>
+        <div class="inPlayer" ng-style="{left:x+'px', top:y+'px'}" title="p{{position}}">
+            <i class="icon2-info" ng-click="editPlayer(player)" ng-show="player"></i>
+            {{player.name}}<br />
+            <span class="club">{{player.club}}</span>
+        </div>
+        <div class="empty" ng-style="{left:x+'px', top:y+'px'}" title="p{{position}}">p{{position}} -</div>
+    </div>
+
+    <div app-version></div>
+       
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"></script>-->
+    <script src="../lib/angular/angular.min.js"></script>
+    <script src="../lib/ui-bootstrap/ui-bootstrap-tpls-0.8.0.min.js"></script>
+    <script src="JATennis.js"></script>
+</body>
+</html>

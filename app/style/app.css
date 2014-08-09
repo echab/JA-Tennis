@@ -1,0 +1,288 @@
+/* app css stylesheet */
+
+.debug {
+    border: 1px dashed gray;
+}
+
+input.ng-invalid {
+    background-color: #FFF2F2;
+}
+
+input.ng-invalid-required:after {
+    content: 'Required !';
+    color: lightcoral;
+}
+
+label {
+    display: inline-block;
+}
+
+[class^="icon-"][ng-click],
+[class*=" icon-"][ng-click],
+[class^="icon2-"][ng-click],
+[class*=" icon2-"][ng-click] {
+    cursor:pointer;
+}
+
+[class^="icon2-"],
+[class*=" icon2-"] {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    *margin-right: .3em;
+    line-height: 16px;
+    vertical-align: text-top;
+    background-image: url("glyphicons.png");
+    background-position: 16px 16px;
+    background-repeat: no-repeat;
+}
+
+.icon2-male {
+    background-position: -0px -0px;
+}
+
+.icon2-female {
+    background-position: -24px -0px;
+}
+
+.icon2-mixte {
+    background-position: -48px -0px;
+}
+
+.icon2-double-male {
+    background-position: -72px -0px;
+}
+
+.icon2-double-female {
+    background-position: -96px -0px;
+}
+
+.icon2-double-mixte {
+    background-position: -120px -0px;
+}
+
+.icon2-mixte {
+    background-position: -48px -0px;
+}
+
+.icon2-address {
+    background-position: -144px -0px;
+}
+
+.icon2-checkmark {
+    background-position: -168px -0px;
+}
+
+.icon2-locker {
+    background-position: -192px -0px;
+}
+
+.icon2-match {
+    background-position: -214px -0px;
+}
+
+.icon2-planning-no {
+    background-position: -238px -0px;
+}
+
+.icon2-note {
+    background-position: -262px -0px;
+}
+
+.icon2-aware {
+    background-position: -72px -24px;
+}
+
+.icon2-responder {
+    background-position: -96px -24px;
+}
+
+.icon2-home {
+    background-position: -120px -24px;
+}
+
+.icon2-refresh {
+    background-position: -238px -24px;
+}
+
+.icon2-info {
+    background-position: -262px -24px;
+}
+
+.icon2-open {
+    background-position: -144px -48px;
+}
+
+.icon2-save {
+    background-position: -168px -48px;
+}
+
+.icon2-print {
+    background-position: -192px -48px;
+}
+
+.icon2-print-preview {
+    background-position: -214px -48px;
+}
+
+.icon2-cut {
+    background-position: -238px -48px;
+}
+
+.icon2-copy {
+    background-position: -262px -48px;
+}
+
+.icon2-paste {
+    background-position: -286px -48px;
+}
+
+.icon2-undo {
+    background-position: -310px -48px;
+}
+
+.icon2-redo {
+    background-position: -334px -48px;
+}
+
+.icon2-switch {
+    background-position: -360px -48px;
+}
+
+.icon2-zoom {
+    background-position: -384px -48px;
+}
+
+.icon2-erase {
+    background-position: -408px -48px;
+}
+
+
+.icon2-ball {
+    background-position: -72px -72px;
+}
+
+.icon2-bug {
+    background-position: -96px -72px;
+}
+
+.icon2-tete-serie {
+    background-position: -144px -72px;
+}
+
+.icon2-qualif-in {
+    background-position: -168px -72px;
+}
+
+.icon2-qualif-out {
+    background-position: -192px -72px;
+}
+
+.icon2-player {
+    background-position: -0px -96px;
+}
+
+.icon2-planning {
+    background-position: -24px -96px;
+}
+
+.icon2-pin {
+    background-position: -48px -96px;
+}
+
+.icon2-draw {
+    background-position: -72px -96px;
+}
+
+.icon2-draw-generate {
+    background-position: -96px -96px;
+}
+
+.icon2-draw-left {
+    background-position: -120px -96px;
+}
+
+.icon2-draw-bottom {
+    background-position: -48px -96px;
+}
+
+.icon2-draw-bottom {
+    background-position: -144px -96px;
+}
+
+.icon2-random {
+    background-position: -168px -96px;
+}
+
+div.draw {
+    position: relative;
+    /*background-color: lightgray;*/
+    border: 1px dashed gray;
+}
+
+canvas.draw {
+    position: absolute;
+}
+
+table.roundrobin {
+    border: 1px dashed gray;
+}
+
+div.inline {
+    display: inline-block;
+    vertical-align: text-top;
+    margin-right: 3px;
+    margin-bottom: 3px;
+}
+
+.box, .inPlayer, .empty {
+    position: absolute;
+    /*border: 1px dashed gray;*/
+    width: 150px;
+    height: 40px;
+}
+
+.played .place, .played .date {
+    display: none;
+}
+
+.roundrobin .box, .roundrobin .inPlayer, .roundrobin .empty {
+    position: initial;
+}
+.roundrobin .box {
+    border-bottom: 1px solid darkgray;
+    border-right: 1px solid darkgray;
+}
+
+.box.hidden {
+    background-color: lightgray;
+}
+.diag {
+    background-color: lightgray;
+}
+
+.box .icon2-info, .inPlayer .icon2-info {
+    opacity: .5;
+    transition: opacity .6s ease;
+}
+.box:hover .icon2-info, .inPlayer:hover .icon2-info {
+    opacity: 1;
+}
+
+.seeded {
+    font-weight: bold;
+    background-color: darkgray;
+    color: white;
+    border-radius: 8px;
+    padding-left: .3em;
+    padding-right: .3em;
+    float: right;
+}
+.qualifIn, .qualifOut {
+    font-weight: bold;
+    color: red;
+}
+.qualifOut {
+    float: right;
+}
