@@ -1,11 +1,11 @@
 ﻿'use strict';
 
-describe('services.roundrobinLib', () => {
-    var roundrobin: jat.service.RoundrobinLib;
+describe('services.roundrobin', () => {
+    var roundrobin: jat.service.Roundrobin;
 
-    beforeEach(module('jat.services.roundrobinLib'));
+    beforeEach(module('jat.services.roundrobin'));
     beforeEach(module('jat.services.type'));
-    beforeEach(inject((_roundrobinLib_: jat.service.RoundrobinLib) => {    //inject before each "it
+    beforeEach(inject((_roundrobinLib_: jat.service.Roundrobin) => {    //inject before each "it
         roundrobin = _roundrobinLib_;
     }));
 

@@ -44,15 +44,15 @@
         <div ng-init="expandDraw=true">
             <i ng-class="{'icon-plus-sign':!expandDraw, 'icon-minus-sign':expandDraw}" ng-click="expandDraw=!expandDraw"></i>
             <label>
-                Event: <i class="icon2-info" ng-click="main.editEvent(main.selection.event)"></i>
-                <select ng-model="main.selection.event" ng-options="event.name for event in main.selection.tournament.events"></select>
+                Event: <i class="icon2-info" ng-click="main.editEvent(main.selection.event)" ng-disabled="!main.selection.event"></i>
+                <select ng-model="main.selection.event" ng-change="main.select(main.selection.event)" ng-options="event.name for event in main.selection.tournament.events"></select>
                 <button ng-click="main.addEvent()" class="btn"><i class="icon-plus"></i> Add event</button>
             </label>
             <label>
-                Draw: <i class="icon2-info" ng-click="main.editDraw(main.selection.event, main.selection.draw)"></i>
-                <select ng-model="main.selection.draw" ng-options="draw.name for draw in main.selection.event.draws"></select>
+                Draw: <i class="icon2-info" ng-click="main.editDraw(main.selection.draw)" ng-disabled="!main.selection.draw"></i>
+                <select ng-model="main.selection.draw" ng-change="main.select(main.selection.draw)" ng-options="draw.name for draw in main.selection.event.draws"></select>
                 <div class="btn-group">
-                    <button ng-click="main.addDraw(main.selection.event)" class="btn" ng-disabled="!main.selection.event"><i class="icon-plus"></i> Add draw</button>
+                    <button ng-click="main.addDraw()" class="btn" ng-disabled="!main.selection.event"><i class="icon-plus"></i> Add draw</button>
                     <button type="button" ng-click="main.generateDraw(main.selection.draw, 1)" ng-disabled="!main.selection.draw" class="btn"><i class="icon2-draw-generate"></i> Generate</button>
                 </div>
                 <div class="btn-group">
@@ -94,8 +94,8 @@
     <script src="services/mainLib.js"></script>
     <script src="services/tournamentLib.js"></script>
     <script src="services/drawLib.js"></script>
-    <script src="services/knockoutLib.js"></script>
-    <script src="services/roundrobinLib.js"></script>
+    <script src="services/knockout.js"></script>
+    <script src="services/roundrobin.js"></script>
 
     <script src="models/model.js"></script>
     <script src="models/player.js"></script>

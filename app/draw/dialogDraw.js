@@ -7,9 +7,11 @@ var jat;
             //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
             //}
             function dialogDrawCtrl(title, draw, //private selection: jat.service.Selection,
-            rank, category, drawLib, tournamentLib) {
+            rank, category, drawLib, tournamentLib, $scope) {
+                var _this = this;
                 this.title = title;
                 this.draw = draw;
+                this.rank = rank;
                 this.drawLib = drawLib;
                 this.tournamentLib = tournamentLib;
                 this.drawTypes = [];
@@ -19,6 +21,18 @@ var jat;
 
                 this.ranks = rank.list();
                 this.categories = category.list();
+
+                //Force minRank <= maxRank
+                $scope.$watch('dlg.draw.minRank', function (minRank) {
+                    if (!_this.draw.maxRank || _this.rank.compare(minRank, _this.draw.maxRank) > 0) {
+                        _this.draw.maxRank = minRank;
+                    }
+                });
+                $scope.$watch('dlg.draw.maxRank', function (maxRank) {
+                    if (maxRank && _this.draw.minRank && _this.rank.compare(_this.draw.minRank, maxRank) > 0) {
+                        _this.draw.minRank = maxRank;
+                    }
+                });
             }
             dialogDrawCtrl.prototype.getRegisteredCount = function () {
                 var players = this.tournamentLib.GetJoueursInscrit(this.draw);

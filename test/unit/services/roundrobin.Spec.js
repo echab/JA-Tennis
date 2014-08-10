@@ -1,8 +1,8 @@
 ﻿'use strict';
-describe('services.roundrobinLib', function () {
+describe('services.roundrobin', function () {
     var roundrobin;
 
-    beforeEach(module('jat.services.roundrobinLib'));
+    beforeEach(module('jat.services.roundrobin'));
     beforeEach(module('jat.services.type'));
     beforeEach(inject(function (_roundrobinLib_) {
         roundrobin = _roundrobinLib_;
@@ -10,7 +10,7 @@ describe('services.roundrobinLib', function () {
 
     var draw1 = {
         id: 'd1', name: 'draw1',
-        type: 2 /* PouleSimple */,
+        type: models.DrawType.PouleSimple,
         minRank: 'NC', maxRank: '40',
         nbColumn: 4, nbOut: 1,
         boxes: []

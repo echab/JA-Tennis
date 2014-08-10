@@ -17,10 +17,10 @@ var jat;
 
             Undo.prototype.action = function (fnDo, fnUndo, message) {
                 if ("public" != typeof fnDo) {
-                    throw "Invalid fnDo";
+                    throw "Undo action: invalid fnDo";
                 }
                 if ("public" != typeof fnUndo) {
-                    throw "Invalid fnUndo";
+                    throw "Undo action: invalid fnUndo";
                 }
                 var action = {
                     type: Undo.ActionType.ACTION,
@@ -34,13 +34,13 @@ var jat;
 
             Undo.prototype.update = function (obj, member, value, message) {
                 if ("undefined" == typeof obj) {
-                    throw "Invalid obj";
+                    throw "Undo update: invalid obj";
                 }
                 if ("undefined" == typeof member) {
-                    throw "Invalid member";
+                    throw "Undo update: invalid member";
                 }
                 if ("undefined" == typeof value) {
-                    throw "Invalid value";
+                    throw "Undo update: invalid value";
                 }
                 var action = {
                     type: Undo.ActionType.UPDATE,
@@ -60,13 +60,13 @@ var jat;
 
             Undo.prototype.insert = function (obj, member, value, message) {
                 if ("undefined" == typeof obj) {
-                    throw "Invalid obj";
+                    throw "Undo insert: invalid obj";
                 }
                 if ("undefined" == typeof member) {
-                    throw "Invalid member";
+                    throw "Undo insert: invalid member";
                 }
                 if ("undefined" == typeof value) {
-                    throw "Invalid value";
+                    throw "Undo insert: invalid value";
                 }
                 if (obj.splice) {
                     if ("number" != typeof member || member < 0 || member > obj.length) {
@@ -90,10 +90,10 @@ var jat;
 
             Undo.prototype.remove = function (obj, member, message) {
                 if ("undefined" == typeof obj) {
-                    throw "Invalid obj";
+                    throw "Undo remove: invalid obj";
                 }
                 if ("undefined" == typeof member) {
-                    throw "Invalid member";
+                    throw "Undo remove: invalid member";
                 }
                 var action = {
                     type: Undo.ActionType.REMOVE,
@@ -116,16 +116,16 @@ var jat;
             //public splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
             Undo.prototype.splice = function (obj, index, howmany, itemX, message) {
                 if ("undefined" == typeof obj) {
-                    throw "Invalid obj";
+                    throw "Undo splice: invalid obj";
                 }
                 if ("undefined" == typeof obj.slice) {
-                    throw "Invalid obj not an array";
+                    throw "Undo splice: invalid obj not an array";
                 }
                 if ("number" != typeof index) {
-                    throw "Invalid index";
+                    throw "Undo splice: invalid index";
                 }
-                if (index < 0 || obj.length <= index) {
-                    throw "Bad array position to remove";
+                if (index < 0 || obj.length < index) {
+                    throw "Undo splice: bad array position to remove";
                 }
 
                 //var isarray = angular.isArray(itemX);

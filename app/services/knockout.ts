@@ -6,7 +6,7 @@ module jat.service {
         QEMPTY = - 1,
         WITH_TDS_HAUTBAS = true;
 
-    export class KnockoutLib implements IDrawLib {
+    export class Knockout implements IDrawLib {
 
         constructor(
             private drawLib: jat.service.DrawLib,
@@ -441,7 +441,7 @@ module jat.service {
                                     t = iTeteSerieQ(b, draw.nbOut);
                                 }
                                 if (t <= nTeteSerie && !this.drawLib.FindTeteSerie(draw, t)) {
-                                    this.drawLib.SetTeteSerie(boxIn, t);
+                                    boxIn.seeded = t;
                                 }
                             }
                         }
@@ -993,8 +993,8 @@ module jat.service {
             + positionBottomCol(c - columnMin(nQualifie));
     }
 
-    angular.module('jat.services.knockoutLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
-        .factory('knockoutLib', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, find: Find) => {
-            return new KnockoutLib(drawLib, tournamentLib, rank, find);
+    angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
+        .factory('knockout', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, find: Find) => {
+            return new Knockout(drawLib, tournamentLib, rank, find);
         });
 }

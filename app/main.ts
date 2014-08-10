@@ -2,10 +2,10 @@
 
 module jat.main {
 
+    /** Main controller for the application */
     export class mainCtrl {
 
         constructor(
-            private $log: ng.ILogService,
             private $modal: uib.IModalService<string>,
             private selection: jat.service.Selection,
             private mainLib: jat.service.MainLib,
@@ -16,12 +16,8 @@ module jat.main {
 
             this.selection.tournament = this.tournamentLib.newTournament();
 
-            this.mainLib.loadTournament('/data/tournament4.json').then((data) => {
-                this.selection.tournament = data;
-                this.selection.event = data.events[0];
+            this.mainLib.loadTournament('/data/tournament5.json').then((data) => {
                 this.selection.draw = data.events[0].draws[0];
-                this.selection.player = undefined;
-                this.selection.match = undefined;
             });
         }
 
@@ -31,14 +27,18 @@ module jat.main {
             //this.mainLib.loadTournament('xxx.json');
         }
         saveTournament(): void {
-            this.mainLib.saveTournament(this.selection.tournament, 'xxx');
+            this.mainLib.saveTournament(this.selection.tournament, '');
         }
         //#endregion tournament
 
-        //#region player
-        addPlayer(player?: models.Player): void {
+        select(item: any): void {
+            this.mainLib.select(item);
+        }
 
-            var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);
+        //#region player
+        addPlayer(): void {
+
+            var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament);
 
             this.$modal.open({
                 templateUrl: 'player/dialogPlayer.html',
@@ -81,9 +81,9 @@ module jat.main {
         //#endregion player
 
         //#region event
-        addEvent(event: models.Event): void {
+        addEvent(): void {
 
-            var newEvent = this.tournamentLib.newEvent(this.selection.tournament, event);
+            var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
 
             this.$modal.open({
                 templateUrl: 'event/dialogEvent.html',
@@ -94,7 +94,7 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.mainLib.addEvent(this.selection.tournament, newEvent);
+                        this.mainLib.addEvent(this.selection.tournament, newEvent); //TODO add event after selected event
                     }
                 });
         }
@@ -125,9 +125,9 @@ module jat.main {
         //#endregion event
 
         //#region draw
-        addDraw(event: models.Event, draw: models.Draw): void {
+        addDraw(): void {
 
-            var newDraw = this.drawLib.newDraw(event, draw);
+            var newDraw = this.drawLib.newDraw(this.selection.event);
 
             this.$modal.open({
                 templateUrl: 'draw/dialogDraw.html',
@@ -137,17 +137,18 @@ module jat.main {
                     draw: () => newDraw
                 }
             }).result.then((result: string) => {
+                    //TODO add event after selected draw
                     if ('Ok' === result) {
-                        this.mainLib.updateDraw(newDraw, draw);
+                        this.mainLib.addDraw(newDraw);
                     } else if ('Generate' === result) {
-                        this.mainLib.updateDraw(newDraw, draw, 1);
+                        this.mainLib.addDraw(newDraw, 1);
                     }
                 });
         }
 
-        editDraw(event: models.Event, draw: models.Draw): void {
+        editDraw(draw: models.Draw): void {
 
-            var editedDraw = this.drawLib.newDraw(event, draw);    // angular.copy(draw)
+            var editedDraw = this.drawLib.newDraw(draw._event, draw);    // angular.copy(draw)
 
             this.$modal.open({
                 templateUrl: 'draw/dialogDraw.html',
@@ -214,8 +215,8 @@ module jat.main {
         'jat.services.undo',
         'jat.services.tournamentLib',
         'jat.services.drawLib',
-        'jat.services.knockoutLib',
-        'jat.services.roundrobinLib',
+        'jat.services.knockout',
+        'jat.services.roundrobin',
         'jat.player.dialog',
         'jat.player.list',
         'jat.event.dialog',

@@ -6,7 +6,7 @@ module jat.service {
         MAX_TABLEAU = 63,
         QEMPTY = - 1;
 
-    export class RoundrobinLib implements IDrawLib {
+    export class Roundrobin implements IDrawLib {
 
         constructor(
             private drawLib: jat.service.DrawLib,
@@ -60,121 +60,20 @@ module jat.service {
 
         public resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void {
 
-            throw "Not implemnted";
-
             if (nJoueur) {
                 throw "Not implemnted";
             }
 
-            if (draw.nbColumn === oldDraw.nbColumn && draw.nbOut === oldDraw.nbOut) {
-                return;
+            //Shift the boxes
+            if (oldDraw && draw.nbOut !== oldDraw.nbOut) {
+
+                for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                    var box = draw.boxes[i];
+                    var c = column(box.position, oldDraw.nbColumn);
+                    var r = row(box.position, oldDraw.nbColumn);
+                    box.position = positionMatchPoule(r, c, draw.nbColumn);
+                }
             }
-
-            var isTypePouleAller: boolean = models.DrawType.PouleSimple === draw.type;
-            //var isTypePouleAllerRetour: boolean = models.DrawType.PouleAR === draw.type;
-
-            if (draw.nbColumn) {
-                ASSERT(MIN_COL <= draw.nbColumn && draw.nbColumn <= MAX_COL_POULE);
-                var nBoxNew = draw.nbColumn * (draw.nbColumn + 1);
-            } else {
-                nBoxNew = 0;
-            }
-
-            //var nBox: number = draw.boxes.length;
-            //var posMax = nBox - 1;
-            //var colMin = 0;
-            //var colMax = draw.nbColumn - 1;
-            //var posMin = 0;
-            //var fm: string = undefined; //TODO
-
-            //if (nBox < nBoxNew) {   //draw is taller
-
-            //    //Allocate new boxes
-            //    for (; nBox < nBoxNew; nBox++) {
-            //        //ASSERT(draw.boxes[nBox] == NULL);
-            //        if (oldDraw && nBox < oldDraw.boxes.length) {
-            //            var box: models.Box = this.drawLib.newBox(draw, oldDraw.boxes[nBox]);
-            //        } else {
-            //            box = this.drawLib.newBox(draw, fm);
-            //        }
-            //        draw.boxes[nBox] = box;
-            //    }
-
-            //    //Shift the boxes
-            //    if (draw.nbColumn > oldDraw.nbColumn) {
-            //        //Décale vers la gauche
-            //        for (var c = oldDraw.nbColumn; c >= 0; c--) {
-            //            for (var r = oldDraw.nbColumn - 1; r >= 0; r--) {
-            //                b = positionMatchPoule(r, c, oldDraw.nbColumn);
-            //                var b2 = positionMatchPoule(r + draw.nbColumn - oldDraw.nbColumn, c + draw.nbColumn - oldDraw.nbColumn, draw.nbColumn);
-            //                var match: models.Match = <models.Match>draw.boxes[b];
-            //                draw.boxes[b2] = match;
-            //                draw.boxes[b] = this.drawLib.newBox(draw, match.matchFormat);   //Effacement ancienne boite
-            //            }
-            //        }
-            //    }
-
-            //    //draw.boxes.length = nBox;
-
-            //} else if (draw.boxes.length > nBoxNew) {   //draw is smaller
-
-            //    //shift the boxes
-            //    if (draw.nbColumn < oldDraw.nbColumn) {
-            //        //shift to the right
-            //        for (var c = 0; c <= draw.nbColumn; c++) {
-            //            for (var r = 0; r < draw.nbColumn; r++) {
-            //                b = positionMatchPoule(r, c, draw.nbColumn);
-            //                var b2 = positionMatchPoule(r + oldDraw.nbColumn - draw.nbColumn, c + oldDraw.nbColumn - draw.nbColumn, oldDraw.nbColumn);
-            //                draw.boxes[b] = draw.boxes[b2];
-            //            }
-            //        }
-            //    }
-
-            //    //remove the extra boxes
-            //    //TODO var next = nextGroup(draw);
-            //    while (draw.boxes.length > nBoxNew) {
-            //        var last = draw.boxes.length - 1
-            //        //ASSERT(draw.boxes[last]);
-            //        //if (next) {
-            //        //    var match = <models.Match>draw.boxes[last];
-            //        //    if (match.qualifOut) {
-            //        //        //TODO remove qualifIn in next group
-            //        //        //SetQualifieSortant(last, 0);
-            //        //    }
-            //        //}
-            //        delete draw.boxes[last];
-            //        draw.boxes.length--;
-            //    }
-            //}
-
-            //oldDraw.nbColumn = draw.nbColumn;
-            //oldDraw.nbOut = draw.nbOut;
-
-            ////left column
-            //for (var b = positionBottomCol(oldDraw.nbColumn); b <= posMax; b++) {
-            //    delete draw.boxes[b].hidden;
-            //}
-            ////the table
-            //for (var c = 0; c < oldDraw.nbColumn; c++) {
-            //    //Matches retour
-            //    for (b = positionBottomCol(c); b < c * (oldDraw.nbColumn + 1); b++) {
-            //        draw.boxes[b].hidden = isTypePouleAller;
-            //    }
-
-            //    //Diagonale
-            //    draw.boxes[b++].hidden = true;
-
-            //    //Matches aller
-            //    for (; b <= positionTopCol(c); b++) {
-            //        delete draw.boxes[b].hidden;
-            //    }
-            //}
-
-            ////TODO CalculeScore((CDocJatennis*)((CFrameTennis*) AfxGetMainWnd()).GetActiveDocument());
-
-
-            //draw.nbColumn = oldDraw.nbColumn;
-            //draw.nbOut = oldDraw.nbOut;
         }
 
         public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn {
@@ -360,17 +259,18 @@ module jat.service {
             return ppJoueur;
         }
 
-        public generateDraw(draw: models.Draw, generate?: number): models.Draw[] {
+        public generateDraw(refDraw: models.Draw, generate?: number): models.Draw[] {
 
-            var oldDraws = this.drawLib.currentGroup(draw);
-            var t = this.find.indexOf(draw._event.draws, 'id', oldDraws[0].id);
+            var oldDraws = this.drawLib.currentGroup(refDraw);
+            var iTableau = this.find.indexOf(refDraw._event.draws, 'id', oldDraws[0].id);
+            if (iTableau === -1) {
+                iTableau = refDraw._event.draws.length;  //append the draws at the end of the event
+            }
 
-            //this.drawLib.resetDraw(draw, draw.nbColumn);
-
-            var players = this.tournamentLib.GetJoueursInscrit(draw);
+            var players = this.tournamentLib.GetJoueursInscrit(refDraw);
 
             //Récupère les qualifiés sortants du tableau précédent
-            var prev = this.drawLib.previousGroup(draw);
+            var prev = this.drawLib.previousGroup(refDraw);
             if (prev) {
                 players = players.concat(<any>this.drawLib.FindAllQualifieSortant(prev, true));
             }
@@ -378,35 +278,15 @@ module jat.service {
             //Tri et Mélange les joueurs de même classement
             this.tournamentLib.TriJoueurs(players);
 
-            ////Delete previous tableau
-            //draw._event.draws.splice(t, oldDraws.length);
+            var event = refDraw._event;
 
-            var draws = this.GeneratePoule(t, players, draw);
-
-            ////replace previous draws by generated ones
-            ////draw._event.draws.splice(t, oldDraws.length, draws);
-            //var args: any[] = [t, oldDraws.length].concat( <any[]>draws);
-            //Array.prototype.splice.apply(draw._event.draws, args);
-
-            //for (var i = 0; i < draws.length; i++) {
-            //    this.drawLib.initDraw(draws[i], draw._event);
-            //}
-
-            return draws;
-        }
-
-        private GeneratePoule(iTableau: number, players: models.Player[], oldDraw: models.Draw): models.Draw[] {
-            var event = oldDraw._event;
-            ASSERT(0 <= iTableau && iTableau <= event.draws.length);
-            ASSERT(0 <= players.length && players.length < (MAX_JOUEUR >> 1));
-
-            var nDraw = Math.floor((players.length + (oldDraw.nbColumn - 1)) / oldDraw.nbColumn);
+            var nDraw = Math.floor((players.length + (refDraw.nbColumn - 1)) / refDraw.nbColumn);
             if (!nDraw) {
                 nDraw = 1;
             }
 
             if ((event.draws.length + nDraw) >= MAX_TABLEAU) {
-                throw ('Maximum oldDraw count is reached'); //TODOjs
+                throw ('Maximum refDraw count is reached'); //TODOjs
                 return;
             }
 
@@ -415,15 +295,14 @@ module jat.service {
             //Créé les poules
             for (var t = 0; t < nDraw; t++) {
 
-                if (t = 0) {
-                    var draw = oldDraw;
+                if (t === 0) {
+                    var draw = refDraw;
                 } else {
-                    draw = this.drawLib.newDraw(event, oldDraw);
-                    draw.id = oldDraw.id + t;    //TODOjs guid service
+                    draw = this.drawLib.newDraw(event, refDraw);
                     draw.suite = true;
                 }
                 draw.boxes = [];
-                draw.name = oldDraw.name + (nDraw > 1 ? ' (' + (t + 1) + ')' : '');
+                draw.name = refDraw.name + (nDraw > 1 ? ' (' + (t + 1) + ')' : '');
 
                 for (var i = draw.nbColumn - 1; i >= 0 && players.length; i--) {
 
@@ -460,7 +339,7 @@ module jat.service {
 
                 //Ajoute 1 tête de série
                 var boxT = <models.PlayerIn>this.findBox(draw, ADVERSAIRE1(draw, draw.nbColumn - 1));
-                this.drawLib.SetTeteSerie(boxT, t + 1);
+                boxT.seeded = t + 1;
 
                 draws.push(draw);
             }
@@ -584,8 +463,8 @@ module jat.service {
         return pos % n + n * n;
     };
 
-    angular.module('jat.services.roundrobinLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
-        .factory('roundrobinLib', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: ServiceRanking, find: Find) => {
-            return new RoundrobinLib(drawLib, tournamentLib, ranking, find);
+    angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
+        .factory('roundrobin', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: ServiceRanking, find: Find) => {
+            return new Roundrobin(drawLib, tournamentLib, ranking, find);
         });
 }

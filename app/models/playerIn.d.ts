@@ -1,6 +1,4 @@
-'use strict';
-
-module models {
+declare module models {
     export interface PlayerIn extends Box {
 
         seeded ?: number;

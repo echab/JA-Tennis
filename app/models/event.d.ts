@@ -1,4 +1,4 @@
-module models {
+declare module models {
 
     export interface Event extends Model {
 

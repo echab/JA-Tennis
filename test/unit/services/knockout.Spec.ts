@@ -1,11 +1,11 @@
 ﻿'use strict';
 
-describe('services.knockoutLib', () => {
-    var knockout: jat.service.KnockoutLib;
+describe('services.knockout', () => {
+    var knockout: jat.service.Knockout;
 
-    beforeEach(module('jat.services.knockoutLib'));
+    beforeEach(module('jat.services.knockout'));
     beforeEach(module('jat.services.type'));
-    beforeEach(inject((_knockoutLib_: jat.service.KnockoutLib) => {    //inject before each "it
+    beforeEach(inject((_knockoutLib_: jat.service.Knockout) => {    //inject before each "it
         knockout = _knockoutLib_;
     }));
 

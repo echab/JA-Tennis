@@ -11,23 +11,23 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="evt in list.events" ng-class="{info:evt === main.selection.event}">
-                <td><input type="checkbox" /> <small>{{evt.id}}</small></td>
+            <tr ng-repeat="event in list.events" ng-class="{info:event === main.selection.event}">
+                <td><input type="checkbox" /> <small>{{event.id}}</small></td>
                 <td>
-                    <i class="icon2-info" ng-click="main.editEvent(evt)"></i>
-                    <span ng-click="main.selection.event = evt; main.selection.draw = null">{{evt.name}}</span>
+                    <i class="icon2-info" ng-click="main.editEvent(event)"></i>
+                    <span ng-click="main.select(event)">{{event.name}}</span>
                 </td>
                 <td>
-                    <div ng-repeat="draw in evt.draws" class="inline" style="border-left: solid 1px blue; padding-left: 3px;">
-                        <i class="icon2-info" ng-click="main.editDraw(evt, draw)"></i>
-                        <span ng-click="main.selection.event = evt; main.selection.draw = draw">{{draw.name}}</span>
-                        <i class="icon-trash" ng-click="main.removeDraw(evt, draw)"></i>
+                    <div ng-repeat="draw in event.draws" class="inline" style="border-left: solid 1px blue; padding-left: 3px;">
+                        <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
+                        <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
+                        <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>
                         <div draw="draw" simple="true" box-width="12" box-height="2" inter-box-width="2" inter-box-height="0"
-                             ng-click="main.selection.event = evt; main.selection.draw = draw">
+                             ng-click="main.select(draw)">
                         </div>
                     </div>
                 </td>
-                <td><i class="icon-trash" ng-click="main.removeEvent(evt)"></i></td>
+                <td><i class="icon-trash" ng-click="main.removeEvent(event)"></i></td>
             </tr>
             <tr ng-show="list.events.length == 0">
                 <td colspan="3">No event</td>

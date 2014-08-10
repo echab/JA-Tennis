@@ -47,6 +47,14 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(draw, source);
             }
+
+            draw.id = 'd' + Math.round(Math.random() * 999);    //TODOjs guid service
+
+            //default values
+            draw.nbColumn = draw.nbColumn || 3;
+            draw.nbOut = draw.nbOut || 1;
+            draw.minRank = draw.minRank || 'NC';    //TODO init depending of previous draw
+
             this.initDraw(draw, parent);
             return draw;
         }
@@ -601,20 +609,6 @@ module jat.service {
             return true;
         }
 
-        public SetTeteSerie(box: models.PlayerIn, iTeteSerie: number): boolean {
-            //	iTeteSerie=0 => enlève Tête de série
-
-            //ASSERT(SetTeteSerieOk(box, iTeteSerie));
-
-            if (iTeteSerie) {
-                box.seeded = iTeteSerie;
-            } else {
-                delete box.seeded;
-            }
-            return true;
-        }
-
-
         //Rempli une boite proprement
         public RempliBoite(box: models.Box, boite: models.Box): boolean {
             //ASSERT(RempliBoiteOk(box, boite));
@@ -666,9 +660,7 @@ module jat.service {
                     }
                 }
                 if (!isTypePoule(box._draw) && boiteIn.seeded) {
-                    if (!this.SetTeteSerie(box, boiteIn.seeded)) {
-                        throw 'Error';
-                    }
+                    boxIn.seeded = boiteIn.seeded;
                 }
 
                 //if( isCreneau( box))

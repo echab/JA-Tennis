@@ -1,8 +1,8 @@
 ﻿'use strict';
-describe('services.knockoutLib', function () {
+describe('services.knockout', function () {
     var knockout;
 
-    beforeEach(module('jat.services.knockoutLib'));
+    beforeEach(module('jat.services.knockout'));
     beforeEach(module('jat.services.type'));
     beforeEach(inject(function (_knockoutLib_) {
         knockout = _knockoutLib_;
@@ -10,7 +10,7 @@ describe('services.knockoutLib', function () {
 
     var draw1 = {
         id: 'd1', name: 'draw1',
-        type: 0 /* Normal */,
+        type: models.DrawType.Normal,
         minRank: 'NC', maxRank: '40',
         nbColumn: 3, nbOut: 1,
         boxes: []
@@ -67,4 +67,4 @@ describe('services.knockoutLib', function () {
         //knockout.FindQualifieSortant()
     });
 });
-//# sourceMappingURL=knockoutLib.Spec.js.map
+//# sourceMappingURL=knockout.Spec.js.map

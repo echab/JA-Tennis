@@ -15,6 +15,14 @@ var jat;
                 if (angular.isObject(source)) {
                     angular.extend(draw, source);
                 }
+
+                draw.id = 'd' + Math.round(Math.random() * 999); //TODOjs guid service
+
+                //default values
+                draw.nbColumn = draw.nbColumn || 3;
+                draw.nbOut = draw.nbOut || 1;
+                draw.minRank = draw.minRank || 'NC'; //TODO init depending of previous draw
+
                 this.initDraw(draw, parent);
                 return draw;
             };
@@ -549,17 +557,6 @@ var jat;
                 return true;
             };
 
-            DrawLib.prototype.SetTeteSerie = function (box, iTeteSerie) {
-                //	iTeteSerie=0 => enlève Tête de série
-                //ASSERT(SetTeteSerieOk(box, iTeteSerie));
-                if (iTeteSerie) {
-                    box.seeded = iTeteSerie;
-                } else {
-                    delete box.seeded;
-                }
-                return true;
-            };
-
             //Rempli une boite proprement
             DrawLib.prototype.RempliBoite = function (box, boite) {
                 //ASSERT(RempliBoiteOk(box, boite));
@@ -608,9 +605,7 @@ var jat;
                         }
                     }
                     if (!isTypePoule(box._draw) && boiteIn.seeded) {
-                        if (!this.SetTeteSerie(box, boiteIn.seeded)) {
-                            throw 'Error';
-                        }
+                        boxIn.seeded = boiteIn.seeded;
                     }
 
                     //if( isCreneau( box))
@@ -665,7 +660,7 @@ var jat;
         }
 
         function isTypePoule(draw) {
-            return draw.type === 2 /* PouleSimple */ || draw.type === 3 /* PouleAR */;
+            return draw.type === models.DrawType.PouleSimple || draw.type === models.DrawType.PouleAR;
         }
 
         function iDiagonale(box) {

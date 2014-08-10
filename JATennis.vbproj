@@ -62,8 +62,8 @@
     <TypeScriptCompile Include="app\draw\dialogMatch.ts" />
     <TypeScriptCompile Include="app\player\dialogPlayer.ts" />
     <TypeScriptCompile Include="app\models\model.ts" />
-    <TypeScriptCompile Include="app\models\box.ts" />
-    <TypeScriptCompile Include="app\models\playerIn.ts" />
+    <TypeScriptCompile Include="app\models\box.d.ts" />
+    <TypeScriptCompile Include="app\models\playerIn.d.ts" />
     <TypeScriptCompile Include="app\main.ts" />
     <Content Include="app\draw\dialogDraw.js">
       <DependentUpon>dialogDraw.ts</DependentUpon>
@@ -94,17 +94,11 @@
     <Content Include="app\services\drawLib.js">
       <DependentUpon>drawLib.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="app\services\knockout.ts" />
     <TypeScriptCompile Include="app\services\mainLib.ts" />
+    <TypeScriptCompile Include="app\services\roundrobin.ts" />
     <TypeScriptCompile Include="app\services\type.ts" />
     <TypeScriptCompile Include="app\services\tournamentLib.ts" />
-    <TypeScriptCompile Include="app\services\knockoutLib.ts" />
-    <Content Include="app\services\knockoutLib.js">
-      <DependentUpon>knockoutLib.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="app\services\roundrobinLib.ts" />
-    <Content Include="app\services\roundrobinLib.js">
-      <DependentUpon>roundrobinLib.ts</DependentUpon>
-    </Content>
     <Content Include="app\services\tournamentLib.js">
       <DependentUpon>tournamentLib.ts</DependentUpon>
     </Content>
@@ -140,29 +134,29 @@
     <Content Include="lib\declarations.js">
       <DependentUpon>declarations.d.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="app\models\event.ts" />
-    <TypeScriptCompile Include="app\models\draw.ts" />
+    <TypeScriptCompile Include="app\models\event.d.ts" />
+    <TypeScriptCompile Include="app\models\draw.d.ts" />
     <Content Include="app\models\draw.js">
-      <DependentUpon>draw.ts</DependentUpon>
+      <DependentUpon>draw.d.ts</DependentUpon>
     </Content>
     <Content Include="app\models\event.js">
-      <DependentUpon>event.ts</DependentUpon>
+      <DependentUpon>event.d.ts</DependentUpon>
     </Content>
     <Content Include="app\models\box.js">
-      <DependentUpon>box.ts</DependentUpon>
+      <DependentUpon>box.d.ts</DependentUpon>
     </Content>
     <Content Include="app\models\player.js">
-      <DependentUpon>player.ts</DependentUpon>
+      <DependentUpon>player.d.ts</DependentUpon>
     </Content>
     <Content Include="app\models\playerIn.js">
-      <DependentUpon>playerIn.ts</DependentUpon>
+      <DependentUpon>playerIn.d.ts</DependentUpon>
     </Content>
     <Content Include="app\models\tournament.js">
-      <DependentUpon>tournament.ts</DependentUpon>
+      <DependentUpon>tournament.d.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="app\models\match.ts" />
+    <TypeScriptCompile Include="app\models\match.d.ts" />
     <Content Include="app\models\match.js">
-      <DependentUpon>match.ts</DependentUpon>
+      <DependentUpon>match.d.ts</DependentUpon>
     </Content>
     <Content Include="app\services\selection.js">
       <DependentUpon>selection.ts</DependentUpon>
@@ -178,8 +172,8 @@
     <Content Include="app\services\undo.js">
       <DependentUpon>undo.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="app\models\player.ts" />
-    <TypeScriptCompile Include="app\models\tournament.ts" />
+    <TypeScriptCompile Include="app\models\player.d.ts" />
+    <TypeScriptCompile Include="app\models\tournament.d.ts" />
     <Content Include="app\draw\dialogDraw.html" />
     <Content Include="app\event\dialogEvent.html" />
     <Content Include="app\event\listEvents.html" />
@@ -197,62 +191,11 @@
     <TypeScriptCompile Include="test\unit\services\drawLib.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\fft.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\find.Spec.ts" />
-    <TypeScriptCompile Include="test\unit\services\knockoutLib.Spec.ts" />
+    <TypeScriptCompile Include="test\unit\services\knockout.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\mainLib.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\roundrobin.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\undo.Spec.ts" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
-    <Import Include="System" />
-    <Import Include="System.Collections" />
-    <Import Include="System.Collections.Generic" />
-    <Import Include="System.Linq" />
-    <Import Include="System.Xml.Linq" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Collections.Specialized" />
-    <Import Include="System.Configuration" />
-    <Import Include="System.Text" />
-    <Import Include="System.Text.RegularExpressions" />
-    <Import Include="System.Web" />
-    <Import Include="System.Web.Caching" />
-    <Import Include="System.Web.SessionState" />
-    <Import Include="System.Web.Security" />
-    <Import Include="System.Web.Profile" />
-    <Import Include="System.Web.UI" />
-    <Import Include="System.Web.UI.WebControls" />
-    <Import Include="System.Web.UI.WebControls.WebParts" />
-    <Import Include="System.Web.UI.HtmlControls" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="My Project\AssemblyInfo.vb" />
-    <Compile Include="My Project\Application.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Application.myapp</DependentUpon>
-    </Compile>
-    <Compile Include="My Project\MyExtensions\MyWebExtension.vb">
-      <VBMyExtensionTemplateID>Microsoft.VisualBasic.Web.MyExtension</VBMyExtensionTemplateID>
-      <VBMyExtensionTemplateVersion>1.0.0.0</VBMyExtensionTemplateVersion>
-    </Compile>
-    <Compile Include="My Project\Resources.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="My Project\Settings.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="My Project\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
-      <CustomToolNamespace>My.Resources</CustomToolNamespace>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>-->
   <ItemGroup>
     <Content Include="app\style\.gitignore" />
     <Content Include="data\tournament1.json" />
@@ -260,17 +203,9 @@
     <Content Include="data\tournament3.json" />
     <Content Include="data\tournament4.json" />
     <Content Include=".gitignore" />
-    <!--<None Include="My Project\Application.myapp">
-      <Generator>MyApplicationCodeGenerator</Generator>
-      <LastGenOutput>Application.Designer.vb</LastGenOutput>
-    </None>
-    <None Include="My Project\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <CustomToolNamespace>My</CustomToolNamespace>
-      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
-    </None>-->
     <Content Include="package.json" />
     <Content Include=".gitattributes" />
+    <Content Include="data\tournament5.json" />
     <None Include="test\karma.config.js" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />
@@ -344,13 +279,6 @@
     <TypeScriptOutFile>app/JATennis.js</TypeScriptOutFile>
     <TypeScriptNoImplicitAny>true</TypeScriptNoImplicitAny>
   </PropertyGroup>
-  <!--<PropertyGroup>
-    <ChutzpahExe>..\..\Chutzpah\chutzpah.console.exe</ChutzpahExe>
-  </PropertyGroup>
-
-  <Target Name="UnitTest">
-    <Exec Command="$(ChutzpahExe) test\services.undoSpec.js /failOnError /vsoutput" />
-  </Target>-->
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,6 +1,4 @@
-'use strict';
-
-module models {
+declare module models {
     export interface Box extends Model {
         id: string;
         position: number;

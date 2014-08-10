@@ -18,10 +18,11 @@ module jat.draw {
             private title: string,
             private draw: models.Draw,
             //private selection: jat.service.Selection,
-            rank: ServiceRank,
+            private rank: ServiceRank,
             category: ServiceCategory,
             private drawLib: jat.service.DrawLib,
             private tournamentLib: jat.service.TournamentLib
+            ,$scope: ng.IScope
             ) {
 
             this.drawTypes = [];
@@ -31,6 +32,18 @@ module jat.draw {
 
             this.ranks = rank.list();
             this.categories = category.list();
+
+            //Force minRank <= maxRank
+            $scope.$watch('dlg.draw.minRank', (minRank: string) => {
+                if (!this.draw.maxRank || this.rank.compare(minRank, this.draw.maxRank) > 0) {
+                    this.draw.maxRank = minRank;
+                }
+            });
+            $scope.$watch('dlg.draw.maxRank', (maxRank: string) => {
+                if (maxRank && this.draw.minRank && this.rank.compare(this.draw.minRank, maxRank) > 0) {
+                    this.draw.minRank = maxRank;
+                }
+            });
         }
     }
 

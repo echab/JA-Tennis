@@ -1,11 +1,11 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (main) {
+        /** Main controller for the application */
         var mainCtrl = (function () {
-            function mainCtrl($log, $modal, selection, mainLib, tournamentLib, drawLib, undo) {
+            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, undo) {
                 var _this = this;
-                this.$log = $log;
                 this.$modal = $modal;
                 this.selection = selection;
                 this.mainLib = mainLib;
@@ -14,12 +14,8 @@ var jat;
                 this.undo = undo;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
-                this.mainLib.loadTournament('/data/tournament4.json').then(function (data) {
-                    _this.selection.tournament = data;
-                    _this.selection.event = data.events[0];
+                this.mainLib.loadTournament('/data/tournament5.json').then(function (data) {
                     _this.selection.draw = data.events[0].draws[0];
-                    _this.selection.player = undefined;
-                    _this.selection.match = undefined;
                 });
             }
             //#region tournament
@@ -28,14 +24,18 @@ var jat;
                 //this.mainLib.loadTournament('xxx.json');
             };
             mainCtrl.prototype.saveTournament = function () {
-                this.mainLib.saveTournament(this.selection.tournament, 'xxx');
+                this.mainLib.saveTournament(this.selection.tournament, '');
             };
 
             //#endregion tournament
+            mainCtrl.prototype.select = function (item) {
+                this.mainLib.select(item);
+            };
+
             //#region player
-            mainCtrl.prototype.addPlayer = function (player) {
+            mainCtrl.prototype.addPlayer = function () {
                 var _this = this;
-                var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);
+                var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament);
 
                 this.$modal.open({
                     templateUrl: 'player/dialogPlayer.html',
@@ -90,9 +90,9 @@ var jat;
 
             //#endregion player
             //#region event
-            mainCtrl.prototype.addEvent = function (event) {
+            mainCtrl.prototype.addEvent = function () {
                 var _this = this;
-                var newEvent = this.tournamentLib.newEvent(this.selection.tournament, event);
+                var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
 
                 this.$modal.open({
                     templateUrl: 'event/dialogEvent.html',
@@ -107,7 +107,7 @@ var jat;
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
-                        _this.mainLib.addEvent(_this.selection.tournament, newEvent);
+                        _this.mainLib.addEvent(_this.selection.tournament, newEvent); //TODO add event after selected event
                     }
                 });
             };
@@ -142,9 +142,9 @@ var jat;
 
             //#endregion event
             //#region draw
-            mainCtrl.prototype.addDraw = function (event, draw) {
+            mainCtrl.prototype.addDraw = function () {
                 var _this = this;
-                var newDraw = this.drawLib.newDraw(event, draw);
+                var newDraw = this.drawLib.newDraw(this.selection.event);
 
                 this.$modal.open({
                     templateUrl: 'draw/dialogDraw.html',
@@ -158,17 +158,18 @@ var jat;
                         }
                     }
                 }).result.then(function (result) {
+                    //TODO add event after selected draw
                     if ('Ok' === result) {
-                        _this.mainLib.updateDraw(newDraw, draw);
+                        _this.mainLib.addDraw(newDraw);
                     } else if ('Generate' === result) {
-                        _this.mainLib.updateDraw(newDraw, draw, 1);
+                        _this.mainLib.addDraw(newDraw, 1);
                     }
                 });
             };
 
-            mainCtrl.prototype.editDraw = function (event, draw) {
+            mainCtrl.prototype.editDraw = function (draw) {
                 var _this = this;
-                var editedDraw = this.drawLib.newDraw(event, draw);
+                var editedDraw = this.drawLib.newDraw(draw._event, draw);
 
                 this.$modal.open({
                     templateUrl: 'draw/dialogDraw.html',
@@ -244,8 +245,8 @@ var jat;
             'jat.services.undo',
             'jat.services.tournamentLib',
             'jat.services.drawLib',
-            'jat.services.knockoutLib',
-            'jat.services.roundrobinLib',
+            'jat.services.knockout',
+            'jat.services.roundrobin',
             'jat.player.dialog',
             'jat.player.list',
             'jat.event.dialog',

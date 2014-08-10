@@ -1,7 +1,7 @@
-module models {
+declare module models {
 
     export interface Tournament extends Model {
-        
+
         id: string;
 
         info: TournamentInfo;
@@ -10,7 +10,9 @@ module models {
 
         events: Event[];
 
-        places ?: string[];
+        places?: string[];
+
+        _url?: string;
     }
 
     export interface TournamentInfo {

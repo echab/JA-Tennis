@@ -3,10 +3,10 @@ var jat;
 (function (jat) {
     (function (_draw) {
         var drawCtrl = (function () {
-            function drawCtrl(drawLib, knockoutLib, roundrobinLib, find) {
+            function drawCtrl(drawLib, knockout, roundrobin, find) {
                 this.drawLib = drawLib;
-                this.knockoutLib = knockoutLib;
-                this.roundrobinLib = roundrobinLib;
+                this.knockout = knockout;
+                this.roundrobin = roundrobin;
                 this.find = find;
                 this.boxWidth = 150;
                 this.boxHeight = 40;
@@ -80,8 +80,10 @@ var jat;
                 }
             };
             drawCtrl.prototype.isDiag = function (position) {
-                var n = this.draw.nbColumn;
-                return (position % n) * (n + 1) === position;
+                if (this.draw) {
+                    var n = this.draw.nbColumn;
+                    return (position % n) * (n + 1) === position;
+                }
             };
             return drawCtrl;
         })();
@@ -141,7 +143,7 @@ var jat;
             };
         }
 
-        angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockoutLib', 'jat.services.roundrobinLib', 'jat.services.find']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective);
+        angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockout', 'jat.services.roundrobin', 'jat.services.find']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective);
     })(jat.draw || (jat.draw = {}));
     var draw = jat.draw;
 })(jat || (jat = {}));

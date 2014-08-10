@@ -28,7 +28,7 @@ module jat.draw {
 
         constructor(
             private drawLib: jat.service.DrawLib,
-            private knockoutLib: jat.service.KnockoutLib, private roundrobinLib: jat.service.RoundrobinLib, //for dependencies
+            private knockout: jat.service.Knockout, private roundrobin: jat.service.Roundrobin, //for dependencies
             private find: jat.service.Find
             ) {
         }
@@ -99,8 +99,10 @@ module jat.draw {
             }
         }
         isDiag(position: number): boolean {
-            var n = this.draw.nbColumn;
-            return (position % n) * (n + 1) === position;
+            if (this.draw) {
+                var n = this.draw.nbColumn;
+                return (position % n) * (n + 1) === position;
+            }
         }
     }
 
@@ -161,7 +163,7 @@ module jat.draw {
         };
     }
 
-    angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockoutLib', 'jat.services.roundrobinLib', 'jat.services.find'])
+    angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockout', 'jat.services.roundrobin', 'jat.services.find'])
         .directive('draw', drawDirective)
         .directive('drawLines', drawLinesDirective);
 }

@@ -1,8 +1,9 @@
-module models {
-    export enum DrawType { Normal, Final, PouleSimple, PouleAR };
+declare module models {
+
+    export enum DrawType { Normal, Final, PouleSimple, PouleAR }
 
     export interface Draw extends Model {
-        id: string;
+        id: string; //new draw has no id
 
         name: string;
 
