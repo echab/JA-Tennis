@@ -9,7 +9,7 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.rank = rank;
                 this.find = find;
-                drawLib._drawLibs[models.DrawType.Normal] = drawLib._drawLibs[models.DrawType.Final] = this;
+                drawLib._drawLibs[0 /* Normal */] = drawLib._drawLibs[1 /* Final */] = this;
             }
             Knockout.prototype.findBox = function (draw, position, create) {
                 var box = this.find.by(draw.boxes, 'position', position);
@@ -52,7 +52,7 @@ var jat;
             };
 
             Knockout.prototype.generateDraw = function (draw, generate, afterIndex) {
-                if (generate === models.GenerateType.Create) {
+                if (generate === 1 /* Create */) {
                     var m_nMatchCol = filledArray(MAX_COL, 0);
 
                     var players = this.tournamentLib.GetJoueursInscrit(draw);
@@ -67,11 +67,11 @@ var jat;
                     this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
                 } else {
                     m_nMatchCol = this.CompteMatchs(draw);
-                    if (generate === models.GenerateType.PlusEchelonne) {
+                    if (generate === 2 /* PlusEchelonne */) {
                         if (!this.TirageEchelonne(draw, m_nMatchCol)) {
                             return;
                         }
-                    } else if (generate === models.GenerateType.PlusEnLigne) {
+                    } else if (generate === 3 /* PlusEnLigne */) {
                         if (!this.TirageEnLigne(draw, m_nMatchCol)) {
                             return;
                         }
@@ -425,7 +425,7 @@ var jat;
                 //	for( b=positionBottomCol(columnMin(draw.nbOut)); b<=positionMax(draw.nbColumn, draw.nbOut); b++)
                 //		draw.boxes[ b].setLockMatch( false);
                 //Mets les qualifiés sortants
-                if (draw.type !== models.DrawType.Final) {
+                if (draw.type !== 1 /* Final */) {
                     //Find the first unused qualif number
                     var group = this.drawLib.group(draw);
                     if (group) {

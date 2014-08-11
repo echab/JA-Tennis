@@ -3,9 +3,10 @@ var jat;
 (function (jat) {
     (function (service) {
         var TournamentLib = (function () {
-            function TournamentLib(drawLib, rank) {
+            function TournamentLib(drawLib, rank, guid) {
                 this.drawLib = drawLib;
                 this.rank = rank;
+                this.guid = guid;
             }
             TournamentLib.prototype.newTournament = function (source) {
                 var tournament = {};
@@ -36,6 +37,7 @@ var jat;
                 if (angular.isObject(source)) {
                     angular.extend(player, source);
                 }
+                player.id = this.guid.create('p');
                 delete player.$$hashKey; //remove angular id
 
                 this.initPlayer(player, parent);
@@ -54,6 +56,7 @@ var jat;
                 if (angular.isObject(source)) {
                     angular.extend(event, source);
                 }
+                event.id = this.guid.create('e');
                 delete event.$$hashKey; //remove angular id
 
                 this.initEvent(event, parent);
@@ -143,8 +146,8 @@ var jat;
         })();
         service.TournamentLib = TournamentLib;
 
-        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type']).factory('tournamentLib', function (drawLib, rank) {
-            return new TournamentLib(drawLib, rank);
+        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type']).factory('tournamentLib', function (drawLib, rank, guid) {
+            return new TournamentLib(drawLib, rank, guid);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

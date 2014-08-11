@@ -1,4 +1,4 @@
-﻿var jat;
+var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL_POULE = 22, MAX_JOUEUR = 8191, MAX_TABLEAU = 63, QEMPTY = -1;

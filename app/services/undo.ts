@@ -14,6 +14,7 @@ interface IUndoAction {
     member?: string;
     value?: any;
     stack?: IUndoAction[];  //group
+    meta: any;
 }
 
 module jat.service {
@@ -25,6 +26,7 @@ module jat.service {
         private group: IUndoAction;
         private maxUndo = 20;
         private static ActionType = { UPDATE: 1, INSERT: 2, REMOVE: 3, GROUP: 4, ACTION: 5, SPLICE: 6 };
+        private meta: any;
 
         public reset() {
             this.stack = [];
@@ -32,7 +34,7 @@ module jat.service {
             this.group = null;
         }
 
-        public action(fnDo: () => void, fnUndo: () => void, message: string): void {
+        public action(fnDo: () => void, fnUndo: () => void, message: string, meta?: any): void {
             if ("public" != typeof fnDo) {
                 throw "Undo action: invalid fnDo";
             }
@@ -43,22 +45,23 @@ module jat.service {
                 type: Undo.ActionType.ACTION,
                 fnDo: fnDo,
                 fnUndo: fnUndo,
-                message: message || ""
+                message: message || "",
+                meta: meta
             };
             fnDo();
             this._pushAction(action);
         }
 
-        public update(obj: any[], member: number, value: any, message: string): void;
-        public update(obj: Object, member: string, value: any, message: string): void;
-        public update(obj: any, member: any, value: any, message: string): void {
-            if ("undefined" == typeof obj) {
+        public update(obj: any[], member: number, value: any, message: string, meta?: any): void;
+        public update(obj: Object, member: string, value: any, message: string, meta?: any): void;
+        public update(obj: any, member: any, value: any, message: string, meta?: any): void {
+            if ("undefined" === typeof obj) {
                 throw "Undo update: invalid obj";
             }
-            if ("undefined" == typeof member) {
+            if ("undefined" === typeof member) {
                 throw "Undo update: invalid member";
             }
-            if ("undefined" == typeof value) {
+            if ("undefined" === typeof value) {
                 throw "Undo update: invalid value";
             }
             var action = {
@@ -66,7 +69,8 @@ module jat.service {
                 obj: obj,
                 member: member,
                 value: obj[member],
-                message: message || "update"
+                message: message || "update",
+                meta: meta
             };
             if (obj.splice) {
                 if ("number" != typeof member || member < 0 || obj.length <= member) {
@@ -77,16 +81,16 @@ module jat.service {
             this._pushAction(action);
         }
 
-        public insert(obj: Object, member: string, value: any, message: string): void;
-        public insert(obj: any[], member: number, value: any, message: string): void;
-        public insert(obj: any, member: any, value: any, message: string): void {
-            if ("undefined" == typeof obj) {
+        public insert(obj: Object, member: string, value: any, message: string, meta?: any): void;
+        public insert(obj: any[], member: number, value: any, message: string, meta?: any): void;
+        public insert(obj: any, member: any, value: any, message: string, meta?: any): void {
+            if ("undefined" === typeof obj) {
                 throw "Undo insert: invalid obj";
             }
-            if ("undefined" == typeof member) {
+            if ("undefined" === typeof member) {
                 throw "Undo insert: invalid member";
             }
-            if ("undefined" == typeof value) {
+            if ("undefined" === typeof value) {
                 throw "Undo insert: invalid value";
             }
             if (obj.splice) {
@@ -99,7 +103,8 @@ module jat.service {
                 obj: obj,
                 member: member,
                 value: <any>undefined,
-                message: message || (member == obj.length ? "append" : "insert")
+                message: message || (member === obj.length ? "append" : "insert"),
+                meta: meta
             };
             if (obj.splice) {
                 obj.splice(member, 0, value);
@@ -109,11 +114,11 @@ module jat.service {
             this._pushAction(action);
         }
 
-        public remove(obj: any, member: any, message: string): void {
-            if ("undefined" == typeof obj) {
+        public remove(obj: any, member: any, message: string, meta?: any): void {
+            if ("undefined" === typeof obj) {
                 throw "Undo remove: invalid obj";
             }
-            if ("undefined" == typeof member) {
+            if ("undefined" === typeof member) {
                 throw "Undo remove: invalid member";
             }
             var action = {
@@ -121,7 +126,8 @@ module jat.service {
                 obj: obj,
                 member: member,
                 value: obj[member],
-                message: message || "remove"
+                message: message || "remove",
+                meta: meta
             };
             if (obj.splice) {
                 if ("number" != typeof member || member < 0 || obj.length <= member) {
@@ -135,11 +141,11 @@ module jat.service {
         }
 
         //public splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
-        public splice(obj: any[], index: number, howmany: number, itemX: any[], message: string): void {
-            if ("undefined" == typeof obj) {
+        public splice(obj: any[], index: number, howmany: number, itemX: any[], message: string, meta?: any): void {
+            if ("undefined" === typeof obj) {
                 throw "Undo splice: invalid obj";
             }
-            if ("undefined" == typeof obj.slice) {
+            if ("undefined" === typeof obj.slice) {
                 throw "Undo splice: invalid obj not an array";
             }
             if ("number" != typeof index) {
@@ -159,7 +165,8 @@ module jat.service {
                 howmany: itemX.length,
                 //message: arguments[arguments.length - 1] || "splice",
                 message: message || "splice",
-                values: <any[]>undefined
+                values: <any[]>undefined,
+                meta: meta
             };
 
             //var p = isarray ? itemX.slice(0, itemX.length) : Array.prototype.slice.call(arguments, 3, arguments.length - 1);
@@ -180,14 +187,15 @@ module jat.service {
             }
         }
 
-        public newGroup(message: string, fnGroup?: () => void): void {
+        public newGroup(message: string, fnGroup?: () => void, meta?: any): void {
             if (this.group) {
                 throw "Cannot imbricate group";
             }
             this.group = {
                 type: Undo.ActionType.GROUP,
                 stack: [],
-                message: message || ""
+                message: message || "",
+                meta: meta
             };
             if ("undefined" != typeof fnGroup) {
                 if (fnGroup()) {
@@ -216,8 +224,9 @@ module jat.service {
         }
 
         public _do(action: IUndoAction, bUndo: boolean): any {
-            if (action.type == Undo.ActionType.GROUP) {
-                var r:any;
+            this.meta = action.meta;
+            if (action.type === Undo.ActionType.GROUP) {
+                var r: any;
                 if (bUndo) {
                     for (var i = action.stack.length - 1; i >= 0; i--) {
                         r = this._do(action.stack[i], bUndo);
@@ -228,33 +237,39 @@ module jat.service {
                     }
                 }
                 return r;
-            } else if (action.type == Undo.ActionType.ACTION) {
+
+            } else if (action.type === Undo.ActionType.ACTION) {
                 if (bUndo) {
                     action.fnUndo();
                 } else {
                     action.fnDo();
                 }
-            } else if (action.type == Undo.ActionType.UPDATE) {
+
+            } else if (action.type === Undo.ActionType.UPDATE) {
                 var temp = action.obj[action.member];
                 action.obj[action.member] = action.value;
                 action.value = temp;
                 return temp;
-            } else if (action.type == Undo.ActionType.SPLICE) {
+
+            } else if (action.type === Undo.ActionType.SPLICE) {
                 var p = action.values.slice(0, action.values.length);   //copy array
                 p.unshift(action.index, action.howmany);
                 action.howmany = action.values.length;
                 action.values = Array.prototype.splice.apply(action.obj, p);
                 return p[2];
-            } else if (bUndo ? action.type == Undo.ActionType.INSERT : action.type == Undo.ActionType.REMOVE) {
+
+            } else if (bUndo ? action.type === Undo.ActionType.INSERT : action.type === Undo.ActionType.REMOVE) {
                 action.value = action.obj[action.member];
                 if (action.obj.splice) {
                     action.obj.splice(action.member, 1);
                 } else {
                     delete action.obj[action.member];
                 }
+
             } else if (action.obj.splice) {
                 action.obj.splice(action.member, 0, action.value);
                 return action.value;
+
             } else {
                 action.obj[action.member] = action.value;
                 return action.value;
@@ -308,6 +323,10 @@ module jat.service {
                 this.head -= nOverflow;
                 this.stack.splice(0, nOverflow);
             }
+        }
+
+        public getMeta(): any {
+            return this.meta;
         }
 
         public toString(): string {

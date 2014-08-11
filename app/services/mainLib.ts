@@ -11,7 +11,8 @@
             private drawLib: jat.service.DrawLib,
             //private rank: ServiceRank,
             private undo: jat.service.Undo,
-            private find: jat.service.Find
+            private find: jat.service.Find,
+            private guid: jat.service.Guid
             ) {
         }
 
@@ -58,9 +59,9 @@
         //#region player
         addPlayer(tournament: models.Tournament, newPlayer: models.Player): void {
             var c = tournament.players;
-            newPlayer.id = 'P' + c.length;    //TODO generate id
+            newPlayer.id = this.guid.create('p');
 
-            this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name); //c.push( newPlayer);
+            this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, models.ModelType.Player); //c.push( newPlayer);
             this.selection.player = newPlayer;
         }
 
@@ -68,7 +69,7 @@
             var isSelected = this.selection.player === player;
             var c = this.selection.tournament.players;
             var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
-            this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i); //c[i] = editedPlayer;
+            this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, models.ModelType.Player); //c[i] = editedPlayer;
             if (isSelected) {
                 this.selection.player = editedPlayer;
             }
@@ -80,7 +81,7 @@
             if (this.selection.player === player) {
                 this.selection.player = c[i + 1] || c[i - 1];   //select next or previous
             }
-            this.undo.remove(c, i, "Delete " + player.name + " " + i);   //c.splice( i, 1);
+            this.undo.remove(c, i, "Delete " + player.name + " " + i, models.ModelType.Player);   //c.splice( i, 1);
             this.select(c[i] || c[i + 1], models.ModelType.Player);
         }
         //#endregion player
@@ -90,8 +91,8 @@
             var c = tournament.events;
             var index = afterEvent ? this.find.indexOf(c, 'id', afterEvent.id) + 1 : c.length;
 
-            newEvent.id = 'E' + c.length;    //TODO generate id
-            this.undo.insert(c, index, newEvent, "Add " + newEvent.name);   //c.push( newEvent);
+            newEvent.id = this.guid.create('e');
+            this.undo.insert(c, index, newEvent, "Add " + newEvent.name, models.ModelType.Event);   //c.push( newEvent);
             this.selection.event = newEvent;
         }
 
@@ -99,7 +100,7 @@
             var isSelected = this.selection.event === event;
             var c = this.selection.tournament.events;
             var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
-            this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i);   //c[i] = editedEvent;
+            this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, models.ModelType.Event);   //c[i] = editedEvent;
             if (isSelected) {
                 this.selection.event = editedEvent;
             }
@@ -111,7 +112,7 @@
             if (this.selection.event === event) {
                 this.selection.event = c[i + 1] || c[i - 2];   //select next or previous
             }
-            this.undo.remove(c, i, "Delete " + c[i].name + " " + i); //c.splice( i, 1);
+            this.undo.remove(c, i, "Delete " + c[i].name + " " + i, models.ModelType.Event); //c.splice( i, 1);
             this.select(c[i] || c[i + 1], models.ModelType.Event);
         }
         //#endregion event
@@ -127,7 +128,7 @@
                 if (!draws || !draws.length) {
                     return;
                 }
-                this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name);
+                this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, models.ModelType.Draw);
 
                 for (var i = 0; i < draws.length; i++) {
                     this.drawLib.initDraw(draws[i], draw._event);
@@ -135,8 +136,8 @@
                 this.selection.draw = draws[0];
 
             } else {
-                draw.id = 'D' + c.length;    //TODO generate id
-                this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name); //c.push( draw);
+                draw.id = this.guid.create('d');
+                this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, models.ModelType.Draw); //c.push( draw);
                 this.selection.draw = draw;
             }
         }
@@ -155,7 +156,7 @@
             var c = draw._event.draws;
             if (generate && draws && group && draws.length) {
                 var i = this.find.indexOf(c, "id", group[0].id, "Draw to edit not found");
-                this.undo.splice(c, i, group.length, draws, "Generate " + models.GenerateType[generate] + ' ' + draw.name);
+                this.undo.splice(c, i, group.length, draws, "Generate " + models.GenerateType[generate] + ' ' + draw.name, models.ModelType.Draw);
 
                 for (var i = 0; i < draws.length; i++) {
                     this.drawLib.initDraw(draws[i], draw._event);
@@ -163,7 +164,7 @@
                 draw = draws[0];
             } else {    //edit draw
                 var i = this.find.indexOf(c, "id", draw.id, "Draw to edit not found");
-                this.undo.update(c, i, draw, "Edit " + draw.name + " " + i); //c[i] = draw;
+                this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, models.ModelType.Draw); //c[i] = draw;
             }
             if (isSelected || generate) {
                 this.selection.draw = draw;
@@ -177,7 +178,7 @@
             if (this.selection.draw === draw) {
                 this.selection.draw = c[i] || c[i - 1]; //select next or previous
             }
-            this.undo.remove(c, i, "Delete " + draw.name + " " + i); //c.splice( i, 1);
+            this.undo.remove(c, i, "Delete " + draw.name + " " + i, models.ModelType.Draw); //c.splice( i, 1);
             this.select(c[i] || c[i + 1], models.ModelType.Draw);
         }
 
@@ -191,7 +192,7 @@
             var c = match._draw.boxes;
             var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
             this.undo.newGroup("Edit match");
-            this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i); //c[i] = editedMatch;
+            this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, models.ModelType.Match); //c[i] = editedMatch;
             //if (!match.playerId && editedMatch.playerId) {
             //    var nextMatch = drawLib.positionMatch(match.position);
             //    //TODO
@@ -199,6 +200,13 @@
             this.undo.endGroup();
         }
         //#endregion match
+
+        public doUndo() {
+            this.select(this.undo.undo(), this.undo.getMeta());
+        }
+        public doRedo() {
+            this.select(this.undo.redo(), this.undo.getMeta());
+        }
 
         public select(r: any, type?: models.ModelType): void {
 
@@ -272,7 +280,8 @@
             roundrobin: jat.service.Roundrobin,
             //rank: ServiceRank,
             undo: jat.service.Undo,
-            find: jat.service.Find) => {
-            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, undo, find);
+            find: jat.service.Find,
+            guid: jat.service.Guid) => {
+            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, undo, find, guid);
         });
 }

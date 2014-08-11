@@ -6,9 +6,10 @@ var jat;
         var MAX_TETESERIE = 32, MAX_QUALIF_ENTRANT = 32, QEMPTY = -1;
 
         var DrawLib = (function () {
-            function DrawLib(find, rank) {
+            function DrawLib(find, rank, guid) {
                 this.find = find;
                 this.rank = rank;
+                this.guid = guid;
                 this._drawLibs = {};
             }
             DrawLib.prototype.newDraw = function (parent, source, after) {
@@ -16,9 +17,8 @@ var jat;
                 if (angular.isObject(source)) {
                     angular.extend(draw, source);
                 }
+                draw.id = this.guid.create('d');
                 delete draw.$$hashKey; //remove angular id
-
-                draw.id = 'd' + Math.round(Math.random() * 999); //TODOjs guid service
 
                 //default values
                 draw.type = draw.type || 0 /* Normal */;
@@ -722,8 +722,8 @@ var jat;
             }
         }
 
-        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find, rank) {
-            return new DrawLib(find, rank);
+        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find, rank, guid) {
+            return new DrawLib(find, rank, guid);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

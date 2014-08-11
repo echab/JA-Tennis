@@ -200,10 +200,10 @@ module jat.main {
         //#endregion match
 
         public doUndo() {
-            this.mainLib.select(this.undo.undo());
+            this.mainLib.doUndo();
         }
         public doRedo() {
-            this.mainLib.select(this.undo.redo());
+            this.mainLib.doRedo();
         }
 
     }

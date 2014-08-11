@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var jat;
 (function (jat) {
     (function (main) {
@@ -228,10 +228,10 @@ var jat;
 
             //#endregion match
             mainCtrl.prototype.doUndo = function () {
-                this.mainLib.select(this.undo.undo());
+                this.mainLib.doUndo();
             };
             mainCtrl.prototype.doRedo = function () {
-                this.mainLib.select(this.undo.redo());
+                this.mainLib.doRedo();
             };
             return mainCtrl;
         })();

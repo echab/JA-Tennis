@@ -6,7 +6,8 @@ module jat.service {
 
         constructor(
             private drawLib: jat.service.DrawLib,
-            private rank: ServiceRank
+            private rank: ServiceRank,
+            private guid: jat.service.Guid
             ) { }
 
         public newTournament(source?: models.Tournament): models.Tournament {
@@ -39,6 +40,7 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(player, source);
             }
+            player.id = this.guid.create('p');
             delete (<any>player).$$hashKey;   //remove angular id
 
             this.initPlayer(player, parent);
@@ -58,6 +60,7 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(event, source);
             }
+            event.id = this.guid.create('e');
             delete (<any>event).$$hashKey;   //remove angular id
 
             this.initEvent(event, parent);
@@ -154,7 +157,7 @@ module jat.service {
     }
 
     angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type'])
-        .factory('tournamentLib', (drawLib: jat.service.DrawLib, rank: ServiceRank) => {
-            return new TournamentLib(drawLib, rank);
+        .factory('tournamentLib', (drawLib: jat.service.DrawLib, rank: ServiceRank, guid: jat.service.Guid) => {
+            return new TournamentLib(drawLib, rank, guid);
         });
 }

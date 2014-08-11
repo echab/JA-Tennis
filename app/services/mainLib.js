@@ -3,7 +3,7 @@
     (function (service) {
         var MainLib = (function () {
             function MainLib($log, $http, $q, selection, tournamentLib, drawLib, //private rank: ServiceRank,
-            undo, find) {
+            undo, find, guid) {
                 this.$log = $log;
                 this.$http = $http;
                 this.$q = $q;
@@ -12,6 +12,7 @@
                 this.drawLib = drawLib;
                 this.undo = undo;
                 this.find = find;
+                this.guid = guid;
             }
             /** This function load tournament data from an url. */
             MainLib.prototype.loadTournament = function (url) {
@@ -53,9 +54,9 @@
             //#region player
             MainLib.prototype.addPlayer = function (tournament, newPlayer) {
                 var c = tournament.players;
-                newPlayer.id = 'P' + c.length; //TODO generate id
+                newPlayer.id = this.guid.create('p');
 
-                this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name); //c.push( newPlayer);
+                this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, 2 /* Player */); //c.push( newPlayer);
                 this.selection.player = newPlayer;
             };
 
@@ -63,7 +64,7 @@
                 var isSelected = this.selection.player === player;
                 var c = this.selection.tournament.players;
                 var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
-                this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i); //c[i] = editedPlayer;
+                this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, 2 /* Player */); //c[i] = editedPlayer;
                 if (isSelected) {
                     this.selection.player = editedPlayer;
                 }
@@ -75,7 +76,7 @@
                 if (this.selection.player === player) {
                     this.selection.player = c[i + 1] || c[i - 1]; //select next or previous
                 }
-                this.undo.remove(c, i, "Delete " + player.name + " " + i); //c.splice( i, 1);
+                this.undo.remove(c, i, "Delete " + player.name + " " + i, 2 /* Player */); //c.splice( i, 1);
                 this.select(c[i] || c[i + 1], 2 /* Player */);
             };
 
@@ -85,8 +86,8 @@
                 var c = tournament.events;
                 var index = afterEvent ? this.find.indexOf(c, 'id', afterEvent.id) + 1 : c.length;
 
-                newEvent.id = 'E' + c.length; //TODO generate id
-                this.undo.insert(c, index, newEvent, "Add " + newEvent.name); //c.push( newEvent);
+                newEvent.id = this.guid.create('e');
+                this.undo.insert(c, index, newEvent, "Add " + newEvent.name, 3 /* Event */); //c.push( newEvent);
                 this.selection.event = newEvent;
             };
 
@@ -94,7 +95,7 @@
                 var isSelected = this.selection.event === event;
                 var c = this.selection.tournament.events;
                 var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
-                this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i); //c[i] = editedEvent;
+                this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, 3 /* Event */); //c[i] = editedEvent;
                 if (isSelected) {
                     this.selection.event = editedEvent;
                 }
@@ -106,7 +107,7 @@
                 if (this.selection.event === event) {
                     this.selection.event = c[i + 1] || c[i - 2]; //select next or previous
                 }
-                this.undo.remove(c, i, "Delete " + c[i].name + " " + i); //c.splice( i, 1);
+                this.undo.remove(c, i, "Delete " + c[i].name + " " + i, 3 /* Event */); //c.splice( i, 1);
                 this.select(c[i] || c[i + 1], 3 /* Event */);
             };
 
@@ -121,15 +122,15 @@
                     if (!draws || !draws.length) {
                         return;
                     }
-                    this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name);
+                    this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, 4 /* Draw */);
 
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
                     }
                     this.selection.draw = draws[0];
                 } else {
-                    draw.id = 'D' + c.length; //TODO generate id
-                    this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name); //c.push( draw);
+                    draw.id = this.guid.create('d');
+                    this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, 4 /* Draw */); //c.push( draw);
                     this.selection.draw = draw;
                 }
             };
@@ -148,7 +149,7 @@
                 var c = draw._event.draws;
                 if (generate && draws && group && draws.length) {
                     var i = this.find.indexOf(c, "id", group[0].id, "Draw to edit not found");
-                    this.undo.splice(c, i, group.length, draws, "Generate " + models.GenerateType[generate] + ' ' + draw.name);
+                    this.undo.splice(c, i, group.length, draws, "Generate " + models.GenerateType[generate] + ' ' + draw.name, 4 /* Draw */);
 
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
@@ -156,7 +157,7 @@
                     draw = draws[0];
                 } else {
                     var i = this.find.indexOf(c, "id", draw.id, "Draw to edit not found");
-                    this.undo.update(c, i, draw, "Edit " + draw.name + " " + i); //c[i] = draw;
+                    this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, 4 /* Draw */); //c[i] = draw;
                 }
                 if (isSelected || generate) {
                     this.selection.draw = draw;
@@ -170,7 +171,7 @@
                 if (this.selection.draw === draw) {
                     this.selection.draw = c[i] || c[i - 1]; //select next or previous
                 }
-                this.undo.remove(c, i, "Delete " + draw.name + " " + i); //c.splice( i, 1);
+                this.undo.remove(c, i, "Delete " + draw.name + " " + i, 4 /* Draw */); //c.splice( i, 1);
                 this.select(c[i] || c[i + 1], 4 /* Draw */);
             };
 
@@ -184,7 +185,7 @@
                 var c = match._draw.boxes;
                 var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
                 this.undo.newGroup("Edit match");
-                this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i); //c[i] = editedMatch;
+                this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, 5 /* Match */); //c[i] = editedMatch;
 
                 //if (!match.playerId && editedMatch.playerId) {
                 //    var nextMatch = drawLib.positionMatch(match.position);
@@ -194,6 +195,13 @@
             };
 
             //#endregion match
+            MainLib.prototype.doUndo = function () {
+                this.select(this.undo.undo(), this.undo.getMeta());
+            };
+            MainLib.prototype.doRedo = function () {
+                this.select(this.undo.redo(), this.undo.getMeta());
+            };
+
             MainLib.prototype.select = function (r, type) {
                 var sel = this.selection;
                 if (r) {
@@ -253,8 +261,8 @@
             'jat.services.knockout',
             'jat.services.roundrobin'
         ]).factory('mainLib', function ($log, $http, $q, selection, tournamentLib, drawLib, knockout, roundrobin, //rank: ServiceRank,
-        undo, find) {
-            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, undo, find);
+        undo, find, guid) {
+            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, undo, find, guid);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

@@ -15,7 +15,7 @@ var jat;
                 this.group = null;
             };
 
-            Undo.prototype.action = function (fnDo, fnUndo, message) {
+            Undo.prototype.action = function (fnDo, fnUndo, message, meta) {
                 if ("public" != typeof fnDo) {
                     throw "Undo action: invalid fnDo";
                 }
@@ -26,20 +26,21 @@ var jat;
                     type: Undo.ActionType.ACTION,
                     fnDo: fnDo,
                     fnUndo: fnUndo,
-                    message: message || ""
+                    message: message || "",
+                    meta: meta
                 };
                 fnDo();
                 this._pushAction(action);
             };
 
-            Undo.prototype.update = function (obj, member, value, message) {
-                if ("undefined" == typeof obj) {
+            Undo.prototype.update = function (obj, member, value, message, meta) {
+                if ("undefined" === typeof obj) {
                     throw "Undo update: invalid obj";
                 }
-                if ("undefined" == typeof member) {
+                if ("undefined" === typeof member) {
                     throw "Undo update: invalid member";
                 }
-                if ("undefined" == typeof value) {
+                if ("undefined" === typeof value) {
                     throw "Undo update: invalid value";
                 }
                 var action = {
@@ -47,7 +48,8 @@ var jat;
                     obj: obj,
                     member: member,
                     value: obj[member],
-                    message: message || "update"
+                    message: message || "update",
+                    meta: meta
                 };
                 if (obj.splice) {
                     if ("number" != typeof member || member < 0 || obj.length <= member) {
@@ -58,14 +60,14 @@ var jat;
                 this._pushAction(action);
             };
 
-            Undo.prototype.insert = function (obj, member, value, message) {
-                if ("undefined" == typeof obj) {
+            Undo.prototype.insert = function (obj, member, value, message, meta) {
+                if ("undefined" === typeof obj) {
                     throw "Undo insert: invalid obj";
                 }
-                if ("undefined" == typeof member) {
+                if ("undefined" === typeof member) {
                     throw "Undo insert: invalid member";
                 }
-                if ("undefined" == typeof value) {
+                if ("undefined" === typeof value) {
                     throw "Undo insert: invalid value";
                 }
                 if (obj.splice) {
@@ -78,7 +80,8 @@ var jat;
                     obj: obj,
                     member: member,
                     value: undefined,
-                    message: message || (member == obj.length ? "append" : "insert")
+                    message: message || (member === obj.length ? "append" : "insert"),
+                    meta: meta
                 };
                 if (obj.splice) {
                     obj.splice(member, 0, value);
@@ -88,11 +91,11 @@ var jat;
                 this._pushAction(action);
             };
 
-            Undo.prototype.remove = function (obj, member, message) {
-                if ("undefined" == typeof obj) {
+            Undo.prototype.remove = function (obj, member, message, meta) {
+                if ("undefined" === typeof obj) {
                     throw "Undo remove: invalid obj";
                 }
-                if ("undefined" == typeof member) {
+                if ("undefined" === typeof member) {
                     throw "Undo remove: invalid member";
                 }
                 var action = {
@@ -100,7 +103,8 @@ var jat;
                     obj: obj,
                     member: member,
                     value: obj[member],
-                    message: message || "remove"
+                    message: message || "remove",
+                    meta: meta
                 };
                 if (obj.splice) {
                     if ("number" != typeof member || member < 0 || obj.length <= member) {
@@ -114,11 +118,11 @@ var jat;
             };
 
             //public splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
-            Undo.prototype.splice = function (obj, index, howmany, itemX, message) {
-                if ("undefined" == typeof obj) {
+            Undo.prototype.splice = function (obj, index, howmany, itemX, message, meta) {
+                if ("undefined" === typeof obj) {
                     throw "Undo splice: invalid obj";
                 }
-                if ("undefined" == typeof obj.slice) {
+                if ("undefined" === typeof obj.slice) {
                     throw "Undo splice: invalid obj not an array";
                 }
                 if ("number" != typeof index) {
@@ -137,7 +141,8 @@ var jat;
                     howmany: itemX.length,
                     //message: arguments[arguments.length - 1] || "splice",
                     message: message || "splice",
-                    values: undefined
+                    values: undefined,
+                    meta: meta
                 };
 
                 //var p = isarray ? itemX.slice(0, itemX.length) : Array.prototype.slice.call(arguments, 3, arguments.length - 1);
@@ -158,14 +163,15 @@ var jat;
                 }
             };
 
-            Undo.prototype.newGroup = function (message, fnGroup) {
+            Undo.prototype.newGroup = function (message, fnGroup, meta) {
                 if (this.group) {
                     throw "Cannot imbricate group";
                 }
                 this.group = {
                     type: Undo.ActionType.GROUP,
                     stack: [],
-                    message: message || ""
+                    message: message || "",
+                    meta: meta
                 };
                 if ("undefined" != typeof fnGroup) {
                     if (fnGroup()) {
@@ -194,7 +200,8 @@ var jat;
             };
 
             Undo.prototype._do = function (action, bUndo) {
-                if (action.type == Undo.ActionType.GROUP) {
+                this.meta = action.meta;
+                if (action.type === Undo.ActionType.GROUP) {
                     var r;
                     if (bUndo) {
                         for (var i = action.stack.length - 1; i >= 0; i--) {
@@ -206,24 +213,24 @@ var jat;
                         }
                     }
                     return r;
-                } else if (action.type == Undo.ActionType.ACTION) {
+                } else if (action.type === Undo.ActionType.ACTION) {
                     if (bUndo) {
                         action.fnUndo();
                     } else {
                         action.fnDo();
                     }
-                } else if (action.type == Undo.ActionType.UPDATE) {
+                } else if (action.type === Undo.ActionType.UPDATE) {
                     var temp = action.obj[action.member];
                     action.obj[action.member] = action.value;
                     action.value = temp;
                     return temp;
-                } else if (action.type == Undo.ActionType.SPLICE) {
+                } else if (action.type === Undo.ActionType.SPLICE) {
                     var p = action.values.slice(0, action.values.length);
                     p.unshift(action.index, action.howmany);
                     action.howmany = action.values.length;
                     action.values = Array.prototype.splice.apply(action.obj, p);
                     return p[2];
-                } else if (bUndo ? action.type == Undo.ActionType.INSERT : action.type == Undo.ActionType.REMOVE) {
+                } else if (bUndo ? action.type === Undo.ActionType.INSERT : action.type === Undo.ActionType.REMOVE) {
                     action.value = action.obj[action.member];
                     if (action.obj.splice) {
                         action.obj.splice(action.member, 1);
@@ -286,6 +293,10 @@ var jat;
                     this.head -= nOverflow;
                     this.stack.splice(0, nOverflow);
                 }
+            };
+
+            Undo.prototype.getMeta = function () {
+                return this.meta;
             };
 
             Undo.prototype.toString = function () {

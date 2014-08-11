@@ -10,7 +10,7 @@ describe('services.roundrobin', function () {
 
     var draw1 = {
         id: 'd1', name: 'draw1',
-        type: models.DrawType.PouleSimple,
+        type: 2 /* PouleSimple */,
         minRank: 'NC', maxRank: '40',
         nbColumn: 4, nbOut: 1,
         boxes: []

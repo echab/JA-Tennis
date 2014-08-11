@@ -77,11 +77,11 @@ module jat.service {
                 this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
             } else {    //from existing players
                 m_nMatchCol = this.CompteMatchs(draw);
-            if (generate === models.GenerateType.PlusEchelonne) {
+                if (generate === models.GenerateType.PlusEchelonne) {
                     if (!this.TirageEchelonne(draw, m_nMatchCol)) {
                         return;
                     }
-            } else if (generate === models.GenerateType.PlusEnLigne) {
+                } else if (generate === models.GenerateType.PlusEnLigne) {
                     if (!this.TirageEnLigne(draw, m_nMatchCol)) {
                         return;
                     }

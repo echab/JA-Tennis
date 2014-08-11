@@ -39,7 +39,8 @@ module jat.service {
 
         constructor(
             private find: jat.service.Find,
-            private rank: ServiceRank
+            private rank: ServiceRank,
+            private guid: jat.service.Guid
             ) {
         }
 
@@ -48,9 +49,8 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(draw, source);
             }
+            draw.id = this.guid.create('d');
             delete (<any>draw).$$hashKey;   //remove angular id
-
-            draw.id = 'd' + Math.round(Math.random() * 999);    //TODOjs guid service
 
             //default values
             draw.type = draw.type || models.DrawType.Normal;
@@ -155,7 +155,7 @@ module jat.service {
             this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);
         }
 
-        public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex:number): models.Draw[] {
+        public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[] {
             return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
         }
 
@@ -281,7 +281,7 @@ module jat.service {
         public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn;
         public FindQualifieEntrant(origin: any, iQualifie: number): models.PlayerIn {
             ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
-            var group:models.Draw[] = angular.isArray(origin) ? origin : this.group(origin);
+            var group: models.Draw[] = angular.isArray(origin) ? origin : this.group(origin);
             for (var i = 0; i < group.length; i++) {
                 var d = group[i];
                 var playerIn = this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
@@ -781,7 +781,7 @@ module jat.service {
     }
 
     angular.module('jat.services.drawLib', ['jat.services.find'])
-        .factory('drawLib', (find: jat.service.Find, rank: ServiceRank) => {
-            return new DrawLib(find, rank);
+        .factory('drawLib', (find: jat.service.Find, rank: ServiceRank, guid: jat.service.Guid) => {
+            return new DrawLib(find, rank, guid);
         });
 }

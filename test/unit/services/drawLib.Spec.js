@@ -28,7 +28,7 @@ describe('services.drawLib', function () {
 
     var draw1 = {
         id: 'd1', name: 'draw1',
-        type: models.DrawType.Normal,
+        type: 0 /* Normal */,
         minRank: 'NC', maxRank: '40',
         nbColumn: 3, nbOut: 1,
         boxes: [],
