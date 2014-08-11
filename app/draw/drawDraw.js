@@ -85,6 +85,14 @@ var jat;
                     return (position % n) * (n + 1) === position;
                 }
             };
+            drawCtrl.prototype.range = function (min, max, step) {
+                step = step || 1;
+                var a = [];
+                for (var i = min; i <= max; i += step) {
+                    a.push(i);
+                }
+                return a;
+            };
             return drawCtrl;
         })();
 

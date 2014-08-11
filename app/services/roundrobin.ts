@@ -237,7 +237,7 @@ module jat.service {
 
             //Récupère les joueurs du tableau
             var ppJoueur: models.Player[] = [];
-            var draws = this.drawLib.currentGroup(draw);
+            var draws = this.drawLib.group(draw);
             for (var j = 0; j < draws.length; j++) {
                 var d = draws[j];
                 var first = positionFirstIn(d.nbColumn),
@@ -259,9 +259,9 @@ module jat.service {
             return ppJoueur;
         }
 
-        public generateDraw(refDraw: models.Draw, generate?: number): models.Draw[] {
+        public generateDraw(refDraw: models.Draw, generate?: models.GenerateType, afterIndex?: number): models.Draw[] {
 
-            var oldDraws = this.drawLib.currentGroup(refDraw);
+            var oldDraws = this.drawLib.group(refDraw);
             var iTableau = this.find.indexOf(refDraw._event.draws, 'id', oldDraws[0].id);
             if (iTableau === -1) {
                 iTableau = refDraw._event.draws.length;  //append the draws at the end of the event
@@ -270,7 +270,7 @@ module jat.service {
             var players = this.tournamentLib.GetJoueursInscrit(refDraw);
 
             //Récupère les qualifiés sortants du tableau précédent
-            var prev = this.drawLib.previousGroup(refDraw);
+            var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(refDraw);
             if (prev) {
                 players = players.concat(<any>this.drawLib.FindAllQualifieSortant(prev, true));
             }
@@ -293,6 +293,7 @@ module jat.service {
             var draws: models.Draw[] = [];
 
             //Créé les poules
+            var name = refDraw.name;
             for (var t = 0; t < nDraw; t++) {
 
                 if (t === 0) {
@@ -302,7 +303,7 @@ module jat.service {
                     draw.suite = true;
                 }
                 draw.boxes = [];
-                draw.name = refDraw.name + (nDraw > 1 ? ' (' + (t + 1) + ')' : '');
+                draw.name = name + (nDraw > 1 ? ' (' + (t + 1) + ')' : '');
 
                 for (var i = draw.nbColumn - 1; i >= 0 && players.length; i--) {
 
@@ -463,7 +464,7 @@ module jat.service {
         return pos % n + n * n;
     };
 
-    angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
+    angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
         .factory('roundrobin', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: ServiceRanking, find: Find) => {
             return new Roundrobin(drawLib, tournamentLib, ranking, find);
         });

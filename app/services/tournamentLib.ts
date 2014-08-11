@@ -39,6 +39,8 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(player, source);
             }
+            delete (<any>player).$$hashKey;   //remove angular id
+
             this.initPlayer(player, parent);
             return player;
         }
@@ -51,6 +53,17 @@ module jat.service {
         }
 
 
+        public newEvent(parent: models.Tournament, source?: models.Event): models.Event {
+            var event: models.Event = <any>{};
+            if (angular.isObject(source)) {
+                angular.extend(event, source);
+            }
+            delete (<any>event).$$hashKey;   //remove angular id
+
+            this.initEvent(event, parent);
+            return event;
+        }
+
         public initEvent(event: models.Event, parent: models.Tournament): void {
             event._tournament = parent;
             if (event.draws) {
@@ -58,15 +71,6 @@ module jat.service {
                     this.drawLib.initDraw(event.draws[i], event);
                 }
             }
-        }
-
-        public newEvent(parent: models.Tournament, source?: models.Event): models.Event {
-            var event: models.Event = <any>{};
-            if (angular.isObject(source)) {
-                angular.extend(event, source);
-            }
-            this.initEvent(event, parent);
-            return event;
         }
 
         public getRegistred(event: models.Event): models.Player[] {
@@ -149,7 +153,7 @@ module jat.service {
         }
     }
 
-    angular.module('jat.services.tournamentLib', ['jat.services.drawLib'])
+    angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type'])
         .factory('tournamentLib', (drawLib: jat.service.DrawLib, rank: ServiceRank) => {
             return new TournamentLib(drawLib, rank);
         });

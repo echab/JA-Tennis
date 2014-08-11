@@ -5,8 +5,8 @@ describe('services.roundrobin', () => {
 
     beforeEach(module('jat.services.roundrobin'));
     beforeEach(module('jat.services.type'));
-    beforeEach(inject((_roundrobinLib_: jat.service.Roundrobin) => {    //inject before each "it
-        roundrobin = _roundrobinLib_;
+    beforeEach(inject((_roundrobin_: jat.service.Roundrobin) => {    //inject before each "it
+        roundrobin = _roundrobin_;
     }));
 
     var draw1: models.Draw = {

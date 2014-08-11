@@ -61,14 +61,14 @@ module jat.service {
             }
         }
 
-        public generateDraw(draw: models.Draw, generate: number): models.Draw[] {
-            if (generate === 1) {   //from registred players
+        public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[] {
+            if (generate === models.GenerateType.Create) {   //from registred players
                 var m_nMatchCol = filledArray(MAX_COL, 0);
 
                 var players = this.tournamentLib.GetJoueursInscrit(draw);
 
                 //Récupère les qualifiés sortants du tableau précédent
-                var prev = this.drawLib.previousGroup(draw);
+                var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(draw);
                 if (prev) {
                     players = players.concat(<any>this.drawLib.FindAllQualifieSortant(prev, true));
                 }
@@ -77,11 +77,11 @@ module jat.service {
                 this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
             } else {    //from existing players
                 m_nMatchCol = this.CompteMatchs(draw);
-                if (generate === 2) {
+            if (generate === models.GenerateType.PlusEchelonne) {
                     if (!this.TirageEchelonne(draw, m_nMatchCol)) {
                         return;
                     }
-                } else if (generate === 3) {
+            } else if (generate === models.GenerateType.PlusEnLigne) {
                     if (!this.TirageEnLigne(draw, m_nMatchCol)) {
                         return;
                     }
@@ -461,7 +461,7 @@ module jat.service {
             if (draw.type !== models.DrawType.Final) {
 
                 //Find the first unused qualif number
-                var group = this.drawLib.currentGroup(draw);
+                var group = this.drawLib.group(draw);
                 if (group) {
                     for (i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
                         if (!this.drawLib.FindQualifieSortant(group, i)) {
@@ -674,7 +674,7 @@ module jat.service {
 
         public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn {
 
-            ASSERT(iQualifie >= 0);
+            ASSERT(0 <= iQualifie);
 
             if (!draw.boxes) {
                 return;
@@ -700,10 +700,7 @@ module jat.service {
                 return;
             }
 
-            var boxOut = <models.Match>this.find.by(draw.boxes, "qualifOut", iQualifie);
-            if (boxOut) {
-                return boxOut;
-            }
+            return <models.Match>this.find.by(draw.boxes, "qualifOut", iQualifie);
         }
 
         private box1(match: models.Match): models.Box {
@@ -993,7 +990,7 @@ module jat.service {
             + positionBottomCol(c - columnMin(nQualifie));
     }
 
-    angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
+    angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
         .factory('knockout', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, find: Find) => {
             return new Knockout(drawLib, tournamentLib, rank, find);
         });

@@ -104,6 +104,14 @@ module jat.draw {
                 return (position % n) * (n + 1) === position;
             }
         }
+        range(min: number, max: number, step?: number): number[] {
+            step = step || 1;
+            var a: number[] = [];
+            for (var i = min; i <= max; i += step) {
+                a.push(i);
+            }
+            return a;
+        }
     }
 
     function isMatch(box: models.Box): boolean {

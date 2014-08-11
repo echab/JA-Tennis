@@ -1,7 +1,5 @@
 declare module models {
 
-    export enum DrawType { Normal, Final, PouleSimple, PouleAR }
-
     export interface Draw extends Model {
         id: string; //new draw has no id
 
@@ -11,8 +9,8 @@ declare module models {
 
         suite?: boolean;
 
-        minRank: string;
-        maxRank: string;
+        minRank: RankString;
+        maxRank: RankString;
 
         //nbEntry: number;
         nbColumn: number;

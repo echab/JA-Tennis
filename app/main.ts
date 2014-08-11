@@ -5,6 +5,8 @@ module jat.main {
     /** Main controller for the application */
     export class mainCtrl {
 
+        public GenerateType = models.GenerateType;
+
         constructor(
             private $modal: uib.IModalService<string>,
             private selection: jat.service.Selection,
@@ -16,7 +18,7 @@ module jat.main {
 
             this.selection.tournament = this.tournamentLib.newTournament();
 
-            this.mainLib.loadTournament('/data/tournament5.json').then((data) => {
+            this.mainLib.loadTournament('/data/tournament6.json').then((data) => {
                 this.selection.draw = data.events[0].draws[0];
             });
         }
@@ -81,7 +83,7 @@ module jat.main {
         //#endregion player
 
         //#region event
-        addEvent(): void {
+        addEvent(after?: models.Event): void { //TODO afterEvent
 
             var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
 
@@ -94,7 +96,7 @@ module jat.main {
                 }
             }).result.then((result: string) => {
                     if ('Ok' === result) {
-                        this.mainLib.addEvent(this.selection.tournament, newEvent); //TODO add event after selected event
+                        this.mainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
                     }
                 });
         }
@@ -125,9 +127,9 @@ module jat.main {
         //#endregion event
 
         //#region draw
-        addDraw(): void {
+        addDraw(after?: models.Draw): void {
 
-            var newDraw = this.drawLib.newDraw(this.selection.event);
+            var newDraw = this.drawLib.newDraw(this.selection.event, undefined, after);
 
             this.$modal.open({
                 templateUrl: 'draw/dialogDraw.html',
@@ -139,9 +141,9 @@ module jat.main {
             }).result.then((result: string) => {
                     //TODO add event after selected draw
                     if ('Ok' === result) {
-                        this.mainLib.addDraw(newDraw);
+                        this.mainLib.addDraw(newDraw, 0, after);
                     } else if ('Generate' === result) {
-                        this.mainLib.addDraw(newDraw, 1);
+                        this.mainLib.addDraw(newDraw, 1, after);
                     }
                 });
         }
@@ -168,11 +170,8 @@ module jat.main {
                 });
         }
 
-        generateDraw(draw: models.Draw, generate?: number): void {
-            if (!draw) {
-                return;
-            }
-            this.mainLib.updateDraw(draw, undefined, generate || 1);
+        generateDraw(draw: models.Draw, generate?: models.GenerateType): void {
+            this.mainLib.updateDraw(draw, undefined, generate || models.GenerateType.Create);
         }
 
         removeDraw(draw: models.Draw): void {

@@ -6,24 +6,28 @@ var jat;
         var MAX_TETESERIE = 32, MAX_QUALIF_ENTRANT = 32, QEMPTY = -1;
 
         var DrawLib = (function () {
-            function DrawLib(find) {
+            function DrawLib(find, rank) {
                 this.find = find;
+                this.rank = rank;
                 this._drawLibs = {};
             }
-            DrawLib.prototype.newDraw = function (parent, source) {
+            DrawLib.prototype.newDraw = function (parent, source, after) {
                 var draw = {};
                 if (angular.isObject(source)) {
                     angular.extend(draw, source);
                 }
+                delete draw.$$hashKey; //remove angular id
 
                 draw.id = 'd' + Math.round(Math.random() * 999); //TODOjs guid service
 
                 //default values
+                draw.type = draw.type || 0 /* Normal */;
                 draw.nbColumn = draw.nbColumn || 3;
                 draw.nbOut = draw.nbOut || 1;
-                draw.minRank = draw.minRank || 'NC'; //TODO init depending of previous draw
+                draw._previous = after;
+                draw.minRank = after && after.maxRank ? this.rank.next(after.maxRank) : 'NC';
 
-                this.initDraw(draw, parent);
+                draw._event = parent;
                 return draw;
             };
 
@@ -60,29 +64,22 @@ var jat;
             };
 
             DrawLib.prototype.resetDraw = function (draw, nPlayer) {
-                var _this = this;
                 //remove qualif out
                 var next = this.nextGroup(draw);
                 if (next && draw.boxes) {
-                    angular.forEach(next, function (d) {
-                        if (d.boxes) {
-                            angular.forEach(next, function (box) {
+                    for (var i = 0; i < next.length; i++) {
+                        var boxes = next[i].boxes;
+                        if (boxes) {
+                            for (var b = 0; b < boxes.length; b++) {
+                                var box = boxes[b];
                                 if (box && box.qualifOut) {
-                                    _this.SetQualifieSortant(box);
+                                    this.SetQualifieSortant(box);
                                 }
-                            });
+                            }
                         }
-                    });
+                    }
                 }
 
-                //if (next && next.boxes && draw.boxes) {
-                //    for (var i = draw.boxes.length - 1; i >= 0; i--) {
-                //        var box = <models.Match> draw.boxes[i];
-                //        if (box && box.qualifOut) {
-                //            this.SetQualifieSortant(box);
-                //        }
-                //    }
-                //}
                 //reset boxes
                 draw.boxes = [];
                 draw.nbColumn = this._drawLibs[draw.type].nbColumnForPlayers(draw, nPlayer);
@@ -124,15 +121,14 @@ var jat;
                 this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);
             };
 
-            DrawLib.prototype.generateDraw = function (draw, generate) {
-                return this._drawLibs[draw.type].generateDraw(draw, generate);
+            DrawLib.prototype.generateDraw = function (draw, generate, afterIndex) {
+                return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
             };
 
             DrawLib.prototype.getPlayer = function (box) {
                 return this.find.byId(box._draw._event._tournament.players, box.playerId);
             };
 
-            //Group functions
             DrawLib.prototype.groupBegin = function (draw) {
                 //return the first Draw of the suite
                 var p = draw;
@@ -152,7 +148,8 @@ var jat;
                 return p;
             };
 
-            DrawLib.prototype.currentGroup = function (draw) {
+            //** return the group of draw of the given draw (mainly for group of round robin). */
+            DrawLib.prototype.group = function (draw) {
                 var draws = [];
                 var d = this.groupBegin(draw);
                 while (d) {
@@ -162,19 +159,52 @@ var jat;
                         break;
                     }
                 }
+
+                //var c = draw._event.draws;
+                //if (c && c.length) {
+                //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
+                //    for (var iBegin = t; c[iBegin].suite && iBegin >= 0; iBegin--) {
+                //    }
+                //    for (var iEnd = t; c[iEnd].suite && iEnd < c.length; iEnd++) {
+                //    }
+                //    for (var i = iBegin; i <= iEnd; i++) {
+                //        draws.push(c[i]);
+                //    }
+                //} else {
+                //    draws.push(draw);
+                //}
                 return draws;
             };
 
+            //** return the draws of the previous group. */
             DrawLib.prototype.previousGroup = function (draw) {
-                //return the draws of the previous suite
                 var p = this.groupBegin(draw);
-                return p && p._previous ? this.currentGroup(p._previous) : null;
+                return p && p._previous ? this.group(p._previous) : null;
+                //var c = draw._event.draws;
+                //if (c && c.length) {
+                //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
+                //    for (var iBegin = t; c[iBegin].suite && iBegin >= 0; iBegin--) {
+                //    }
+                //    t = iBegin - 1;
+                //    if (0 <= t) {
+                //        return this.group(c[t]);
+                //    }
+                //}
             };
 
+            //** return the draws of the next group. */
             DrawLib.prototype.nextGroup = function (draw) {
-                //return the draws of the next suite
                 var p = this.groupEnd(draw);
-                return p ? this.currentGroup(p) : null;
+                return p ? this.group(p) : null;
+                //var c = draw._event.draws;
+                //if (c && c.length) {
+                //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
+                //    for (var iEnd = t; c[iEnd].suite && iEnd < c.length; iEnd++) {
+                //    }
+                //    if (t < c.length) {
+                //        return this.group(c[t]);
+                //    }
+                //}
             };
 
             //public setType(BYTE iType) {
@@ -194,57 +224,52 @@ var jat;
                 return box && ('score' in box) && ((box.place) || box.date);
             };
 
-            DrawLib.prototype.FindTeteSerie = function (draw, iTeteSerie) {
+            DrawLib.prototype.FindTeteSerie = function (origin, iTeteSerie) {
                 ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-
-                for (var i = 0; i <= draw.boxes.length; i++) {
-                    var boxIn = draw.boxes[i];
-                    if (!boxIn) {
-                        continue;
-                    }
-                    var e = boxIn.seeded;
-                    if (e === iTeteSerie || (!iTeteSerie && e)) {
-                        return boxIn;
-                    }
-
-                    if (draw._next && draw._next.suite) {
-                        boxIn = this.FindTeteSerie(draw._next, iTeteSerie);
-                        if (boxIn) {
+                var group = angular.isArray(origin) ? origin : this.group(origin);
+                for (var i = 0; i < group.length; i++) {
+                    var boxes = group[i].boxes;
+                    for (var j = 0; j < boxes.length; j++) {
+                        var boxIn = boxes[j];
+                        if (boxIn.seeded === iTeteSerie) {
                             return boxIn;
                         }
                     }
                 }
-            };
-
-            DrawLib.prototype.FindQualifieEntrant = function (origin, iQualifie) {
-                var _this = this;
-                var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
-                angular.forEach(group, function (d) {
-                    var playerIn = _this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
-                    if (playerIn) {
-                        return playerIn;
-                    }
-                });
                 return null;
             };
 
+            DrawLib.prototype.FindQualifieEntrant = function (origin, iQualifie) {
+                ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+                var group = angular.isArray(origin) ? origin : this.group(origin);
+                for (var i = 0; i < group.length; i++) {
+                    var d = group[i];
+                    var playerIn = this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
+                    if (playerIn) {
+                        return playerIn;
+                    }
+                }
+            };
+
             DrawLib.prototype.FindQualifieSortant = function (origin, iQualifie) {
-                var _this = this;
-                var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
-                angular.forEach(group, function (d) {
-                    var boxOut = _this._drawLibs[d.type].FindQualifieSortant(d, iQualifie);
+                ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+                var group = angular.isArray(origin) ? origin : this.group(origin);
+                for (var i = 0; i < group.length; i++) {
+                    var d = group[i];
+                    var boxOut = this._drawLibs[d.type].FindQualifieSortant(d, iQualifie);
                     if (boxOut) {
                         return boxOut;
                     }
-                });
+                }
 
                 //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
                 var outCount = 0;
-                angular.forEach(group, function (d) {
+                for (var i = 0; i < group.length; i++) {
+                    var d = group[i];
                     if (d.type >= 2) {
                         outCount += d.nbOut;
                     }
-                });
+                }
                 if (iQualifie <= outCount) {
                     return -2;
                 }
@@ -253,7 +278,7 @@ var jat;
 
             DrawLib.prototype.FindAllQualifieSortant = function (origin, hideNumbers) {
                 //Récupère les qualifiés sortants du tableau
-                var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
+                var group = angular.isArray(origin) ? origin : this.group(origin);
                 if (group) {
                     var a = [];
                     for (var i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
@@ -660,7 +685,7 @@ var jat;
         }
 
         function isTypePoule(draw) {
-            return draw.type === models.DrawType.PouleSimple || draw.type === models.DrawType.PouleAR;
+            return draw.type === 2 /* PouleSimple */ || draw.type === 3 /* PouleAR */;
         }
 
         function iDiagonale(box) {
@@ -697,8 +722,8 @@ var jat;
             }
         }
 
-        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find) {
-            return new DrawLib(find);
+        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find, rank) {
+            return new DrawLib(find, rank);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

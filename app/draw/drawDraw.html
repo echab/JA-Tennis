@@ -11,6 +11,9 @@
             <td ng-repeat="row in ctrlDraw.rows" ng-style="{width: ctrlDraw.boxWidth +'px'}">
                 <div draw-box="ctrlDraw.getBox(row[0])" ng-if="!ctrlDraw.simple"></div>
             </td>
+            <td>
+                <div ng-repeat="i in ctrlDraw.range(1, ctrlDraw.draw.nbOut)" class="qualifOut">Q{{i}}</div>
+            </td>
         </tr>
         <tr ng-repeat="row in ctrlDraw.rows" ng-style="{height: ctrlDraw.boxHeight +'px'}">
             <td ng-repeat="col in row" ng-class="{diag: ctrlDraw.isDiag(col)}">

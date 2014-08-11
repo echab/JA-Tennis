@@ -3,7 +3,7 @@
     computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[];
     resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void;
     nbColumnForPlayers(draw: models.Draw, nJoueur: number): number;
-    generateDraw(draw: models.Draw, generate: number): models.Draw[];
+    generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[];
     SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean;    //setPlayerIn
     SetQualifieSortant(box: models.Box, outNumber?: number): boolean;    //setPlayerOut
     FindQualifieEntrant(draw: models.Draw, inNumber: number): models.PlayerIn;  //findPlayerIn
@@ -38,24 +38,28 @@ module jat.service {
         _drawLibs: { [name: string]: IDrawLib } = {};
 
         constructor(
-            private find: jat.service.Find
+            private find: jat.service.Find,
+            private rank: ServiceRank
             ) {
         }
 
-        public newDraw(parent: models.Event, source?: models.Draw): models.Draw {
+        public newDraw(parent: models.Event, source?: models.Draw, after?: models.Draw): models.Draw {
             var draw: models.Draw = <any>{};
             if (angular.isObject(source)) {
                 angular.extend(draw, source);
             }
+            delete (<any>draw).$$hashKey;   //remove angular id
 
             draw.id = 'd' + Math.round(Math.random() * 999);    //TODOjs guid service
 
             //default values
+            draw.type = draw.type || models.DrawType.Normal;
             draw.nbColumn = draw.nbColumn || 3;
             draw.nbOut = draw.nbOut || 1;
-            draw.minRank = draw.minRank || 'NC';    //TODO init depending of previous draw
+            draw._previous = after;
+            draw.minRank = after && after.maxRank ? this.rank.next(after.maxRank) : 'NC';
 
-            this.initDraw(draw, parent);
+            draw._event = parent;
             return draw;
         }
 
@@ -95,31 +99,26 @@ module jat.service {
             //remove qualif out
             var next = this.nextGroup(draw);
             if (next && draw.boxes) {
-                angular.forEach(next, (d: models.Draw) => {
-                    if (d.boxes) {
-                        angular.forEach(next, (box: models.Match) => {
+                for (var i = 0; i < next.length; i++) {
+                    var boxes = next[i].boxes;
+                    if (boxes) {
+                        for (var b = 0; b < boxes.length; b++) {
+                            var box = <models.Match> boxes[b];
                             if (box && box.qualifOut) {
                                 this.SetQualifieSortant(box);
                             }
-                        });
+                        }
                     }
-                });
+                }
             }
-            //if (next && next.boxes && draw.boxes) {
-            //    for (var i = draw.boxes.length - 1; i >= 0; i--) {
-            //        var box = <models.Match> draw.boxes[i];
-            //        if (box && box.qualifOut) {
-            //            this.SetQualifieSortant(box);
-            //        }
-            //    }
-            //}
+
             //reset boxes
             draw.boxes = [];
             draw.nbColumn = this._drawLibs[draw.type].nbColumnForPlayers(draw, nPlayer);
         }
 
-        public newBox(parent: models.Draw, matchFormat?: string, position?: number): models.Box;
-        public newBox(parent: models.Draw, source?: models.Box, position?: number): models.Box;
+        public newBox(parent: models.Draw, matchFormat?: string, position?: number): models.Box
+        public newBox(parent: models.Draw, source?: models.Box, position?: number): models.Box
         public newBox(parent: models.Draw, source?: any, position?: number): models.Box {
             var box: models.Box = <any>{};
             if (angular.isObject(source)) {
@@ -156,15 +155,14 @@ module jat.service {
             this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);
         }
 
-        public generateDraw(draw: models.Draw, generate: number): models.Draw[] {
-            return this._drawLibs[draw.type].generateDraw(draw, generate);
+        public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex:number): models.Draw[] {
+            return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
         }
 
         public getPlayer(box: models.Box): models.Player {
             return this.find.byId(box._draw._event._tournament.players, box.playerId);
         }
 
-        //Group functions
         private groupBegin(draw: models.Draw): models.Draw {   //getDebut
             //return the first Draw of the suite
             var p = draw;
@@ -184,7 +182,8 @@ module jat.service {
             return p;
         }
 
-        public currentGroup(draw: models.Draw): models.Draw[] {
+        //** return the group of draw of the given draw (mainly for group of round robin). */
+        public group(draw: models.Draw): models.Draw[] {
             var draws: models.Draw[] = [];
             var d = this.groupBegin(draw);
             while (d) {
@@ -194,19 +193,51 @@ module jat.service {
                     break;
                 }
             }
+            //var c = draw._event.draws;
+            //if (c && c.length) {
+            //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
+            //    for (var iBegin = t; c[iBegin].suite && iBegin >= 0; iBegin--) {
+            //    }
+            //    for (var iEnd = t; c[iEnd].suite && iEnd < c.length; iEnd++) {
+            //    }
+            //    for (var i = iBegin; i <= iEnd; i++) {
+            //        draws.push(c[i]);
+            //    }
+            //} else {
+            //    draws.push(draw);
+            //}
             return draws;
         }
 
+        //** return the draws of the previous group. */
         public previousGroup(draw: models.Draw): models.Draw[] {	//getPrecedent
-            //return the draws of the previous suite
             var p = this.groupBegin(draw);
-            return p && p._previous ? this.currentGroup(p._previous) : null;
+            return p && p._previous ? this.group(p._previous) : null;
+            //var c = draw._event.draws;
+            //if (c && c.length) {
+            //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
+            //    for (var iBegin = t; c[iBegin].suite && iBegin >= 0; iBegin--) {
+            //    }
+            //    t = iBegin - 1;
+            //    if (0 <= t) {
+            //        return this.group(c[t]);
+            //    }
+            //}
         }
 
+        //** return the draws of the next group. */
         public nextGroup(draw: models.Draw): models.Draw[] {	    //getSuivant
-            //return the draws of the next suite
             var p = this.groupEnd(draw);
-            return p ? this.currentGroup(p) : null;
+            return p ? this.group(p) : null;
+            //var c = draw._event.draws;
+            //if (c && c.length) {
+            //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
+            //    for (var iEnd = t; c[iEnd].suite && iEnd < c.length; iEnd++) {
+            //    }
+            //    if (t < c.length) {
+            //        return this.group(c[t]);
+            //    }
+            //}
         }
 
         //public setType(BYTE iType) {
@@ -229,61 +260,58 @@ module jat.service {
             return box && ('score' in box) && (<any>(box.place) || box.date);
         }
 
-        public FindTeteSerie(draw: models.Draw, iTeteSerie: number): models.PlayerIn {
-
+        public FindTeteSerie(group: models.Draw[], iTeteSerie: number): models.PlayerIn;
+        public FindTeteSerie(draw: models.Draw, iTeteSerie: number): models.PlayerIn;
+        public FindTeteSerie(origin: any, iTeteSerie: number): models.PlayerIn {
             ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-
-            //i =  isTypePoule() ? iBasColQ(m_nColonne): iBoiteMin();
-            for (var i = 0; i <= draw.boxes.length; i++) {
-                var boxIn = <models.PlayerIn>draw.boxes[i];
-                if (!boxIn) {
-                    continue;
-                }
-                var e = boxIn.seeded;
-                if (e === iTeteSerie || (!iTeteSerie && e)) {
-                    return boxIn;
-                }
-
-                if (draw._next && draw._next.suite) {
-                    boxIn = this.FindTeteSerie(draw._next, iTeteSerie);
-                    if (boxIn) {
+            var group = angular.isArray(origin) ? origin : this.group(origin);
+            for (var i = 0; i < group.length; i++) {
+                var boxes = group[i].boxes;
+                for (var j = 0; j < boxes.length; j++) {
+                    var boxIn: models.PlayerIn = boxes[j];
+                    if (boxIn.seeded === iTeteSerie) {
                         return boxIn;
                     }
                 }
             }
+            return null;
         }
 
         public FindQualifieEntrant(group: models.Draw[], iQualifie: number): models.PlayerIn;
         public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn;
         public FindQualifieEntrant(origin: any, iQualifie: number): models.PlayerIn {
-            var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
-            angular.forEach(group, (d: models.Draw) => {
+            ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+            var group:models.Draw[] = angular.isArray(origin) ? origin : this.group(origin);
+            for (var i = 0; i < group.length; i++) {
+                var d = group[i];
                 var playerIn = this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
                 if (playerIn) {
                     return playerIn;
                 }
-            });
-            return null;
+            }
         }
 
         public FindQualifieSortant(group: models.Draw[], iQualifie: number): models.Match;
         public FindQualifieSortant(draw: models.Draw, iQualifie: number): models.Match;
         public FindQualifieSortant(origin: any, iQualifie: number): models.Match {
-            var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
-            angular.forEach(group, (d: models.Draw) => {
+            ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+            var group = angular.isArray(origin) ? origin : this.group(origin);
+            for (var i = 0; i < group.length; i++) {
+                var d = group[i];
                 var boxOut = this._drawLibs[d.type].FindQualifieSortant(d, iQualifie);
                 if (boxOut) {
                     return boxOut;
                 }
-            });
+            }
 
             //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
             var outCount = 0;
-            angular.forEach(group, (d: models.Draw) => {
+            for (var i = 0; i < group.length; i++) {
+                var d = group[i];
                 if (d.type >= 2) {
                     outCount += d.nbOut;
                 }
-            });
+            }
             if (iQualifie <= outCount) {
                 return <any> -2;    //TODO
             }
@@ -294,7 +322,7 @@ module jat.service {
         public FindAllQualifieSortant(draw: models.Draw, hideNumbers?: boolean): number[];
         public FindAllQualifieSortant(origin: any, hideNumbers?: boolean): number[] {
             //Récupère les qualifiés sortants du tableau
-            var group = angular.isArray(origin) ? origin : this.currentGroup(origin);
+            var group = angular.isArray(origin) ? origin : this.group(origin);
             if (group) {
                 var a: number[] = [];
                 for (var i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
@@ -753,7 +781,7 @@ module jat.service {
     }
 
     angular.module('jat.services.drawLib', ['jat.services.find'])
-        .factory('drawLib', (find: jat.service.Find) => {
-            return new DrawLib(find);
+        .factory('drawLib', (find: jat.service.Find, rank: ServiceRank) => {
+            return new DrawLib(find, rank);
         });
 }

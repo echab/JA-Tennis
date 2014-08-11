@@ -9,8 +9,8 @@ declare module models {
         typeDouble ?: boolean;
         sexe: string;
 
-        category: string;
-        maxRank: string;
+        category: CategoryString;
+        maxRank: RankString;
 
         consolation ?: boolean;
 

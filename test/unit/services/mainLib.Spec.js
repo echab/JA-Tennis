@@ -1,11 +1,13 @@
 ﻿'use strict';
 describe('services.mainLib', function () {
-    var main;
+    var main, undo, find;
 
     beforeEach(module('jat.services.mainLib'));
 
-    beforeEach(inject(function (_mainLib_) {
+    beforeEach(inject(function (_mainLib_, _undo_, _find_) {
         main = _mainLib_;
+        undo = _undo_;
+        find = _find_;
     }));
 
     describe('Load/save', function () {
@@ -20,8 +22,8 @@ describe('services.mainLib', function () {
             events: []
         };
 
-        var player1 = { id: 'p1', name: 'Eloi', rank: '30/3', registration: [] };
-        var player2 = { id: 'p2', name: 'Denis', rank: '4/6', registration: [] };
+        var player1 = { id: 'p1', name: 'Eloi', rank: '30/3', registration: [], _tournament: tournament1 };
+        var player2 = { id: 'p2', name: 'Denis', rank: '4/6', registration: [], _tournament: tournament1 };
 
         //clean tournament1
         afterEach(function () {
@@ -67,6 +69,205 @@ describe('services.mainLib', function () {
     });
 
     describe('Draws management', function () {
+        var event1 = {
+            id: 'e1', name: 'Simple messieurs', sexe: 'H', category: 'Senior', maxRank: '30/1',
+            draws: []
+        };
+        var tournament1 = {
+            id: 't1', info: { name: 'Tournament 1' },
+            players: [
+                { id: 'p1', name: 'Albert', rank: 'NC', registration: ['e1'] },
+                { id: 'p2', name: 'Bernard', rank: 'NC', registration: ['e1'] },
+                { id: 'p3', name: 'Claude', rank: 'NC', registration: ['e1'] },
+                { id: 'p4', name: 'Daniel', rank: 'NC', registration: ['e1'] },
+                { id: 'p5', name: 'Eloi', rank: '30/3', registration: ['e1'] },
+                { id: 'p6', name: 'Frank', rank: '30/5', registration: ['e1'] }
+            ],
+            events: [event1]
+        };
+        event1._tournament = tournament1;
+
+        describe('Draw generation new', function () {
+            //clean event
+            afterEach(function () {
+                return event1.draws.splice(0, event1.draws.length);
+            });
+
+            it('should add a first knockout draw', function () {
+                main.addDraw({ id: 'd1', name: 'draw1', type: 0 /* Normal */, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 });
+
+                expect(event1.draws.length).toBe(1);
+                var draw1 = event1.draws[0];
+                expect(draw1.name).toBe('draw1');
+            });
+
+            it('should generate a first knockout draw', function () {
+                main.addDraw({ id: 'd1', name: 'draw1', type: 0 /* Normal */, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(1);
+                var draw1 = event1.draws[0];
+                expect(draw1.type).toBe(0 /* Normal */);
+                expect(draw1.boxes).toBeDefined();
+                expect(draw1.boxes.length).toBe(7);
+
+                var boxIn = find.by(draw1.boxes, 'position', 6);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 5);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 4);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 3);
+                expect(boxIn._player.rank).toBe('NC');
+
+                var boxOut = find.by(draw1.boxes, 'position', 0);
+                expect(boxOut.qualifOut).toBe(1);
+            });
+
+            it('should generate a first knockout draw with 2 Q', function () {
+                main.addDraw({ id: 'd1', name: 'draw1', type: 0 /* Normal */, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 2, boxes: undefined, _event: event1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(1);
+                var draw1 = event1.draws[0];
+                expect(draw1.type).toBe(0 /* Normal */);
+                expect(draw1.boxes).toBeDefined();
+                expect(draw1.boxes.length).toBe(6);
+
+                var boxIn = find.by(draw1.boxes, 'position', 6);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 5);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 4);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 3);
+                expect(boxIn._player.rank).toBe('NC');
+
+                var boxOut = find.by(draw1.boxes, 'position', 2);
+                expect(boxOut.qualifOut).toBe(1);
+
+                boxOut = find.by(draw1.boxes, 'position', 1);
+                expect(boxOut.qualifOut).toBe(2);
+            });
+
+            it('should generate a first roundrobin draw', function () {
+                main.addDraw({ id: 'd1', name: 'poule', type: 2 /* PouleSimple */, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(1);
+                var draw1 = event1.draws[0];
+                expect(draw1.type).toBe(2 /* PouleSimple */);
+                expect(draw1.suite).toBeFalsy();
+                expect(draw1.boxes).toBeDefined();
+                expect(draw1.boxes.length).toBe(10);
+
+                var boxIn = find.by(draw1.boxes, 'position', 19);
+                expect(boxIn._player.rank).toBe('NC');
+                expect(boxIn.seeded).toBe(1);
+
+                boxIn = find.by(draw1.boxes, 'position', 18);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 17);
+                expect(boxIn._player.rank).toBe('NC');
+
+                boxIn = find.by(draw1.boxes, 'position', 16);
+                expect(boxIn._player.rank).toBe('NC');
+            });
+
+            it('should generate first two roundrobin draw', function () {
+                main.addDraw({ id: 'd1', name: 'poule', type: 2 /* PouleSimple */, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 1, boxes: undefined, _event: event1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(2);
+
+                var draw1 = event1.draws[0];
+                expect(draw1.type).toBe(2 /* PouleSimple */);
+                expect(draw1.suite).toBeFalsy();
+                expect(draw1.boxes).toBeDefined();
+                expect(draw1.boxes.length).toBe(3);
+
+                var boxIn = find.by(draw1.boxes, 'position', 5);
+                expect(boxIn._player.rank).toBe('NC');
+                expect(boxIn.seeded).toBe(1);
+
+                boxIn = find.by(draw1.boxes, 'position', 4);
+                expect(boxIn._player.rank).toBe('NC');
+
+                var draw2 = event1.draws[1];
+                expect(draw2.type).toBe(2 /* PouleSimple */);
+                expect(draw2.suite).toBeTruthy();
+                expect(draw2.boxes).toBeDefined();
+                expect(draw2.boxes.length).toBe(3);
+
+                boxIn = find.by(draw2.boxes, 'position', 5);
+                expect(boxIn._player.rank).toBe('NC');
+                expect(boxIn.seeded).toBe(2);
+
+                boxIn = find.by(draw2.boxes, 'position', 4);
+                expect(boxIn._player.rank).toBe('NC');
+            });
+
+            it('should generate a second knockout draw', function () {
+                main.addDraw({ id: 'd0', name: 'draw1', type: 0 /* Normal */, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, 1 /* Create */);
+                var draw1 = event1.draws[0];
+                main.addDraw({ id: 'd1', name: 'draw2', type: 0 /* Normal */, minRank: '40', maxRank: '30/2', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1, _previous: draw1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(2);
+                var draw = event1.draws[1];
+                expect(draw.type).toBe(0 /* Normal */);
+                expect(draw.boxes).toBeDefined();
+                expect(draw.boxes.length).toBe(5);
+
+                var boxIn = find.by(draw.boxes, 'position', 3);
+                expect(boxIn._player.rank).toBe('30/5');
+
+                boxIn = find.by(draw.boxes, 'position', 4);
+                expect(boxIn.qualifIn).toBe(-1);
+
+                boxIn = find.by(draw.boxes, 'position', 2);
+                expect(boxIn._player.rank).toBe('30/3');
+                expect(boxIn.seeded).toBe(1);
+
+                var boxOut = find.by(draw.boxes, 'position', 0);
+                expect(boxOut.qualifOut).toBe(1);
+            });
+
+            it('should generate after a round a second knockout draw', function () {
+                main.addDraw({ id: 'd0', name: 'poule', type: 2 /* PouleSimple */, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, 1 /* Create */);
+                var draw1 = event1.draws[0];
+                main.addDraw({ id: 'd1', name: 'draw2', type: 0 /* Normal */, minRank: '40', maxRank: '30/2', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1, _previous: draw1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(2);
+                var draw = event1.draws[1];
+                expect(draw.type).toBe(0 /* Normal */);
+                expect(draw.boxes).toBeDefined();
+                expect(draw.boxes.length).toBe(5);
+
+                var boxIn = find.by(draw.boxes, 'position', 3);
+                expect(boxIn._player.rank).toBe('30/5');
+
+                boxIn = find.by(draw.boxes, 'position', 4);
+                expect(boxIn.qualifIn).toBe(-1);
+
+                boxIn = find.by(draw.boxes, 'position', 2);
+                expect(boxIn._player.rank).toBe('30/3');
+                expect(boxIn.seeded).toBe(1);
+
+                var boxOut = find.by(draw.boxes, 'position', 0);
+                expect(boxOut.qualifOut).toBe(1);
+
+                var r = undo.undo();
+                expect(event1.draws.length).toBe(1);
+                expect(event1.draws[0]).toBe(draw1);
+                expect(r).toBeUndefined();
+            });
+        });
+
+        describe('Draw generation mix', function () {
+        });
     });
 });
 //# sourceMappingURL=mainLib.Spec.js.map

@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (service) {
@@ -36,6 +36,8 @@ var jat;
                 if (angular.isObject(source)) {
                     angular.extend(player, source);
                 }
+                delete player.$$hashKey; //remove angular id
+
                 this.initPlayer(player, parent);
                 return player;
             };
@@ -47,6 +49,17 @@ var jat;
                 //};
             };
 
+            TournamentLib.prototype.newEvent = function (parent, source) {
+                var event = {};
+                if (angular.isObject(source)) {
+                    angular.extend(event, source);
+                }
+                delete event.$$hashKey; //remove angular id
+
+                this.initEvent(event, parent);
+                return event;
+            };
+
             TournamentLib.prototype.initEvent = function (event, parent) {
                 event._tournament = parent;
                 if (event.draws) {
@@ -54,15 +67,6 @@ var jat;
                         this.drawLib.initDraw(event.draws[i], event);
                     }
                 }
-            };
-
-            TournamentLib.prototype.newEvent = function (parent, source) {
-                var event = {};
-                if (angular.isObject(source)) {
-                    angular.extend(event, source);
-                }
-                this.initEvent(event, parent);
-                return event;
             };
 
             TournamentLib.prototype.getRegistred = function (event) {
@@ -139,7 +143,7 @@ var jat;
         })();
         service.TournamentLib = TournamentLib;
 
-        angular.module('jat.services.tournamentLib', ['jat.services.drawLib']).factory('tournamentLib', function (drawLib, rank) {
+        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type']).factory('tournamentLib', function (drawLib, rank) {
             return new TournamentLib(drawLib, rank);
         });
     })(jat.service || (jat.service = {}));

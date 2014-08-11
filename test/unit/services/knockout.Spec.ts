@@ -5,8 +5,8 @@ describe('services.knockout', () => {
 
     beforeEach(module('jat.services.knockout'));
     beforeEach(module('jat.services.type'));
-    beforeEach(inject((_knockoutLib_: jat.service.Knockout) => {    //inject before each "it
-        knockout = _knockoutLib_;
+    beforeEach(inject((_knockout_: jat.service.Knockout) => {    //inject before each "it
+        knockout = _knockout_;
     }));
 
     var draw1: models.Draw = {

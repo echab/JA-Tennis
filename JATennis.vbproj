@@ -87,9 +87,6 @@
       <DependentUpon>listEvents.ts</DependentUpon>
     </Content>
     <Content Include="app\favicon.ico" />
-    <Content Include="app\models\model.js">
-      <DependentUpon>model.ts</DependentUpon>
-    </Content>
     <TypeScriptCompile Include="app\services\drawLib.ts" />
     <Content Include="app\services\drawLib.js">
       <DependentUpon>drawLib.ts</DependentUpon>
@@ -136,28 +133,7 @@
     </Content>
     <TypeScriptCompile Include="app\models\event.d.ts" />
     <TypeScriptCompile Include="app\models\draw.d.ts" />
-    <Content Include="app\models\draw.js">
-      <DependentUpon>draw.d.ts</DependentUpon>
-    </Content>
-    <Content Include="app\models\event.js">
-      <DependentUpon>event.d.ts</DependentUpon>
-    </Content>
-    <Content Include="app\models\box.js">
-      <DependentUpon>box.d.ts</DependentUpon>
-    </Content>
-    <Content Include="app\models\player.js">
-      <DependentUpon>player.d.ts</DependentUpon>
-    </Content>
-    <Content Include="app\models\playerIn.js">
-      <DependentUpon>playerIn.d.ts</DependentUpon>
-    </Content>
-    <Content Include="app\models\tournament.js">
-      <DependentUpon>tournament.d.ts</DependentUpon>
-    </Content>
     <TypeScriptCompile Include="app\models\match.d.ts" />
-    <Content Include="app\models\match.js">
-      <DependentUpon>match.d.ts</DependentUpon>
-    </Content>
     <Content Include="app\services\selection.js">
       <DependentUpon>selection.ts</DependentUpon>
     </Content>
@@ -206,6 +182,7 @@
     <Content Include="package.json" />
     <Content Include=".gitattributes" />
     <Content Include="data\tournament5.json" />
+    <Content Include="data\tournament6.json" />
     <None Include="test\karma.config.js" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />
@@ -219,7 +196,6 @@
   </ItemGroup>
   <ItemGroup>
     <!--<Folder Include="My Project\" />-->
-    <Folder Include="test\lib\" />
     <Folder Include="test\unit\draw\" />
     <Folder Include="test\unit\event\" />
   </ItemGroup>

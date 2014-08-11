@@ -6,9 +6,15 @@ module jat.draw {
         drawTypes: { value: number; label: string; }[];
 
         getRegisteredCount(): number {
-            var players = this.tournamentLib.GetJoueursInscrit(this.draw);
-            var qualifs = this.drawLib.FindAllQualifieSortant(this.draw);
-            return players.length + qualifs.length;
+            var n = this.tournamentLib.GetJoueursInscrit(this.draw).length;
+            var previous = this.drawLib.previousGroup(this.draw);
+            if (previous) {
+                var qualifs = this.drawLib.FindAllQualifieSortant(previous);
+                if (qualifs) {
+                    n += qualifs.length;
+                }
+            }
+            return n;
         }
         //getNbEntry(): number {
         //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);

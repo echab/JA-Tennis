@@ -12,9 +12,10 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.drawLib = drawLib;
                 this.undo = undo;
+                this.GenerateType = models.GenerateType;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
-                this.mainLib.loadTournament('/data/tournament5.json').then(function (data) {
+                this.mainLib.loadTournament('/data/tournament6.json').then(function (data) {
                     _this.selection.draw = data.events[0].draws[0];
                 });
             }
@@ -90,7 +91,7 @@ var jat;
 
             //#endregion player
             //#region event
-            mainCtrl.prototype.addEvent = function () {
+            mainCtrl.prototype.addEvent = function (after) {
                 var _this = this;
                 var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
 
@@ -107,7 +108,7 @@ var jat;
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
-                        _this.mainLib.addEvent(_this.selection.tournament, newEvent); //TODO add event after selected event
+                        _this.mainLib.addEvent(_this.selection.tournament, newEvent, after); //TODO add event after selected event
                     }
                 });
             };
@@ -142,9 +143,9 @@ var jat;
 
             //#endregion event
             //#region draw
-            mainCtrl.prototype.addDraw = function () {
+            mainCtrl.prototype.addDraw = function (after) {
                 var _this = this;
-                var newDraw = this.drawLib.newDraw(this.selection.event);
+                var newDraw = this.drawLib.newDraw(this.selection.event, undefined, after);
 
                 this.$modal.open({
                     templateUrl: 'draw/dialogDraw.html',
@@ -160,9 +161,9 @@ var jat;
                 }).result.then(function (result) {
                     //TODO add event after selected draw
                     if ('Ok' === result) {
-                        _this.mainLib.addDraw(newDraw);
+                        _this.mainLib.addDraw(newDraw, 0, after);
                     } else if ('Generate' === result) {
-                        _this.mainLib.addDraw(newDraw, 1);
+                        _this.mainLib.addDraw(newDraw, 1, after);
                     }
                 });
             };
@@ -194,10 +195,7 @@ var jat;
             };
 
             mainCtrl.prototype.generateDraw = function (draw, generate) {
-                if (!draw) {
-                    return;
-                }
-                this.mainLib.updateDraw(draw, undefined, generate || 1);
+                this.mainLib.updateDraw(draw, undefined, generate || 1 /* Create */);
             };
 
             mainCtrl.prototype.removeDraw = function (draw) {

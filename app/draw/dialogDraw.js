@@ -35,9 +35,15 @@ var jat;
                 });
             }
             dialogDrawCtrl.prototype.getRegisteredCount = function () {
-                var players = this.tournamentLib.GetJoueursInscrit(this.draw);
-                var qualifs = this.drawLib.FindAllQualifieSortant(this.draw);
-                return players.length + qualifs.length;
+                var n = this.tournamentLib.GetJoueursInscrit(this.draw).length;
+                var previous = this.drawLib.previousGroup(this.draw);
+                if (previous) {
+                    var qualifs = this.drawLib.FindAllQualifieSortant(previous);
+                    if (qualifs) {
+                        n += qualifs.length;
+                    }
+                }
+                return n;
             };
             return dialogDrawCtrl;
         })();

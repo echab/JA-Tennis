@@ -4,8 +4,8 @@ describe('services.knockout', function () {
 
     beforeEach(module('jat.services.knockout'));
     beforeEach(module('jat.services.type'));
-    beforeEach(inject(function (_knockoutLib_) {
-        knockout = _knockoutLib_;
+    beforeEach(inject(function (_knockout_) {
+        knockout = _knockout_;
     }));
 
     var draw1 = {

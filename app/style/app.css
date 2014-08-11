@@ -277,12 +277,11 @@ div.inline {
     border-radius: 8px;
     padding-left: .3em;
     padding-right: .3em;
-    float: right;
 }
 .qualifIn, .qualifOut {
     font-weight: bold;
     color: red;
 }
-.qualifOut {
+.box .qualifOut, .box .seeded {
     float: right;
 }

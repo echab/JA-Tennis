@@ -4,8 +4,8 @@ describe('services.roundrobin', function () {
 
     beforeEach(module('jat.services.roundrobin'));
     beforeEach(module('jat.services.type'));
-    beforeEach(inject(function (_roundrobinLib_) {
-        roundrobin = _roundrobinLib_;
+    beforeEach(inject(function (_roundrobin_) {
+        roundrobin = _roundrobin_;
     }));
 
     var draw1 = {
