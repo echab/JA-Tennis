@@ -9,4 +9,7 @@ module jat.service {
             return (prefix || '') + Math.round(Math.random() * 999);
         }
     }
+
+    angular.module('jat.services.guid', [])
+        .service('guid', Guid);
 }

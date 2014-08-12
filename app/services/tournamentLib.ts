@@ -40,7 +40,7 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(player, source);
             }
-            player.id = this.guid.create('p');
+            player.id = player.id || this.guid.create('p');
             delete (<any>player).$$hashKey;   //remove angular id
 
             this.initPlayer(player, parent);
@@ -60,7 +60,7 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(event, source);
             }
-            event.id = this.guid.create('e');
+            event.id = event.id || this.guid.create('e');
             delete (<any>event).$$hashKey;   //remove angular id
 
             this.initEvent(event, parent);
@@ -95,6 +95,7 @@ module jat.service {
                 //if numbers, p1 or p2 are PlayerIn
                 var isNumber1 = 'number' === typeof p1,
                     isNumber2 = 'number' === typeof p2;
+                //console.log('Compare ' + (isNumber1 ? <any>p1 : p1.name) + ' and ' + (isNumber2 ? <any>p2 : p2.name));
                 if (isNumber1 && isNumber2) {
                     return 0;
                 }
@@ -104,9 +105,14 @@ module jat.service {
                 if (isNumber2) {
                     return 1;
                 }
-                return this.rank.compare(p1.rank, p2.rank);
+                var r = this.rank.compare(p1.rank, p2.rank);
+                //if (r === 0) {
+                //    r = Math.random() - 0.5;    //Mélange les joueurs de même classement
+                //}
+                return r;
             };
-            players.sort(compare1);
+            //console.log('TriJoueurs: Before: ' + players.reduce<string>((prev: string, cur: models.Player, idx: number, a: models.Player[]): string => prev + ',' + cur.name, ''));
+            players = players.sort(compare1);
 
             //Mélange les joueurs de même classement
             for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
@@ -130,6 +136,8 @@ module jat.service {
                     r0 = ++r1;
                 }
             }
+
+            //console.log('TriJoueurs: After : ' + players.reduce<string>((prev: string, cur: models.Player, idx: number, a: models.Player[]): string => prev + ',' + (cur.name || cur), ''));
         }
 
         public GetJoueursInscrit(draw: models.Draw): models.Player[] {
@@ -156,7 +164,7 @@ module jat.service {
         }
     }
 
-    angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type'])
+    angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
         .factory('tournamentLib', (drawLib: jat.service.DrawLib, rank: ServiceRank, guid: jat.service.Guid) => {
             return new TournamentLib(drawLib, rank, guid);
         });

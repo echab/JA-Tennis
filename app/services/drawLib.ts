@@ -49,7 +49,7 @@ module jat.service {
             if (angular.isObject(source)) {
                 angular.extend(draw, source);
             }
-            draw.id = this.guid.create('d');
+            draw.id = draw.id || this.guid.create('d');
             delete (<any>draw).$$hashKey;   //remove angular id
 
             //default values
@@ -780,7 +780,7 @@ module jat.service {
         }
     }
 
-    angular.module('jat.services.drawLib', ['jat.services.find'])
+    angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid'])
         .factory('drawLib', (find: jat.service.Find, rank: ServiceRank, guid: jat.service.Guid) => {
             return new DrawLib(find, rank, guid);
         });

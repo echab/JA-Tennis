@@ -88,6 +88,10 @@ module jat.service {
                 }
                 players = this.GetJoueursTableau(draw);
             }
+
+            //Tri et Mélange les joueurs de même classement
+            this.tournamentLib.TriJoueurs(players);
+
             draw = this.ConstruitMatch(draw, m_nMatchCol, players);
             return [draw];
         }
@@ -340,8 +344,6 @@ module jat.service {
                     }
                 }
             }
-
-            this.tournamentLib.TriJoueurs(players);
 
             //Nombre de Tête de série
             var nTeteSerie = draw.nbOut;

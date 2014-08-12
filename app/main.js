@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (main) {
@@ -16,7 +16,7 @@ var jat;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
                 this.mainLib.loadTournament('/data/tournament6.json').then(function (data) {
-                    _this.selection.draw = data.events[0].draws[0];
+                    _this.mainLib.select(data.events[0].draws[0], 4 /* Draw */);
                 });
             }
             //#region tournament

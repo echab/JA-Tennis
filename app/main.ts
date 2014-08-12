@@ -19,7 +19,7 @@ module jat.main {
             this.selection.tournament = this.tournamentLib.newTournament();
 
             this.mainLib.loadTournament('/data/tournament6.json').then((data) => {
-                this.selection.draw = data.events[0].draws[0];
+                this.mainLib.select( data.events[0].draws[0], models.ModelType.Draw);
             });
         }
 

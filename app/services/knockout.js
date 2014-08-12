@@ -1,4 +1,4 @@
-var jat;
+﻿var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL = 9, MAX_QUALIF_ENTRANT = 32, QEMPTY = -1, WITH_TDS_HAUTBAS = true;
@@ -78,6 +78,10 @@ var jat;
                     }
                     players = this.GetJoueursTableau(draw);
                 }
+
+                //Tri et Mélange les joueurs de même classement
+                this.tournamentLib.TriJoueurs(players);
+
                 draw = this.ConstruitMatch(draw, m_nMatchCol, players);
                 return [draw];
             };
@@ -313,8 +317,6 @@ var jat;
                         }
                     }
                 }
-
-                this.tournamentLib.TriJoueurs(players);
 
                 //Nombre de Tête de série
                 var nTeteSerie = draw.nbOut;

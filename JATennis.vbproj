@@ -74,7 +74,7 @@
     <TypeScriptCompile Include="app\services\knockout.ts" />
     <TypeScriptCompile Include="app\services\mainLib.ts" />
     <TypeScriptCompile Include="app\services\roundrobin.ts" />
-    <TypeScriptCompile Include="app\services\type.ts" />
+    <TypeScriptCompile Include="app\services\type.d.ts" />
     <TypeScriptCompile Include="app\services\tournamentLib.ts" />
     <Content Include="app\style\app.css" />
     <Content Include="app\style\glyphicons.png" />
@@ -99,13 +99,17 @@
     <Content Include="app\event\listEvents.html" />
     <Content Include="app\player\dialogPlayer.html" />
     <Content Include="app\player\listPlayers.html" />
+    <Content Include="lib\mocks\array-mock.js" />
+    <Content Include="lib\mocks\math-mock.js" />
+    <TypeScriptCompile Include="lib\mocks\guid-mock.ts" />
     <TypeScriptCompile Include="lib\typings\angularjs\angular-mocks.d.ts" />
     <TypeScriptCompile Include="lib\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="lib\typings\jasmine\jasmine.d.ts" />
     <TypeScriptCompile Include="lib\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="lib\typings\mocks\math-mock.d.ts" />
     <TypeScriptCompile Include="lib\typings\ui-bootstrap\ui-bootstrap-mocks.d.ts" />
     <TypeScriptCompile Include="lib\typings\ui-bootstrap\ui-bootstrap.d.ts" />
-    <Content Include="lib\ui-bootstrap-mocks\ui-bootstrap-mocks.js" />
+    <Content Include="lib\mocks\ui-bootstrap-mocks.js" />
     <TypeScriptCompile Include="test\unit\main.Spec.ts" />
     <TypeScriptCompile Include="test\unit\player\dialogPlayer.Spec.ts" />
     <TypeScriptCompile Include="test\unit\services\drawLib.Spec.ts" />

@@ -17,7 +17,7 @@ var jat;
                 if (angular.isObject(source)) {
                     angular.extend(draw, source);
                 }
-                draw.id = this.guid.create('d');
+                draw.id = draw.id || this.guid.create('d');
                 delete draw.$$hashKey; //remove angular id
 
                 //default values
@@ -722,7 +722,7 @@ var jat;
             }
         }
 
-        angular.module('jat.services.drawLib', ['jat.services.find']).factory('drawLib', function (find, rank, guid) {
+        angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid']).factory('drawLib', function (find, rank, guid) {
             return new DrawLib(find, rank, guid);
         });
     })(jat.service || (jat.service = {}));

@@ -6,6 +6,20 @@ module jat.service {
         MAX_TABLEAU = 63,
         QEMPTY = - 1;
 
+    /**
+      box positions example for nbColumn=3:
+
+            |  11   |  10   |   9   |   row:
+     -------+-------+-------+-------+
+        11  |-- 8 --|   5   |   2   |     2
+     -------+-------+-------+-------+
+        10  |   7   |-- 4 --|   1   |     1
+     -------+-------+-------+-------+
+         9  |   6   |   3   |-- 0 --|     0
+     -------+-------+-------+-------+
+
+    col: 3      2       1       0
+    */
     export class Roundrobin implements IDrawLib {
 
         constructor(
@@ -55,6 +69,7 @@ module jat.service {
         }
 
         public computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[] {
+            //nothing to do for round robin
             return;
         }
 
@@ -64,14 +79,45 @@ module jat.service {
                 throw "Not implemnted";
             }
 
-            //Shift the boxes
-            if (oldDraw && draw.nbOut !== oldDraw.nbOut) {
+            if (oldDraw && draw.nbColumn !== oldDraw.nbColumn) {
+                var nOld = oldDraw.nbColumn,
+                    nCol = draw.nbColumn,
+                    maxPos = nCol * (nCol + 1) - 1;
 
+                //Shift the boxes positions
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var box = draw.boxes[i];
-                    var c = column(box.position, oldDraw.nbColumn);
-                    var r = row(box.position, oldDraw.nbColumn);
-                    box.position = positionMatchPoule(r, c, draw.nbColumn);
+                    var b = positionResize(box.position, nOld, nCol);
+
+                    var diag = iDiagonalePos(nCol, b);
+                    if (b < 0 || maxPos < b
+                        || b === diag || (b < diag && draw.type === models.DrawType.PouleSimple)) {
+                        draw.boxes.splice(i, 1);    //remove the exceeding box
+                        continue;
+                    }
+
+                    box.position = b;
+                }
+
+                //Append new in players and matches
+                if (nCol > nOld) {
+                    for (var i = nCol - nOld - 1; i >= 0; i--) {
+
+                        var b = ADVERSAIRE1(draw, i);
+                        var boxIn = <models.PlayerIn>this.drawLib.newBox(draw, undefined, b);
+                        draw.boxes.push(boxIn);
+
+                        //Append the matches
+                        var diag = iDiagonalePos(nCol, b);
+                        for (b -= nCol; b >= 0; b -= nCol) {
+                            if (b === diag || (b < diag && draw.type === models.DrawType.PouleSimple)) {
+                                continue;
+                            }
+                            var match = <models.Match>this.drawLib.newBox(draw, undefined, b);
+                            match.score = '';
+                            draw.boxes.push(match);
+                        }
+                    }
                 }
             }
         }
@@ -310,20 +356,18 @@ module jat.service {
                     var b = ADVERSAIRE1(draw, i);
                     var j = t + (draw.nbColumn - i - 1) * nDraw;
 
-                    if (j >= players.length) {
-                        break;
-                    }
-
                     var boxIn = <models.PlayerIn>this.drawLib.newBox(draw, undefined, b);
                     draw.boxes.push(boxIn);
 
-                    var qualif: number = 'number' === typeof players[j] ? <any>players[j] : 0;
-                    if (qualif) {	//Qualifié entrant
-                        if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
+                    if (j < players.length) {
+                        var qualif: number = 'number' === typeof players[j] ? <any>players[j] : 0;
+                        if (qualif) {	//Qualifié entrant
+                            if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
+                                return;
+                            }
+                        } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
                             return;
                         }
-                    } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
-                        return;
                     }
 
                     //Append the matches
@@ -449,6 +493,12 @@ module jat.service {
 
     function positionMatchPoule(row: number, col: number, nCol: number): number { //IMATCH
         return (col * nCol) + row;
+    }
+
+    function positionResize(pos: number, nColOld: number, nCol: number): number {
+        var r = row(pos, nColOld),
+            col = column(pos, nColOld);
+        return (nCol - nColOld + r) + nCol * (nCol - nColOld + col);
     }
 
     function iDiagonale(box: models.Box): number {

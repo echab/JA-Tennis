@@ -23,11 +23,10 @@
 
                     data._url = url;
 
-                    _this.selection.tournament = data;
-                    _this.selection.event = data.events[0];
-                    _this.selection.draw = data.events[0] ? data.events[0].draws[0] : undefined;
+                    if (data.events[0]) {
+                        _this.select(data.events[0].draws[0], 4 /* Draw */);
+                    }
                     _this.selection.player = undefined;
-                    _this.selection.match = undefined;
 
                     deferred.resolve(data);
                 }).error(function (data, status) {
@@ -57,27 +56,26 @@
                 newPlayer.id = this.guid.create('p');
 
                 this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, 2 /* Player */); //c.push( newPlayer);
-                this.selection.player = newPlayer;
+                this.select(newPlayer, 2 /* Player */);
             };
 
             MainLib.prototype.editPlayer = function (editedPlayer, player) {
                 var isSelected = this.selection.player === player;
-                var c = this.selection.tournament.players;
+                var c = editedPlayer._tournament.players;
                 var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
                 this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, 2 /* Player */); //c[i] = editedPlayer;
                 if (isSelected) {
-                    this.selection.player = editedPlayer;
+                    this.select(editedPlayer, 2 /* Player */);
                 }
             };
 
             MainLib.prototype.removePlayer = function (player) {
                 var c = player._tournament.players;
                 var i = this.find.indexOf(c, "id", player.id, "Player to remove not found");
-                if (this.selection.player === player) {
-                    this.selection.player = c[i + 1] || c[i - 1]; //select next or previous
-                }
                 this.undo.remove(c, i, "Delete " + player.name + " " + i, 2 /* Player */); //c.splice( i, 1);
-                this.select(c[i] || c[i + 1], 2 /* Player */);
+                if (this.selection.player === player) {
+                    this.select(c[i] || c[i - 1], 2 /* Player */); //select next or previous
+                }
             };
 
             //#endregion player
@@ -88,27 +86,26 @@
 
                 newEvent.id = this.guid.create('e');
                 this.undo.insert(c, index, newEvent, "Add " + newEvent.name, 3 /* Event */); //c.push( newEvent);
-                this.selection.event = newEvent;
+                this.select(newEvent, 3 /* Event */);
             };
 
             MainLib.prototype.editEvent = function (editedEvent, event) {
                 var isSelected = this.selection.event === event;
-                var c = this.selection.tournament.events;
+                var c = editedEvent._tournament.events;
                 var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
                 this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, 3 /* Event */); //c[i] = editedEvent;
                 if (isSelected) {
-                    this.selection.event = editedEvent;
+                    this.select(editedEvent, 3 /* Event */);
                 }
             };
 
             MainLib.prototype.removeEvent = function (event) {
                 var c = event._tournament.events;
                 var i = this.find.indexOf(c, "id", event.id, "Event to remove not found");
-                if (this.selection.event === event) {
-                    this.selection.event = c[i + 1] || c[i - 2]; //select next or previous
-                }
                 this.undo.remove(c, i, "Delete " + c[i].name + " " + i, 3 /* Event */); //c.splice( i, 1);
-                this.select(c[i] || c[i + 1], 3 /* Event */);
+                if (this.selection.event === event) {
+                    this.select(c[i] || c[i - 1], 3 /* Event */);
+                }
             };
 
             //#endregion event
@@ -127,11 +124,11 @@
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
                     }
-                    this.selection.draw = draws[0];
+                    this.select(draws[0], 4 /* Draw */);
                 } else {
                     draw.id = this.guid.create('d');
                     this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, 4 /* Draw */); //c.push( draw);
-                    this.selection.draw = draw;
+                    this.select(draw, 4 /* Draw */);
                 }
             };
 
@@ -160,7 +157,7 @@
                     this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, 4 /* Draw */); //c[i] = draw;
                 }
                 if (isSelected || generate) {
-                    this.selection.draw = draw;
+                    this.select(draw, 4 /* Draw */);
                     this.refresh(draw); //force angular refresh
                 }
             };
@@ -168,11 +165,10 @@
             MainLib.prototype.removeDraw = function (draw) {
                 var c = draw._event.draws;
                 var i = this.find.indexOf(c, "id", draw.id, "Draw to remove not found");
-                if (this.selection.draw === draw) {
-                    this.selection.draw = c[i] || c[i - 1]; //select next or previous
-                }
                 this.undo.remove(c, i, "Delete " + draw.name + " " + i, 4 /* Draw */); //c.splice( i, 1);
-                this.select(c[i] || c[i + 1], 4 /* Draw */);
+                if (this.selection.draw === draw) {
+                    this.select(c[i] || c[i - 1], 4 /* Draw */); //select next or previous
+                }
             };
 
             MainLib.prototype.refresh = function (draw) {
@@ -255,6 +251,7 @@
             'jat.services.selection',
             'jat.services.find',
             'jat.services.undo',
+            'jat.services.guid',
             'jat.services.type',
             'jat.services.tournamentLib',
             'jat.services.drawLib',

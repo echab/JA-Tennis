@@ -1,8 +1,22 @@
-var jat;
+﻿var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL_POULE = 22, MAX_JOUEUR = 8191, MAX_TABLEAU = 63, QEMPTY = -1;
 
+        /**
+        box positions example for nbColumn=3:
+        
+        |  11   |  10   |   9   |   row:
+        -------+-------+-------+-------+
+        11  |-- 8 --|   5   |   2   |     2
+        -------+-------+-------+-------+
+        10  |   7   |-- 4 --|   1   |     1
+        -------+-------+-------+-------+
+        9  |   6   |   3   |-- 0 --|     0
+        -------+-------+-------+-------+
+        
+        col: 3      2       1       0
+        */
         var Roundrobin = (function () {
             function Roundrobin(drawLib, tournamentLib, ranking, find) {
                 this.drawLib = drawLib;
@@ -45,6 +59,7 @@ var jat;
             };
 
             Roundrobin.prototype.computePositions = function (draw, dimensions) {
+                //nothing to do for round robin
                 return;
             };
 
@@ -53,13 +68,40 @@ var jat;
                     throw "Not implemnted";
                 }
 
-                //Shift the boxes
-                if (oldDraw && draw.nbOut !== oldDraw.nbOut) {
+                if (oldDraw && draw.nbColumn !== oldDraw.nbColumn) {
+                    var nOld = oldDraw.nbColumn, nCol = draw.nbColumn, maxPos = nCol * (nCol + 1) - 1;
+
                     for (var i = draw.boxes.length - 1; i >= 0; i--) {
                         var box = draw.boxes[i];
-                        var c = column(box.position, oldDraw.nbColumn);
-                        var r = row(box.position, oldDraw.nbColumn);
-                        box.position = positionMatchPoule(r, c, draw.nbColumn);
+                        var b = positionResize(box.position, nOld, nCol);
+
+                        var diag = iDiagonalePos(nCol, b);
+                        if (b < 0 || maxPos < b || b === diag || (b < diag && draw.type === 2 /* PouleSimple */)) {
+                            draw.boxes.splice(i, 1); //remove the exceeding box
+                            continue;
+                        }
+
+                        box.position = b;
+                    }
+
+                    //Append new in players and matches
+                    if (nCol > nOld) {
+                        for (var i = nCol - nOld - 1; i >= 0; i--) {
+                            var b = ADVERSAIRE1(draw, i);
+                            var boxIn = this.drawLib.newBox(draw, undefined, b);
+                            draw.boxes.push(boxIn);
+
+                            //Append the matches
+                            var diag = iDiagonalePos(nCol, b);
+                            for (b -= nCol; b >= 0; b -= nCol) {
+                                if (b === diag || (b < diag && draw.type === 2 /* PouleSimple */)) {
+                                    continue;
+                                }
+                                var match = this.drawLib.newBox(draw, undefined, b);
+                                match.score = '';
+                                draw.boxes.push(match);
+                            }
+                        }
                     }
                 }
             };
@@ -285,20 +327,18 @@ var jat;
                         var b = ADVERSAIRE1(draw, i);
                         var j = t + (draw.nbColumn - i - 1) * nDraw;
 
-                        if (j >= players.length) {
-                            break;
-                        }
-
                         var boxIn = this.drawLib.newBox(draw, undefined, b);
                         draw.boxes.push(boxIn);
 
-                        var qualif = 'number' === typeof players[j] ? players[j] : 0;
-                        if (qualif) {
-                            if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
+                        if (j < players.length) {
+                            var qualif = 'number' === typeof players[j] ? players[j] : 0;
+                            if (qualif) {
+                                if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
+                                    return;
+                                }
+                            } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
                                 return;
                             }
-                        } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
-                            return;
                         }
 
                         //Append the matches
@@ -406,6 +446,11 @@ var jat;
 
         function positionMatchPoule(row, col, nCol) {
             return (col * nCol) + row;
+        }
+
+        function positionResize(pos, nColOld, nCol) {
+            var r = row(pos, nColOld), col = column(pos, nColOld);
+            return (nCol - nColOld + r) + nCol * (nCol - nColOld + col);
         }
 
         function iDiagonale(box) {
