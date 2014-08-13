@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (event) {
@@ -19,8 +19,7 @@ var jat;
         }
 
         var listEventsCtrl = (function () {
-            function listEventsCtrl(selection) {
-                //console.log("Events controller: cntr");
+            function listEventsCtrl() {
             }
             return listEventsCtrl;
         })();

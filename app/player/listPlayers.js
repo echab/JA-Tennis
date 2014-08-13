@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (player) {
@@ -19,8 +19,7 @@ var jat;
         }
 
         var listPlayersCtrl = (function () {
-            function listPlayersCtrl(selection) {
-                //console.log("Players controller: cntr");
+            function listPlayersCtrl() {
             }
             return listPlayersCtrl;
         })();

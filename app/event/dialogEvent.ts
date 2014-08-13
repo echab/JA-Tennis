@@ -16,8 +16,6 @@ module jat.event {
             category: ServiceCategory
             ) {
 
-            //console.log("Event controller: cntr");
-
             this.ranks = rank.list();
             this.categories = category.list();
 

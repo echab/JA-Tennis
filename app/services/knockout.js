@@ -1,4 +1,4 @@
-﻿var jat;
+var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL = 9, MAX_QUALIF_ENTRANT = 32, QEMPTY = -1, WITH_TDS_HAUTBAS = true;

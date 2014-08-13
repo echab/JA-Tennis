@@ -23,9 +23,8 @@ module jat.event {
 
     class listEventsCtrl {
         events: models.Event[];
-        constructor(selection: jat.service.Selection) {
-            //console.log("Events controller: cntr");
-        }
+        //constructor(selection: jat.service.Selection) {
+        //}
     }
 
     angular.module('jat.event.list', [])

@@ -87,11 +87,9 @@ var jat;
             TournamentLib.prototype.TriJoueurs = function (players) {
                 var _this = this;
                 //Tri les joueurs par classement
-                var compare1 = function (p1, p2) {
+                var comparePlayersByRank = function (p1, p2) {
                     //if numbers, p1 or p2 are PlayerIn
                     var isNumber1 = 'number' === typeof p1, isNumber2 = 'number' === typeof p2;
-
-                    //console.log('Compare ' + (isNumber1 ? <any>p1 : p1.name) + ' and ' + (isNumber2 ? <any>p2 : p2.name));
                     if (isNumber1 && isNumber2) {
                         return 0;
                     }
@@ -101,37 +99,20 @@ var jat;
                     if (isNumber2) {
                         return 1;
                     }
-                    var r = _this.rank.compare(p1.rank, p2.rank);
-
-                    //if (r === 0) {
-                    //    r = Math.random() - 0.5;    //Mélange les joueurs de même classement
-                    //}
-                    return r;
+                    return _this.rank.compare(p1.rank, p2.rank);
                 };
-
-                //console.log('TriJoueurs: Before: ' + players.reduce<string>((prev: string, cur: models.Player, idx: number, a: models.Player[]): string => prev + ',' + cur.name, ''));
-                players = players.sort(compare1);
+                players.sort(comparePlayersByRank);
 
                 for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
-                    if (r1 === players.length || compare1(players[r0], players[r1])) {
+                    if (r1 === players.length || comparePlayersByRank(players[r0], players[r1])) {
                         //nouvelle plage de classement
-                        r1--;
+                        //r0: premier joueur de l'intervalle
+                        //r1: premier joueur de l'intervalle suivant
+                        shuffle(players, r0, r1);
 
-                        for (var i = r0; i < r1; i++) {
-                            //echange deux joueurs p et q
-                            var p = Math.round(r0 + Math.random() * (r1 - r0));
-                            var q = Math.round(r0 + Math.random() * (r1 - r0));
-                            if (p != q) {
-                                var t = players[p];
-                                players[p] = players[q];
-                                players[q] = t;
-                            }
-                        }
-
-                        r0 = ++r1;
+                        r0 = r1;
                     }
                 }
-                //console.log('TriJoueurs: After : ' + players.reduce<string>((prev: string, cur: models.Player, idx: number, a: models.Player[]): string => prev + ',' + (cur.name || cur), ''));
             };
 
             TournamentLib.prototype.GetJoueursInscrit = function (draw) {
@@ -155,6 +136,22 @@ var jat;
             return TournamentLib;
         })();
         service.TournamentLib = TournamentLib;
+
+        function shuffle(array, from, toExlusive) {
+            from = from || 0;
+            if (arguments.length < 3) {
+                toExlusive = array.length;
+            }
+
+            var n = toExlusive - from;
+            for (var i = toExlusive - 1; i > from; i--) {
+                var t = from + Math.floor(n * Math.random());
+                var tmp = array[t];
+                array[t] = array[i];
+                array[i] = tmp;
+            }
+            return array;
+        }
 
         angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid']).factory('tournamentLib', function (drawLib, rank, guid) {
             return new TournamentLib(drawLib, rank, guid);

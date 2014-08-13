@@ -23,9 +23,8 @@ module jat.player {
 
     class listPlayersCtrl {
         players: models.Player[];
-        constructor(selection: jat.service.Selection) {
-            //console.log("Players controller: cntr");
-        }
+        //constructor(selection: jat.service.Selection) {
+        //}
     }
 
     angular.module('jat.player.list', [])

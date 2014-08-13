@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (_player) {
@@ -7,7 +7,6 @@ var jat;
                 this.title = title;
                 this.player = player;
                 this.events = events;
-                //console.log("Player controller: cntr");
                 this.ranks = rank.list();
                 this.categories = category.list();
             }

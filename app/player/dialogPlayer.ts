@@ -14,8 +14,6 @@ module jat.player {
             category: ServiceCategory
             ) {
 
-            //console.log("Player controller: cntr");
-
             this.ranks = rank.list();
             this.categories = category.list();
         }

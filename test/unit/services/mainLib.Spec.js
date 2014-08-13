@@ -5,15 +5,13 @@ describe('services.mainLib', function () {
     beforeEach(module('jat.services.mainLib'));
     beforeEach(module('jat.services.guid.mock'));
     beforeEach(module('math.mock'));
-    beforeEach(module('array.sort.mock'));
 
-    beforeEach(inject(function (_mainLib_, _drawLib_, _undo_, _find_, _guid_, _math_, _array_) {
+    beforeEach(inject(function (_mainLib_, _drawLib_, _undo_, _find_, _guid_, _math_) {
         main = _mainLib_;
         drawLib = _drawLib_;
         undo = _undo_;
         find = _find_;
         math = _math_;
-        //console.log('Test sort: ' + [2, 3, 1, 4, 5, 0].sort().reduce((prev: string, cur: number, i: number, a: number[]): string=> prev + ',' + cur, ''));
     }));
 
     describe('Load/save', function () {
@@ -89,7 +87,7 @@ describe('services.mainLib', function () {
 
         describe('Draw generation new', function () {
             beforeEach(function () {
-                return math.randomReturns([0.1, 0.8, 0.2, 0.4, 0.7, 0.9, 0.6, 0.2, 0.3, 0.1]);
+                return math.randomReturns([0.1, 0.8, 0.2]);
             });
 
             //clean event
@@ -115,16 +113,16 @@ describe('services.mainLib', function () {
                 expect(draw1.boxes.length).toBe(7);
 
                 var boxIn = find.by(draw1.boxes, 'position', 6);
-                expect(boxIn._player.name).toBe('Albert');
-
-                boxIn = find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = find.by(draw1.boxes, 'position', 4);
+                boxIn = find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = find.by(draw1.boxes, 'position', 3);
+                boxIn = find.by(draw1.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
+
+                boxIn = find.by(draw1.boxes, 'position', 3);
+                expect(boxIn._player.name).toBe('Albert');
 
                 var boxOut = find.by(draw1.boxes, 'position', 0);
                 expect(boxOut.qualifOut).toBe(1);
@@ -140,16 +138,16 @@ describe('services.mainLib', function () {
                 expect(draw1.boxes.length).toBe(6);
 
                 var boxIn = find.by(draw1.boxes, 'position', 6);
-                expect(boxIn._player.name).toBe('Albert');
-
-                boxIn = find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = find.by(draw1.boxes, 'position', 4);
+                boxIn = find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = find.by(draw1.boxes, 'position', 3);
+                boxIn = find.by(draw1.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
+
+                boxIn = find.by(draw1.boxes, 'position', 3);
+                expect(boxIn._player.name).toBe('Albert');
 
                 var boxOut = find.by(draw1.boxes, 'position', 2);
                 expect(boxOut.qualifOut).toBe(1);
@@ -169,17 +167,17 @@ describe('services.mainLib', function () {
                 expect(draw1.boxes.length).toBe(10);
 
                 var boxIn = find.by(draw1.boxes, 'position', 19);
-                expect(boxIn._player.name).toBe('Claude');
+                expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
                 boxIn = find.by(draw1.boxes, 'position', 18);
-                expect(boxIn._player.name).toBe('Bernard');
-
-                boxIn = find.by(draw1.boxes, 'position', 17);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = find.by(draw1.boxes, 'position', 16);
+                boxIn = find.by(draw1.boxes, 'position', 17);
                 expect(boxIn._player.name).toBe('Albert');
+
+                boxIn = find.by(draw1.boxes, 'position', 16);
+                expect(boxIn._player.name).toBe('Claude');
             });
 
             it('should generate first two roundrobin draw', function () {
@@ -194,11 +192,11 @@ describe('services.mainLib', function () {
                 expect(draw1.boxes.length).toBe(3);
 
                 var boxIn = find.by(draw1.boxes, 'position', 5);
-                expect(boxIn._player.name).toBe('Claude');
+                expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
                 boxIn = find.by(draw1.boxes, 'position', 4);
-                expect(boxIn._player.name).toBe('Daniel');
+                expect(boxIn._player.name).toBe('Albert');
 
                 var draw2 = event1.draws[1];
                 expect(draw2.type).toBe(2 /* PouleSimple */);
@@ -207,11 +205,11 @@ describe('services.mainLib', function () {
                 expect(draw2.boxes.length).toBe(3);
 
                 boxIn = find.by(draw2.boxes, 'position', 5);
-                expect(boxIn._player.name).toBe('Bernard');
+                expect(boxIn._player.name).toBe('Daniel');
                 expect(boxIn.seeded).toBe(2);
 
                 boxIn = find.by(draw2.boxes, 'position', 4);
-                expect(boxIn._player.name).toBe('Albert');
+                expect(boxIn._player.name).toBe('Claude');
             });
 
             it('should generate a second knockout draw', function () {
@@ -275,7 +273,7 @@ describe('services.mainLib', function () {
 
         describe('Draw generation mix', function () {
             beforeEach(function () {
-                return math.randomReturns([0.1, 0.8, 0.2, 0.4, 0.7, 0.9]);
+                return math.randomReturns([0.1, 0.8, 0.2]);
             });
 
             //clean event
@@ -288,22 +286,22 @@ describe('services.mainLib', function () {
                 var draw1 = event1.draws[0];
 
                 var draw = drawLib.newDraw(draw1._event, draw1);
-                math.randomReturns([0.6, 0.2, 0.3, 0.1, 0.5, 0.4]);
+                math.randomReturns([0.6, 0.2, 0.3]);
                 main.updateDraw(draw, draw1, 4 /* Mix */);
 
                 expect(draw.boxes.length).toBe(7);
 
                 var boxIn = find.by(draw.boxes, 'position', 6);
-                expect(boxIn._player.name).toBe('Albert');
-
-                boxIn = find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = find.by(draw.boxes, 'position', 4);
+                boxIn = find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = find.by(draw.boxes, 'position', 3);
+                boxIn = find.by(draw.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
+
+                boxIn = find.by(draw.boxes, 'position', 3);
+                expect(boxIn._player.name).toBe('Albert');
             });
 
             it('should mix a round robin draw', function () {
@@ -311,28 +309,28 @@ describe('services.mainLib', function () {
                 var draw1 = event1.draws[0];
 
                 var draw = drawLib.newDraw(draw1._event, draw1);
-                math.randomReturns([0.1, 0.2, 0.7, 0.6, 0.8, 0.4]);
+                math.randomReturns([0.1, 0.2, 0.7]);
                 main.updateDraw(draw, draw1, 4 /* Mix */);
 
                 expect(draw.boxes.length).toBe(10);
 
                 var boxIn = find.by(draw.boxes, 'position', 19);
-                expect(boxIn._player.name).toBe('Bernard');
-
-                boxIn = find.by(draw.boxes, 'position', 18);
                 expect(boxIn._player.name).toBe('Claude');
 
+                boxIn = find.by(draw.boxes, 'position', 18);
+                expect(boxIn._player.name).toBe('Daniel');
+
                 boxIn = find.by(draw.boxes, 'position', 17);
-                expect(boxIn._player.name).toBe('Albert');
+                expect(boxIn._player.name).toBe('Bernard');
 
                 boxIn = find.by(draw.boxes, 'position', 16);
-                expect(boxIn._player.name).toBe('Daniel');
+                expect(boxIn._player.name).toBe('Albert');
             });
         });
 
         describe('Draw update', function () {
             beforeEach(function () {
-                return math.randomReturns([0.1, 0.8, 0.2, 0.4, 0.7, 0.9, 0.6, 0.2, 0.3, 0.1]);
+                return math.randomReturns([0.1, 0.8, 0.2]);
             });
 
             //clean event
@@ -361,16 +359,16 @@ describe('services.mainLib', function () {
                 });
 
                 var boxIn = find.by(draw.boxes, 'position', 6);
-                expect(boxIn._player.name).toBe('Albert');
-
-                boxIn = find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = find.by(draw.boxes, 'position', 4);
+                boxIn = find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = find.by(draw.boxes, 'position', 3);
+                boxIn = find.by(draw.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
+
+                boxIn = find.by(draw.boxes, 'position', 3);
+                expect(boxIn._player.name).toBe('Albert');
             });
 
             it('should resize (expand) a round robin draw', function () {
@@ -386,11 +384,11 @@ describe('services.mainLib', function () {
                 expect(draw.boxes.length).toBe(6);
 
                 var boxIn = find.by(draw1.boxes, 'position', 11);
-                expect(boxIn._player.name).toBe('Claude');
+                expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
                 boxIn = find.by(draw1.boxes, 'position', 10);
-                expect(boxIn._player.name).toBe('Daniel');
+                expect(boxIn._player.name).toBe('Albert');
 
                 boxIn = find.by(draw1.boxes, 'position', 9);
                 expect(boxIn._player).toBeUndefined();
@@ -409,11 +407,11 @@ describe('services.mainLib', function () {
                 expect(draw.boxes.length).toBe(3);
 
                 var boxIn = find.by(draw1.boxes, 'position', 5);
-                expect(boxIn._player.name).toBe('Claude');
+                expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
                 boxIn = find.by(draw1.boxes, 'position', 4);
-                expect(boxIn._player.name).toBe('Daniel');
+                expect(boxIn._player.name).toBe('Albert');
             });
         });
     });
