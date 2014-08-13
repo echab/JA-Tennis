@@ -9,6 +9,7 @@
         surname?: string;
         sexe?: string;
         birth?: Date;
+        category?: string;
         club?: string;
         licence?: string;
         nationality?: string;

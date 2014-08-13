@@ -3,7 +3,7 @@
 var jat;
 (function (jat) {
     (function (service) {
-        var MAX_TETESERIE = 32, MAX_QUALIF_ENTRANT = 32, QEMPTY = -1;
+        var MAX_TETESERIE = 32, MAX_QUALIF = 32, QEMPTY = -1;
 
         var DrawLib = (function () {
             function DrawLib(find, rank, guid) {
@@ -240,7 +240,7 @@ var jat;
             };
 
             DrawLib.prototype.FindQualifieEntrant = function (origin, iQualifie) {
-                ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+                ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 for (var i = 0; i < group.length; i++) {
                     var d = group[i];
@@ -252,7 +252,7 @@ var jat;
             };
 
             DrawLib.prototype.FindQualifieSortant = function (origin, iQualifie) {
-                ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+                ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 for (var i = 0; i < group.length; i++) {
                     var d = group[i];
@@ -281,7 +281,7 @@ var jat;
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 if (group) {
                     var a = [];
-                    for (var i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
+                    for (var i = 1; i <= MAX_QUALIF; i++) {
                         if (this.FindQualifieSortant(group, i)) {
                             a.push(hideNumbers ? QEMPTY : i);
                         }
@@ -314,7 +314,7 @@ var jat;
                 }
 
                 var boxIn = box;
-                var match = box;
+                var match = isMatch(box) ? box : undefined;
                 box.playerId = player.id;
                 this.initBox(box, box._draw);
 
@@ -322,7 +322,7 @@ var jat;
                 //match.score = '';
                 if (isGauchePoule(box)) {
                     //TODO boxIn.rank = 0;   //classement de la poule
-                } else if ('score' in match) {
+                } else if (match) {
                     match.date = undefined;
                     match.place = undefined;
                 }

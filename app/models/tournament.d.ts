@@ -13,9 +13,17 @@ declare module models {
         places?: string[];
 
         _url?: string;
+
+        _dayCount?: number;
+        _day?: models.Match[][]; //list of matches by day
     }
 
     export interface TournamentInfo {
         name: string;
+
+        start?: Date;
+        end?: Date;
+
+        slotLength?: number;
     }
 }

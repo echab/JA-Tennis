@@ -70,10 +70,13 @@
     <TypeScriptCompile Include="app\draw\drawDraw.ts" />
     <Content Include="app\favicon.ico" />
     <TypeScriptCompile Include="app\services\drawLib.ts" />
+    <TypeScriptCompile Include="app\services\fftValidation.ts" />
     <TypeScriptCompile Include="app\services\guid.ts" />
     <TypeScriptCompile Include="app\services\knockout.ts" />
+    <TypeScriptCompile Include="app\services\knockoutValidation.ts" />
     <TypeScriptCompile Include="app\services\mainLib.ts" />
     <TypeScriptCompile Include="app\services\roundrobin.ts" />
+    <TypeScriptCompile Include="app\services\roundrobinValidation.ts" />
     <TypeScriptCompile Include="app\services\type.d.ts" />
     <TypeScriptCompile Include="app\services\tournamentLib.ts" />
     <Content Include="app\style\app.css" />
@@ -84,6 +87,7 @@
     <TypeScriptCompile Include="app\player\listPlayers.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <Content Include="app\index.html" />
+    <TypeScriptCompile Include="app\services\validation.ts" />
     <TypeScriptCompile Include="lib\declarations.d.ts" />
     <TypeScriptCompile Include="app\services\selection.ts" />
     <TypeScriptCompile Include="app\utils\checkList.ts" />

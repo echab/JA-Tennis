@@ -2,6 +2,8 @@
 var jat;
 (function (jat) {
     (function (service) {
+        var MINUTES = 60000, DAYS = 24 * 60 * MINUTES;
+
         var TournamentLib = (function () {
             function TournamentLib(drawLib, rank, guid) {
                 this.drawLib = drawLib;
@@ -29,6 +31,11 @@ var jat;
                         //tournament.events[i] = new Event(tournament, tournament.events[i]);
                         this.initEvent(tournament.events[i], tournament);
                     }
+                }
+
+                tournament.info.slotLength = tournament.info.slotLength || 90 * MINUTES;
+                if (tournament.info.start && tournament.info.end) {
+                    tournament._dayCount = Math.floor((tournament.info.end.getTime() - tournament.info.start.getTime()) / DAYS + 1);
                 }
             };
 
@@ -72,12 +79,16 @@ var jat;
                 }
             };
 
+            TournamentLib.prototype.isRegistred = function (event, player) {
+                return player.registration.indexOf(event.id) !== -1;
+            };
+
             TournamentLib.prototype.getRegistred = function (event) {
                 var a = [];
                 var c = event._tournament.players;
                 for (var i = 0, n = c.length; i < n; i++) {
                     var player = c[i];
-                    if (player.registration.indexOf(event.id) !== -1) {
+                    if (this.isRegistred(event, player)) {
                         a.push(player);
                     }
                 }
@@ -132,6 +143,11 @@ var jat;
                 }
 
                 return ppJoueur;
+            };
+
+            TournamentLib.prototype.isSexeCompatible = function (event, sexe) {
+                return;
+                event.sexe === sexe || (event.sexe === 'M' && !event.typeDouble); //ou simple mixte
             };
             return TournamentLib;
         })();

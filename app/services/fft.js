@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     // FFT type services
@@ -57,7 +57,7 @@ var jat;
             };
 
             Rank.prototype.within = function (rank, rank1, rank2) {
-                return this.compare(rank1, rank) <= 0 && this.compare(rank, rank2) <= 0;
+                return (!rank1 || this.compare(rank1, rank) <= 0) && (!rank2 || this.compare(rank, rank2) <= 0);
             };
 
             Rank.prototype.groups = function () {
@@ -147,6 +147,42 @@ var jat;
                     }
                     return i;
                 }
+            };
+
+            Category.prototype.isCompatible = function (eventCategory, playerCategory) {
+                if (playerCategory || !eventCategory) {
+                    return true;
+                }
+
+                //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.
+                var idxSenior = this._index['Senior'];
+                var idxEvent = this._index[eventCategory];
+
+                //Epreuve senior
+                if (idxEvent === idxSenior) {
+                    return true;
+                }
+
+                var catEvent = this._category[eventCategory];
+                var catPlayer = this._category[playerCategory];
+
+                if (idxEvent < idxSenior) {
+                    //Epreuve jeunes
+                    if (catPlayer.ageMax <= catEvent.ageMax) {
+                        return true;
+                    }
+                } else {
+                    //Epreuve vétérans
+                    if (catEvent.ageMin <= catPlayer.ageMin) {
+                        return true;
+                    }
+                }
+
+                return false;
+                //TODO? 2006/08/28	AgeMin() < playerCategory.AgeMin()	//vétéran
+                //	return playerCategory.isVide() || isVide()
+                //		(playerCategory.AgeMin() <= AgeMax()
+                //		&& AgeMin() <= playerCategory.AgeMax() );
             };
             return Category;
         })();

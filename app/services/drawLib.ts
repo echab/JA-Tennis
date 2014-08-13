@@ -30,7 +30,7 @@ interface ISize {
 module jat.service {
 
     var MAX_TETESERIE = 32,
-        MAX_QUALIF_ENTRANT = 32,
+        MAX_QUALIF = 32,
         QEMPTY = - 1;
 
     export class DrawLib implements IDrawLib {
@@ -280,7 +280,7 @@ module jat.service {
         public FindQualifieEntrant(group: models.Draw[], iQualifie: number): models.PlayerIn;
         public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn;
         public FindQualifieEntrant(origin: any, iQualifie: number): models.PlayerIn {
-            ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+            ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
             var group: models.Draw[] = angular.isArray(origin) ? origin : this.group(origin);
             for (var i = 0; i < group.length; i++) {
                 var d = group[i];
@@ -294,7 +294,7 @@ module jat.service {
         public FindQualifieSortant(group: models.Draw[], iQualifie: number): models.Match;
         public FindQualifieSortant(draw: models.Draw, iQualifie: number): models.Match;
         public FindQualifieSortant(origin: any, iQualifie: number): models.Match {
-            ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF_ENTRANT);
+            ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
             var group = angular.isArray(origin) ? origin : this.group(origin);
             for (var i = 0; i < group.length; i++) {
                 var d = group[i];
@@ -325,7 +325,7 @@ module jat.service {
             var group = angular.isArray(origin) ? origin : this.group(origin);
             if (group) {
                 var a: number[] = [];
-                for (var i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
+                for (var i = 1; i <= MAX_QUALIF; i++) {
                     if (this.FindQualifieSortant(group, i)) {
                         a.push(hideNumbers ? QEMPTY : i);
                     }
@@ -360,7 +360,7 @@ module jat.service {
             }
 
             var boxIn = <models.PlayerIn>box;
-            var match = <models.Match>box;
+            var match = isMatch(box) ? <models.Match>box : undefined;
             box.playerId = player.id;
             this.initBox(box, box._draw);
             //boxIn.order = 0;
@@ -368,7 +368,7 @@ module jat.service {
 
             if (isGauchePoule(box)) {
                 //TODO boxIn.rank = 0;   //classement de la poule
-            } else if ('score' in match) {
+            } else if (match) {
                 match.date = undefined;
                 match.place = undefined;
             }

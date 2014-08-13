@@ -2,6 +2,9 @@
 
 module jat.service {
 
+    var MINUTES = 60000,
+        DAYS = 24 * 60 * MINUTES;
+
     export class TournamentLib {
 
         constructor(
@@ -31,6 +34,11 @@ module jat.service {
                     //tournament.events[i] = new Event(tournament, tournament.events[i]);
                     this.initEvent(tournament.events[i], tournament);
                 }
+            }
+
+            tournament.info.slotLength = tournament.info.slotLength || 90 * MINUTES;
+            if (tournament.info.start && tournament.info.end) {
+                tournament._dayCount = Math.floor((tournament.info.end.getTime() - tournament.info.start.getTime()) / DAYS + 1);
             }
         }
 
@@ -76,12 +84,16 @@ module jat.service {
             }
         }
 
+        public isRegistred(event: models.Event, player: models.Player): boolean {
+            return player.registration.indexOf(event.id) !== -1;
+        }
+
         public getRegistred(event: models.Event): models.Player[] {
             var a: models.Player[] = [];
             var c = event._tournament.players;
             for (var i = 0, n = c.length; i < n; i++) {
                 var player = c[i];
-                if (player.registration.indexOf(event.id) !== -1) {
+                if (this.isRegistred(event, player)) {
                     a.push(player);
                 }
             }
@@ -144,16 +156,22 @@ module jat.service {
 
             return ppJoueur;
         }
+
+        public isSexeCompatible(event: models.Event, sexe: string): boolean {
+	        return
+		        event.sexe === sexe	//sexe épreuve = sexe joueur
+            || (event.sexe === 'M' && !event.typeDouble);	//ou simple mixte
+        }
     }
 
     function shuffle<T>(array: T[], from?: number, toExlusive?: number): T[] {
         from = from || 0;
         if (arguments.length < 3) {
-            toExlusive = array.length ;
+            toExlusive = array.length;
         }
 
         var n = toExlusive - from;
-        for (var i = toExlusive - 1; i >  from; i--) {
+        for (var i = toExlusive - 1; i > from; i--) {
             var t = from + Math.floor(n * Math.random());
             var tmp = array[t];
             array[t] = array[i];

@@ -63,7 +63,8 @@ module jat.service {
         }
 
         within(rank: RankString, rank1: RankString, rank2: RankString): boolean {
-            return this.compare(rank1, rank) <= 0 && this.compare(rank, rank2) <= 0;
+            return (!rank1 || this.compare(rank1, rank) <= 0)
+                && (!rank2 || this.compare(rank, rank2) <= 0);
         }
 
         groups(): RankGroupString[] {
@@ -146,7 +147,7 @@ module jat.service {
         }
 
         ofDate(date: Date): string {
-            var age = this.getAge(date), i: string, prev:string;
+            var age = this.getAge(date), i: string, prev: string;
             for (i in this._category) {
                 var categ = this._category[i];
 
@@ -163,6 +164,48 @@ module jat.service {
                 }
                 return i;
             }
+        }
+
+        isCompatible(eventCategory: CategoryString, playerCategory: CategoryString): boolean {
+
+            if (playerCategory || !eventCategory) {
+                return true;
+            }
+
+            //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.
+
+            var idxSenior = this._index['Senior'];
+            var idxEvent = this._index[<string>eventCategory];
+
+            //Epreuve senior
+            if (idxEvent === idxSenior) {
+                return true;
+            }
+
+            var catEvent = this._category[<string>eventCategory];
+            var catPlayer = this._category[<string>playerCategory];
+
+            if (idxEvent < idxSenior) {
+
+                //Epreuve jeunes
+                if (catPlayer.ageMax <= catEvent.ageMax) {
+                    return true;
+                }
+            } else {
+
+                //Epreuve vétérans
+                if (catEvent.ageMin <= catPlayer.ageMin) {
+                    return true;
+                }
+            }
+
+            return false;
+
+            //TODO? 2006/08/28	AgeMin() < playerCategory.AgeMin()	//vétéran
+
+            //	return playerCategory.isVide() || isVide()
+            //		(playerCategory.AgeMin() <= AgeMax() 
+            //		&& AgeMin() <= playerCategory.AgeMax() );
         }
     }
 
@@ -337,7 +380,7 @@ module jat.service {
 
         public deltaJeu(bVainqueur: boolean /*, BOOL bEquipe */): number {
             throw "Not implemented";
-            
+
             var n = 0;
             for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                 n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
@@ -423,7 +466,7 @@ module jat.service {
 
         public deltaPoint(bVainqueur: boolean /*, BOOL bEquipe */): number {
             throw "Not implemented";
-            
+
             var n = 0;
             for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                 n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);

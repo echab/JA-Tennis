@@ -2,7 +2,7 @@ module jat.service {
 
     var MIN_COL = 0,
         MAX_COL = 9,
-        MAX_QUALIF_ENTRANT = 32,
+        MAX_QUALIF = 32,
         QEMPTY = - 1,
         WITH_TDS_HAUTBAS = true;
 
@@ -465,7 +465,7 @@ module jat.service {
                 //Find the first unused qualif number
                 var group = this.drawLib.group(draw);
                 if (group) {
-                    for (i = 1; i <= MAX_QUALIF_ENTRANT; i++) {
+                    for (i = 1; i <= MAX_QUALIF; i++) {
                         if (!this.drawLib.FindQualifieSortant(group, i)) {
                             break;
                         }
@@ -476,7 +476,7 @@ module jat.service {
 
                 bottom = positionBottomCol(colMin);
                 top = positionTopCol(colMin);
-                for (var b = top; b >= bottom && i <= MAX_QUALIF_ENTRANT; b--, i++) {
+                for (var b = top; b >= bottom && i <= MAX_QUALIF; b--, i++) {
                     var box = this.findBox(draw, b);
                     if (box) {
                         this.drawLib.SetQualifieSortant(box, i);
@@ -543,7 +543,7 @@ module jat.service {
             return true;
         }
 
-        private isJoueurNouveau(box: models.Box): boolean {	//Première apparition du joueur dans le tableau
+        public isJoueurNouveau(box: models.Box): boolean {	//Première apparition du joueur dans le tableau
             if (!box) {
                 return false;
             }
