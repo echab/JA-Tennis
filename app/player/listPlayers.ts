@@ -1,10 +1,6 @@
 'use strict';
 module jat.player {
 
-    interface ListPlayersScope extends ng.IScope {
-        list: listPlayersCtrl;
-    }
-
     function listPlayersDirective() {
         var dir = {
             templateUrl: 'player/listPlayers.html',
@@ -12,9 +8,9 @@ module jat.player {
             controllerAs: 'list',
             restrict: 'EA',
             scope: true,
-            link: (scope: ListPlayersScope, element: JQuery, attrs: any, controller: any) => {
-                scope.$watch(attrs.listPlayers, (newValue: models.Player[], oldValue: models.Player[], scope: ListPlayersScope) => {
-                    scope.list.players = newValue;
+            link: (scope: ng.IScope, element: JQuery, attrs: any, controller: listPlayersCtrl) => {
+                scope.$watch(attrs.listPlayers, (newValue: models.Player[], oldValue: models.Player[], scope: ng.IScope) => {
+                    controller.players = newValue;
                 });
             }
         };
@@ -23,11 +19,21 @@ module jat.player {
 
     class listPlayersCtrl {
         players: models.Player[];
-        //constructor(selection: jat.service.Selection) {
-        //}
+        //eventById: { [id: string]: models.Event };
+
+        eventById(id: string): models.Event {
+            if (this.selection.tournament && this.selection.tournament.events) {
+                return this.find.byId(this.selection.tournament.events, id);
+            }
+        }
+
+        constructor(
+            private selection: jat.service.Selection,
+            private find: jat.service.Find) {
+        }
     }
 
-    angular.module('jat.player.list', [])
+    angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find'])
         .directive('listPlayers', listPlayersDirective)
         .controller('listPlayersCtrl', listPlayersCtrl)
     ;

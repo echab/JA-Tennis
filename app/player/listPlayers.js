@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (player) {
@@ -11,7 +11,7 @@ var jat;
                 scope: true,
                 link: function (scope, element, attrs, controller) {
                     scope.$watch(attrs.listPlayers, function (newValue, oldValue, scope) {
-                        scope.list.players = newValue;
+                        controller.players = newValue;
                     });
                 }
             };
@@ -19,12 +19,20 @@ var jat;
         }
 
         var listPlayersCtrl = (function () {
-            function listPlayersCtrl() {
+            function listPlayersCtrl(selection, find) {
+                this.selection = selection;
+                this.find = find;
             }
+            //eventById: { [id: string]: models.Event };
+            listPlayersCtrl.prototype.eventById = function (id) {
+                if (this.selection.tournament && this.selection.tournament.events) {
+                    return this.find.byId(this.selection.tournament.events, id);
+                }
+            };
             return listPlayersCtrl;
         })();
 
-        angular.module('jat.player.list', []).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', listPlayersCtrl);
+        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', listPlayersCtrl);
     })(jat.player || (jat.player = {}));
     var player = jat.player;
 })(jat || (jat = {}));

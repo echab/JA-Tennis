@@ -165,7 +165,7 @@
             }
             if (isSelected || generate) {
                 this.select(draw, models.ModelType.Draw);
-                this.refresh(draw);  //force angular refresh
+                this.drawLib.refresh(draw);  //force angular refresh
             }
         }
 
@@ -182,10 +182,6 @@
             if (this.selection.draw === draw) {
                 this.select(c[i] || c[i - 1], models.ModelType.Draw);   //select next or previous
             }
-        }
-
-        refresh(draw: models.Draw): void {
-            draw._refresh = new Date(); //force angular refresh
         }
         //#endregion draw
 

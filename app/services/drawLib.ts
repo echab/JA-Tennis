@@ -4,8 +4,8 @@
     resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void;
     nbColumnForPlayers(draw: models.Draw, nJoueur: number): number;
     generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[];
-    SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean;    //setPlayerIn
-    SetQualifieSortant(box: models.Box, outNumber?: number): boolean;    //setPlayerOut
+    SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean;    //setPlayerIn
+    SetQualifieSortant(box: models.Match, outNumber?: number): boolean;    //setPlayerOut
     FindQualifieEntrant(draw: models.Draw, inNumber: number): models.PlayerIn;  //findPlayerIn
     FindQualifieSortant(draw: models.Draw, outNumber: number): models.Match;    //findPlayerOut
     CalculeScore(draw: models.Draw): boolean;
@@ -57,7 +57,7 @@ module jat.service {
             draw.nbColumn = draw.nbColumn || 3;
             draw.nbOut = draw.nbOut || 1;
             if (after) {
-                draw._previous = after; 
+                draw._previous = after;
                 //TODO? after._next = draw;
             }
             if (!draw.minRank) {
@@ -150,6 +150,10 @@ module jat.service {
 
         public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[] {
             return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
+        }
+
+        refresh(draw: models.Draw): void {
+            draw._refresh = new Date(); //force angular refresh
         }
 
         public updateQualif(draw: models.Draw): void {
@@ -351,12 +355,12 @@ module jat.service {
             }
         }
 
-        public SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean {
+        public SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean {
             // inNumber=0 => enlève qualifié
             return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);
         }
 
-        public SetQualifieSortant(box: models.Box, outNumber?: number): boolean { //setPlayerOut
+        public SetQualifieSortant(box: models.Match, outNumber?: number): boolean { //setPlayerOut
             // iQualifie=0 => enlève qualifié
             return this._drawLibs[box._draw.type].SetQualifieSortant(box, outNumber);
         }
@@ -379,7 +383,7 @@ module jat.service {
             var boxIn = <models.PlayerIn>box;
             var match = isMatch(box) ? <models.Match>box : undefined;
             box.playerId = player.id;
-            this.initBox(box, box._draw);
+            box._player = player;
             //boxIn.order = 0;
             //match.score = '';
 
@@ -390,15 +394,16 @@ module jat.service {
                 match.place = undefined;
             }
 
-            var next = this.nextGroup(box._draw);
             var boxOut = <models.Match>box;
-            var e: number;
-            if ((e = boxOut.qualifOut) && next) {
-                var boxIn = this.FindQualifieEntrant(next, e);
-                if (boxIn) {
-                    if (!boxIn.playerId
-                        && !this.MetJoueur(boxIn, player, true)) {
-                        throw 'Error';
+            if (boxOut.qualifOut) {
+                var next = this.nextGroup(box._draw);
+                if (next) {
+                    var boxIn = this.FindQualifieEntrant(next, boxOut.qualifOut);
+                    if (boxIn) {
+                        if (!boxIn.playerId
+                            && !this.MetJoueur(boxIn, player, true)) {
+                            throw 'Error';
+                        }
                     }
                 }
             }
@@ -529,7 +534,9 @@ module jat.service {
 
             box.playerId = undefined;
             this.initBox(box, box._draw);
-            match.score = '';
+            if (isMatch(box)) {
+                match.score = '';
+            }
 
             var boxIn = <models.PlayerIn>box;
             //delete boxIn.order;
@@ -660,8 +667,8 @@ module jat.service {
 
             var boxIn = <models.PlayerIn>box;
             var boiteIn = <models.PlayerIn>boite;
-            var match = <models.Match>box;
-            var boiteMatch = <models.Match>boite;
+            var match = isMatch(box) ? <models.Match>box : undefined;
+            var boiteMatch = isMatch(boite) ? <models.Match>boite : undefined;
 
             if (boxIn.qualifIn
                 && boxIn.qualifIn != boiteIn.qualifIn) {
@@ -696,38 +703,40 @@ module jat.service {
                     if (!this.MetJoueur(box, boite._player)) {
                         throw 'Error';
                     }
-                    match.score = boiteMatch.score;
-                }
-
-                if (boiteMatch.qualifOut) {
-                    if (!this.SetQualifieSortant(box, boiteMatch.qualifOut)) {
-                        throw 'Error';
+                    if (match) {
+                        match.score = boiteMatch.score;
                     }
                 }
+
                 if (!isTypePoule(box._draw) && boiteIn.seeded) {
                     boxIn.seeded = boiteIn.seeded;
                 }
 
-                //if( isCreneau( box))
-                //v0998
-                var opponents = this.boxesOpponents(match);
-                if (opponents.box1 && opponents.box2
-                    && (boiteMatch.place || boiteMatch.date)
-                    ) {
-                    if (!this.MetCreneau(match, boiteMatch)) {
-                        throw 'Error';
+                if (match) {
+                    if (boiteMatch.qualifOut) {
+                        if (!this.SetQualifieSortant(match, boiteMatch.qualifOut)) {
+                            throw 'Error';
+                        }
                     }
-                }
 
-                if (isMatch(box)) {
+                    //if( isCreneau( box))
+                    //v0998
+                    var opponents = this.boxesOpponents(match);
+                    if (opponents.box1 && opponents.box2
+                        && (boiteMatch.place || boiteMatch.date)
+                        ) {
+                        if (!this.MetCreneau(match, boiteMatch)) {
+                            throw 'Error';
+                        }
+                    }
+
                     if (!this.MetPointage(box, boite)) {
                         throw 'Error';
                     }
+                    match.matchFormat = boiteMatch.matchFormat;
+
+                    match.note = match.note;
                 }
-
-                match.matchFormat = boiteMatch.matchFormat;
-
-                match.note = match.note;
             }
 
             this.CalculeScore(box._draw);

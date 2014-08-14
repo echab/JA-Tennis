@@ -9,21 +9,15 @@ module jat.draw {
     class boxCtrl {
 
         box: models.Box;
-        isMatch: boolean;
-        player: models.Player;
         pos: IPosition;
-        played: boolean;
+        isMatch: boolean;
 
-        constructor(
-            private find: jat.service.Find
-            ) {
+        isPlayed(): boolean {
+            return this.isMatch && !!(<models.Match>this.box).score;
         }
 
-        getPlayer(id: string): models.Player {
-            if (this.box && this.box._draw) {
-                return <models.Player>this.find.byId(this.box._draw._event._tournament.players, id);
-            }
-        }
+        //constructor() {
+        //}
     }
 
     function drawBoxDirective() {
@@ -37,9 +31,7 @@ module jat.draw {
 
                 scope.$watch(attrs.drawBox, (box: models.Box) => {
                     ctrlBox.box = box;
-                    ctrlBox.player = box ? ctrlBox.getPlayer(box.playerId) : undefined;
-                    ctrlBox.isMatch = box && "score" in box; //isMatch();
-                    ctrlBox.played = ctrlBox.isMatch && !!(<models.Match>box).score;
+                    ctrlBox.isMatch = isMatch(box);
                 });
 
                 scope.$watch(attrs.pos, (pos: IPosition) => {
@@ -47,6 +39,10 @@ module jat.draw {
                 });
             }
         };
+    }
+
+    function isMatch(box: models.Box): boolean {
+        return box && ('score' in box);
     }
 
     angular.module('jat.draw.box', ['jat.services.find'])

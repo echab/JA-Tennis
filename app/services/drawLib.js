@@ -118,6 +118,10 @@ var jat;
                 return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
             };
 
+            DrawLib.prototype.refresh = function (draw) {
+                draw._refresh = new Date(); //force angular refresh
+            };
+
             DrawLib.prototype.updateQualif = function (draw) {
                 //retreive qualifIn box
                 var qualifs = [];
@@ -330,7 +334,7 @@ var jat;
                 var boxIn = box;
                 var match = isMatch(box) ? box : undefined;
                 box.playerId = player.id;
-                this.initBox(box, box._draw);
+                box._player = player;
 
                 //boxIn.order = 0;
                 //match.score = '';
@@ -341,14 +345,15 @@ var jat;
                     match.place = undefined;
                 }
 
-                var next = this.nextGroup(box._draw);
                 var boxOut = box;
-                var e;
-                if ((e = boxOut.qualifOut) && next) {
-                    var boxIn = this.FindQualifieEntrant(next, e);
-                    if (boxIn) {
-                        if (!boxIn.playerId && !this.MetJoueur(boxIn, player, true)) {
-                            throw 'Error';
+                if (boxOut.qualifOut) {
+                    var next = this.nextGroup(box._draw);
+                    if (next) {
+                        var boxIn = this.FindQualifieEntrant(next, boxOut.qualifOut);
+                        if (boxIn) {
+                            if (!boxIn.playerId && !this.MetJoueur(boxIn, player, true)) {
+                                throw 'Error';
+                            }
                         }
                     }
                 }
@@ -471,7 +476,9 @@ var jat;
 
                 box.playerId = undefined;
                 this.initBox(box, box._draw);
-                match.score = '';
+                if (isMatch(box)) {
+                    match.score = '';
+                }
 
                 var boxIn = box;
 
@@ -601,8 +608,8 @@ var jat;
                 //ASSERT(RempliBoiteOk(box, boite));
                 var boxIn = box;
                 var boiteIn = boite;
-                var match = box;
-                var boiteMatch = boite;
+                var match = isMatch(box) ? box : undefined;
+                var boiteMatch = isMatch(boite) ? boite : undefined;
 
                 if (boxIn.qualifIn && boxIn.qualifIn != boiteIn.qualifIn) {
                     if (!this.SetQualifieEntrant(box)) {
@@ -635,36 +642,38 @@ var jat;
                         if (!this.MetJoueur(box, boite._player)) {
                             throw 'Error';
                         }
-                        match.score = boiteMatch.score;
-                    }
-
-                    if (boiteMatch.qualifOut) {
-                        if (!this.SetQualifieSortant(box, boiteMatch.qualifOut)) {
-                            throw 'Error';
+                        if (match) {
+                            match.score = boiteMatch.score;
                         }
                     }
+
                     if (!isTypePoule(box._draw) && boiteIn.seeded) {
                         boxIn.seeded = boiteIn.seeded;
                     }
 
-                    //if( isCreneau( box))
-                    //v0998
-                    var opponents = this.boxesOpponents(match);
-                    if (opponents.box1 && opponents.box2 && (boiteMatch.place || boiteMatch.date)) {
-                        if (!this.MetCreneau(match, boiteMatch)) {
-                            throw 'Error';
+                    if (match) {
+                        if (boiteMatch.qualifOut) {
+                            if (!this.SetQualifieSortant(match, boiteMatch.qualifOut)) {
+                                throw 'Error';
+                            }
                         }
-                    }
 
-                    if (isMatch(box)) {
+                        //if( isCreneau( box))
+                        //v0998
+                        var opponents = this.boxesOpponents(match);
+                        if (opponents.box1 && opponents.box2 && (boiteMatch.place || boiteMatch.date)) {
+                            if (!this.MetCreneau(match, boiteMatch)) {
+                                throw 'Error';
+                            }
+                        }
+
                         if (!this.MetPointage(box, boite)) {
                             throw 'Error';
                         }
+                        match.matchFormat = boiteMatch.matchFormat;
+
+                        match.note = match.note;
                     }
-
-                    match.matchFormat = boiteMatch.matchFormat;
-
-                    match.note = match.note;
                 }
 
                 this.CalculeScore(box._draw);

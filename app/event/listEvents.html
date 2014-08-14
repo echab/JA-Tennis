@@ -1,6 +1,6 @@
 ﻿<div ng-init="expand=false">
     <h4 ng-click="expand=!expand"><i ng-class="{'icon-plus-sign':!expand, 'icon-minus-sign':expand}"></i> The events:</h4>
-    <table class="table table-hover table-condensed" ng-show="expand">
+    <table class="table table-hover table-condensed" style="width:auto;" ng-show="expand">
         <!--<caption>Events</caption>-->
         <thead>
             <tr>
@@ -22,7 +22,7 @@
                         <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
                         <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
                         <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>
-                        <div draw="draw" simple="true" box-width="12" box-height="2" inter-box-width="2" inter-box-height="0"
+                        <div draw="draw" simple="true" box-width="10" box-height="2" inter-box-width="2" inter-box-height="0"
                              ng-click="main.select(draw)">
                         </div>
                     </div>

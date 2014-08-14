@@ -1,10 +1,6 @@
 'use strict';
 module jat.event {
 
-    interface ListEventsScope extends ng.IScope {
-        list: listEventsCtrl;
-    }
-
     function listEventsDirective() {
         var dir = {
             templateUrl: 'event/listEvents.html',
@@ -12,9 +8,9 @@ module jat.event {
             controllerAs: 'list',
             restrict: 'EA',
             scope: true,
-            link: (scope: ListEventsScope, element: JQuery, attrs: any, controller: any) => {
-                scope.$watch(attrs.listEvents, (newValue: models.Event[], oldValue: models.Event[], scope: ListEventsScope) => {
-                    scope.list.events = newValue;
+            link: (scope: ng.IScope, element: JQuery, attrs: any, controller: listEventsCtrl) => {
+                scope.$watch(attrs.listEvents, (newValue: models.Event[], oldValue: models.Event[], scope: ng.IScope) => {
+                    controller.events = newValue;
                 });
             }
         };

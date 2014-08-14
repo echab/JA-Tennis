@@ -1,9 +1,9 @@
-﻿<div ng-class="{box: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.played, hidden: ctrlBox.box.hidden}"
+﻿<div ng-class="{box: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.isPlayed(), hidden: ctrlBox.box.hidden}"
      ng-style="{left:ctrlBox.pos.x +'px', top:ctrlBox.pos.y +'px'}">
-    <span ng-if="ctrlBox.box.qualifIn" class="qualifIn">Q{{ctrlBox.box.qualifIn === -1 ? '?' : ctrlBox.box.qualifIn}}</span>
+    <span ng-if="ctrlBox.box.qualifIn" class="qualifIn">{{ctrlBox.box.qualifIn === -1 ? 'Q?' : 'Q' + ctrlBox.box.qualifIn}}</span>
     <span ng-if="ctrlBox.box.seeded" class="seeded">{{ctrlBox.box.seeded}}</span>
-    <i class="icon2-player" ng-if="ctrlBox.player" ng-click="main.editPlayer(ctrlBox.player)" title="Edit the player"></i>{{ctrlBox.player.name}}
-    <span ng-if="!ctrlBox.isMatch" class="rank">{{ctrlBox.player.rank}}</span>
+    <i class="icon2-player" ng-if="ctrlBox.box._player" ng-click="main.editPlayer(ctrlBox.box._player)" title="Edit the player"></i>{{ctrlBox.box._player.name}}
+    <span ng-if="!ctrlBox.isMatch" class="rank">{{ctrlBox.box._player.rank}}</span>
     <span ng-if="ctrlBox.box.qualifOut" class="qualifOut">Q{{ctrlBox.box.qualifOut}}</span>
     <br />
     <span ng-if="ctrlBox.isMatch">
@@ -12,5 +12,5 @@
         <span class="date">{{ctrlBox.box.date}}</span>
         <span class="score">{{ctrlBox.box.score}}</span>
     </span>
-    <span ng-if="!ctrlBox.isMatch" class="club">{{ctrlBox.player.club}}</span>
+    <span ng-if="!ctrlBox.isMatch" class="club">{{ctrlBox.box._player.club}}</span>
 </div>

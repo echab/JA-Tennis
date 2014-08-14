@@ -32,5 +32,20 @@
         return a;
     }
     tool.filledArray = filledArray;
+
+    function hashById(array) {
+        if (!array) {
+            return;
+        }
+        var a = {};
+        for (var i = array.length - 1; i >= 0; i--) {
+            var elem = array[i];
+            if (elem.id) {
+                a[elem.id] = elem;
+            }
+        }
+        return a;
+    }
+    tool.hashById = hashById;
 })(tool || (tool = {}));
 //# sourceMappingURL=tool.js.map

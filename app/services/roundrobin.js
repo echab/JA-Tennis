@@ -145,8 +145,6 @@
                 var draw = box._draw;
 
                 //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
-                var boxIn = box;
-
                 if (inNumber) {
                     var prev = this.drawLib.previousGroup(draw);
                     if (!player && prev && inNumber != QEMPTY) {
@@ -157,7 +155,7 @@
                         }
                     }
 
-                    if (boxIn.qualifIn) {
+                    if (box.qualifIn) {
                         if (!this.SetQualifieEntrant(box)) {
                             ASSERT(false);
                         }
@@ -174,7 +172,7 @@
                         this.SetQualifieEntrant(box, inNumber);
                     }
                 } else {
-                    boxIn.qualifIn = 0;
+                    box.qualifIn = 0;
 
                     if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                         ASSERT(false);
@@ -194,10 +192,8 @@
                 var box1 = box._draw.boxes[ADVERSAIRE1(box._draw, box.position)];
 
                 if (outNumber) {
-                    var boxOut = box;
-
                     //Met à jour le tableau suivant
-                    if (next && box.playerId && boxOut.qualifOut) {
+                    if (next && box.playerId && box.qualifOut) {
                         var boxIn = this.drawLib.FindQualifieEntrant(box._draw, outNumber);
                         if (boxIn) {
                             ASSERT(boxIn.playerId === box.playerId);
@@ -208,12 +204,12 @@
                     }
 
                     //Enlève le précédent n° de qualifié sortant
-                    if (boxOut.qualifOut)
-                        if (!this.SetQualifieSortant(boxOut)) {
+                    if (box.qualifOut)
+                        if (!this.SetQualifieSortant(box)) {
                             ASSERT(false);
                         }
 
-                    this.SetQualifieSortant(boxOut, outNumber);
+                    this.SetQualifieSortant(box, outNumber);
 
                     diag.playerId = box1.playerId;
                     this.drawLib.initBox(diag, box._draw);

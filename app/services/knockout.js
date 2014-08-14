@@ -407,6 +407,7 @@
                                         var p = players[t];
                                         players[t] = qualif;
                                         players[iJoueur] = p;
+                                        qualif = 0;
                                         break;
                                     }
                                 }
@@ -461,9 +462,9 @@
                     bottom = positionBottomCol(colMin);
                     top = positionTopCol(colMin);
                     for (var b = top; b >= bottom && i <= MAX_QUALIF; b--, i++) {
-                        var box = this.findBox(draw, b);
-                        if (box) {
-                            this.drawLib.SetQualifieSortant(box, i);
+                        var boxOut = this.findBox(draw, b);
+                        if (boxOut) {
+                            this.drawLib.SetQualifieSortant(boxOut, i);
                         }
                     }
                 }
@@ -498,16 +499,15 @@
                 var positions = [];
 
                 //var heights = <number[]> [];  //TODO variable height
-                var minPos = positionMin(draw.nbOut), maxPos = positionMax(draw.nbColumn, draw.nbOut), colMin = columnMin(draw.nbOut);
+                var minPos = positionMin(draw.nbOut), maxPos = positionMax(draw.nbColumn, draw.nbOut), c0 = draw.nbColumn - 1 + columnMin(draw.nbOut);
                 for (var pos = maxPos; pos >= minPos; pos--) {
                     //var b = box[pos];
-                    var col = column(pos);
-                    var c = draw.nbColumn - col - 1 + colMin;
-                    var topPos = positionTopCol(col);
-                    var g = positionTopCol(c - 1) + 2;
-                    var x = c * (dimensions.boxWidth + dimensions.interBoxWidth);
-                    var y = (topPos - pos) * (dimensions.boxHeight + dimensions.interBoxHeight) * g + (dimensions.boxHeight + dimensions.interBoxHeight) * (g / 2 - 0.5);
-                    positions[pos] = { x: x, y: y };
+                    var col = column(pos), topPos = positionTopCol(col), c = c0 - col, g = positionTopCol(c - 1) + 2;
+
+                    positions[pos] = {
+                        x: c * (dimensions.boxWidth + dimensions.interBoxWidth),
+                        y: (topPos - pos) * (dimensions.boxHeight + dimensions.interBoxHeight) * g + (dimensions.boxHeight + dimensions.interBoxHeight) * (g / 2 - 0.5)
+                    };
                 }
 
                 //to refresh lines
@@ -525,8 +525,8 @@
                     return false;
                 }
                 var boxIn = box;
-                var box1, box2;
-                return box.playerId && (!!boxIn.qualifIn || !(((box1 = this.box1(box)) && box1.playerId) || ((box2 = this.box2(box)) && box2.playerId)));
+                var opponents = this.boxesOpponents(box);
+                return box.playerId && (!!boxIn.qualifIn || !((opponents.box1 && opponents.box1.playerId) || (opponents.box2 && opponents.box2.playerId)));
             };
 
             Knockout.prototype.SetQualifieEntrant = function (box, inNumber, player) {
@@ -534,11 +534,9 @@
                 var draw = box._draw;
 
                 //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
-                var boxIn = box;
-
                 if (inNumber) {
                     var prev = this.drawLib.previousGroup(draw);
-                    if (!player && prev && inNumber !== QEMPTY) {
+                    if (!player && prev && prev.length && inNumber !== QEMPTY) {
                         //Va chercher le joueur dans le tableau précédent
                         var boxOut = this.drawLib.FindQualifieSortant(prev, inNumber);
                         if (angular.isObject(boxOut)) {
@@ -546,7 +544,7 @@
                         }
                     }
 
-                    if (boxIn.qualifIn) {
+                    if (box.qualifIn) {
                         if (!this.SetQualifieEntrant(box)) {
                             ASSERT(false);
                         }
@@ -560,7 +558,7 @@
 
                     //Qualifié entrant pas déjà pris
                     if (inNumber === QEMPTY || !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
-                        boxIn.qualifIn = inNumber;
+                        box.qualifIn = inNumber;
 
                         //Cache les boites de gauche
                         this.iBoiteDeGauche(box.position, draw, true, function (box) {
@@ -568,7 +566,7 @@
                         });
                     }
                 } else {
-                    boxIn.qualifIn = 0;
+                    box.qualifIn = 0;
 
                     if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                         ASSERT(false);
@@ -589,10 +587,8 @@
 
                 //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
                 if (outNumber) {
-                    var boxOut = box;
-
                     //Met à jour le tableau suivant
-                    if (next && boxOut.playerId && boxOut.qualifOut) {
+                    if (next && box.playerId && box.qualifOut) {
                         var boxIn = this.drawLib.FindQualifieEntrant(next, outNumber);
                         if (boxIn) {
                             ASSERT(boxIn.playerId === box.playerId);
@@ -603,13 +599,13 @@
                     }
 
                     //Enlève le précédent n° de qualifié sortant
-                    if (boxOut.qualifOut) {
-                        if (!this.SetQualifieSortant(boxOut)) {
+                    if (box.qualifOut) {
+                        if (!this.SetQualifieSortant(box)) {
                             ASSERT(false);
                         }
                     }
 
-                    boxOut.qualifOut = outNumber;
+                    box.qualifOut = outNumber;
 
                     //Met à jour le tableau suivant
                     if (next && box.playerId && boxIn) {
@@ -617,10 +613,9 @@
                         }
                     }
                 } else {
-                    var boxOut = box;
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
-                        var boxIn = this.drawLib.FindQualifieEntrant(next, boxOut.qualifOut);
+                        var boxIn = this.drawLib.FindQualifieEntrant(next, box.qualifOut);
                         if (boxIn) {
                             ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
                             if (!this.drawLib.EnleveJoueur(boxIn, true)) {
@@ -629,7 +624,7 @@
                         }
                     }
 
-                    delete boxOut.qualifOut;
+                    delete box.qualifOut;
                 }
 
                 return true;
@@ -664,15 +659,14 @@
                 return this.find.by(draw.boxes, "qualifOut", iQualifie);
             };
 
-            Knockout.prototype.box1 = function (match) {
-                var pos = positionOpponent1(match.position);
-                return this.find.by(match._draw.boxes, 'position', pos);
-            };
-            Knockout.prototype.box2 = function (match) {
-                var pos = positionOpponent2(match.position);
-                return this.find.by(match._draw.boxes, 'position', pos);
-            };
-
+            //private box1(match: models.Match): models.Box {
+            //    var pos = positionOpponent1(match.position);
+            //    return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
+            //}
+            //private box2(match: models.Match): models.Box {
+            //    var pos = positionOpponent2(match.position);
+            //    return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
+            //}
             //formule de décalage à droite:
             //
             // iNew = i - pivot * 2 ^ (log2(i+1) -log2(pivot+1))

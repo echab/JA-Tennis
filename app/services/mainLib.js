@@ -158,7 +158,7 @@
                 }
                 if (isSelected || generate) {
                     this.select(draw, 4 /* Draw */);
-                    this.refresh(draw); //force angular refresh
+                    this.drawLib.refresh(draw); //force angular refresh
                 }
             };
 
@@ -175,10 +175,6 @@
                 if (this.selection.draw === draw) {
                     this.select(c[i] || c[i - 1], 4 /* Draw */); //select next or previous
                 }
-            };
-
-            MainLib.prototype.refresh = function (draw) {
-                draw._refresh = new Date(); //force angular refresh
             };
 
             //#endregion draw

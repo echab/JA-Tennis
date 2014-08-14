@@ -439,6 +439,7 @@ module jat.service {
                                     var p = players[t];
                                     players[t] = <any> qualif;
                                     players[iJoueur] = p;
+                                    qualif = 0;
                                     break;
                                 }
                             }
@@ -496,9 +497,9 @@ module jat.service {
                 bottom = positionBottomCol(colMin);
                 top = positionTopCol(colMin);
                 for (var b = top; b >= bottom && i <= MAX_QUALIF; b--, i++) {
-                    var box = this.findBox(draw, b);
-                    if (box) {
-                        this.drawLib.SetQualifieSortant(box, i);
+                    var boxOut = <models.Match> this.findBox(draw, b);
+                    if (boxOut) {
+                        this.drawLib.SetQualifieSortant(boxOut, i);
                     }
                 }
             }
@@ -540,16 +541,18 @@ module jat.service {
 
             var minPos = positionMin(draw.nbOut),
                 maxPos = positionMax(draw.nbColumn, draw.nbOut),
-                colMin = columnMin(draw.nbOut);
+                c0 = draw.nbColumn - 1 + columnMin(draw.nbOut);
             for (var pos = maxPos; pos >= minPos; pos--) {
                 //var b = box[pos];
-                var col = column(pos);
-                var c = draw.nbColumn - col - 1 + colMin;
-                var topPos = positionTopCol(col);
-                var g = positionTopCol(c - 1) + 2;
-                var x = c * (dimensions.boxWidth + dimensions.interBoxWidth);
-                var y = (topPos - pos) * (dimensions.boxHeight + dimensions.interBoxHeight) * g + (dimensions.boxHeight + dimensions.interBoxHeight) * (g / 2 - 0.5);
-                positions[pos] = { x: x, y: y };
+                var col = column(pos),
+                    topPos = positionTopCol(col),
+                    c = c0 - col,
+                    g = positionTopCol(c - 1) + 2;
+
+                positions[pos] = {
+                    x: c * (dimensions.boxWidth + dimensions.interBoxWidth),
+                    y: (topPos - pos) * (dimensions.boxHeight + dimensions.interBoxHeight) * g + (dimensions.boxHeight + dimensions.interBoxHeight) * (g / 2 - 0.5)
+                };
             }
 
             //to refresh lines
@@ -567,30 +570,29 @@ module jat.service {
                 return false;
             }
             var boxIn = <models.PlayerIn>box;
-            var box1: models.Box, box2: models.Box;
+            var opponents = this.boxesOpponents(<models.Match>box);
             return box.playerId
                 &&
                 (
                 !!boxIn.qualifIn
                 ||
                 !(
-                ((box1 = this.box1(<models.Match> box)) && box1.playerId)
+                (opponents.box1 && opponents.box1.playerId)
                 ||
-                ((box2 = this.box2(<models.Match> box)) && box2.playerId)
+                (opponents.box2 && opponents.box2.playerId)
                 )
                 );
         }
 
-        public SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean { //setPlayerIn
+        public SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean { //setPlayerIn
             // inNumber=0 => enlève qualifié
 
             var draw = box._draw;
             //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
-            var boxIn = <models.PlayerIn> box;
 
             if (inNumber) {	//Ajoute un qualifié entrant
                 var prev = this.drawLib.previousGroup(draw);
-                if (!player && prev && inNumber !== QEMPTY) {
+                if (!player && prev && prev.length && inNumber !== QEMPTY) {
                     //Va chercher le joueur dans le tableau précédent
                     var boxOut = this.drawLib.FindQualifieSortant(prev, inNumber);
                     if (angular.isObject(boxOut)) {	//V0997
@@ -598,7 +600,7 @@ module jat.service {
                     }
                 }
 
-                if (boxIn.qualifIn) {
+                if (box.qualifIn) {
                     if (!this.SetQualifieEntrant(box)) {	//Enlève le précédent qualifié
                         ASSERT(false);
                     }
@@ -614,7 +616,7 @@ module jat.service {
                 if (inNumber === QEMPTY ||
                     !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
 
-                    boxIn.qualifIn = inNumber;
+                    box.qualifIn = inNumber;
 
                     //Cache les boites de gauche
                     this.iBoiteDeGauche(box.position, draw, true, (box) => {
@@ -623,7 +625,7 @@ module jat.service {
                 }
             } else {	// Enlève un qualifié entrant
 
-                boxIn.qualifIn = 0;
+                box.qualifIn = 0;
 
                 if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                     ASSERT(false);
@@ -638,7 +640,7 @@ module jat.service {
             return true;
         }
 
-        public SetQualifieSortant(box: models.Box, outNumber?: number): boolean { //setPlayerOut
+        public SetQualifieSortant(box: models.Match, outNumber?: number): boolean { //setPlayerOut
             // outNumber=0 => enlève qualifié
 
             var next = this.drawLib.nextGroup(box._draw);
@@ -646,10 +648,9 @@ module jat.service {
             //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
 
             if (outNumber) {	//Ajoute un qualifié sortant
-                var boxOut = <models.Match>box;
 
                 //Met à jour le tableau suivant
-                if (next && boxOut.playerId && boxOut.qualifOut) {
+                if (next && box.playerId && box.qualifOut) {
                     var boxIn = this.drawLib.FindQualifieEntrant(next, outNumber);
                     if (boxIn) {
                         ASSERT(boxIn.playerId === box.playerId);
@@ -660,13 +661,13 @@ module jat.service {
                 }
 
                 //Enlève le précédent n° de qualifié sortant
-                if (boxOut.qualifOut) {
-                    if (!this.SetQualifieSortant(boxOut)) {	//Enlève le qualifié
+                if (box.qualifOut) {
+                    if (!this.SetQualifieSortant(box)) {	//Enlève le qualifié
                         ASSERT(false);
                     }
                 }
 
-                boxOut.qualifOut = outNumber;
+                box.qualifOut = outNumber;
 
                 //Met à jour le tableau suivant
                 if (next && box.playerId && boxIn) {
@@ -675,10 +676,9 @@ module jat.service {
                 }
 
             } else {	//Enlève un qualifié sortant
-                var boxOut = <models.Match>box;
                 if (next && box.playerId) {
                     //Met à jour le tableau suivant
-                    var boxIn = this.drawLib.FindQualifieEntrant(next, boxOut.qualifOut);
+                    var boxIn = this.drawLib.FindQualifieEntrant(next, box.qualifOut);
                     if (boxIn) {
                         ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
                         if (!this.drawLib.EnleveJoueur(boxIn, true)) {
@@ -687,7 +687,7 @@ module jat.service {
                     }
                 }
 
-                delete boxOut.qualifOut;
+                delete box.qualifOut;
             }
 
             return true;
@@ -724,14 +724,14 @@ module jat.service {
             return <models.Match>this.find.by(draw.boxes, "qualifOut", iQualifie);
         }
 
-        private box1(match: models.Match): models.Box {
-            var pos = positionOpponent1(match.position);
-            return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
-        }
-        private box2(match: models.Match): models.Box {
-            var pos = positionOpponent2(match.position);
-            return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
-        }
+        //private box1(match: models.Match): models.Box {
+        //    var pos = positionOpponent1(match.position);
+        //    return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
+        //}
+        //private box2(match: models.Match): models.Box {
+        //    var pos = positionOpponent2(match.position);
+        //    return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
+        //}
 
         //formule de décalage à droite:
         //

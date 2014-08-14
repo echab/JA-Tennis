@@ -3,13 +3,10 @@ var jat;
 (function (jat) {
     (function (draw) {
         var boxCtrl = (function () {
-            function boxCtrl(find) {
-                this.find = find;
+            function boxCtrl() {
             }
-            boxCtrl.prototype.getPlayer = function (id) {
-                if (this.box && this.box._draw) {
-                    return this.find.byId(this.box._draw._event._tournament.players, id);
-                }
+            boxCtrl.prototype.isPlayed = function () {
+                return this.isMatch && !!this.box.score;
             };
             return boxCtrl;
         })();
@@ -24,9 +21,7 @@ var jat;
                 link: function (scope, element, attrs, ctrlBox) {
                     scope.$watch(attrs.drawBox, function (box) {
                         ctrlBox.box = box;
-                        ctrlBox.player = box ? ctrlBox.getPlayer(box.playerId) : undefined;
-                        ctrlBox.isMatch = box && "score" in box; //isMatch();
-                        ctrlBox.played = ctrlBox.isMatch && !!box.score;
+                        ctrlBox.isMatch = isMatch(box);
                     });
 
                     scope.$watch(attrs.pos, function (pos) {
@@ -34,6 +29,10 @@ var jat;
                     });
                 }
             };
+        }
+
+        function isMatch(box) {
+            return box && ('score' in box);
         }
 
         angular.module('jat.draw.box', ['jat.services.find']).directive('drawBox', drawBoxDirective);

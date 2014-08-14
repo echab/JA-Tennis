@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (_draw) {
@@ -49,23 +49,24 @@ var jat;
                 }
 
                 //draw the lines...
-                var ctx = (canvas[0]).getContext('2d');
+                var ctx = canvas[0].getContext('2d');
                 ctx.lineWidth = .5;
                 ctx.translate(.5, .5);
                 var boxHeight2 = this.boxHeight >> 1;
 
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
-                    var b = draw.boxes[i];
-                    var pt = this.positions[b.position];
+                    var box = draw.boxes[i];
+                    var pt = this.positions[box.position];
                     if (!pt) {
                         continue;
                     }
                     var x = pt.x, y = pt.y;
 
-                    if (isMatch(b)) {
-                        ctx.moveTo(x - this.interBoxWidth, this.positions[positionOpponent1(b.position)].y + boxHeight2);
+                    if (isMatch(box)) {
+                        var opponent = positionOpponents(box.position);
+                        ctx.moveTo(x - this.interBoxWidth, this.positions[opponent.pos1].y + boxHeight2);
                         ctx.lineTo(x, y + boxHeight2);
-                        ctx.lineTo(x - this.interBoxWidth, this.positions[positionOpponent2(b.position)].y + boxHeight2);
+                        ctx.lineTo(x - this.interBoxWidth, this.positions[opponent.pos2].y + boxHeight2);
                         ctx.stroke();
                     }
                     ctx.moveTo(x, y + boxHeight2);
@@ -100,12 +101,11 @@ var jat;
             return box && ('score' in box);
         }
 
-        function positionOpponent1(pos) {
-            return (pos << 1) + 2;
-        }
-
-        function positionOpponent2(pos) {
-            return (pos << 1) + 1;
+        function positionOpponents(pos) {
+            return {
+                pos1: (pos << 1) + 2,
+                pos2: (pos << 1) + 1
+            };
         }
 
         function drawDirective() {

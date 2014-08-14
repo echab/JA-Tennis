@@ -159,12 +159,11 @@ module jat.service {
             }
         }
 
-        public SetQualifieEntrant(box: models.Box, inNumber?: number, player?: models.Player): boolean { //setPlayerIn
+        public SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean { //setPlayerIn
             // inNumber=0 => enlève qualifié
 
             var draw = box._draw;
             //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
-            var boxIn = <models.PlayerIn> box;
 
             if (inNumber) {	//Ajoute un qualifié entrant
                 var prev = this.drawLib.previousGroup(draw);
@@ -176,7 +175,7 @@ module jat.service {
                     }
                 }
 
-                if (boxIn.qualifIn) {
+                if (box.qualifIn) {
                     if (!this.SetQualifieEntrant(box)) {	//Enlève le précédent qualifié
                         ASSERT(false);
                     }
@@ -196,7 +195,7 @@ module jat.service {
                 }
             } else {	// Enlève un qualifié entrant
 
-                boxIn.qualifIn = 0;
+                box.qualifIn = 0;
 
                 if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                     ASSERT(false);
@@ -206,7 +205,7 @@ module jat.service {
             return true;
         }
 
-        public SetQualifieSortant(box: models.Box, outNumber?: number): boolean { //setPlayerOut
+        public SetQualifieSortant(box: models.Match, outNumber?: number): boolean { //setPlayerOut
             // outNumber=0 => enlève qualifié
 
             //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
@@ -218,9 +217,8 @@ module jat.service {
             var box1 = box._draw.boxes[ADVERSAIRE1(box._draw, box.position)];
 
             if (outNumber) {	//Ajoute un qualifié sortant
-                var boxOut = <models.Match>box;
                 //Met à jour le tableau suivant
-                if (next && box.playerId && boxOut.qualifOut) {
+                if (next && box.playerId && box.qualifOut) {
                     var boxIn = this.drawLib.FindQualifieEntrant(box._draw, outNumber);
                     if (boxIn) {
                         ASSERT(boxIn.playerId === box.playerId);
@@ -231,12 +229,12 @@ module jat.service {
                 }
 
                 //Enlève le précédent n° de qualifié sortant
-                if (boxOut.qualifOut)
-                    if (!this.SetQualifieSortant(boxOut)) {	//Enlève le qualifié
+                if (box.qualifOut)
+                    if (!this.SetQualifieSortant(box)) {	//Enlève le qualifié
                         ASSERT(false);
                     }
 
-                this.SetQualifieSortant(boxOut, outNumber);
+                this.SetQualifieSortant(box, outNumber);
 
                 diag.playerId = box1.playerId;
                 this.drawLib.initBox(diag, box._draw);

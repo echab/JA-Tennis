@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (event) {
@@ -11,7 +11,7 @@ var jat;
                 scope: true,
                 link: function (scope, element, attrs, controller) {
                     scope.$watch(attrs.listEvents, function (newValue, oldValue, scope) {
-                        scope.list.events = newValue;
+                        controller.events = newValue;
                     });
                 }
             };

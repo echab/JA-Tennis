@@ -31,4 +31,17 @@
         return a;
     }
 
+    export function hashById<T extends { id: string }>(array: T[]): { [id: string]: T } {
+        if (!array) {
+            return;
+        }
+        var a: { [id: string]: T } = {};
+        for (var i = array.length - 1; i >= 0; i--) {
+            var elem = array[i];
+            if (elem.id) {
+                a[<string>elem.id] = elem;
+            }
+        }
+        return a;
+    } 
 } 
