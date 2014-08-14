@@ -495,7 +495,7 @@ var jat;
                     case 0:
                         return this.dPoint.toString();
                     case 1:
-                        return (this.dSet2 / 2).toString();
+                        return Math.floor(this.dSet2 / 2).toString();
                     case 2:
                         return this.dJeu.toString();
                 }

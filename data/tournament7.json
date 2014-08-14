@@ -1,0 +1,144 @@
+﻿{
+  "info": {
+    "name": "Tournoi 4",
+    "slotLength": 5400000
+  },
+  "players": [
+    {
+      "id": "j0",
+      "name": "Alphonse",
+      "club": "TAC",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j1",
+      "name": "Bernard",
+      "club": "TCB",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j2",
+      "name": "Claude",
+      "club": "TROC",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j3",
+      "name": "Daniel",
+      "club": "ST",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j4",
+      "name": "Eloi",
+      "club": "ST",
+      "rank": "30/3",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j5",
+      "name": "Frank",
+      "club": "ST",
+      "rank": "30/5",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "p295",
+      "name": "Gérard",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "p237",
+      "name": "Henri",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "p123",
+      "name": "John",
+      "rank": "30/4",
+      "registration": [
+        "e0"
+      ]
+    }
+  ],
+  "events": [
+    {
+        "id": "e0",
+        "name": "Simple messieurs",
+        "draws": [
+            {
+                "id": "d18",
+                "type": 0,
+                "nbColumn": 2,
+                "nbOut": 3,
+                "minRank": "NC",
+                "maxRank": "NC",
+                "name": "First",
+                "boxes": [
+                    {
+                        "position": 6,
+                        "score": "",
+                        "qualifOut": 1
+                    },
+                    {
+                        "position": 5,
+                        "score": "",
+                        "qualifOut": 2
+                    },
+                    {
+                        "position": 4,
+                        "score": "",
+                        "qualifOut": 3
+                    },
+                    {
+                        "position": 14,
+                        "playerId": "j0"
+                    },
+                    {
+                        "position": 12,
+                        "playerId": "p237"
+                    },
+                    {
+                        "position": 10,
+                        "playerId": "j3"
+                    },
+                    {
+                        "position": 9,
+                        "playerId": "j1"
+                    },
+                    {
+                        "position": 11,
+                        "playerId": "p295"
+                    },
+                    {
+                        "position": 13,
+                        "playerId": "j2"
+                    }
+                ]
+            }
+        ]
+    }
+  ]
+} 

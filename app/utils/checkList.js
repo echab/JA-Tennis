@@ -43,7 +43,6 @@ value: '@'
 },
 link: (scope, element, attrs, ngModel) => {
 if (!ngModel) return; // do nothing if no ng-model
-//console.log("array: " + scope.array);
 // Specify how UI should be updated
 ngModel.$render = () => {
 //console.log("render:" + ngModel.$viewValue);

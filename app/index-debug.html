@@ -41,7 +41,7 @@
 
         <div list-events="main.selection.tournament.events"></div>
 
-        <div ng-init="expandDraw=true">
+        <form ng-init="expandDraw=true" class="form-horizontal">
             <i ng-class="{'icon-plus-sign':!expandDraw, 'icon-minus-sign':expandDraw}" ng-click="expandDraw=!expandDraw"></i>
             <label>
                 Event: <i class="icon2-info" ng-click="main.editEvent(main.selection.event)" ng-disabled="!main.selection.event"></i>
@@ -62,8 +62,11 @@
                     <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEnLigne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
                     <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Mix)" ng-disabled="!main.selection.draw" class="btn" title="Mix the players"><i class="icon2-random"></i></button>
                 </div>
+                <div class="btn-group">
+                    <button type="button" ng-click="main.updateQualif(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
+                </div>
             </label>
-        </div>
+        </form>
 
         <div draw="main.selection.draw" ng-show="expandDraw"></div>
 
@@ -86,6 +89,7 @@
 
     <script src="app.js"></script>
 
+    <script src="utils/tool.js"></script>
     <script src="utils/checkList.js"></script>
 
     <script src="services/version.js"></script>

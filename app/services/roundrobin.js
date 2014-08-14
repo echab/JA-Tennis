@@ -1,4 +1,4 @@
-var jat;
+﻿var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL_POULE = 22, MAX_JOUEUR = 8191, MAX_TABLEAU = 63, QEMPTY = -1;
@@ -48,7 +48,7 @@ var jat;
 
             Roundrobin.prototype.getSize = function (draw, dimensions) {
                 if (!draw.nbColumn) {
-                    return { width: 10, height: 10 };
+                    return { width: dimensions.boxWidth, height: dimensions.boxHeight };
                 }
 
                 var n = draw.nbColumn;

@@ -269,6 +269,48 @@ describe('services.mainLib', function () {
                 expect(event1.draws[0]).toBe(draw1);
                 expect(r).toBeUndefined();
             });
+
+            it('should generate a knockout draw with 6 players and 3 outs', function () {
+                tournament1.players.push({ id: 'p7', name: 'Gérard', rank: 'NC', registration: ['e1'] });
+                tournament1.players.push({ id: 'p8', name: 'Henri', rank: 'NC', registration: ['e1'] });
+                math.randomReturns([0.7, 0.1, 0.4, 0.8, 0.6, 0.3, 0.2, 0.5]);
+
+                main.addDraw({ id: 'd0', name: 'draw6', type: 0 /* Normal */, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 3, boxes: undefined, _event: event1 }, 1 /* Create */);
+
+                expect(event1.draws.length).toBe(1);
+
+                var draw = event1.draws[0];
+                expect(draw.boxes.length).toBe(9);
+
+                var boxIn = find.by(draw.boxes, 'position', 14);
+                expect(boxIn._player.name).toBe('Gérard');
+
+                boxIn = find.by(draw.boxes, 'position', 13);
+                expect(boxIn._player.name).toBe('Henri');
+
+                boxIn = find.by(draw.boxes, 'position', 12);
+                expect(boxIn._player.name).toBe('Daniel');
+
+                boxIn = find.by(draw.boxes, 'position', 11);
+                expect(boxIn._player.name).toBe('Claude');
+
+                boxIn = find.by(draw.boxes, 'position', 10);
+                expect(boxIn._player.name).toBe('Bernard');
+
+                boxIn = find.by(draw.boxes, 'position', 9);
+                expect(boxIn._player.name).toBe('Albert');
+
+                var boxOut = find.by(draw.boxes, 'position', 6);
+                expect(boxOut.qualifOut).toBe(1);
+
+                boxOut = find.by(draw.boxes, 'position', 5);
+                expect(boxOut.qualifOut).toBe(2);
+
+                boxOut = find.by(draw.boxes, 'position', 4);
+                expect(boxOut.qualifOut).toBe(3);
+
+                tournament1.players.splice(6, 2); //remove two additional players
+            });
         });
 
         describe('Draw generation mix', function () {

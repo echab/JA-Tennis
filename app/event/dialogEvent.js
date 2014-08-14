@@ -8,7 +8,6 @@ var jat;
                 this.title = title;
                 this.event = event;
                 this.tournamentLib = tournamentLib;
-                //console.log("Event controller: cntr");
                 this.ranks = rank.list();
                 this.categories = category.list();
 

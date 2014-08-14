@@ -6,6 +6,25 @@ module jat.service {
         QEMPTY = - 1,
         WITH_TDS_HAUTBAS = true;
 
+    /**
+
+    ---14---
+            >-- 6---.
+    ---13---	    |
+                    >-- 2---.
+    ---12---    	|   	|
+            >-- 5---'	    |
+    ---11---		        |
+                            >-- 0---
+    ---10---		        |
+            >-- 4---.	    |
+    --- 9---	    |   	|
+                    >-- 1---'
+    --- 8---	    |
+            >-- 3---'
+    --- 7---
+    */
+
     export class Knockout implements IDrawLib {
 
         constructor(
@@ -63,12 +82,12 @@ module jat.service {
 
         public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[] {
             if (generate === models.GenerateType.Create) {   //from registred players
-                var m_nMatchCol = filledArray(MAX_COL, 0);
+                var m_nMatchCol = tool.filledArray(MAX_COL, 0);
 
                 var players = this.tournamentLib.GetJoueursInscrit(draw);
 
                 //Récupère les qualifiés sortants du tableau précédent
-                var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(draw);
+                var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = this.drawLib.previousGroup(draw);
                 if (prev) {
                     players = players.concat(<any>this.drawLib.FindAllQualifieSortant(prev, true));
                 }
@@ -499,12 +518,12 @@ module jat.service {
         public getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize {
 
             if (!draw || !draw.nbColumn || !draw.nbOut) {
-                return { width: 10, height: 10 };
+                return { width: dimensions.boxWidth, height: dimensions.boxHeight };
             }
 
             return {
                 width: draw.nbColumn * (dimensions.boxWidth + dimensions.interBoxWidth) - dimensions.interBoxWidth,
-                height: countInCol(columnMax(draw.nbColumn, draw.nbOut))
+                height: countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut)
                 * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
             };
         }
@@ -758,14 +777,6 @@ module jat.service {
         }
     }
 
-    function filledArray(size: number, value: number): number[] {
-        var a = new Array(size);
-        for (var i = size - 1; i >= 0; i--) {
-            a[i] = 0;
-        }
-        return a;
-    }
-
     function ASSERT(b: boolean, message?: string): void {
         if (!b) {
             debugger;
@@ -902,11 +913,11 @@ module jat.service {
 
     //Partie du tableau de i par rapport au qualifié sortant
     //retour: 0 à nQualifie-1, en partant du bas
-    function iPartieQ(i: number, nQualifie: number): number {
+    export function iPartieQ(i: number, nQualifie: number): number {
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         var c = column(i);
-        return (i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie));
+        return Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
         // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
         //TODOjs? pb division entière
     }
@@ -977,7 +988,7 @@ module jat.service {
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         var c: number = column(i);
         //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );  
-        return (nQualifie - 1) - ((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
+        return (nQualifie - 1) - Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
         // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
         //TODOjs? pb division entière
     }

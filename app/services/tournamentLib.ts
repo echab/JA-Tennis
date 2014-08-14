@@ -36,6 +36,7 @@ module jat.service {
                 }
             }
 
+            tournament.info = tournament.info || { name: '' };
             tournament.info.slotLength = tournament.info.slotLength || 90 * MINUTES;
             if (tournament.info.start && tournament.info.end) {
                 tournament._dayCount = Math.floor((tournament.info.end.getTime() - tournament.info.start.getTime()) / DAYS + 1);
@@ -77,9 +78,16 @@ module jat.service {
 
         public initEvent(event: models.Event, parent: models.Tournament): void {
             event._tournament = parent;
-            if (event.draws) {
-                for (var i = event.draws.length - 1; i >= 0; i--) {
-                    this.drawLib.initDraw(event.draws[i], event);
+
+            var c = event.draws;
+            if (c) {
+                for (var i = c.length - 1; i >= 0; i--) {
+                    var draw = c[i];
+                    this.drawLib.initDraw(draw, event);
+
+                    //init draws linked list
+                    draw._previous = c[i - 1];
+                    draw._next = c[i + 1];
                 }
             }
         }
@@ -127,7 +135,7 @@ module jat.service {
 
                     //r0: premier joueur de l'intervalle
                     //r1: premier joueur de l'intervalle suivant
-                    shuffle(players, r0, r1);
+                    tool.shuffle(players, r0, r1);
 
                     r0 = r1;
                 }
@@ -162,22 +170,6 @@ module jat.service {
 		        event.sexe === sexe	//sexe épreuve = sexe joueur
             || (event.sexe === 'M' && !event.typeDouble);	//ou simple mixte
         }
-    }
-
-    function shuffle<T>(array: T[], from?: number, toExlusive?: number): T[] {
-        from = from || 0;
-        if (arguments.length < 3) {
-            toExlusive = array.length;
-        }
-
-        var n = toExlusive - from;
-        for (var i = toExlusive - 1; i > from; i--) {
-            var t = from + Math.floor(n * Math.random());
-            var tmp = array[t];
-            array[t] = array[i];
-            array[i] = tmp;
-        }
-        return array;
     }
 
     angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])

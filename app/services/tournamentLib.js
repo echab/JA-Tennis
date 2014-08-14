@@ -33,6 +33,7 @@ var jat;
                     }
                 }
 
+                tournament.info = tournament.info || { name: '' };
                 tournament.info.slotLength = tournament.info.slotLength || 90 * MINUTES;
                 if (tournament.info.start && tournament.info.end) {
                     tournament._dayCount = Math.floor((tournament.info.end.getTime() - tournament.info.start.getTime()) / DAYS + 1);
@@ -72,9 +73,16 @@ var jat;
 
             TournamentLib.prototype.initEvent = function (event, parent) {
                 event._tournament = parent;
-                if (event.draws) {
-                    for (var i = event.draws.length - 1; i >= 0; i--) {
-                        this.drawLib.initDraw(event.draws[i], event);
+
+                var c = event.draws;
+                if (c) {
+                    for (var i = c.length - 1; i >= 0; i--) {
+                        var draw = c[i];
+                        this.drawLib.initDraw(draw, event);
+
+                        //init draws linked list
+                        draw._previous = c[i - 1];
+                        draw._next = c[i + 1];
                     }
                 }
             };
@@ -119,7 +127,7 @@ var jat;
                         //nouvelle plage de classement
                         //r0: premier joueur de l'intervalle
                         //r1: premier joueur de l'intervalle suivant
-                        shuffle(players, r0, r1);
+                        tool.shuffle(players, r0, r1);
 
                         r0 = r1;
                     }
@@ -152,22 +160,6 @@ var jat;
             return TournamentLib;
         })();
         service.TournamentLib = TournamentLib;
-
-        function shuffle(array, from, toExlusive) {
-            from = from || 0;
-            if (arguments.length < 3) {
-                toExlusive = array.length;
-            }
-
-            var n = toExlusive - from;
-            for (var i = toExlusive - 1; i > from; i--) {
-                var t = from + Math.floor(n * Math.random());
-                var tmp = array[t];
-                array[t] = array[i];
-                array[i] = tmp;
-            }
-            return array;
-        }
 
         angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid']).factory('tournamentLib', function (drawLib, rank, guid) {
             return new TournamentLib(drawLib, rank, guid);

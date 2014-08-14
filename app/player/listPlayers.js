@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var jat;
 (function (jat) {
     (function (player) {

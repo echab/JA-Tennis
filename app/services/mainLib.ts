@@ -169,6 +169,12 @@
             }
         }
 
+        updateQualif(draw: models.Draw): void {
+            this.undo.newGroup('Update qualified', undefined, draw);
+            this.drawLib.updateQualif(draw);
+            this.undo.endGroup();
+        }
+
         removeDraw(draw: models.Draw): void {
             var c = draw._event.draws;
             var i = this.find.indexOf(c, "id", draw.id, "Draw to remove not found");

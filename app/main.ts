@@ -18,8 +18,8 @@ module jat.main {
 
             this.selection.tournament = this.tournamentLib.newTournament();
 
-            this.mainLib.loadTournament('/data/tournament6.json').then((data) => {
-                this.mainLib.select( data.events[0].draws[0], models.ModelType.Draw);
+            this.mainLib.loadTournament('/data/tournament8.json').then((data) => {
+                this.mainLib.select(data.events[0].draws[data.events[0].draws.length - 1], models.ModelType.Draw);
             });
         }
 
@@ -172,6 +172,10 @@ module jat.main {
 
         generateDraw(draw: models.Draw, generate?: models.GenerateType): void {
             this.mainLib.updateDraw(draw, undefined, generate || models.GenerateType.Create);
+        }
+
+        updateQualif(draw: models.Draw): void {
+            this.mainLib.updateQualif(draw);
         }
 
         removeDraw(draw: models.Draw): void {

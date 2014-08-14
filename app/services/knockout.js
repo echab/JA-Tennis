@@ -3,6 +3,24 @@
     (function (service) {
         var MIN_COL = 0, MAX_COL = 9, MAX_QUALIF = 32, QEMPTY = -1, WITH_TDS_HAUTBAS = true;
 
+        /**
+        
+        ---14---
+        >-- 6---.
+        ---13---	    |
+        >-- 2---.
+        ---12---    	|   	|
+        >-- 5---'	    |
+        ---11---		        |
+        >-- 0---
+        ---10---		        |
+        >-- 4---.	    |
+        --- 9---	    |   	|
+        >-- 1---'
+        --- 8---	    |
+        >-- 3---'
+        --- 7---
+        */
         var Knockout = (function () {
             function Knockout(drawLib, tournamentLib, rank, find) {
                 this.drawLib = drawLib;
@@ -53,12 +71,12 @@
 
             Knockout.prototype.generateDraw = function (draw, generate, afterIndex) {
                 if (generate === 1 /* Create */) {
-                    var m_nMatchCol = filledArray(MAX_COL, 0);
+                    var m_nMatchCol = tool.filledArray(MAX_COL, 0);
 
                     var players = this.tournamentLib.GetJoueursInscrit(draw);
 
                     //Récupère les qualifiés sortants du tableau précédent
-                    var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined;
+                    var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous;
                     if (prev) {
                         players = players.concat(this.drawLib.FindAllQualifieSortant(prev, true));
                     }
@@ -463,12 +481,12 @@
 
             Knockout.prototype.getSize = function (draw, dimensions) {
                 if (!draw || !draw.nbColumn || !draw.nbOut) {
-                    return { width: 10, height: 10 };
+                    return { width: dimensions.boxWidth, height: dimensions.boxHeight };
                 }
 
                 return {
                     width: draw.nbColumn * (dimensions.boxWidth + dimensions.interBoxWidth) - dimensions.interBoxWidth,
-                    height: countInCol(columnMax(draw.nbColumn, draw.nbOut)) * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
+                    height: countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut) * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
                 };
             };
 
@@ -697,14 +715,6 @@
         })();
         service.Knockout = Knockout;
 
-        function filledArray(size, value) {
-            var a = new Array(size);
-            for (var i = size - 1; i >= 0; i--) {
-                a[i] = 0;
-            }
-            return a;
-        }
-
         function ASSERT(b, message) {
             if (!b) {
                 debugger;
@@ -826,10 +836,11 @@
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-            return (i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie));
+            return Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
             // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
             //TODOjs? pb division entière
         }
+        service.iPartieQ = iPartieQ;
 
         //Numére de boite de la partie de tableau, ramenée à un seul qualifié
         function iDecaleGaucheQ(i, nQualifie) {
@@ -885,7 +896,7 @@
             var c = column(i);
 
             //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );
-            return (nQualifie - 1) - ((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
+            return (nQualifie - 1) - Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
             // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
             //TODOjs? pb division entière
         }

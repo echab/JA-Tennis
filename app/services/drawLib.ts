@@ -56,8 +56,16 @@ module jat.service {
             draw.type = draw.type || models.DrawType.Normal;
             draw.nbColumn = draw.nbColumn || 3;
             draw.nbOut = draw.nbOut || 1;
-            draw._previous = after;
-            draw.minRank = after && after.maxRank ? this.rank.next(after.maxRank) : 'NC';
+            if (after) {
+                draw._previous = after; 
+                //TODO? after._next = draw;
+            }
+            if (!draw.minRank) {
+                draw.minRank = after && after.maxRank ? this.rank.next(after.maxRank) : 'NC';
+            }
+            if (draw.maxRank && this.rank.compare(draw.minRank, draw.maxRank) > 0) {
+                draw.maxRank = draw.minRank;
+            }
 
             draw._event = parent;
             return draw;
@@ -69,21 +77,6 @@ module jat.service {
             draw.type = draw.type || 0;
             draw.nbColumn = draw.nbColumn || 0;
             draw.nbOut = draw.nbOut || 0;
-
-            //init group linked list
-            var i = this.find.indexOf(parent.draws, 'id', draw.id);
-            if (i > 0) {
-                var d = parent.draws[i - 1];
-                draw._previous = d;
-                d._next = draw;
-            } else {
-                draw._previous = null;
-            }
-            if (i < parent.draws.length - 1) {
-                var d = parent.draws[i + 1];
-                draw._next = d;
-                d._previous = draw;
-            }
 
             //init boxes
             if (!draw.boxes) {
@@ -157,6 +150,30 @@ module jat.service {
 
         public generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[] {
             return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
+        }
+
+        public updateQualif(draw: models.Draw): void {
+
+            //retreive qualifIn box
+            var qualifs: models.PlayerIn[] = [];
+            for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                var boxIn = <models.PlayerIn>draw.boxes[i];
+                if (boxIn.qualifIn) {
+                    qualifs.push(boxIn);
+                }
+            }
+
+            tool.shuffle(qualifs);
+
+            //remove old qualif numbers
+            for (i = qualifs.length - 1; i >= 0; i--) {
+                this.SetQualifieEntrant(qualifs[i], 0);
+            }
+
+            //assign new qualif number
+            for (i = qualifs.length - 1; i >= 0; i--) {
+                this.SetQualifieEntrant(qualifs[i], i + 1);
+            }
         }
 
         public getPlayer(box: models.Box): models.Player {
@@ -693,9 +710,8 @@ module jat.service {
 
                 //if( isCreneau( box))
                 //v0998
-                var m = box._draw.boxes.length;
-                if (ADVERSAIRE1(box) < m
-                    && ADVERSAIRE2(box) < m
+                var opponents = this.boxesOpponents(match);
+                if (opponents.box1 && opponents.box2
                     && (boiteMatch.place || boiteMatch.date)
                     ) {
                     if (!this.MetCreneau(match, boiteMatch)) {
@@ -767,7 +783,7 @@ module jat.service {
     function ADVERSAIRE2(box: models.Box): number {
         if (isTypePoule(box._draw)) {
             var n = box._draw.nbColumn;
-            return box.position / n + n * n;
+            return Math.floor(box.position / n) + n * n;
         } else {
             return (box.position << 1) + 1;
         }

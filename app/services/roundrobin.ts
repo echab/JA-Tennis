@@ -58,7 +58,7 @@ module jat.service {
         public getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize {
 
             if (!draw.nbColumn) {
-                return { width: 10, height: 10 };
+                return { width: dimensions.boxWidth, height: dimensions.boxHeight };
             }
 
             var n = draw.nbColumn;

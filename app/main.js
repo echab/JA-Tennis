@@ -15,8 +15,8 @@ var jat;
                 this.GenerateType = models.GenerateType;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
-                this.mainLib.loadTournament('/data/tournament6.json').then(function (data) {
-                    _this.mainLib.select(data.events[0].draws[0], 4 /* Draw */);
+                this.mainLib.loadTournament('/data/tournament8.json').then(function (data) {
+                    _this.mainLib.select(data.events[0].draws[data.events[0].draws.length - 1], 4 /* Draw */);
                 });
             }
             //#region tournament
@@ -196,6 +196,10 @@ var jat;
 
             mainCtrl.prototype.generateDraw = function (draw, generate) {
                 this.mainLib.updateDraw(draw, undefined, generate || 1 /* Create */);
+            };
+
+            mainCtrl.prototype.updateQualif = function (draw) {
+                this.mainLib.updateQualif(draw);
             };
 
             mainCtrl.prototype.removeDraw = function (draw) {
