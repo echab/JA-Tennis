@@ -202,15 +202,17 @@
             },
             {
               "position": 11,
-              "qualifIn": -1
+              "qualifIn": 1,
+              "playerId": "j0"
             },
             {
               "position": 10,
-              "qualifIn": -1
+              "qualifIn": 3
             },
             {
               "position": 8,
-              "qualifIn": -1
+              "qualifIn": 2,
+              "playerId": "p295"
             }
           ]
         }

@@ -59,7 +59,7 @@ module jat.main {
 
         editPlayer(player: models.Player): void {
 
-            var editedPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);    // angular.copy(player)
+            var editedPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);
 
             this.$modal.open({
                 templateUrl: 'player/dialogPlayer.html',
@@ -103,7 +103,7 @@ module jat.main {
 
         editEvent(event: models.Event): void {
 
-            var editedEvent = this.tournamentLib.newEvent(this.selection.tournament, event);    // angular.copy(event)
+            var editedEvent = this.tournamentLib.newEvent(this.selection.tournament, event);
 
             this.$modal.open({
                 templateUrl: 'event/dialogEvent.html',
@@ -150,7 +150,7 @@ module jat.main {
 
         editDraw(draw: models.Draw): void {
 
-            var editedDraw = this.drawLib.newDraw(draw._event, draw);    // angular.copy(draw)
+            var editedDraw = this.drawLib.newDraw(draw._event, draw);
 
             this.$modal.open({
                 templateUrl: 'draw/dialogDraw.html',
@@ -204,12 +204,11 @@ module jat.main {
         //#endregion match
 
         public doUndo() {
-            this.mainLib.doUndo();
+            this.mainLib.select(this.undo.undo(), this.undo.getMeta());
         }
         public doRedo() {
-            this.mainLib.doRedo();
+            this.mainLib.select(this.undo.redo(), this.undo.getMeta());
         }
-
     }
 
     angular.module('jat.main', [

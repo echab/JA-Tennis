@@ -41,7 +41,7 @@
 
         saveTournament(tournament: models.Tournament, url: string): void {
             var data = {};
-            models.copy(tournament, data);
+            tool.copy(tournament, data);
             if (!url) {
                 this.$log.info(angular.toJson(data, true));
                 return;
@@ -186,25 +186,25 @@
         //#endregion draw
 
         //#region match
-        editMatch(editedMatch: models.Box, match: models.Box): void {
+        editMatch(editedMatch: models.Match, match: models.Match): void {
+            this.drawLib.initBox(editedMatch, editedMatch._draw);
             var c = match._draw.boxes;
             var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
             this.undo.newGroup("Edit match");
             this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, models.ModelType.Match); //c[i] = editedMatch;
-            //if (!match.playerId && editedMatch.playerId) {
-            //    var nextMatch = drawLib.positionMatch(match.position);
-            //    //TODO
-            //}
+            if (editedMatch.qualifOut) {
+                var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
+                if (nextGroup) {
+                    var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
+                    if (boxIn) {
+                        //TODO undo
+                        this.drawLib.SetQualifieEntrant(boxIn, editedMatch.qualifOut, editedMatch._player);
+                    }
+                }
+            }
             this.undo.endGroup();
         }
         //#endregion match
-
-        public doUndo() {
-            this.select(this.undo.undo(), this.undo.getMeta());
-        }
-        public doRedo() {
-            this.select(this.undo.redo(), this.undo.getMeta());
-        }
 
         public select(r: any, type?: models.ModelType): void {
 

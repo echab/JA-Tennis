@@ -37,9 +37,9 @@
             <button ng-click="main.addPlayer()" class="btn"><i class="icon-plus"></i> Add player</button>
         </div>
 
-        <div list-players="main.selection.tournament.players"></div>
+        <div list-players="main.selection.tournament.players" class="inline"></div>
 
-        <div list-events="main.selection.tournament.events"></div>
+        <div list-events="main.selection.tournament.events" class="inline"></div>
 
         <form ng-init="expandDraw=true" class="form-horizontal">
             <i ng-class="{'icon-plus-sign':!expandDraw, 'icon-minus-sign':expandDraw}" ng-click="expandDraw=!expandDraw"></i>

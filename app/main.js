@@ -232,10 +232,10 @@ var jat;
 
             //#endregion match
             mainCtrl.prototype.doUndo = function () {
-                this.mainLib.doUndo();
+                this.mainLib.select(this.undo.undo(), this.undo.getMeta());
             };
             mainCtrl.prototype.doRedo = function () {
-                this.mainLib.doRedo();
+                this.mainLib.select(this.undo.redo(), this.undo.getMeta());
             };
             return mainCtrl;
         })();

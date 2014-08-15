@@ -38,7 +38,7 @@
 
             MainLib.prototype.saveTournament = function (tournament, url) {
                 var data = {};
-                models.copy(tournament, data);
+                tool.copy(tournament, data);
                 if (!url) {
                     this.$log.info(angular.toJson(data, true));
                     return;
@@ -180,26 +180,25 @@
             //#endregion draw
             //#region match
             MainLib.prototype.editMatch = function (editedMatch, match) {
+                this.drawLib.initBox(editedMatch, editedMatch._draw);
                 var c = match._draw.boxes;
                 var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
                 this.undo.newGroup("Edit match");
                 this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, 5 /* Match */); //c[i] = editedMatch;
-
-                //if (!match.playerId && editedMatch.playerId) {
-                //    var nextMatch = drawLib.positionMatch(match.position);
-                //    //TODO
-                //}
+                if (editedMatch.qualifOut) {
+                    var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
+                    if (nextGroup) {
+                        var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
+                        if (boxIn) {
+                            //TODO undo
+                            this.drawLib.SetQualifieEntrant(boxIn, editedMatch.qualifOut, editedMatch._player);
+                        }
+                    }
+                }
                 this.undo.endGroup();
             };
 
             //#endregion match
-            MainLib.prototype.doUndo = function () {
-                this.select(this.undo.undo(), this.undo.getMeta());
-            };
-            MainLib.prototype.doRedo = function () {
-                this.select(this.undo.redo(), this.undo.getMeta());
-            };
-
             MainLib.prototype.select = function (r, type) {
                 var sel = this.selection;
                 if (r) {
