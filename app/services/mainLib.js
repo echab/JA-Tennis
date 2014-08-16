@@ -186,12 +186,13 @@
                 this.undo.newGroup("Edit match");
                 this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, 5 /* Match */); //c[i] = editedMatch;
                 if (editedMatch.qualifOut) {
+                    //report qualified player to next draw
                     var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
                     if (nextGroup) {
                         var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
                         if (boxIn) {
-                            //TODO undo
-                            this.drawLib.SetQualifieEntrant(boxIn, editedMatch.qualifOut, editedMatch._player);
+                            this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player'); //boxIn.playerId = editedMatch.playerId;
+                            this.undo.update(boxIn, '_player', editedMatch._player, 'Set player'); //boxIn._player = editedMatch._player;
                         }
                     }
                 }

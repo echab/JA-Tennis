@@ -214,19 +214,6 @@ module jat.service {
                     break;
                 }
             }
-            //var c = draw._event.draws;
-            //if (c && c.length) {
-            //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
-            //    for (var iBegin = t; c[iBegin].suite && iBegin >= 0; iBegin--) {
-            //    }
-            //    for (var iEnd = t; c[iEnd].suite && iEnd < c.length; iEnd++) {
-            //    }
-            //    for (var i = iBegin; i <= iEnd; i++) {
-            //        draws.push(c[i]);
-            //    }
-            //} else {
-            //    draws.push(draw);
-            //}
             return draws;
         }
 
@@ -234,31 +221,12 @@ module jat.service {
         public previousGroup(draw: models.Draw): models.Draw[] {	//getPrecedent
             var p = this.groupBegin(draw);
             return p && p._previous ? this.group(p._previous) : null;
-            //var c = draw._event.draws;
-            //if (c && c.length) {
-            //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
-            //    for (var iBegin = t; c[iBegin].suite && iBegin >= 0; iBegin--) {
-            //    }
-            //    t = iBegin - 1;
-            //    if (0 <= t) {
-            //        return this.group(c[t]);
-            //    }
-            //}
         }
 
         //** return the draws of the next group. */
         public nextGroup(draw: models.Draw): models.Draw[] {	    //getSuivant
             var p = this.groupEnd(draw);
-            return p ? this.group(p) : null;
-            //var c = draw._event.draws;
-            //if (c && c.length) {
-            //    var t = this.find.indexOf(c, 'id', draw.id, 'Draw ' + draw.id + ' not found');
-            //    for (var iEnd = t; c[iEnd].suite && iEnd < c.length; iEnd++) {
-            //    }
-            //    if (t < c.length) {
-            //        return this.group(c[t]);
-            //    }
-            //}
+            return p && p._next ? this.group(p._next) : null;
         }
 
         //public setType(BYTE iType) {
@@ -532,8 +500,7 @@ module jat.service {
                 }
             }
 
-            box.playerId = undefined;
-            this.initBox(box, box._draw);
+            box.playerId = box._player = undefined;
             if (isMatch(box)) {
                 match.score = '';
             }

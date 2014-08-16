@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var models;
 (function (models) {
     (function (DrawType) {

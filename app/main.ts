@@ -186,7 +186,7 @@ module jat.main {
         //#region match
         editMatch(match: models.Match): void {
 
-            var editedMatch = this.drawLib.newBox(match._draw, match);    // angular.copy(match)
+            var editedMatch = <models.Match> this.drawLib.newBox(match._draw, match);
 
             this.$modal.open({
                 templateUrl: 'draw/dialogMatch.html',
