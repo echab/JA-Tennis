@@ -4,11 +4,22 @@
     //validateDay(): boolean;   //VerifieJour
 }
 
+interface IError {
+    message: string;
+    player?: models.Player;
+    event?: models.Event;
+    draw?: models.Draw;
+    box?: models.Box;
+    detail?: string;
+}
+
 module jat.service {
 
     export class Validation implements IValidation {
 
         _validLibs: IValidation[] = [];
+
+        _errors: IError[] = [];
 
         addValidator(validator: IValidation): void {
             this._validLibs.push(validator);
@@ -30,10 +41,10 @@ module jat.service {
             return res;
         }
 
-        error(message: string, player:models.Player): void;
+        error(message: string, player: models.Player): void;
         error(message: string, draw: models.Draw, box?: models.Box, detail?: string): void;
-        error(message: string, player_draw: any, box?: models.Box, detail?:string): void {
-            var a: string[];
+        error(message: string, player_draw: any, box?: models.Box, detail?: string): void {
+            var a: string[] = [];
             a.push('Validation error on', player_draw.name);
             if (box && box._player) {
                 a.push('for', box._player.name);
@@ -43,6 +54,16 @@ module jat.service {
             }
             a.push(':', message);
             console.warn(a.join(' '));
+
+            if ('boxes' in player_draw) {
+                this._errors.push({ message: message, player: box ? box._player : undefined, draw: box._draw, box: box, detail: detail });
+            } else {
+                this._errors.push({ message: message, player: player_draw });
+            }
+        }
+
+        reset(): void {
+            this._errors.splice(0, this._errors.length);
         }
     }
 

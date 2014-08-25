@@ -108,7 +108,7 @@
                 // - Eventuellement à égalité de classement
                 // - Ensuite à un classement supérieur au sien
                 // - Ecart maximal souhaité DEUX échelons
-                if (draw.minRank && draw.maxRank && draw.maxRank < draw.minRank) {
+                if (draw.minRank && draw.maxRank && this.rank.compare(draw.maxRank, draw.minRank) < 0) {
                     this.validation.error('IDS_ERR_TAB_CLAST_INV', draw);
                     bRes = false;
                 }
@@ -359,64 +359,69 @@
                         //DONE 01/08/19 (00/05/28): CTableau, interdit de faire entrer un joueur plus loin qu'un joueur de classement supérieur au sien
                     }
 
-                    var e = boxIn.qualifIn;
-                    if (e && e != QEMPTY) {
-                        nqe++;
+                    if (boxIn) {
+                        var e = boxIn.qualifIn;
+                        if (e && e != QEMPTY) {
+                            nqe++;
 
-                        ASSERT(!isTypePoule || (b >= positionBottomCol(draw.nbColumn, draw.nbOut))); //Qe que dans colonne de gauche
+                            ASSERT(!isTypePoule || (b >= positionBottomCol(draw.nbColumn, draw.nbOut))); //Qe que dans colonne de gauche
 
-                        var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
-                        if (iTableau == 0) {
-                            this.validation.error('IDS_ERR_TAB_ENTRANT_TAB1', draw, box);
-                            bRes = false;
-                        }
-
-                        //ASSERT( iTableau != 0);
-                        //DONE 00/03/07: CTableau, qualifié entrant en double
-                        var j;
-                        if (!draw.suite && (j = this.drawLib.FindQualifieEntrant(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
-                            this.validation.error('IDS_ERR_TAB_ENTRANT_DUP', draw, box);
-                            bRes = false;
-                        }
-
-                        var group = this.drawLib.previousGroup(draw);
-                        if (group) {
-                            //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                            j = this.drawLib.FindQualifieSortant(group, e);
-                            if (!j) {
-                                this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, box);
+                            var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
+                            if (iTableau == 0) {
+                                this.validation.error('IDS_ERR_TAB_ENTRANT_TAB1', draw, box);
                                 bRes = false;
-                            } else if (j.playerId != box.playerId) {
-                                this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, box);
+                            }
+
+                            //ASSERT( iTableau != 0);
+                            //DONE 00/03/07: CTableau, qualifié entrant en double
+                            var j;
+                            if (!draw.suite && (j = this.drawLib.FindQualifieEntrant(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
+                                this.validation.error('IDS_ERR_TAB_ENTRANT_DUP', draw, box);
                                 bRes = false;
+                            }
+
+                            var group = this.drawLib.previousGroup(draw);
+                            if (group) {
+                                //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
+                                j = this.drawLib.FindQualifieSortant(group, e);
+                                if (!j) {
+                                    this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, box);
+                                    bRes = false;
+                                } else if (j.playerId != box.playerId) {
+                                    this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, box);
+                                    bRes = false;
+                                }
                             }
                         }
                     }
 
-                    if (e = match.qualifOut) {
-                        nqs++;
+                    if (match) {
+                        var e = match.qualifOut;
+                        if (e) {
+                            nqs++;
 
-                        //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
-                        //DONE 00/03/07: CTableau, qualifié sortant en double
-                        j = this.drawLib.FindQualifieSortant(draw, e);
-                        if (j && (j.position != b || j._draw.id != draw.id)) {
-                            this.validation.error('IDS_ERR_TAB_SORTANT_DUP', draw, box);
-                            bRes = false;
-                        }
+                            //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
+                            //DONE 00/03/07: CTableau, qualifié sortant en double
+                            j = this.drawLib.FindQualifieSortant(draw, e);
+                            if (j && (j.position != b || j._draw.id != draw.id)) {
+                                this.validation.error('IDS_ERR_TAB_SORTANT_DUP', draw, box);
+                                bRes = false;
+                            }
 
-                        if (draw.type === 1 /* Final */) {
-                            this.validation.error('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
-                            bRes = false;
+                            if (draw.type === 1 /* Final */) {
+                                this.validation.error('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
+                                bRes = false;
+                            }
+                            /*
+                            pSuite = getSuivant();
+                            if( pSuite && (j = pSuite.FindQualifieEntrant( e, &pSuite)) != -1) {
+                            if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
+                            this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
+                            bRes=false;
+                            }
+                            }
+                            */
                         }
-                        /*
-                        pSuite = getSuivant();
-                        if( pSuite && (j = pSuite.FindQualifieEntrant( e, &pSuite)) != -1) {
-                        if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
-                        this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
-                        bRes=false;
-                        }
-                        }
-                        */
                     }
                 }
 
@@ -436,7 +441,7 @@
                                 bRes = false;
                             }
 
-                            for (var i = 0; i <= draw.boxes.length; i++) {
+                            for (var i = 0; i < draw.boxes.length; i++) {
                                 var boxIn2 = draw.boxes[i];
                                 if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
                                     this.validation.error('IDS_ERR_TAB_TETESERIE_DUP', boxIn._draw, boxIn, 'Seeded ' + e);

@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (service) {
@@ -154,8 +154,7 @@ var jat;
             };
 
             TournamentLib.prototype.isSexeCompatible = function (event, sexe) {
-                return;
-                event.sexe === sexe || (event.sexe === 'M' && !event.typeDouble); //ou simple mixte
+                return event.sexe === sexe || (event.sexe === 'M' && !event.typeDouble);
             };
             return TournamentLib;
         })();

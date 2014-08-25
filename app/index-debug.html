@@ -51,6 +51,7 @@
             </label>
             <label>
                 Draw: <i class="icon2-info" ng-click="main.editDraw(main.selection.draw)" ng-disabled="!main.selection.draw"></i>
+                <i class="icon2-locker" ng-click="main.lockDraw(main.selection.draw, !main.selection.draw.locked)" ng-disabled="!main.selection.draw" title="Lock/unlock the draw modifications"></i>
                 <select ng-model="main.selection.draw" ng-change="main.select(main.selection.draw)" ng-options="draw.name for draw in main.selection.event.draws"></select>
                 <i class="icon-trash" ng-click="main.removeDraw(main.selection.draw)" ng-disabled="!main.selection.draw"></i>
                 <div class="btn-group">
@@ -65,10 +66,20 @@
                 <div class="btn-group">
                     <button type="button" ng-click="main.updateQualif(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
                 </div>
+                <div class="btn-group">
+                    <button type="button" ng-click="main.validateDraw(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Check the draw"><i class="icon2-checkmark"></i> Check</button>
+                </div>
             </label>
         </form>
 
-        <div draw="main.selection.draw" ng-show="expandDraw"></div>
+        <div draw="main.selection.draw" ng-show="expandDraw" class="inline"></div>
+
+        <div class="inline">
+            Validation errors:
+            <ul>
+                <li ng-repeat="error in main.validation._errors">{{error.message}}</li>
+            </ul>
+        </div>
 
         <hr />
 
@@ -97,12 +108,18 @@
     <script src="services/find.js"></script>
     <script src="services/guid.js"></script>
     <script src="services/selection.js"></script>
-    <script src="services/fft.js"></script>
     <script src="services/mainLib.js"></script>
     <script src="services/tournamentLib.js"></script>
     <script src="services/drawLib.js"></script>
     <script src="services/knockout.js"></script>
     <script src="services/roundrobin.js"></script>
+
+    <script src="services/validation.js"></script>
+    <script src="services/knockoutValidation.js"></script>
+    <script src="services/roundrobinValidation.js"></script>
+
+    <script src="services/fft.js"></script>
+    <script src="services/fftValidation.js"></script>
 
     <script src="models/model.js"></script>
 

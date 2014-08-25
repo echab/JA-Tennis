@@ -9,6 +9,7 @@
             private selection: jat.service.Selection,
             private tournamentLib: jat.service.TournamentLib,
             private drawLib: jat.service.DrawLib,
+            private validation: jat.service.Validation,
             //private rank: ServiceRank,
             private undo: jat.service.Undo,
             private find: jat.service.Find,
@@ -183,6 +184,11 @@
                 this.select(c[i] || c[i - 1], models.ModelType.Draw);   //select next or previous
             }
         }
+
+        validateDraw(draw: models.Draw): void {
+            this.validation.reset();
+            this.validation.validateDraw(draw);
+        }
         //#endregion draw
 
         //#region match
@@ -269,7 +275,8 @@
         'jat.services.tournamentLib',
         'jat.services.drawLib',
         'jat.services.knockout',
-        'jat.services.roundrobin'
+        'jat.services.roundrobin',
+        'jat.services.validation'
     ])
         .factory('mainLib', (
             $log: ng.ILogService, $http: ng.IHttpService, $q: ng.IQService,
@@ -278,10 +285,14 @@
             drawLib: jat.service.DrawLib,
             knockout: jat.service.Knockout,
             roundrobin: jat.service.Roundrobin,
+            validation: jat.service.Validation,
+            knockoutValidation: jat.service.KnockoutValidation,
+            roundrobinValidation: jat.service.RoundrobinValidation,
+            fftValidation: jat.service.FFTValidation,
             //rank: ServiceRank,
             undo: jat.service.Undo,
             find: jat.service.Find,
             guid: jat.service.Guid) => {
-            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, undo, find, guid);
+            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
         });
 }

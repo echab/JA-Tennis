@@ -4,6 +4,7 @@
         var Validation = (function () {
             function Validation() {
                 this._validLibs = [];
+                this._errors = [];
             }
             Validation.prototype.addValidator = function (validator) {
                 this._validLibs.push(validator);
@@ -26,7 +27,7 @@
             };
 
             Validation.prototype.error = function (message, player_draw, box, detail) {
-                var a;
+                var a = [];
                 a.push('Validation error on', player_draw.name);
                 if (box && box._player) {
                     a.push('for', box._player.name);
@@ -36,6 +37,16 @@
                 }
                 a.push(':', message);
                 console.warn(a.join(' '));
+
+                if ('boxes' in player_draw) {
+                    this._errors.push({ message: message, player: box ? box._player : undefined, draw: box._draw, box: box, detail: detail });
+                } else {
+                    this._errors.push({ message: message, player: player_draw });
+                }
+            };
+
+            Validation.prototype.reset = function () {
+                this._errors.splice(0, this._errors.length);
             };
             return Validation;
         })();

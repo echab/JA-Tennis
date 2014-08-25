@@ -2,7 +2,7 @@
 (function (jat) {
     (function (service) {
         var MainLib = (function () {
-            function MainLib($log, $http, $q, selection, tournamentLib, drawLib, //private rank: ServiceRank,
+            function MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, //private rank: ServiceRank,
             undo, find, guid) {
                 this.$log = $log;
                 this.$http = $http;
@@ -10,6 +10,7 @@
                 this.selection = selection;
                 this.tournamentLib = tournamentLib;
                 this.drawLib = drawLib;
+                this.validation = validation;
                 this.undo = undo;
                 this.find = find;
                 this.guid = guid;
@@ -177,6 +178,11 @@
                 }
             };
 
+            MainLib.prototype.validateDraw = function (draw) {
+                this.validation.reset();
+                this.validation.validateDraw(draw);
+            };
+
             //#endregion draw
             //#region match
             MainLib.prototype.editMatch = function (editedMatch, match) {
@@ -258,10 +264,11 @@
             'jat.services.tournamentLib',
             'jat.services.drawLib',
             'jat.services.knockout',
-            'jat.services.roundrobin'
-        ]).factory('mainLib', function ($log, $http, $q, selection, tournamentLib, drawLib, knockout, roundrobin, //rank: ServiceRank,
+            'jat.services.roundrobin',
+            'jat.services.validation'
+        ]).factory('mainLib', function ($log, $http, $q, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, //rank: ServiceRank,
         undo, find, guid) {
-            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, undo, find, guid);
+            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
         });
     })(jat.service || (jat.service = {}));
     var service = jat.service;

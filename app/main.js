@@ -1,16 +1,17 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (main) {
         /** Main controller for the application */
         var mainCtrl = (function () {
-            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, undo) {
+            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, validation, undo) {
                 var _this = this;
                 this.$modal = $modal;
                 this.selection = selection;
                 this.mainLib = mainLib;
                 this.tournamentLib = tournamentLib;
                 this.drawLib = drawLib;
+                this.validation = validation;
                 this.undo = undo;
                 this.GenerateType = models.GenerateType;
                 this.selection.tournament = this.tournamentLib.newTournament();
@@ -194,6 +195,15 @@ var jat;
                 });
             };
 
+            mainCtrl.prototype.lockDraw = function (draw, lock) {
+                //TODO
+                draw.locked = lock;
+            };
+
+            mainCtrl.prototype.validateDraw = function (draw) {
+                this.mainLib.validateDraw(draw);
+            };
+
             mainCtrl.prototype.generateDraw = function (draw, generate) {
                 this.mainLib.updateDraw(draw, undefined, generate || 1 /* Create */);
             };
@@ -249,6 +259,10 @@ var jat;
             'jat.services.drawLib',
             'jat.services.knockout',
             'jat.services.roundrobin',
+            'jat.services.validation',
+            'jat.services.validation.knockout',
+            'jat.services.validation.roundrobin',
+            'jat.services.validation.fft',
             'jat.player.dialog',
             'jat.player.list',
             'jat.event.dialog',

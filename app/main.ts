@@ -13,6 +13,7 @@ module jat.main {
             private mainLib: jat.service.MainLib,
             private tournamentLib: jat.service.TournamentLib,
             private drawLib: jat.service.DrawLib,
+            public validation: jat.service.Validation,
             private undo: jat.service.Undo
             ) {
 
@@ -170,6 +171,15 @@ module jat.main {
                 });
         }
 
+        lockDraw(draw: models.Draw, lock: boolean): void {
+            //TODO
+            draw.locked = lock;
+        }
+
+        validateDraw(draw: models.Draw): void {
+            this.mainLib.validateDraw(draw);
+        }
+
         generateDraw(draw: models.Draw, generate?: models.GenerateType): void {
             this.mainLib.updateDraw(draw, undefined, generate || models.GenerateType.Create);
         }
@@ -219,6 +229,12 @@ module jat.main {
         'jat.services.drawLib',
         'jat.services.knockout',
         'jat.services.roundrobin',
+
+        'jat.services.validation',
+        'jat.services.validation.knockout',
+        'jat.services.validation.roundrobin',
+        'jat.services.validation.fft',
+
         'jat.player.dialog',
         'jat.player.list',
         'jat.event.dialog',

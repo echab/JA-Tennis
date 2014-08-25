@@ -30,7 +30,7 @@ var jat;
 
                 var isTypePoule = draw.type >= 2;
 
-                var pColClast;
+                var pColClast = {};
 
                 var nqe = 0;
 
@@ -43,7 +43,7 @@ var jat;
 
                     //VERIFIE //1   //progression des classements
                     //rank progress, no more than two ranks difference into a column
-                    if (!isTypePoule) {
+                    if (player && !isTypePoule) {
                         var c = column(box.position);
 
                         var colRank = pColClast[player.rank];
@@ -92,7 +92,7 @@ var jat;
                     }
 
                     //VERIFIE	//4
-                    if (boxIn.qualifIn) {
+                    if (boxIn && boxIn.qualifIn) {
                         nqe++;
                     }
 

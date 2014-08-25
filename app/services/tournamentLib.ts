@@ -166,8 +166,7 @@ module jat.service {
         }
 
         public isSexeCompatible(event: models.Event, sexe: string): boolean {
-	        return
-		        event.sexe === sexe	//sexe épreuve = sexe joueur
+	        return event.sexe === sexe	//sexe épreuve = sexe joueur
             || (event.sexe === 'M' && !event.typeDouble);	//ou simple mixte
         }
     }
