@@ -11,7 +11,7 @@ var jat;
             return boxCtrl;
         })();
 
-        function drawBoxDirective() {
+        function drawBoxDirective(validation) {
             return {
                 restrict: 'EA',
                 scope: true,
@@ -22,6 +22,7 @@ var jat;
                     scope.$watch(attrs.drawBox, function (box) {
                         ctrlBox.box = box;
                         ctrlBox.isMatch = isMatch(box);
+                        ctrlBox.error = validation.getErrorBox(box);
                     });
 
                     scope.$watch(attrs.pos, function (pos) {

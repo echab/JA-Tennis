@@ -1,5 +1,5 @@
-﻿<div ng-class="{box: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.isPlayed(), hidden: ctrlBox.box.hidden}"
-     ng-style="{left:ctrlBox.pos.x +'px', top:ctrlBox.pos.y +'px'}">
+﻿<div ng-class="{box: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.isPlayed(), hidden: ctrlBox.box.hidden, error: ctrlBox.error}"
+     ng-style="{left:ctrlBox.pos.x +'px', top:ctrlBox.pos.y +'px'}" title="{{ctrlBox.error.message +' '+ ctrlBox.error.detail}}">
     <span ng-if="ctrlBox.box.qualifIn" class="qualifIn">{{ctrlBox.box.qualifIn === -1 ? 'Q?' : 'Q' + ctrlBox.box.qualifIn}}</span>
     <span ng-if="ctrlBox.box.seeded" class="seeded">{{ctrlBox.box.seeded}}</span>
     <i class="icon2-player" ng-if="ctrlBox.box._player" ng-click="main.editPlayer(ctrlBox.box._player)" title="Edit the player"></i>{{ctrlBox.box._player.name}}

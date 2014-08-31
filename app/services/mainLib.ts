@@ -186,8 +186,11 @@
         }
 
         validateDraw(draw: models.Draw): void {
-            this.validation.reset();
+            this.validation.resetDraw(draw);
             this.validation.validateDraw(draw);
+            if (this.selection.draw === draw) {
+                this.drawLib.refresh(draw);  //force angular refresh
+            }
         }
         //#endregion draw
 

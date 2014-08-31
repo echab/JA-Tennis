@@ -30,22 +30,22 @@
             if (draw.suite) {
                 var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
                 if (iTableau === 0 || !draw._previous) {
-                    this.validation.error('IDS_ERR_TAB_SUITE_PREMIER', draw);
+                    this.validation.errorDraw('IDS_ERR_TAB_SUITE_PREMIER', draw);
                     bRes = false;
                 }
 
                 var group = this.drawLib.group(draw);
                 if (group) {
                     if (draw.type !== group[0].type) {
-                        this.validation.error('IDS_ERR_TAB_SUITE_TYPE', draw);
+                        this.validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
                         bRes = false;
                     }
                     if (draw.minRank != group[0].minRank) {
-                        this.validation.error('IDS_ERR_TAB_SUITE_MIN', draw);
+                        this.validation.errorDraw('IDS_ERR_TAB_SUITE_MIN', draw);
                         bRes = false;
                     }
                     if (draw.maxRank != group[0].maxRank) {
-                        this.validation.error('IDS_ERR_TAB_SUITE_MAX', draw);
+                        this.validation.errorDraw('IDS_ERR_TAB_SUITE_MAX', draw);
                         bRes = false;
                     }
                 }
@@ -55,7 +55,7 @@
             if (prevGroup) {
                 if (prevGroup[0].type !== models.DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
                     if (this.rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
-                        this.validation.error('IDS_ERR_TAB_CLASSMAX_OVR', draw);
+                        this.validation.errorDraw('IDS_ERR_TAB_CLASSMAX_OVR', draw);
                         bRes = false;
                     }
                 }
@@ -65,7 +65,7 @@
             if (nextGroup) {
                 if (draw.type !== models.DrawType.Final && draw.maxRank && nextGroup[0].minRank) {
                     if (this.rank.compare(nextGroup[0].minRank, draw.maxRank) < 0) {
-                        this.validation.error('IDS_ERR_TAB_CLASSMAX_NEXT_OVR', draw);
+                        this.validation.errorDraw('IDS_ERR_TAB_CLASSMAX_NEXT_OVR', draw);
                         bRes = false;
                     }
                 }
@@ -81,7 +81,7 @@
                 }
                 for (var e2 = 1; e2 <= e; e2++) {
                     if (!this.drawLib.FindQualifieSortant(group, e2)) {
-                        this.validation.error('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
+                        this.validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
                         bRes = false;
                     }
                 }
@@ -118,13 +118,13 @@
             // - Ecart maximal souhaité DEUX échelons
 
             if (draw.minRank && draw.maxRank && this.rank.compare(draw.maxRank, draw.minRank) < 0) {
-                this.validation.error('IDS_ERR_TAB_CLAST_INV', draw);
+                this.validation.errorDraw('IDS_ERR_TAB_CLAST_INV', draw);
                 bRes = false;
             }
 
             //DONE 00/05/10: CTableau contrôle progression des classements
             if (draw._event.maxRank && this.rank.compare(draw._event.maxRank, draw.maxRank) < 0) {
-                this.validation.error('IDS_ERR_TAB_CLASSLIM_OVR', draw);
+                this.validation.errorDraw('IDS_ERR_TAB_CLASSLIM_OVR', draw);
                 bRes = false;
             }
 
@@ -159,25 +159,25 @@
                     && !boxIn.qualifIn
                     && !box.hidden
                     ) {
-                    this.validation.error('IDS_ERR_TAB_DUPLI', draw, box);
+                    this.validation.errorDraw('IDS_ERR_TAB_DUPLI', draw, boxIn);
                     bRes = false;
                 }
 
                 var player = box._player;
 
                 //if( boxes[ i].order >= 0 && player) 
-                if (player && boxIn && this.knockout.isJoueurNouveau(box) && !boxIn.qualifIn) {
+                if (player && boxIn && this.knockout.isJoueurNouveau(boxIn) && !boxIn.qualifIn) {
 
                     //DONE 00/03/07: Tableau, joueur sans classement
                     //DONE 00/03/04: Tableau, Classement des joueurs correspond au limites du tableau
                     if (!player.rank) {
-                        this.validation.error('IDS_ERR_CLAST_NO', draw, box);
+                        this.validation.errorDraw('IDS_ERR_CLAST_NO', draw, boxIn);
                         bRes = false;
                     } else {
 
                         //Players rank within draw min and max ranks
                         if (!this.rank.within(player.rank, draw.minRank, draw.maxRank)) {
-                            this.validation.error('IDS_ERR_CLAST_MIS', draw, box, player.rank);
+                            this.validation.errorDraw('IDS_ERR_CLAST_MIS', draw, boxIn, player.rank);
                             bRes = false;
                         }
 
@@ -193,7 +193,7 @@
                         if (c < colMax
                             && pClastMaxCol[c + 1]
                             && this.rank.compare(player.rank, pClastMaxCol[c + 1]) < 0) {
-                            this.validation.error('IDS_ERR_CLAST_PROGR', draw, box, player.rank);
+                            this.validation.errorDraw('IDS_ERR_CLAST_PROGR', draw, boxIn, player.rank);
                             bRes = false;
                         }
                         //}
@@ -202,23 +202,23 @@
 
                     //Check inscriptions
                     if (!this.tournamentLib.isSexeCompatible(draw._event, player.sexe)) {
-                        this.validation.error('IDS_ERR_EPR_SEXE', draw, box);
+                        this.validation.errorDraw('IDS_ERR_EPR_SEXE', draw, boxIn);
 
                     } else if (!this.tournamentLib.isRegistred(draw._event, player)) {
-                        this.validation.error('IDS_ERR_INSCR_NO', draw, box);
+                        this.validation.errorDraw('IDS_ERR_INSCR_NO', draw, boxIn);
                     }
 
                     //DONE 00/05/11: CTableau, check categorie
                     //Check Categorie
                     if (!this.category.isCompatible(draw._event.category, player.category)) {
-                        this.validation.error('IDS_ERR_CATEG_MIS', draw, box);
+                        this.validation.errorDraw('IDS_ERR_CATEG_MIS', draw, boxIn);
                     }
                 }
 
                 //if (!isMatch(box) && match.score) {
 
                 //    //DONE 01/07/13: CTableau, isValid score sans match
-                //    this.validation.error('IDS_ERR_SCORE_MATCH_NO', draw, box);
+                //    this.validation.errorDraw('IDS_ERR_SCORE_MATCH_NO', draw, box);
                 //    bRes = false;
                 //}
 
@@ -239,33 +239,33 @@
 
                     if (!match.score) {
 
-                        if (box.playerId) {
-                            this.validation.error('IDS_ERR_VAINQ_SCORE_NO', draw, box);
+                        if (match.playerId) {
+                            this.validation.errorDraw('IDS_ERR_VAINQ_SCORE_NO', draw, match, match._player.name);
                             bRes = false;
                         }
 
                     } else {
                         ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
 
-                        if (!box.playerId) {
-                            this.validation.error('IDS_ERR_SCORE_VAINQ_NO', draw, box);
+                        if (!match.playerId) {
+                            this.validation.errorDraw('IDS_ERR_SCORE_VAINQ_NO', draw, match);
                             bRes = false;
                         }
 
                         if (!this.score.isValid(match.score)) {
-                            this.validation.error('IDS_ERR_SCORE_BAD', draw, box, <string>match.score);
+                            this.validation.errorDraw('IDS_ERR_SCORE_BAD', draw, match, <string>match.score);
                             bRes = false;
                         }
 
                         //ASSERT( boxes[ i].playerId==-1 || player.isInscrit( tournament.FindEpreuve( this)) );
                         ASSERT(column(b) < colMax);
                         if (!opponent.box1.playerId || !opponent.box2.playerId) {
-                            this.validation.error('IDS_ERR_MATCH_JOUEUR_NO', draw, box);
+                            this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, match);
                             bRes = false;
 
-                        } else if (opponent.box1.playerId != box.playerId
-                            && opponent.box2.playerId != box.playerId) {
-                            this.validation.error('IDS_ERR_VAINQUEUR_MIS', draw, box);
+                        } else if (opponent.box1.playerId != match.playerId
+                            && opponent.box2.playerId != match.playerId) {
+                            this.validation.errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, match);
                             bRes = false;
                         }
                     }
@@ -279,16 +279,16 @@
                         if (opponent.box1.playerId) {
                             if (opponent.box2.playerId) {
                                 if (!CompString(opponent.box1._player.club, opponent.box2._player.club)) {
-                                    this.validation.error('IDS_ERR_MEME_CLUB1', draw, box, opponent.box1._player.club);
+                                    this.validation.errorDraw('IDS_ERR_MEME_CLUB1', draw, match, opponent.box1._player.club);
                                     bRes = false;
                                 }
                             } else if (this.isMatchJouable(opponent.box2)) { //!isTypePoule &&
 
                                 if (!CompString(opponent.box1._player.club, opponent2.box1._player.club)) {
-                                    this.validation.error('IDS_ERR_MEME_CLUB2', draw, box, opponent.box1._player.club);
+                                    this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
                                     bRes = false;
                                 } else if (!CompString(opponent.box1._player.club, opponent2.box2._player.club)) {
-                                    this.validation.error('IDS_ERR_MEME_CLUB2', draw, box, opponent.box1._player.club);
+                                    this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
                                     bRes = false;
                                 }
                             }
@@ -297,10 +297,10 @@
                         } else if (opponent.box2.playerId) {
                             if (this.isMatchJouable(opponent.box1)) {
                                 if (!CompString(opponent.box2._player.club, opponent1.box1._player.club)) {
-                                    this.validation.error('IDS_ERR_MEME_CLUB2', draw, box, opponent.box2._player.club);
+                                    this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
                                     bRes = false;
                                 } else if (!CompString(opponent.box2._player.club, opponent1.box2._player.club)) {
-                                    this.validation.error('IDS_ERR_MEME_CLUB2', draw, box, opponent.box2._player.club);
+                                    this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
                                     bRes = false;
                                 }
                             }
@@ -308,12 +308,12 @@
 
                             if (!CompString(opponent1.box1._player.club, opponent2.box1._player.club)
                                 || !CompString(opponent1.box1._player.club, opponent2.box2._player.club)) {
-                                this.validation.error('IDS_ERR_MEME_CLUB2', draw, box, opponent1.box1._player.club);
+                                this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box1._player.club);
                                 bRes = false;
                             }
                             if (!CompString(opponent1.box2._player.club, opponent2.box1._player.club)
                                 || !CompString(opponent1.box2._player.club, opponent2.box2._player.club)) {
-                                this.validation.error('IDS_ERR_MEME_CLUB2', draw, box, opponent1.box2._player.club);
+                                this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box2._player.club);
                                 bRes = false;
                             }
                         }
@@ -323,13 +323,13 @@
                     if (match.date) {
                         if (draw._event.start
                             && match.date < draw._event.start) {
-                            this.validation.error('IDS_ERR_DATE_MATCH_EPREUVE', draw, box, match.date.toDateString());
+                            this.validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
                             bRes = false;
                         }
 
                         if (draw._event.end
                             && draw._event.end < match.date) {
-                            this.validation.error('IDS_ERR_DATE_MATCH_EPREUVE', draw, box, match.date.toDateString());
+                            this.validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
                             bRes = false;
                         }
 
@@ -348,13 +348,13 @@
                                     if (match2.position != match.position
                                         && match2.place == match.place
                                         && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength) {
-                                        this.validation.error('IDS_ERR_PLN_OVERLAP', draw, box, match.date.toDateString());
+                                        this.validation.errorDraw('IDS_ERR_PLN_OVERLAP', draw, match, match.date.toDateString());
                                         bRes = false;
                                     }
                                 }
                             } else {
                                 //Match en dehors du planning
-                                this.validation.error('IDS_ERR_DATE_MATCH_TOURNOI', draw, box, match.date.toDateString());
+                                this.validation.errorDraw('IDS_ERR_DATE_MATCH_TOURNOI', draw, match, match.date.toDateString());
                                 bRes = false;
                             }
                         }
@@ -372,28 +372,28 @@
                         if (isMatch(opponent.box1)
                             && match1.date) {
                             if (match.date < match1.date) {
-                                this.validation.error('IDS_ERR_DATE_MATCHS', draw, box, match.date.toDateString());
+                                this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                 bRes = false;
                             } else if (match.date.getTime() < (match1.date.getTime() + (tournament.info.slotLength << 1))) {
-                                this.validation.error('IDS_ERR_DATE_MATCHS', draw, box, match.date.toDateString());
+                                this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                 bRes = false;
                             }
                         }
 
                         if (isMatch(opponent.box2) && match2.date) {
                             if (match.date < match2.date) {
-                                this.validation.error('IDS_ERR_DATE_MATCHS', draw, box, match.date.toDateString());
+                                this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                 bRes = false;
                             } else if (match.date.getTime() < (match2.date.getTime() + (tournament.info.slotLength << 1))) {
-                                this.validation.error('IDS_ERR_DATE_MATCHS', draw, box, match.date.toDateString());
+                                this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                 bRes = false;
                             }
                         }
                         //}
 
                         if (match.date) {
-                            if (!box.playerId && !match.place && tournament.places.length && tournament._dayCount) {
-                                this.validation.error('IDS_ERR_PLN_COURT_NO', draw, box);
+                            if (!match.playerId && !match.place && tournament.places.length && tournament._dayCount) {
+                                this.validation.errorDraw('IDS_ERR_PLN_COURT_NO', draw, match);
                                 bRes = false;
                             }
                         }
@@ -418,7 +418,7 @@
 
                         var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
                         if (iTableau == 0) {
-                            this.validation.error('IDS_ERR_TAB_ENTRANT_TAB1', draw, box);
+                            this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_TAB1', draw, boxIn);
                             bRes = false;
                         }
                         //ASSERT( iTableau != 0);
@@ -426,7 +426,7 @@
                         //DONE 00/03/07: CTableau, qualifié entrant en double
                         var j: models.Box;
                         if (!draw.suite && (j = this.drawLib.FindQualifieEntrant(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
-                            this.validation.error('IDS_ERR_TAB_ENTRANT_DUP', draw, box);
+                            this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
                             bRes = false;
                         }
 
@@ -435,10 +435,10 @@
                             //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
                             j = this.drawLib.FindQualifieSortant(group, e);
                             if (!j) {
-                                this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, box);
+                                this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                                 bRes = false;
-                            } else if (j.playerId != box.playerId) {
-                                this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, box);
+                            } else if (j.playerId != boxIn.playerId) {
+                                this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, boxIn);
                                 bRes = false;
                             }
                         }
@@ -453,22 +453,21 @@
                         //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
 
                         //DONE 00/03/07: CTableau, qualifié sortant en double
-                        j = this.drawLib.FindQualifieSortant(draw, e)
-                    if (j &&
-                            (j.position != b || j._draw.id != draw.id)) {
-                            this.validation.error('IDS_ERR_TAB_SORTANT_DUP', draw, box);
+                        j = this.drawLib.FindQualifieSortant(draw, e);
+                        if (j && (j.position != b || j._draw.id != draw.id)) {
+                        this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
                             bRes = false;
                         }
 
                         if (draw.type === models.DrawType.Final) {
-                            this.validation.error('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
+                            this.validation.errorDraw('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
                             bRes = false;
                         }
                         /*			
                         pSuite = getSuivant();
                         if( pSuite && (j = pSuite.FindQualifieEntrant( e, &pSuite)) != -1) {
                             if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
-                                this.validation.error('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
+                                this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
                                 bRes=false;
                             }
                         }
@@ -485,19 +484,19 @@
                     boxIn = this.drawLib.FindTeteSerie(draw, e);
                     if (boxIn) {
                         if (e > e2 + 1) {
-                            this.validation.error('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
+                            this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
                             bRes = false;
                         }
 
                         if (isMatch(boxIn)) {
-                            this.validation.error('IDS_ERR_TAB_TETESERIE_ENTRANT', boxIn._draw, boxIn, 'Seeded ' + e);
+                            this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_ENTRANT', boxIn._draw, boxIn, 'Seeded ' + e);
                             bRes = false;
                         }
 
                         for (var i = 0; i < draw.boxes.length; i++) {
                             var boxIn2 = <models.PlayerIn>draw.boxes[i];
                             if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
-                                this.validation.error('IDS_ERR_TAB_TETESERIE_DUP', boxIn._draw, boxIn, 'Seeded ' + e);
+                                this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_DUP', boxIn._draw, boxIn, 'Seeded ' + e);
                                 bRes = false;
                             }
                         }
@@ -515,7 +514,7 @@
                         var boxOut = this.drawLib.FindQualifieSortant(pT, e);
                         boxIn = this.drawLib.FindQualifieEntrant(draw, e);
                         if (boxOut && !boxIn) {
-                            this.validation.error('IDS_ERR_TAB_SORTANT_PREC_NO', boxOut._draw, boxOut);
+                            this.validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);
                             bRes = false;
                         }
                     }
@@ -523,19 +522,19 @@
             }
 
             if (isTypePoule && nqs < draw.nbOut) {
-                this.validation.error('IDS_ERR_POULE_SORTANT_NO', draw);
+                this.validation.errorDraw('IDS_ERR_POULE_SORTANT_NO', draw);
                 bRes = false;
             }
 
             if (draw.type === models.DrawType.Final) {
 
                 if (draw.suite || group[group.length - 1].id !== draw.id) {
-                    this.validation.error('IDS_ERR_TAB_SUITE_FINAL', draw);
+                    this.validation.errorDraw('IDS_ERR_TAB_SUITE_FINAL', draw);
                     bRes = false;
                 }
 
                 if (draw.nbOut != 1) {
-                    this.validation.error('IDS_ERR_TAB_FINAL_NQUAL', draw);
+                    this.validation.errorDraw('IDS_ERR_TAB_FINAL_NQUAL', draw);
                     bRes = false;
                 }
             }

@@ -11,6 +11,7 @@ module jat.draw {
         box: models.Box;
         pos: IPosition;
         isMatch: boolean;
+        error: IError;
 
         isPlayed(): boolean {
             return this.isMatch && !!(<models.Match>this.box).score;
@@ -20,7 +21,7 @@ module jat.draw {
         //}
     }
 
-    function drawBoxDirective() {
+    function drawBoxDirective(validation: jat.service.Validation) {
         return {
             restrict: 'EA',
             scope: true,
@@ -32,6 +33,7 @@ module jat.draw {
                 scope.$watch(attrs.drawBox, (box: models.Box) => {
                     ctrlBox.box = box;
                     ctrlBox.isMatch = isMatch(box);
+                    ctrlBox.error = validation.getErrorBox(box);
                 });
 
                 scope.$watch(attrs.pos, (pos: IPosition) => {

@@ -18,7 +18,7 @@
                     <span ng-click="main.select(event)">{{event.name}}</span>
                 </td>
                 <td>
-                    <div ng-repeat="draw in event.draws" class="inline" style="border-left: solid 1px blue; padding-left: 3px;">
+                    <div ng-repeat="draw in event.draws" class="inline" ng-class="{error:main.validation.hasErrorDraw(draw)}" style="border-left: solid 1px blue; padding-left: 3px;">
                         <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
                         <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
                         <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>

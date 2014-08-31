@@ -37,7 +37,7 @@
                 //        if (boxes[j].m_iClassement
                 //            && boxes[iDiagonale(j)].isQualifieSortant()) {
                 //		if(boxes[j].m_iClassement > (char)e) {
-                //                this.validation.error('IDS_ERR_POU_QSORTANT', draw, j);
+                //                this.validation.errorDraw('IDS_ERR_POU_QSORTANT', draw, j);
                 //                bRes = false;
                 //            }
                 //        }
@@ -48,7 +48,7 @@
                 //    //Poule complète, avec assez de joueurs
                 //    if (boxes[j].playerId == -1
                 //        && !boxes[j].isQualifieEntrant()) {
-                //        this.validation.error('IDS_ERR_POU_JOUEUR_NO', draw, j);
+                //        this.validation.errorDraw('IDS_ERR_POU_JOUEUR_NO', draw, j);
                 //        bRes = false;
                 //        break;
                 //    }
@@ -77,11 +77,11 @@
                         //    var box1 = draw.boxes[ADVERSAIRE1(i)];
                         //    var box2 = draw.boxes[ADVERSAIRE2(i)];
                         //    if (!box1.playerId || !box2.playerId) {
-                        //        this.validation.error('IDS_ERR_MATCH_JOUEUR_NO', draw, box);
+                        //        this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, box);
                         //        bRes = false;
                         //    } else {
                         //        if (box.playerId != box1.playerId && box.playerId != box2.playerId) {
-                        //            this.validation.error('IDS_ERR_VAINQUEUR_MIS', draw, box);
+                        //            this.validation.errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, box);
                         //            bRes = false;
                         //        }
                         //    }

@@ -21,7 +21,7 @@ label {
 [class*=" icon-"][ng-click],
 [class^="icon2-"][ng-click],
 [class*=" icon2-"][ng-click] {
-    cursor:pointer;
+    cursor: pointer;
 }
 
 [class^="icon2-"],
@@ -250,6 +250,7 @@ div.inline {
 .roundrobin .box, .roundrobin .inPlayer, .roundrobin .empty {
     position: initial;
 }
+
 .roundrobin .box {
     border-bottom: 1px solid darkgray;
     border-right: 1px solid darkgray;
@@ -258,6 +259,7 @@ div.inline {
 .box.hidden {
     background-color: lightgray;
 }
+
 .diag {
     background-color: lightgray;
 }
@@ -266,6 +268,7 @@ div.inline {
     opacity: .5;
     transition: opacity .6s ease;
 }
+
 .box:hover .icon2-info, .inPlayer:hover .icon2-info {
     opacity: 1;
 }
@@ -278,10 +281,18 @@ div.inline {
     padding-left: .3em;
     padding-right: .3em;
 }
+
 .qualifIn, .qualifOut {
     font-weight: bold;
     color: red;
 }
+
 .box .qualifOut, .box .seeded {
     float: right;
+}
+
+tr.error, div.error, span.error {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAXSURBVBhXY/jHwPAPBsAsCJ8BLgxmAAAh+RvJXdMJlQAAAABJRU5ErkJggg==);
+    background-repeat: repeat-x;
+    background-position-y: bottom;
 }

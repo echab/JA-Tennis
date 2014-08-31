@@ -77,7 +77,7 @@
         <div class="inline">
             Validation errors:
             <ul>
-                <li ng-repeat="error in main.validation._errors">{{error.message}}</li>
+                <li ng-repeat="error in main.validation.getErrorDraw(main.selection.draw)">{{error.message + ' '+ error.detail}}</li>
             </ul>
         </div>
 

@@ -19,7 +19,7 @@ var jat;
                 //    && !player.rank.Division()
                 //    //&& ((CClassement( N50) <= player.rank) && (player.rank < CClassement( N35)))
                 //    ) {
-                //    this.validation.error('IDS_ERR_CLAST_1SERIE', player);
+                //    this.validation.errorDraw('IDS_ERR_CLAST_1SERIE', player);
                 //    bRes = false;
                 //}
                 return bRes;
@@ -50,7 +50,7 @@ var jat;
                         if (!colRank) {
                             pColClast[player.rank] = c;
                         } else if (Math.abs(colRank - c) > 1) {
-                            this.validation.error('IDS_ERR_CLAST_PROGR2', draw, box, player.rank);
+                            this.validation.errorDraw('IDS_ERR_CLAST_PROGR2', draw, box, player.rank);
                             bRes = false;
                         }
                     }
@@ -63,7 +63,7 @@ var jat;
                         //for (var j = iHautCol(iColPoule(i, m_nColonne)); j > i; j--) {
                         //    if (isMatch(j) && !boxes[j].m_Date.isVide()
                         //        && boxes[i].m_Date == boxes[j].m_Date) {
-                        //        this.validation.error('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i)].m_iJoueur, iEpreuve, iTableau, i);
+                        //        this.validation.errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i)].m_iJoueur, iEpreuve, iTableau, i);
                         //        bRes = false;
                         //        break;
                         //    }
@@ -73,7 +73,7 @@ var jat;
                         //    for (var j = ADVERSAIRE1(i) - GetnColonne(); j > i; j -= GetnColonne()) {
                         //        if (isMatch(j) && !boxes[j].m_Date.isVide()
                         //            && boxes[i].m_Date == boxes[j].m_Date) {
-                        //            this.validation.error('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i)].m_iJoueur, iEpreuve, iTableau, i);
+                        //            this.validation.errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i)].m_iJoueur, iEpreuve, iTableau, i);
                         //            bRes = false;
                         //            break;
                         //        }
@@ -86,7 +86,7 @@ var jat;
                     if (!isTypePoule && match) {
                         var opponent = this.knockout.boxesOpponents(match);
                         if (opponent.box1.qualifIn && opponent.box2.qualifIn) {
-                            this.validation.error('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1);
+                            this.validation.errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1);
                             bRes = false;
                         }
                     }
@@ -97,7 +97,7 @@ var jat;
                     }
 
                     if (isTypePoule && nqe > 1) {
-                        this.validation.error('IDS_ERR_POULE_ENTRANT_OVR', draw, box);
+                        this.validation.errorDraw('IDS_ERR_POULE_ENTRANT_OVR', draw, box);
                         bRes = false;
                     }
                 }
@@ -107,7 +107,7 @@ var jat;
                     var boxT = this.drawLib.FindTeteSerie(draw, 1);
                     if (!boxT) {
                         var boxMax = this.find.by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
-                        this.validation.error('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);
+                        this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);
                         bRes = false;
                     }
                 }
