@@ -55,20 +55,20 @@ module jat.service {
             }
         }
 
-        public getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize {
+        public getSize(draw: models.Draw): ISize {
 
             if (!draw.nbColumn) {
-                return { width: dimensions.boxWidth, height: dimensions.boxHeight };
+                return { width: 1, height: 1 };
             }
 
             var n = draw.nbColumn;
             return {
-                width: (n + 1) * (dimensions.boxWidth + dimensions.interBoxWidth) - dimensions.interBoxWidth,
-                height: n * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
+                width: (n + 1), // * (dimensions.boxWidth + dimensions.interBoxWidth) - dimensions.interBoxWidth,
+                height: n   // * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
             };
         }
 
-        public computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[] {
+        public computePositions(draw: models.Draw): IPoint[] {
             //nothing to do for round robin
             return;
         }

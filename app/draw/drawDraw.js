@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (_draw) {
@@ -18,15 +18,17 @@ var jat;
                 if (!this.draw) {
                     return;
                 }
-                var size = this.drawLib.getSize(this.draw, this);
-                this.width = size.width;
-                this.height = size.height;
+                var draw = this.draw;
+                var size = this.drawLib.getSize(draw);
+                this.width = size.width * this.boxWidth - this.interBoxWidth;
+                this.height = size.height * this.boxHeight;
 
-                this.positions = this.drawLib.computePositions(this.draw, this);
+                draw._points = this.drawLib.computePositions(draw); //TODO to be moved into drawLib when draw changes
+                this._refresh = new Date(); //to refresh lines
 
                 if (!this.isKnockout) {
                     //for roundrobin, fill the list of rows/columns for the view
-                    var n = this.draw.nbColumn;
+                    var n = draw.nbColumn;
                     this.rows = new Array(n);
                     for (var r = 0; r < n; r++) {
                         var cols = new Array(n + 1);
@@ -56,21 +58,17 @@ var jat;
 
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var box = draw.boxes[i];
-                    var pt = this.positions[box.position];
-                    if (!pt) {
-                        continue;
-                    }
-                    var x = pt.x, y = pt.y;
+                    var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
 
                     if (isMatch(box)) {
                         var opponent = positionOpponents(box.position);
-                        ctx.moveTo(x - this.interBoxWidth, this.positions[opponent.pos1].y + boxHeight2);
+                        ctx.moveTo(x - this.interBoxWidth, draw._points[opponent.pos1].y * this.boxHeight + boxHeight2);
                         ctx.lineTo(x, y + boxHeight2);
-                        ctx.lineTo(x - this.interBoxWidth, this.positions[opponent.pos2].y + boxHeight2);
+                        ctx.lineTo(x - this.interBoxWidth, draw._points[opponent.pos2].y * this.boxHeight + boxHeight2);
                         ctx.stroke();
                     }
                     ctx.moveTo(x, y + boxHeight2);
-                    ctx.lineTo(x + this.boxWidth, y + boxHeight2);
+                    ctx.lineTo(x + this.boxWidth - this.interBoxWidth, y + boxHeight2);
                     ctx.stroke();
                 }
             };

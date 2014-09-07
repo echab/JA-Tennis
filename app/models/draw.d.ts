@@ -23,6 +23,8 @@ declare module models {
 
         locked?: boolean;
 
+        _points?: IPoint[];
+
         //group/suite
         _previous?: models.Draw;
         _next?: models.Draw;

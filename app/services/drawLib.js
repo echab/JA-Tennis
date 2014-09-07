@@ -104,11 +104,11 @@ var jat;
             DrawLib.prototype.nbColumnForPlayers = function (draw, nJoueur) {
                 return this._drawLibs[draw.type].nbColumnForPlayers(draw, nJoueur);
             };
-            DrawLib.prototype.getSize = function (draw, dimensions) {
-                return this._drawLibs[draw.type].getSize(draw, dimensions);
+            DrawLib.prototype.getSize = function (draw) {
+                return this._drawLibs[draw.type].getSize(draw);
             };
-            DrawLib.prototype.computePositions = function (draw, dimensions) {
-                return this._drawLibs[draw.type].computePositions(draw, dimensions);
+            DrawLib.prototype.computePositions = function (draw) {
+                return this._drawLibs[draw.type].computePositions(draw);
             };
             DrawLib.prototype.resize = function (draw, oldDraw, nJoueur) {
                 this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);

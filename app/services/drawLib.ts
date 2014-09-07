@@ -1,6 +1,6 @@
 ﻿interface IDrawLib {
-    getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize;
-    computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[];
+    getSize(draw: models.Draw): ISize;
+    computePositions(draw: models.Draw): IPoint[];
     resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void;
     nbColumnForPlayers(draw: models.Draw, nJoueur: number): number;
     generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[];
@@ -12,13 +12,13 @@
     boxesOpponents(match: models.Match): { box1: models.Box; box2: models.Box };
 }
 
-interface IDrawDimensions {
-    boxWidth: number;
-    boxHeight: number;
-    interBoxWidth: number;
-    interBoxHeight: number;
-}
-interface IPosition {
+//interface IDrawDimensions {
+//    boxWidth: number;
+//    boxHeight: number;
+//    interBoxWidth: number;
+//    interBoxHeight: number;
+//}
+interface IPoint {
     x: number;
     y: number
 };
@@ -138,11 +138,11 @@ module jat.service {
         public nbColumnForPlayers(draw: models.Draw, nJoueur: number): number {
             return this._drawLibs[draw.type].nbColumnForPlayers(draw, nJoueur);
         }
-        public getSize(draw: models.Draw, dimensions: IDrawDimensions): ISize {
-            return this._drawLibs[draw.type].getSize(draw, dimensions);
+        public getSize(draw: models.Draw): ISize {
+            return this._drawLibs[draw.type].getSize(draw);
         }
-        public computePositions(draw: models.Draw, dimensions: IDrawDimensions): IPosition[] {
-            return this._drawLibs[draw.type].computePositions(draw, dimensions);
+        public computePositions(draw: models.Draw): IPoint[] {
+            return this._drawLibs[draw.type].computePositions(draw);
         }
         public resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void {
             this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);

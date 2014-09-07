@@ -7,12 +7,14 @@ declare module models {
         locked?: boolean;
 
         playerId: string;
-        _player ?: Player;
+        _player?: Player;
 
         //Planning
-        receive ?: boolean;
-        aware ?: boolean;
+        receive?: boolean;
+        aware?: boolean;
 
-        _draw ?: Draw;
+        _draw?: Draw;
+        _x?: number;
+        _y?: number;
     }
 }

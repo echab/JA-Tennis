@@ -1,4 +1,4 @@
-var jat;
+﻿var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL = 9, MAX_QUALIF = 32, QEMPTY = -1, WITH_TDS_HAUTBAS = true;
@@ -480,18 +480,18 @@ var jat;
                 };
             };
 
-            Knockout.prototype.getSize = function (draw, dimensions) {
+            Knockout.prototype.getSize = function (draw) {
                 if (!draw || !draw.nbColumn || !draw.nbOut) {
-                    return { width: dimensions.boxWidth, height: dimensions.boxHeight };
+                    return { width: 1, height: 1 };
                 }
 
                 return {
-                    width: draw.nbColumn * (dimensions.boxWidth + dimensions.interBoxWidth) - dimensions.interBoxWidth,
-                    height: countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut) * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
+                    width: draw.nbColumn,
+                    height: countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut)
                 };
             };
 
-            Knockout.prototype.computePositions = function (draw, dimensions) {
+            Knockout.prototype.computePositions = function (draw) {
                 if (!draw || !draw.nbColumn || !draw.nbOut || !draw.boxes || !draw.boxes.length) {
                     return;
                 }
@@ -501,17 +501,19 @@ var jat;
                 //var heights = <number[]> [];  //TODO variable height
                 var minPos = positionMin(draw.nbOut), maxPos = positionMax(draw.nbColumn, draw.nbOut), c0 = draw.nbColumn - 1 + columnMin(draw.nbOut);
                 for (var pos = maxPos; pos >= minPos; pos--) {
-                    //var b = box[pos];
                     var col = column(pos), topPos = positionTopCol(col), c = c0 - col, g = positionTopCol(c - 1) + 2;
 
                     positions[pos] = {
-                        x: c * (dimensions.boxWidth + dimensions.interBoxWidth),
-                        y: (topPos - pos) * (dimensions.boxHeight + dimensions.interBoxHeight) * g + (dimensions.boxHeight + dimensions.interBoxHeight) * (g / 2 - 0.5)
+                        x: c,
+                        y: (topPos - pos) * g + g / 2 - 0.5
                     };
-                }
 
-                //to refresh lines
-                (positions)._refresh = new Date();
+                    var box = this.find.by(draw.boxes, 'position', pos);
+                    if (box) {
+                        box._x = positions[pos].x;
+                        box._y = positions[pos].y;
+                    }
+                }
 
                 return positions;
             };

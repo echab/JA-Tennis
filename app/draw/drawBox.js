@@ -24,10 +24,6 @@ var jat;
                         ctrlBox.isMatch = isMatch(box);
                         ctrlBox.error = validation.getErrorBox(box);
                     });
-
-                    scope.$watch(attrs.pos, function (pos) {
-                        ctrlBox.pos = pos;
-                    });
                 }
             };
         }

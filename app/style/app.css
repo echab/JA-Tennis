@@ -239,7 +239,7 @@ div.inline {
 .box, .inPlayer, .empty {
     position: absolute;
     /*border: 1px dashed gray;*/
-    width: 150px;
+    width: 140px;
     height: 40px;
 }
 

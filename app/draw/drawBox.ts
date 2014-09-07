@@ -3,13 +3,11 @@ module jat.draw {
 
     interface BoxAttributes extends ng.IAttributes {
         drawBox: string;
-        pos: string;
     }
 
     class boxCtrl {
 
         box: models.Box;
-        pos: IPosition;
         isMatch: boolean;
         error: IError;
 
@@ -34,10 +32,6 @@ module jat.draw {
                     ctrlBox.box = box;
                     ctrlBox.isMatch = isMatch(box);
                     ctrlBox.error = validation.getErrorBox(box);
-                });
-
-                scope.$watch(attrs.pos, (pos: IPosition) => {
-                    ctrlBox.pos = pos;
                 });
             }
         };

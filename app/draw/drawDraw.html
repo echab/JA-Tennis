@@ -1,7 +1,7 @@
 ﻿<div ng-if="ctrlDraw.isKnockout" class="draw knockout" ng-style="{width: ctrlDraw.width +'px', height: ctrlDraw.height +'px'}">
-    <canvas draw-lines="ctrlDraw.positions._refresh"></canvas>
+    <canvas draw-lines="ctrlDraw._refresh"></canvas>
     <div ng-repeat="box in ctrlDraw.draw.boxes" ng-if="!ctrlDraw.simple">
-        <div draw-box="box" pos="ctrlDraw.positions[box.position]"></div>
+        <div draw-box="box" class="box" ng-style="{left:(box._x * ctrlDraw.boxWidth) +'px', top:(box._y * ctrlDraw.boxHeight) +'px'}"></div>
     </div>
 </div>
 <table ng-if="!ctrlDraw.isKnockout" class="draw roundrobin">

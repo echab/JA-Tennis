@@ -1,4 +1,4 @@
-var jat;
+﻿var jat;
 (function (jat) {
     (function (service) {
         var MIN_COL = 0, MAX_COL_POULE = 22, MAX_JOUEUR = 8191, MAX_TABLEAU = 63, QEMPTY = -1;
@@ -46,19 +46,19 @@ var jat;
                 };
             };
 
-            Roundrobin.prototype.getSize = function (draw, dimensions) {
+            Roundrobin.prototype.getSize = function (draw) {
                 if (!draw.nbColumn) {
-                    return { width: dimensions.boxWidth, height: dimensions.boxHeight };
+                    return { width: 1, height: 1 };
                 }
 
                 var n = draw.nbColumn;
                 return {
-                    width: (n + 1) * (dimensions.boxWidth + dimensions.interBoxWidth) - dimensions.interBoxWidth,
-                    height: n * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
+                    width: (n + 1),
+                    height: n
                 };
             };
 
-            Roundrobin.prototype.computePositions = function (draw, dimensions) {
+            Roundrobin.prototype.computePositions = function (draw) {
                 //nothing to do for round robin
                 return;
             };
