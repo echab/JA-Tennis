@@ -271,6 +271,7 @@ var jat;
             'jat.draw.list',
             'jat.draw.box',
             'jat.match.dialog',
+            'ec.panels',
             'ui.bootstrap']).controller('mainCtrl', mainCtrl);
     })(jat.main || (jat.main = {}));
     var main = jat.main;

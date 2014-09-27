@@ -1,38 +1,34 @@
-﻿<div ng-init="expand=false">
-    <h4 ng-click="expand=!expand"><i ng-class="{'icon-plus-sign':!expand, 'icon-minus-sign':expand}"></i> The events:</h4>
-    <table class="table table-hover table-condensed" style="width:auto;" ng-show="expand">
-        <!--<caption>Events</caption>-->
-        <thead>
-            <tr>
-                <th class="span1"><input type="checkbox" /></th>
-                <th>Event name</th>
-                <th>Draws</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="event in list.events" ng-class="{info:event === main.selection.event}">
-                <td><input type="checkbox" /> <small>{{event.id}}</small></td>
-                <td>
-                    <i class="icon2-info" ng-click="main.editEvent(event)"></i>
-                    <span ng-click="main.select(event)">{{event.name}}</span>
-                </td>
-                <td>
-                    <div ng-repeat="draw in event.draws" class="inline" ng-class="{error:main.validation.hasErrorDraw(draw)}" style="border-left: solid 1px blue; padding-left: 3px;">
-                        <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
-                        <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
-                        <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>
-                        <div draw="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
-                             ng-click="main.select(draw)">
-                        </div>
+﻿<table class="table table-hover table-condensed" style="width:auto;">
+    <!--<caption>Events</caption>-->
+    <thead>
+        <tr>
+            <th class="span1"><input type="checkbox" /></th>
+            <th>Event name</th>
+            <th>Draws</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="event in list.events" ng-class="{info:event === main.selection.event}">
+            <td><input type="checkbox" /> <small>{{event.id}}</small></td>
+            <td>
+                <i class="icon2-info" ng-click="main.editEvent(event)"></i>
+                <span ng-click="main.select(event)">{{event.name}}</span>
+                <i class="icon-trash" ng-click="main.removeEvent(event)"></i>
+            </td>
+            <td>
+                <div ng-repeat="draw in event.draws" class="inline" ng-class="{error:main.validation.hasErrorDraw(draw)}" style="border-left: solid 1px blue; padding-left: 3px;">
+                    <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
+                    <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
+                    <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>
+                    <div draw="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
+                            ng-click="main.select(draw)">
                     </div>
-                </td>
-                <td><i class="icon-trash" ng-click="main.removeEvent(event)"></i></td>
-            </tr>
-            <tr ng-show="list.events.length == 0">
-                <td colspan="3">No event</td>
-            </tr>
-        </tbody>
-    </table>
-    <!--<input type="button" value="Add event" ng-click="addEvent({name:''})" />-->
-</div>
+                </div>
+            </td>
+        </tr>
+        <tr ng-show="list.events.length == 0">
+            <td colspan="3">No event</td>
+        </tr>
+    </tbody>
+</table>

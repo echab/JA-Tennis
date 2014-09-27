@@ -104,6 +104,7 @@
     <Content Include="app\event\listEvents.html" />
     <Content Include="app\player\dialogPlayer.html" />
     <Content Include="app\player\listPlayers.html" />
+    <Content Include="app\ui\ec-panels.js" />
     <Content Include="lib\mocks\math-mock.js" />
     <TypeScriptCompile Include="lib\mocks\guid-mock.ts" />
     <TypeScriptCompile Include="lib\typings\angularjs\angular-mocks.d.ts" />
