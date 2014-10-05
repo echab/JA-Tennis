@@ -311,62 +311,74 @@ tr.error, div.error, span.error {
     height: 100%;
     white-space: nowrap;
 
-    display: -webkit-box;
+    /*display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
-    display: flex;
+    display: flex;*/
 }
 .panel {
     background-color: #bbb;
     transition: max-width .5s;
-    /*
+
     display: inline-block;
-    vertical-align: top;
     height: 100%;
+    overflow: auto;
+
+    /*
+    vertical-align: top;
     */
-    -webkit-box-flex: 1;
+    /*-webkit-box-flex: 1;
     -webkit-flex: 1;
     -ms-flex: 1;
     flex: 1;
 
-    bottom: 0px;
+    bottom: 0px;*/
 }
 
 .panel .header {
     display: block;
-    margin-left: 3em;
-    height: 3em;
+    position: absolute;
+    padding-left: .5em;
+    padding-right: .5em;
+    line-height: 3em;
     background-color: #f8f8f8;
     border-color: #e7e7e7;
     transition: margin-left .5s;
+    box-shadow: rgba(200,200,200,5) -2px -2px inset;
+    z-index: 2;
+}
+.panel .header form {
+    margin-bottom: 0px;
 }
 .panelbadge {
     position: absolute;
     display: block;
-    width: 1em;
-    height: 1em;
+    width: 3em;
+    line-height: 3em;
     color: #555;
     background-color: #bbb;
-    padding: 1em;
     text-align:center;
     z-index: 2;
     -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
     transition: all .5s;
 }
-.panel .header .title {
-    display: inline-block;
-    right: 0em;
-    height: 3em;
-    color: #333;
+
+.panel:not(.active) .header {
+    Zdisplay: none;
+    width: 0em;
+}
+.panel:not(.active) form, .panel:not(.active) button {
+    display: none;
 }
 
-.panelbadge:not(.active) {
+/*.panel:not(.active) .panelbadge {
     background-color: lightsteelblue;
     color: black;
-}
+}*/
 
 .panel .content {
-    overflow: auto;
+    padding: .5em;
+    padding-top: 3.5em;
 }
 
 .panel.tournament, .panel.tournament .header {
@@ -380,7 +392,7 @@ tr.error, div.error, span.error {
     background-color: lightblue;
 }
 .panelbadge.players {
-    background-color: blue;
+    background-color: blueviolet;
 }
 
 .panel.draws, .panel.draws .header {

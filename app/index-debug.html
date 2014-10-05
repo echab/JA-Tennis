@@ -24,11 +24,14 @@
     </ul>-->
 
     <div ec-panelset="" class="ng-cloak">
-        <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div><div ec-panel="" active="true" class="tournament">
-            <div ec-header="">{{main.selection.tournament.info.name}}</div>
+        <div ec-panel="" active="true" class="tournament">
+            <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
+            <div ec-header="">
+                {{main.selection.tournament.info.name}}
+            </div>
             <div class="content">
 
-                <div class="btn-toolbar">
+                <div class="">
                     <div class="btn-group">
                         <!--<button ng-click="main.loadTournament()" class="btn"><i class="icon2-open"></i> Open</button>-->
                         <button ng-click="main.saveTournament()" class="btn"><i class="icon2-save"></i> Save</button>
@@ -40,32 +43,22 @@
                     <button ng-click="main.addEvent(main.selection.event)" class="btn"><i class="icon-plus"></i> Add event</button>
                 </div>
 
-
                 <div list-events="main.selection.tournament.events" class="inline"></div>
 
                 <div app-version></div>
             </div>
-        </div>
-        <!--
-
-
-    -->
-        <div ec-badge="" class="players"><i class="icon2-player"></i></div><div ec-panel="" active="false" class="players">
-            <div ec-header="" zzzclass="btn-toolbar">
-                <button ng-click="main.addPlayer()" class="btn"><i class="icon-plus"></i> Add player</button>
+        </div><div ec-panel="" active="false" class="players">
+            <div ec-badge="" class="players"><i class="icon2-player"></i></div>
+            <div ec-header="">
+                <form class="form-horizontal">
+                    <button ng-click="main.addPlayer()" class="btn"><i class="icon-plus"></i> Add player</button>
+                </form>
             </div>
-
             <div class="content">
                 <div list-players="main.selection.tournament.players"></div>
             </div>
-        </div>
-        <!--
-
-
-    -->
-        <div ec-badge="" class="draws"><i class="icon2-draw"></i></div><div ec-panel="" active="true" class="draws">
-            <!--
-        -->
+        </div><div ec-panel="" active="true" class="draws">
+            <div ec-badge="" class="draws"><i class="icon2-draw"></i></div>
             <div ec-header="">
                 <form class="form-horizontal">
                     <label>
@@ -79,7 +72,6 @@
                 </form>
             </div>
             <div class="content">
-
                 <form class="form-horizontal">
                     <label>
                         <div class="btn-group">
@@ -108,20 +100,18 @@
                         <li ng-repeat="error in main.validation.getErrorDraw(main.selection.draw)">{{error.message + ' '+ error.detail}}</li>
                     </ul>
                 </div>
-
             </div>
         </div>
         <!--
 
 
-    - -><div ec-badge="" class="planning"><i class="icon2-planning"></i></div><div ec-panel="" active="false" class="planning"><!- -
-        - -><div ec-header="">Planning</div>
-        <div class="content">
-            TODO
+        - -><div ec-badge="" class="planning"><i class="icon2-planning"></i></div><div ec-panel="" active="false" class="planning"><!- -
+            - -><div ec-header="">Planning</div>
+            <div class="content">
+                TODO
+            </div>
         </div>
-    </div>
-    -->
-
+        -->
     </div>
 
     <!-- In production use:
