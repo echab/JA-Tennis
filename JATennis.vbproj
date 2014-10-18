@@ -68,7 +68,6 @@
     <Content Include="app\draw\drawBox.html" />
     <Content Include="app\draw\drawDraw.html" />
     <TypeScriptCompile Include="app\draw\drawDraw.ts" />
-    <Content Include="app\favicon.ico" />
     <TypeScriptCompile Include="app\services\drawLib.ts" />
     <TypeScriptCompile Include="app\services\fftValidation.ts" />
     <TypeScriptCompile Include="app\services\guid.ts" />
@@ -80,8 +79,8 @@
     <TypeScriptCompile Include="app\services\type.d.ts" />
     <TypeScriptCompile Include="app\services\tournamentLib.ts" />
     <Content Include="app\style\app.css" />
+    <Content Include="app\style\favicon.ico" />
     <Content Include="app\style\glyphicons.png" />
-    <Content Include="app\style\test-icon2.html" />
     <Content Include="app\index-async.html" />
     <TypeScriptCompile Include="app\player\listPlayers.ts" />
     <TypeScriptCompile Include="app\app.ts" />
@@ -103,6 +102,7 @@
     <Content Include="app\event\listEvents.html" />
     <Content Include="app\player\dialogPlayer.html" />
     <Content Include="app\player\listPlayers.html" />
+    <Content Include="app\style\_test-icon2.html" />
     <Content Include="app\ui\ec-panels.js" />
     <Content Include="Gruntfile.js" />
     <Content Include="lib\mocks\math-mock.js" />
@@ -138,6 +138,7 @@
     <Content Include="data\tournament6.json" />
     <Content Include="data\tournament7.json" />
     <Content Include="data\tournament8.json" />
+    <None Include="app\jatennis.appcache" />
     <None Include="test\karma.config.js" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />
@@ -148,6 +149,7 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <Content Include="_dist.cmd" />
   </ItemGroup>
   <ItemGroup>
     <!--<Folder Include="My Project\" />-->

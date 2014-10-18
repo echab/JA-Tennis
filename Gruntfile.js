@@ -9,21 +9,19 @@ module.exports = function (grunt) {
             main: {
                 expand: true,
                 cwd: 'app/',
-                src: ['index.html', '**/*.{ico,png}'],
+                src: ['index.html', '**/*.{ico,png}', 'jatennis.appcache'],
                 dest: 'dist/'
             }
         },
 
         concat: {
             options: {
-                //separator: ';',
-                separator: '/*! <%= grunt.src %> - ' +
-                    '<%= grunt.template.today("yyyy-mm-dd hh:mm:ss") %> */',
+                separator: ';'
             },
             dist: {
                 src: ['app/**/*.js', '!**/*.min.js', '!**/_*.js'],
-                dest: 'dist/jatennis.js',
-            },
+                dest: 'dist/jatennis.js'
+            }
         },
 
         rev: {
@@ -33,7 +31,10 @@ module.exports = function (grunt) {
         },
 
         useminPrepare: {
-            html: 'dist/index.html'
+            html: 'index.html',
+            options: {
+                dest: 'dist'
+            }
         },
 
         usemin: {
@@ -117,7 +118,7 @@ module.exports = function (grunt) {
                 },
                 sourceMap: true
             },
-            jatennis: {
+            dist: {
                 files: {
                     'dist/jatennis.min.js': ['dist/jatennis.js']
                 }
@@ -129,15 +130,15 @@ module.exports = function (grunt) {
 
     // Tell Grunt what to do when we type "grunt" into the terminal
     grunt.registerTask('default', [
-        'copy',
+        'copy:main',
 	    'inline_angular_templates',
+        'targethtml',
 	    //'htmlclean',
 	    'useminPrepare',
 	    'concat',
-        'targethtml',
 	    'uglify',
 	    'cssmin',
 	    //'filerev', 
-	    'usemin',
+	    'usemin'
     ]);
 };

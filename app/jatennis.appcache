@@ -1,0 +1,12 @@
+CACHE MANIFEST
+index.html
+jatennis.min.js
+style/app.min.css
+style/glyphicons.png
+style/favicon.ico
+http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css
+http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/img/glyphicons-halflings.png
+http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/img/glyphicons-halflings-white.png
+http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js
+http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js
+/data/tournament8.json
