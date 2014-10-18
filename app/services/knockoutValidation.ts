@@ -642,7 +642,9 @@
     }
 
     angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type'])
-        .factory('knockoutValidation', (validation: jat.service.Validation, knockout: jat.service.Knockout, drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, category: ServiceCategory, score: ServiceScore, find: jat.service.Find) => {
+        .factory('knockoutValidation', [
+            'validation', 'knockout', 'drawLib', 'tournamentLib', 'rank', 'category', 'score', 'find',
+            (validation: jat.service.Validation, knockout: jat.service.Knockout, drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, category: ServiceCategory, score: ServiceScore, find: jat.service.Find) => {
             return new KnockoutValidation(validation, knockout, drawLib, tournamentLib, rank, category, score, find);
-        });
+        }]);
 } 

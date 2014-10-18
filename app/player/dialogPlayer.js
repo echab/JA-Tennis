@@ -14,7 +14,13 @@ var jat;
         })();
         _player.dialogPlayerCtrl = dialogPlayerCtrl;
 
-        angular.module('jat.player.dialog', ['jat.utils.checkList']).controller('dialogPlayerCtrl', dialogPlayerCtrl);
+        angular.module('jat.player.dialog', ['jat.utils.checkList']).controller('dialogPlayerCtrl', [
+            'title',
+            'player',
+            'events',
+            'rank',
+            'category',
+            dialogPlayerCtrl]);
     })(jat.player || (jat.player = {}));
     var player = jat.player;
 })(jat || (jat = {}));

@@ -172,7 +172,9 @@ module jat.service {
     }
 
     angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
-        .factory('tournamentLib', (drawLib: jat.service.DrawLib, rank: ServiceRank, guid: jat.service.Guid) => {
+        .factory('tournamentLib',
+            ['drawLib', 'rank', 'guid',
+            (drawLib: jat.service.DrawLib, rank: ServiceRank, guid: jat.service.Guid) => {
             return new TournamentLib(drawLib, rank, guid);
-        });
+        }]);
 }

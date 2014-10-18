@@ -32,7 +32,7 @@ var jat;
             return box && ('score' in box);
         }
 
-        angular.module('jat.draw.box', ['jat.services.find']).directive('drawBox', drawBoxDirective);
+        angular.module('jat.draw.box', ['jat.services.find']).directive('drawBox', ['validation', drawBoxDirective]);
     })(jat.draw || (jat.draw = {}));
     var draw = jat.draw;
 })(jat || (jat = {}));

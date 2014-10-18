@@ -8,11 +8,13 @@ angular.module('jat', [
     'jat.services.undo',
     'jat.services.type',
     'jat.main'
-]).constant('appName', 'JA-Tennis').constant('appVersion', '0.1').directive('appVersion', function (appName, appVersion) {
-    return {
-        template: appName + ' v' + appVersion
-    };
-});
+]).constant('appName', 'JA-Tennis').constant('appVersion', '0.1').directive('appVersion', [
+    'appName', 'appVersion',
+    function (appName, appVersion) {
+        return {
+            template: appName + ' v' + appVersion
+        };
+    }]);
 /*
 .config([<any>'$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {
 //routes

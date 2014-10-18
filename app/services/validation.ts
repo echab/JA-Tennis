@@ -120,7 +120,9 @@ module jat.service {
     }
 
     angular.module('jat.services.validation', ['jat.services.find'])
-        .factory('validation', (find: jat.service.Find) => {
+        .factory('validation', [
+            'find',
+            (find: jat.service.Find) => {
             return new Validation(find);
-        });
+        }]);
 }

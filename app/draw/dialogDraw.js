@@ -48,7 +48,15 @@ var jat;
             return dialogDrawCtrl;
         })();
 
-        angular.module('jat.draw.dialog', []).controller('dialogDrawCtrl', dialogDrawCtrl);
+        angular.module('jat.draw.dialog', []).controller('dialogDrawCtrl', [
+            'title',
+            'draw',
+            'rank',
+            'category',
+            'drawLib',
+            'tournamentLib',
+            '$scope',
+            dialogDrawCtrl]);
     })(jat.draw || (jat.draw = {}));
     var draw = jat.draw;
 })(jat || (jat = {}));

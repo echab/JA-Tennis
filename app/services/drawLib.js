@@ -711,9 +711,11 @@ var jat;
             }
         }
 
-        angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid']).factory('drawLib', function (find, rank, guid) {
-            return new DrawLib(find, rank, guid);
-        });
+        angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid']).factory('drawLib', [
+            'find', 'rank', 'guid',
+            function (find, rank, guid) {
+                return new DrawLib(find, rank, guid);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

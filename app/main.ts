@@ -246,5 +246,13 @@ module jat.main {
         'ec.panels',
         'ui.bootstrap'])
 
-        .controller('mainCtrl', mainCtrl);
+        .controller('mainCtrl', [
+            '$modal',
+            'selection',
+            'mainLib',
+            'tournamentLib',
+            'drawLib',
+            'validation',
+            'undo'
+            , mainCtrl]);
 }

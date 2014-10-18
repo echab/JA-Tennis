@@ -269,10 +269,26 @@
             'jat.services.knockout',
             'jat.services.roundrobin',
             'jat.services.validation'
-        ]).factory('mainLib', function ($log, $http, $q, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, //rank: ServiceRank,
-        undo, find, guid) {
-            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
-        });
+        ]).factory('mainLib', [
+            '$log',
+            '$http',
+            '$q',
+            'selection',
+            'tournamentLib',
+            'drawLib',
+            'knockout',
+            'roundrobin',
+            'validation',
+            'knockoutValidation',
+            'roundrobinValidation',
+            'fftValidation',
+            'undo',
+            'find',
+            'guid',
+            function ($log, $http, $q, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, //rank: ServiceRank,
+            undo, find, guid) {
+                return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

@@ -1,54 +1,176 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en" ng-app="jat">
 <head>
     <meta charset="utf-8">
     <title>JA-Tennis</title>
+    <style type="text/css">
+        .ng-cloak {
+            display: none;
+        }
+    </style>
+    <!--(if target dev)><!-->
     <link rel="stylesheet" href="../lib/ui-bootstrap/assets/bootstrap.css" />
+    <!--<!(endif)-->
+    <!--(if target dist)>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
+    <!(endif)-->
+
+    <!-- build:css style/app.min.css -->
     <link rel="stylesheet" href="style/app.css" />
+    <!-- endbuild -->
+    <link rel="icon" href="style/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
-<body ng-controller="mainCtrl" class="ng-cloak">
-    <div class="btn-toolbar">
-        <div class="btn-group">
-            <button ng-disabled="!undo.canUndo()" ng-click="undo.undo()" class="btn"><i class="icon2-undo" title="Undo {{undo.messageUndo()}}"></i></button>
-            <button ng-disabled="!undo.canRedo()" ng-click="undo.redo()" class="btn"><i class="icon2-redo" title="Redo {{undo.messageRedo()}}"></i></button>
+<body ng-controller="mainCtrl as main">
+
+    <!--<div id="splash" ng-if="false">Loading application...</div>-->
+    <!--    <ul class="nav nav-pills">
+        <li class="active"><a href="#/players">players</a></li>
+        <li class="active"><a href="#/events">events</a></li>
+    </ul>-->
+
+    <div ec-panelset="" class="ng-cloak">
+        <div ec-panel="" active="true" class="tournament">
+            <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
+            <div ec-header="">
+                {{main.selection.tournament.info.name}}
+            </div>
+            <div class="content">
+
+                <div class="">
+                    <div class="btn-group">
+                        <!--<button ng-click="main.loadTournament()" class="btn"><i class="icon2-open"></i> Open</button>-->
+                        <button ng-click="main.saveTournament()" class="btn"><i class="icon2-save"></i> Save</button>
+                    </div>
+                    <div class="btn-group">
+                        <button ng-disabled="!main.undo.canUndo()" ng-click="main.doUndo()" class="btn"><i class="icon2-undo" title="Undo {{main.undo.messageUndo()}}"></i></button>
+                        <button ng-disabled="!main.undo.canRedo()" ng-click="main.doRedo()" class="btn"><i class="icon2-redo" title="Redo {{main.undo.messageRedo()}}"></i></button>
+                    </div>
+                    <button ng-click="main.addEvent(main.selection.event)" class="btn"><i class="icon-plus"></i> Add event</button>
+                </div>
+
+                <div list-events="main.selection.tournament.events" class="inline"></div>
+
+                <div app-version></div>
+            </div>
+        </div><div ec-panel="" active="false" class="players">
+            <div ec-badge="" class="players"><i class="icon2-player"></i></div>
+            <div ec-header="">
+                <form class="form-horizontal">
+                    <button ng-click="main.addPlayer()" class="btn"><i class="icon-plus"></i> Add player</button>
+                </form>
+            </div>
+            <div class="content">
+                <div list-players="main.selection.tournament.players"></div>
+            </div>
+        </div><div ec-panel="" active="true" class="draws">
+            <div ec-badge="" class="draws"><i class="icon2-draw"></i></div>
+            <div ec-header="">
+                <form class="form-horizontal">
+                    <label>
+                        <select ng-model="main.selection.event" ng-change="main.select(main.selection.event)" ng-options="event.name for event in main.selection.tournament.events"></select>
+                    </label>
+                    <label>
+                        <i class="icon2-info" ng-click="main.editDraw(main.selection.draw)" ng-disabled="!main.selection.draw"></i>
+                        <select ng-model="main.selection.draw" ng-change="main.select(main.selection.draw)" ng-options="draw.name for draw in main.selection.event.draws"></select>
+                        <i class="icon2-locker" ng-click="main.lockDraw(main.selection.draw, !main.selection.draw.locked)" ng-disabled="!main.selection.draw" title="Lock/unlock the draw modifications"></i>
+                    </label>
+                </form>
+            </div>
+            <div class="content">
+                <form class="form-horizontal">
+                    <label>
+                        <div class="btn-group">
+                            <button ng-click="main.addDraw(main.selection.draw)" class="btn" ng-disabled="!main.selection.event"><i class="icon-plus"></i> Add draw</button>
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Create)" ng-disabled="!main.selection.draw" class="btn"><i class="icon2-draw-generate"></i> Generate</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEchelonne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw more"><i class="icon2-draw-left"></i></button>
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEnLigne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Mix)" ng-disabled="!main.selection.draw" class="btn" title="Mix the players"><i class="icon2-random"></i></button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" ng-click="main.updateQualif(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" ng-click="main.validateDraw(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Check the draw"><i class="icon2-checkmark"></i> Check</button>
+                        </div>
+                    </label>
+                </form>
+
+                <div draw="main.selection.draw" class="inline"></div>
+
+                <div class="inline">
+                    Validation errors:
+                    <ul>
+                        <li ng-repeat="error in main.validation.getErrorDraw(main.selection.draw)">{{error.message + ' '+ error.detail}}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <button ng-click="addPlayer()" class="btn"><i class="icon-plus"></i>Add player</button>
-        <button ng-click="addEvent()" class="btn"><i class="icon-plus"></i>Add event</button>
-        <button ng-click="addDraw(selection.event)" class="btn" ng-disabled="!selection.event"><i class="icon-plus"></i>Add draw</button>
+        <!--
+
+
+        - -><div ec-badge="" class="planning"><i class="icon2-planning"></i></div><div ec-panel="" active="false" class="planning"><!- -
+            - -><div ec-header="">Planning</div>
+            <div class="content">
+                TODO
+            </div>
+        </div>
+        -->
     </div>
 
-    <div list-players="selection.tournament.players"></div>
-
-    <div list-events="selection.tournament.events"></div>
-
-    <div ng-init="expandDraw=true">
-        <i ng-class="{'icon-plus-sign':!expandDraw, 'icon-minus-sign':expandDraw}" ng-click="expandDraw=!expandDraw"></i>
-        <label>
-            Event: <i class="icon2-info" ng-click="editEvent(selection.event)"></i>
-            <select ng-model="selection.event" ng-options="event.name for event in selection.tournament.events"></select></label>
-        <label>
-            Draw: <i class="icon2-info" ng-click="editDraw(selection.event, selection.draw)"></i>
-            <select ng-model="selection.draw" ng-options="draw.name for draw in selection.event.draws"></select></label>
-    </div>
-    <div draw="selection.draw" ng-show="expandDraw" box-width="150" box-height="40" inter-box-width="10" inter-box-height="10">
-        <div class="box" ng-style="{left:positions[position].x+'px', top:positions[position].y+'px'}" title="p{{position}}">
-            <i class="icon2-info" ng-click="editPlayer(player)" ng-show="player"></i>{{player.name}}<br />
-            <i class="icon2-info" ng-click="editMatch(match)"></i><span class="place">{{match.place}}</span> <span class="date">{{match.date}}</span> <span class="score">{{match.score}}</span>
-        </div>
-        <div class="inPlayer" ng-style="{left:x+'px', top:y+'px'}" title="p{{position}}">
-            <i class="icon2-info" ng-click="editPlayer(player)" ng-show="player"></i>
-            {{player.name}}<br />
-            <span class="club">{{player.club}}</span>
-        </div>
-        <div class="empty" ng-style="{left:x+'px', top:y+'px'}" title="p{{position}}">p{{position}} -</div>
-    </div>
-
-    <div app-version></div>
-       
-    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"></script>-->
-    <script src="../lib/angular/angular.min.js"></script>
+    <!--(if target dev)><!-->
+    <script src="../lib/angular/angular.js"></script>
     <script src="../lib/ui-bootstrap/ui-bootstrap-tpls-0.8.0.min.js"></script>
-    <script src="JATennis.js"></script>
+    <!--<!(endif)-->
+
+    <!--(if target dist)>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
+    <!(endif)-->
+
+    <!-- build:js app/jatennis.min.js -->
+    <script src="app.js"></script>
+
+    <script src="utils/tool.js"></script>
+    <script src="utils/checkList.js"></script>
+
+    <script src="services/version.js"></script>
+    <script src="services/undo.js"></script>
+    <script src="services/find.js"></script>
+    <script src="services/guid.js"></script>
+    <script src="services/selection.js"></script>
+    <script src="services/mainLib.js"></script>
+    <script src="services/tournamentLib.js"></script>
+    <script src="services/drawLib.js"></script>
+    <script src="services/knockout.js"></script>
+    <script src="services/roundrobin.js"></script>
+
+    <script src="services/validation.js"></script>
+    <script src="services/knockoutValidation.js"></script>
+    <script src="services/roundrobinValidation.js"></script>
+
+    <script src="services/fft.js"></script>
+    <script src="services/fftValidation.js"></script>
+
+    <script src="models/model.js"></script>
+
+    <script src="main.js"></script>
+
+    <script src="player/listPlayers.js"></script>
+    <script src="player/dialogPlayer.js"></script>
+
+    <script src="event/listEvents.js"></script>
+    <script src="event/dialogEvent.js"></script>
+
+    <script src="draw/drawDraw.js"></script>
+    <script src="draw/drawBox.js"></script>
+    <script src="draw/dialogDraw.js"></script>
+    <script src="draw/dialogMatch.js"></script>
+
+    <script src="ui/ec-panels.js"></script>
+    <!-- endbuild -->
 </body>
 </html>

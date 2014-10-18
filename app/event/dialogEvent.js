@@ -16,7 +16,14 @@ var jat;
             return dialogEventCtrl;
         })();
 
-        angular.module('jat.event.dialog', []).controller('dialogEventCtrl', dialogEventCtrl);
+        angular.module('jat.event.dialog', []).controller('dialogEventCtrl', [
+            'selection',
+            'title',
+            'event',
+            'tournamentLib',
+            'rank',
+            'category',
+            dialogEventCtrl]);
     })(jat.event || (jat.event = {}));
     var event = jat.event;
 })(jat || (jat = {}));

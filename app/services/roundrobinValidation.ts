@@ -119,7 +119,9 @@
     }
 
     angular.module('jat.services.validation.roundrobin', ['jat.services.validation'])
-        .factory('roundrobinValidation', (validation: jat.service.Validation) => {
+        .factory('roundrobinValidation', [
+            'validation',
+            (validation: jat.service.Validation) => {
             return new RoundrobinValidation(validation);
-        });
+        }]);
 }  

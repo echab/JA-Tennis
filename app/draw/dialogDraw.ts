@@ -54,5 +54,14 @@ module jat.draw {
     }
 
     angular.module('jat.draw.dialog', [])
-        .controller('dialogDrawCtrl', dialogDrawCtrl);
+        .controller('dialogDrawCtrl', [
+            'title',
+            'draw',
+            //'selection',
+            'rank',
+            'category',
+            'drawLib',
+            'tournamentLib',
+            '$scope',
+            dialogDrawCtrl]);
 }

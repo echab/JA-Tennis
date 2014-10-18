@@ -12,11 +12,13 @@ angular.module('jat', [
 ])
     .constant('appName', 'JA-Tennis')
     .constant('appVersion', '0.1')
-    .directive('appVersion', (appName: string, appVersion: string) => {
+    .directive('appVersion',
+        ['appName', 'appVersion',
+        (appName: string, appVersion: string) => {
         return {
             template: appName + ' v' + appVersion
         };
-    })
+    }])
 ;
 /*    
 .config([<any>'$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {

@@ -83,7 +83,6 @@
     <Content Include="app\style\glyphicons.png" />
     <Content Include="app\style\test-icon2.html" />
     <Content Include="app\index-async.html" />
-    <Content Include="app\index-debug.html" />
     <TypeScriptCompile Include="app\player\listPlayers.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <Content Include="app\index.html" />
@@ -105,6 +104,7 @@
     <Content Include="app\player\dialogPlayer.html" />
     <Content Include="app\player\listPlayers.html" />
     <Content Include="app\ui\ec-panels.js" />
+    <Content Include="Gruntfile.js" />
     <Content Include="lib\mocks\math-mock.js" />
     <TypeScriptCompile Include="lib\mocks\guid-mock.ts" />
     <TypeScriptCompile Include="lib\typings\angularjs\angular-mocks.d.ts" />

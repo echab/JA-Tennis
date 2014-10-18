@@ -520,7 +520,7 @@ var jat;
         })();
 
         //===========================================
-        angular.module('jat.services.type', []).service('rank', Rank).service('category', Category).service('matchFormat', MatchFormat).service('score', Score).service('licence', Licence).service('ranking', Ranking);
+        angular.module('jat.services.type', []).service('rank', Rank).service('category', Category).service('matchFormat', MatchFormat).service('score', Score).service('licence', Licence).service('ranking', ['score', Ranking]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

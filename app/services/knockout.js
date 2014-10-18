@@ -904,9 +904,11 @@ var jat;
             return i - (nQualifie - 1 - iPartieQhb(i, nQualifie)) * countInCol(c - columnMin(nQualifie)) - positionBottomCol(c, nQualifie) + positionBottomCol(c - columnMin(nQualifie));
         }
 
-        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('knockout', function (drawLib, tournamentLib, rank, find) {
-            return new Knockout(drawLib, tournamentLib, rank, find);
-        });
+        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('knockout', [
+            'drawLib', 'tournamentLib', 'rank', 'find',
+            function (drawLib, tournamentLib, rank, find) {
+                return new Knockout(drawLib, tournamentLib, rank, find);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

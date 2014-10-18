@@ -20,5 +20,11 @@ module jat.player {
     }
 
     angular.module('jat.player.dialog', ['jat.utils.checkList'])
-        .controller('dialogPlayerCtrl', dialogPlayerCtrl);
+        .controller('dialogPlayerCtrl', [
+            'title',
+            'player',
+            'events',
+            'rank',
+            'category',
+            dialogPlayerCtrl]);
 }

@@ -1005,7 +1005,9 @@ module jat.service {
     }
 
     angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
-        .factory('knockout', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, find: Find) => {
+        .factory('knockout', [
+           'drawLib', 'tournamentLib', 'rank', 'find',
+            (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, rank: ServiceRank, find: Find) => {
             return new Knockout(drawLib, tournamentLib, rank, find);
-        });
+        }]);
 }

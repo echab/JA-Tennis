@@ -32,7 +32,10 @@ var jat;
             return listPlayersCtrl;
         })();
 
-        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', listPlayersCtrl);
+        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', [
+            'selection',
+            'find',
+            listPlayersCtrl]);
     })(jat.player || (jat.player = {}));
     var player = jat.player;
 })(jat || (jat = {}));

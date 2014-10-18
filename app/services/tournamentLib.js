@@ -160,9 +160,11 @@ var jat;
         })();
         service.TournamentLib = TournamentLib;
 
-        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid']).factory('tournamentLib', function (drawLib, rank, guid) {
-            return new TournamentLib(drawLib, rank, guid);
-        });
+        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid']).factory('tournamentLib', [
+            'drawLib', 'rank', 'guid',
+            function (drawLib, rank, guid) {
+                return new TournamentLib(drawLib, rank, guid);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

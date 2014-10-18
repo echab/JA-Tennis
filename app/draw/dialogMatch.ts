@@ -26,5 +26,11 @@ module jat.match {
     }
 
     angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type'])
-        .controller('dialogMatchCtrl', dialogMatchCtrl);
+        .controller('dialogMatchCtrl', [
+            'title',
+            'match',
+            'find',
+            'drawLib',
+            'matchFormat',
+            dialogMatchCtrl]);
 }

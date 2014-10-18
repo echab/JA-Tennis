@@ -24,5 +24,12 @@ module jat.event {
     }
 
     angular.module('jat.event.dialog', [])
-        .controller('dialogEventCtrl', dialogEventCtrl);
+        .controller('dialogEventCtrl', [
+            'selection',
+            'title',
+            'event',
+            'tournamentLib',
+            'rank',
+            'category',
+            dialogEventCtrl]);
 }

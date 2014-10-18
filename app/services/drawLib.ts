@@ -773,7 +773,9 @@ module jat.service {
     }
 
     angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid'])
-        .factory('drawLib', (find: jat.service.Find, rank: ServiceRank, guid: jat.service.Guid) => {
+        .factory('drawLib', [
+            'find', 'rank', 'guid',
+            (find: jat.service.Find, rank: ServiceRank, guid: jat.service.Guid) => {
             return new DrawLib(find, rank, guid);
-        });
+        }]);
 }

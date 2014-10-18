@@ -106,9 +106,11 @@
         })();
         service.Validation = Validation;
 
-        angular.module('jat.services.validation', ['jat.services.find']).factory('validation', function (find) {
-            return new Validation(find);
-        });
+        angular.module('jat.services.validation', ['jat.services.find']).factory('validation', [
+            'find',
+            function (find) {
+                return new Validation(find);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

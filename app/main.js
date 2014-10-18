@@ -272,7 +272,15 @@ var jat;
             'jat.draw.box',
             'jat.match.dialog',
             'ec.panels',
-            'ui.bootstrap']).controller('mainCtrl', mainCtrl);
+            'ui.bootstrap']).controller('mainCtrl', [
+            '$modal',
+            'selection',
+            'mainLib',
+            'tournamentLib',
+            'drawLib',
+            'validation',
+            'undo',
+            mainCtrl]);
     })(jat.main || (jat.main = {}));
     var main = jat.main;
 })(jat || (jat = {}));

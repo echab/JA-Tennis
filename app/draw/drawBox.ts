@@ -42,5 +42,5 @@ module jat.draw {
     }
 
     angular.module('jat.draw.box', ['jat.services.find'])
-        .directive('drawBox', drawBoxDirective);
+        .directive('drawBox', ['validation',drawBoxDirective]);
 } 

@@ -25,6 +25,8 @@ module jat.event {
 
     angular.module('jat.event.list', [])
         .directive('listEvents', listEventsDirective)
-        .controller('listEventsCtrl', listEventsCtrl)
+        .controller('listEventsCtrl', [
+            //'selection',
+            listEventsCtrl])
     ;
 }

@@ -111,7 +111,7 @@ var jat;
                 restrict: 'EA',
                 scope: true,
                 templateUrl: 'draw/drawDraw.html',
-                controller: drawCtrl,
+                controller: ['drawLib', 'knockout', 'roundrobin', 'find', drawCtrl],
                 controllerAs: 'ctrlDraw',
                 link: function (scope, element, attrs, ctrlDraw) {
                     var doRefresh = function (draw, oldValue) {

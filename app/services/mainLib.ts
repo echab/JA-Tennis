@@ -281,8 +281,28 @@
         'jat.services.roundrobin',
         'jat.services.validation'
     ])
-        .factory('mainLib', (
-            $log: ng.ILogService, $http: ng.IHttpService, $q: ng.IQService,
+        .factory('mainLib',
+        [
+            '$log',
+            '$http',
+            '$q',
+            'selection',
+            'tournamentLib',
+            'drawLib',
+            'knockout',
+            'roundrobin',
+            'validation',
+            'knockoutValidation',
+            'roundrobinValidation',
+            'fftValidation',
+            //'rank',
+            'undo',
+            'find',
+            'guid',
+        (
+            $log: ng.ILogService,
+            $http: ng.IHttpService,
+            $q: ng.IQService,
             selection: jat.service.Selection,
             tournamentLib: jat.service.TournamentLib,
             drawLib: jat.service.DrawLib,
@@ -297,5 +317,5 @@
             find: jat.service.Find,
             guid: jat.service.Guid) => {
             return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
-        });
+        }]);
 }

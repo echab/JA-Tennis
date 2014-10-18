@@ -130,7 +130,7 @@ module jat.draw {
             restrict: 'EA',
             scope: true,
             templateUrl: 'draw/drawDraw.html',
-            controller: drawCtrl,
+            controller: ['drawLib', 'knockout', 'roundrobin', 'find', drawCtrl],
             controllerAs: 'ctrlDraw',
             link: (scope: ng.IScope, element: JQuery, attrs: DrawAttributes, ctrlDraw: drawCtrl) => {
 

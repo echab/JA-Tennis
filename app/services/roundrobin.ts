@@ -513,7 +513,9 @@ module jat.service {
     };
 
     angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
-        .factory('roundrobin', (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: ServiceRanking, find: Find) => {
+        .factory('roundrobin', [
+            'drawLib', 'tournamentLib', 'ranking', 'find',
+            (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: ServiceRanking, find: Find) => {
             return new Roundrobin(drawLib, tournamentLib, ranking, find);
-        });
+        }]);
 }

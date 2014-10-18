@@ -18,7 +18,13 @@ var jat;
             return dialogMatchCtrl;
         })();
 
-        angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type']).controller('dialogMatchCtrl', dialogMatchCtrl);
+        angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type']).controller('dialogMatchCtrl', [
+            'title',
+            'match',
+            'find',
+            'drawLib',
+            'matchFormat',
+            dialogMatchCtrl]);
     })(jat.match || (jat.match = {}));
     var match = jat.match;
 })(jat || (jat = {}));

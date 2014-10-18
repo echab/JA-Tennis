@@ -99,9 +99,11 @@
             return 'score' in box;
         }
 
-        angular.module('jat.services.validation.roundrobin', ['jat.services.validation']).factory('roundrobinValidation', function (validation) {
-            return new RoundrobinValidation(validation);
-        });
+        angular.module('jat.services.validation.roundrobin', ['jat.services.validation']).factory('roundrobinValidation', [
+            'validation',
+            function (validation) {
+                return new RoundrobinValidation(validation);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

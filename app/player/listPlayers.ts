@@ -35,6 +35,9 @@ module jat.player {
 
     angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find'])
         .directive('listPlayers', listPlayersDirective)
-        .controller('listPlayersCtrl', listPlayersCtrl)
+        .controller('listPlayersCtrl', [
+            'selection',
+            'find',
+            listPlayersCtrl])
     ;
 }

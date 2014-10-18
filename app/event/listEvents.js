@@ -24,7 +24,7 @@ var jat;
             return listEventsCtrl;
         })();
 
-        angular.module('jat.event.list', []).directive('listEvents', listEventsDirective).controller('listEventsCtrl', listEventsCtrl);
+        angular.module('jat.event.list', []).directive('listEvents', listEventsDirective).controller('listEventsCtrl', [listEventsCtrl]);
     })(jat.event || (jat.event = {}));
     var event = jat.event;
 })(jat || (jat = {}));

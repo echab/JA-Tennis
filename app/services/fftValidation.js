@@ -337,9 +337,11 @@ var jat;
             return !nQ || nQ === 1 ? (1 << nCol) - 2 : positionTopCol(columnMax(nCol, nQ));
         }
 
-        angular.module('jat.services.validation.fft', ['jat.services.validation']).factory('fftValidation', function (validation, drawLib, knockout, find) {
-            return new FFTValidation(validation, drawLib, knockout, find);
-        });
+        angular.module('jat.services.validation.fft', ['jat.services.validation']).factory('fftValidation', [
+            'validation', 'drawLib', 'knockout', 'find',
+            function (validation, drawLib, knockout, find) {
+                return new FFTValidation(validation, drawLib, knockout, find);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));

@@ -594,6 +594,6 @@ module jat.service {
         .service('matchFormat', MatchFormat)
         .service('score', Score)
         .service('licence', Licence)
-        .service('ranking', Ranking)
+        .service('ranking', ['score', Ranking])
     ;
 }

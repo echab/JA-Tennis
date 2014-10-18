@@ -463,9 +463,11 @@ var jat;
         }
         ;
 
-        angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('roundrobin', function (drawLib, tournamentLib, ranking, find) {
-            return new Roundrobin(drawLib, tournamentLib, ranking, find);
-        });
+        angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('roundrobin', [
+            'drawLib', 'tournamentLib', 'ranking', 'find',
+            function (drawLib, tournamentLib, ranking, find) {
+                return new Roundrobin(drawLib, tournamentLib, ranking, find);
+            }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;
 })(jat || (jat = {}));
