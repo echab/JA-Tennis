@@ -19,14 +19,14 @@ module jat.event {
 
     class listEventsCtrl {
         events: models.Event[];
+
+        //static $inject = ['selection'];
         //constructor(selection: jat.service.Selection) {
         //}
     }
 
     angular.module('jat.event.list', [])
         .directive('listEvents', listEventsDirective)
-        .controller('listEventsCtrl', [
-            //'selection',
-            listEventsCtrl])
+        .controller('listEventsCtrl', listEventsCtrl)
     ;
 }

@@ -7,6 +7,15 @@ module jat.event {
         categories: CategoryString[];
         registred: models.Player[];
 
+        static $inject = [
+            'selection',
+            'title',
+            'event',
+            'tournamentLib',
+            'rank',
+            'category'
+        ];
+
         constructor(
             private selection: jat.service.Selection,
             private title: string,
@@ -24,12 +33,5 @@ module jat.event {
     }
 
     angular.module('jat.event.dialog', [])
-        .controller('dialogEventCtrl', [
-            'selection',
-            'title',
-            'event',
-            'tournamentLib',
-            'rank',
-            'category',
-            dialogEventCtrl]);
+        .controller('dialogEventCtrl', dialogEventCtrl);
 }

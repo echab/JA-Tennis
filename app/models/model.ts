@@ -11,5 +11,5 @@ module models {
 
     export enum GenerateType { None, Create, PlusEchelonne, PlusEnLigne, Mix }
 
-    export enum ModelType { None, Tournament, Player, Event, Draw, Match }
+    export enum ModelType { None, Tournament, Player, Event, Draw, Match, Box }
 }

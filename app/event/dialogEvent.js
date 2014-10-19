@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (_event) {
@@ -13,17 +13,18 @@ var jat;
 
                 this.registred = tournamentLib.getRegistred(event);
             }
+            dialogEventCtrl.$inject = [
+                'selection',
+                'title',
+                'event',
+                'tournamentLib',
+                'rank',
+                'category'
+            ];
             return dialogEventCtrl;
         })();
 
-        angular.module('jat.event.dialog', []).controller('dialogEventCtrl', [
-            'selection',
-            'title',
-            'event',
-            'tournamentLib',
-            'rank',
-            'category',
-            dialogEventCtrl]);
+        angular.module('jat.event.dialog', []).controller('dialogEventCtrl', dialogEventCtrl);
     })(jat.event || (jat.event = {}));
     var event = jat.event;
 })(jat || (jat = {}));

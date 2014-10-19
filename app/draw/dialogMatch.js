@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (_match) {
@@ -15,16 +15,17 @@ var jat;
                 this.places = tournament.places;
                 this.matchFormats = matchFormat.list();
             }
+            dialogMatchCtrl.$inject = [
+                'title',
+                'match',
+                'find',
+                'drawLib',
+                'matchFormat'
+            ];
             return dialogMatchCtrl;
         })();
 
-        angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type']).controller('dialogMatchCtrl', [
-            'title',
-            'match',
-            'find',
-            'drawLib',
-            'matchFormat',
-            dialogMatchCtrl]);
+        angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type']).controller('dialogMatchCtrl', dialogMatchCtrl);
     })(jat.match || (jat.match = {}));
     var match = jat.match;
 })(jat || (jat = {}));

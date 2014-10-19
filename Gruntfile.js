@@ -9,7 +9,7 @@ module.exports = function (grunt) {
             main: {
                 expand: true,
                 cwd: 'app/',
-                src: ['index.html', '**/*.{ico,png}', 'jatennis.appcache'],
+                src: ['index.html', '**/*.{ico,png}', 'jatennis.appcache', '.htaccess'],
                 dest: 'dist/'
             }
         },
@@ -123,7 +123,25 @@ module.exports = function (grunt) {
                     'dist/jatennis.min.js': ['dist/jatennis.js']
                 }
             }
+        },
+
+        'string-replace': {
+            version: {
+                files: {
+                    'dist/jatennis.appcache': 'dist/jatennis.appcache'
+                },
+                options: {
+                    replacements: [{
+                        pattern: /{{ VERSION }}/g,
+                        replacement: '<%= pkg.version %>'
+                    }, {
+                        pattern: /{{ DATE }}/g,
+                        replacement: '<%= grunt.template.today("yyyy-mm-dd HH:MM") %>'
+                    }]
+                }
+            }
         }
+
     });
 
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
@@ -131,9 +149,10 @@ module.exports = function (grunt) {
     // Tell Grunt what to do when we type "grunt" into the terminal
     grunt.registerTask('default', [
         'copy:main',
+        'string-replace:version',
+	    //'htmlclean',
 	    'inline_angular_templates',
         'targethtml',
-	    //'htmlclean',
 	    'useminPrepare',
 	    'concat',
 	    'uglify',

@@ -6,6 +6,14 @@ module jat.player {
         ranks: RankString[];
         categories: CategoryString[];
 
+        static $inject = [
+            'title',
+            'player',
+            'events',
+            'rank',
+            'category'
+        ];
+
         constructor(
             private title: string,
             private player: models.Player,
@@ -20,11 +28,5 @@ module jat.player {
     }
 
     angular.module('jat.player.dialog', ['jat.utils.checkList'])
-        .controller('dialogPlayerCtrl', [
-            'title',
-            'player',
-            'events',
-            'rank',
-            'category',
-            dialogPlayerCtrl]);
+        .controller('dialogPlayerCtrl', dialogPlayerCtrl);
 }

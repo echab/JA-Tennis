@@ -7,6 +7,16 @@ module jat.main {
 
         public GenerateType = models.GenerateType;
 
+        static $inject = [
+            '$modal',
+            'selection',
+            'mainLib',
+            'tournamentLib',
+            'drawLib',
+            'validation',
+            'undo',
+            '$window'];
+
         constructor(
             private $modal: uib.IModalService<string>,
             private selection: jat.service.Selection,
@@ -14,23 +24,44 @@ module jat.main {
             private tournamentLib: jat.service.TournamentLib,
             private drawLib: jat.service.DrawLib,
             public validation: jat.service.Validation,
-            private undo: jat.service.Undo
+            private undo: jat.service.Undo,
+            private $window: ng.IWindowService
             ) {
 
             this.selection.tournament = this.tournamentLib.newTournament();
 
-            this.mainLib.loadTournament('/data/tournament8.json').then((data) => {
-                this.mainLib.select(data.events[0].draws[data.events[0].draws.length - 1], models.ModelType.Draw);
+            //Load saved tournament if exists
+            this.mainLib.loadTournament().then((data) => {
+            }, (reason) => {
+                this.mainLib.loadTournament('/data/tournament8.json').then((data) => {
+                });
             });
+
+            //Auto save tournament on exit
+            var onBeforeUnloadHandler = (event: Event) => {
+                this.mainLib.saveTournament(this.selection.tournament);
+            };
+            if ($window.addEventListener) {
+                $window.addEventListener('beforeunload', onBeforeUnloadHandler);
+            } else {
+                $window.onbeforeunload = onBeforeUnloadHandler;
+            }
+ 
+
         }
 
         //#region tournament
+        newTournament(): void {
+            //TODO browse for file
+            //this.mainLib.loadTournament('xxx.json');
+        }
         loadTournament(): void {
             //TODO browse for file
             //this.mainLib.loadTournament('xxx.json');
         }
         saveTournament(): void {
             this.mainLib.saveTournament(this.selection.tournament, '');
+            
         }
         //#endregion tournament
 
@@ -246,13 +277,5 @@ module jat.main {
         'ec.panels',
         'ui.bootstrap'])
 
-        .controller('mainCtrl', [
-            '$modal',
-            'selection',
-            'mainLib',
-            'tournamentLib',
-            'drawLib',
-            'validation',
-            'undo'
-            , mainCtrl]);
+        .controller('mainCtrl', mainCtrl);
 }

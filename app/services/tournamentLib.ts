@@ -79,7 +79,7 @@ module jat.service {
         public initEvent(event: models.Event, parent: models.Tournament): void {
             event._tournament = parent;
 
-            var c = event.draws;
+            var c = event.draws = event.draws || [];
             if (c) {
                 for (var i = c.length - 1; i >= 0; i--) {
                     var draw = c[i];

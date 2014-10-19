@@ -1,11 +1,8 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (_draw) {
         var dialogDrawCtrl = (function () {
-            //getNbEntry(): number {
-            //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
-            //}
             function dialogDrawCtrl(title, draw, //private selection: jat.service.Selection,
             rank, category, drawLib, tournamentLib, $scope) {
                 var _this = this;
@@ -45,18 +42,19 @@ var jat;
                 }
                 return n;
             };
+
+            dialogDrawCtrl.$inject = [
+                'title',
+                'draw',
+                'rank',
+                'category',
+                'drawLib',
+                'tournamentLib',
+                '$scope'];
             return dialogDrawCtrl;
         })();
 
-        angular.module('jat.draw.dialog', []).controller('dialogDrawCtrl', [
-            'title',
-            'draw',
-            'rank',
-            'category',
-            'drawLib',
-            'tournamentLib',
-            '$scope',
-            dialogDrawCtrl]);
+        angular.module('jat.draw.dialog', []).controller('dialogDrawCtrl', dialogDrawCtrl);
     })(jat.draw || (jat.draw = {}));
     var draw = jat.draw;
 })(jat || (jat = {}));

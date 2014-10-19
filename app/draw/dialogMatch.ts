@@ -6,6 +6,14 @@ module jat.match {
         places: string[];
         matchFormats: any;  //TODO !any
 
+        static $inject = [
+            'title',
+            'match',
+            'find',
+            'drawLib',
+            'matchFormat'
+        ];
+
         constructor(
             private title: string,
             private match: models.Match,
@@ -26,11 +34,5 @@ module jat.match {
     }
 
     angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type'])
-        .controller('dialogMatchCtrl', [
-            'title',
-            'match',
-            'find',
-            'drawLib',
-            'matchFormat',
-            dialogMatchCtrl]);
+        .controller('dialogMatchCtrl', dialogMatchCtrl);
 }

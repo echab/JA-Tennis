@@ -6,6 +6,7 @@
             private $log: ng.ILogService,
             private $http: ng.IHttpService,
             private $q: ng.IQService,
+            private $window: ng.IWindowService,
             private selection: jat.service.Selection,
             private tournamentLib: jat.service.TournamentLib,
             private drawLib: jat.service.DrawLib,
@@ -18,33 +19,47 @@
         }
 
         /** This function load tournament data from an url. */
-        loadTournament(url: string): ng.IPromise<models.Tournament> {
+        loadTournament(url?: string): ng.IPromise<models.Tournament> {
             var deferred = this.$q.defer();
-            this.$http.get(url)
-                .success((data: models.Tournament, status: number) => {
+            if (!url) {
+                var data = this.$window.localStorage['tournament'];
+                if (data) {
+                    data = angular.fromJson(data);
                     this.tournamentLib.initTournament(data);
-
-                    data._url = url;
-
-                    if (data.events[0]) {
-                        this.select(data.events[0].draws[0], models.ModelType.Draw);
-                    }
-                    this.selection.player = undefined;
-
+                    this.loadedTournament(data);
                     deferred.resolve(data);
-                })
-                .error((data: any, status: number) => {
-                    deferred.reject(data);
-                });
-
+                } else {
+                    deferred.reject('nothing in storage');
+                }
+            } else {
+                this.$http.get(url)
+                    .success((data: models.Tournament, status: number) => {
+                        data._url = url;
+                        this.tournamentLib.initTournament(data);
+                        this.loadedTournament(data);
+                        deferred.resolve(data);
+                    })
+                    .error((data: any, status: number) => {
+                        deferred.reject(data);
+                    });
+            }
             return deferred.promise;
         }
 
-        saveTournament(tournament: models.Tournament, url: string): void {
+        private loadedTournament(tournament: models.Tournament): void {
+            if (tournament.events[0]) {
+                this.select(tournament.events[0].draws[tournament.events[0].draws.length - 1], models.ModelType.Draw);
+            } else {
+                this.select(tournament, models.ModelType.Tournament);
+            }
+        }
+
+        saveTournament(tournament: models.Tournament, url?: string): void {
             var data = {};
             tool.copy(tournament, data);
             if (!url) {
-                this.$log.info(angular.toJson(data, true));
+                //this.$log.info(angular.toJson(data, true));
+                this.$window.localStorage['tournament'] = angular.toJson(data);
                 return;
             }
             this.$http.post(url || tournament._url, data)
@@ -220,29 +235,29 @@
 
             var sel = this.selection;
             if (r) {
-                if (r.playerId && r._draw) { //box
+                if (type === models.ModelType.Box || (r.playerId && r._draw)) { //box
                     sel.tournament = r._draw._event._tournament;
                     sel.event = r._draw._event;
                     sel.draw = r._draw;
                     sel.match = r;
 
-                } else if (r._event) { //draw
+                } else if (type === models.ModelType.Draw || r._event) { //draw
                     sel.tournament = r._event._tournament;
                     sel.event = r._event;
                     sel.draw = r;
                     sel.match = undefined;
 
-                } else if (r.draws && r._tournament) { //event
+                } else if (type === models.ModelType.Event || (r.draws && r._tournament)) { //event
                     sel.tournament = r._tournament;
                     sel.event = r;
-                    sel.draw = r.draws[0];
+                    sel.draw = r.draws ? r.draws[0] : undefined;
                     sel.match = undefined;
 
-                } else if (r.name && r._tournament) {   //player
+                } else if (type === models.ModelType.Player || (r.name && r._tournament)) {   //player
                     sel.tournament = r._tournament;
                     sel.player = r;
 
-                } else if (r.players && r.events) { //tournament
+                } else if (type === models.ModelType.Tournament || (r.players && r.events)) { //tournament
                     sel.tournament = r;
                     sel.event = undefined;
                     sel.draw = undefined;
@@ -286,6 +301,7 @@
             '$log',
             '$http',
             '$q',
+            '$window',
             'selection',
             'tournamentLib',
             'drawLib',
@@ -303,6 +319,7 @@
             $log: ng.ILogService,
             $http: ng.IHttpService,
             $q: ng.IQService,
+            $window: ng.IWindowService,
             selection: jat.service.Selection,
             tournamentLib: jat.service.TournamentLib,
             drawLib: jat.service.DrawLib,
@@ -316,6 +333,6 @@
             undo: jat.service.Undo,
             find: jat.service.Find,
             guid: jat.service.Guid) => {
-            return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
+            return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
         }]);
 }

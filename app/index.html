@@ -1,5 +1,10 @@
 ﻿<!DOCTYPE html>
+<!--(if target dev)><!-->
+<html lang="en" ng-app="jat">
+<!--<!(endif)-->
+<!--(if target dist)>
 <html lang="en" ng-app="jat" manifest="jatennis.appcache">
+<!(endif)-->
 <head>
     <meta charset="utf-8">
     <title>JA-Tennis</title>
@@ -8,16 +13,15 @@
             display: none;
         }
     </style>
-<!--(if target dev)><!-->
+    <!--(if target dev)><!-->
     <link rel="stylesheet" href="../lib/ui-bootstrap/assets/bootstrap.css" />
-<!--<!(endif)-->
-<!--(if target dist)>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
-<!(endif)-->
-
-<!-- build:css style/app.min.css -->
+    <!--<!(endif)-->
+    <!--(if target dist)>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
+    <!(endif)-->
+    <!-- build:css style/app.min.css -->
     <link rel="stylesheet" href="style/app.css" />
-<!-- endbuild -->
+    <!-- endbuild -->
 
     <link rel="icon" href="style/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon">
@@ -122,16 +126,15 @@
         -->
     </div>
 
-<!--(if target dev)><!-->
+    <!--(if target dev)><!-->
     <script src="../lib/angular/angular.js"></script>
     <script src="../lib/ui-bootstrap/ui-bootstrap-tpls-0.8.0.min.js"></script>
-<!--<!(endif)-->
-<!--(if target dist)>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
-<!(endif)-->
-
-<!-- build:js jatennis.min.js -->
+    <!--<!(endif)-->
+    <!--(if target dist)>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
+    <!(endif)-->
+    <!-- build:js jatennis.min.js -->
     <script src="app.js"></script>
 
     <script src="utils/tool.js"></script>
@@ -171,6 +174,6 @@
     <script src="draw/dialogMatch.js"></script>
 
     <script src="ui/ec-panels.js"></script>
-<!-- endbuild -->
+    <!-- endbuild -->
 </body>
 </html>

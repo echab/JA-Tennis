@@ -2,11 +2,12 @@
 (function (jat) {
     (function (service) {
         var MainLib = (function () {
-            function MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, //private rank: ServiceRank,
+            function MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, //private rank: ServiceRank,
             undo, find, guid) {
                 this.$log = $log;
                 this.$http = $http;
                 this.$q = $q;
+                this.$window = $window;
                 this.selection = selection;
                 this.tournamentLib = tournamentLib;
                 this.drawLib = drawLib;
@@ -19,29 +20,43 @@
             MainLib.prototype.loadTournament = function (url) {
                 var _this = this;
                 var deferred = this.$q.defer();
-                this.$http.get(url).success(function (data, status) {
-                    _this.tournamentLib.initTournament(data);
-
-                    data._url = url;
-
-                    if (data.events[0]) {
-                        _this.select(data.events[0].draws[0], 4 /* Draw */);
+                if (!url) {
+                    var data = this.$window.localStorage['tournament'];
+                    if (data) {
+                        data = angular.fromJson(data);
+                        this.tournamentLib.initTournament(data);
+                        this.loadedTournament(data);
+                        deferred.resolve(data);
+                    } else {
+                        deferred.reject('nothing in storage');
                     }
-                    _this.selection.player = undefined;
-
-                    deferred.resolve(data);
-                }).error(function (data, status) {
-                    deferred.reject(data);
-                });
-
+                } else {
+                    this.$http.get(url).success(function (data, status) {
+                        data._url = url;
+                        _this.tournamentLib.initTournament(data);
+                        _this.loadedTournament(data);
+                        deferred.resolve(data);
+                    }).error(function (data, status) {
+                        deferred.reject(data);
+                    });
+                }
                 return deferred.promise;
+            };
+
+            MainLib.prototype.loadedTournament = function (tournament) {
+                if (tournament.events[0]) {
+                    this.select(tournament.events[0].draws[tournament.events[0].draws.length - 1], 4 /* Draw */);
+                } else {
+                    this.select(tournament, 1 /* Tournament */);
+                }
             };
 
             MainLib.prototype.saveTournament = function (tournament, url) {
                 var data = {};
                 tool.copy(tournament, data);
                 if (!url) {
-                    this.$log.info(angular.toJson(data, true));
+                    //this.$log.info(angular.toJson(data, true));
+                    this.$window.localStorage['tournament'] = angular.toJson(data);
                     return;
                 }
                 this.$http.post(url || tournament._url, data).success(function (data, status) {
@@ -212,25 +227,25 @@
             MainLib.prototype.select = function (r, type) {
                 var sel = this.selection;
                 if (r) {
-                    if (r.playerId && r._draw) {
+                    if (type === 6 /* Box */ || (r.playerId && r._draw)) {
                         sel.tournament = r._draw._event._tournament;
                         sel.event = r._draw._event;
                         sel.draw = r._draw;
                         sel.match = r;
-                    } else if (r._event) {
+                    } else if (type === 4 /* Draw */ || r._event) {
                         sel.tournament = r._event._tournament;
                         sel.event = r._event;
                         sel.draw = r;
                         sel.match = undefined;
-                    } else if (r.draws && r._tournament) {
+                    } else if (type === 3 /* Event */ || (r.draws && r._tournament)) {
                         sel.tournament = r._tournament;
                         sel.event = r;
-                        sel.draw = r.draws[0];
+                        sel.draw = r.draws ? r.draws[0] : undefined;
                         sel.match = undefined;
-                    } else if (r.name && r._tournament) {
+                    } else if (type === 2 /* Player */ || (r.name && r._tournament)) {
                         sel.tournament = r._tournament;
                         sel.player = r;
-                    } else if (r.players && r.events) {
+                    } else if (type === 1 /* Tournament */ || (r.players && r.events)) {
                         sel.tournament = r;
                         sel.event = undefined;
                         sel.draw = undefined;
@@ -273,6 +288,7 @@
             '$log',
             '$http',
             '$q',
+            '$window',
             'selection',
             'tournamentLib',
             'drawLib',
@@ -285,9 +301,9 @@
             'undo',
             'find',
             'guid',
-            function ($log, $http, $q, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, //rank: ServiceRank,
+            function ($log, $http, $q, $window, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, //rank: ServiceRank,
             undo, find, guid) {
-                return new MainLib($log, $http, $q, selection, tournamentLib, drawLib, validation, undo, find, guid);
+                return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
             }]);
     })(jat.service || (jat.service = {}));
     var service = jat.service;

@@ -2,7 +2,7 @@
     <!--<caption>Events</caption>-->
     <thead>
         <tr>
-            <th class="span1"><input type="checkbox" /></th>
+            <!--<th class="span1"><input type="checkbox" /></th>-->
             <th>Event name</th>
             <th>Draws</th>
             <th></th>
@@ -10,19 +10,19 @@
     </thead>
     <tbody>
         <tr ng-repeat="event in list.events" ng-class="{info:event === main.selection.event}">
-            <td><input type="checkbox" /> <small>{{event.id}}</small></td>
-            <td>
+            <!--<td><input type="checkbox" /> <small>{{event.id}}</small></td>-->
+            <td ng-class="{selected: event === main.selection.event}">
                 <i class="icon2-info" ng-click="main.editEvent(event)"></i>
                 <span ng-click="main.select(event)">{{event.name}}</span>
                 <i class="icon-trash" ng-click="main.removeEvent(event)"></i>
             </td>
             <td>
-                <div ng-repeat="draw in event.draws" class="inline" ng-class="{error:main.validation.hasErrorDraw(draw)}" style="border-left: solid 1px blue; padding-left: 3px;">
+                <div ng-repeat="draw in event.draws" class="inline" ng-class="{error:main.validation.hasErrorDraw(draw), selected: draw === main.selection.draw}" style="border-left: solid 1px blue; padding-left: 3px;">
                     <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
                     <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
                     <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>
                     <div draw="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
-                            ng-click="main.select(draw)">
+                         ng-click="main.select(draw)">
                     </div>
                 </div>
             </td>

@@ -20,6 +20,16 @@ module jat.draw {
         //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
         //}
 
+        static $inject = [
+            'title',
+            'draw',
+            //'selection',
+            'rank',
+            'category',
+            'drawLib',
+            'tournamentLib',
+            '$scope'];
+
         constructor(
             private title: string,
             private draw: models.Draw,
@@ -54,14 +64,5 @@ module jat.draw {
     }
 
     angular.module('jat.draw.dialog', [])
-        .controller('dialogDrawCtrl', [
-            'title',
-            'draw',
-            //'selection',
-            'rank',
-            'category',
-            'drawLib',
-            'tournamentLib',
-            '$scope',
-            dialogDrawCtrl]);
+        .controller('dialogDrawCtrl', dialogDrawCtrl);
 }

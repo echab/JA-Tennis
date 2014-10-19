@@ -25,6 +25,7 @@ var models;
         ModelType[ModelType["Event"] = 3] = "Event";
         ModelType[ModelType["Draw"] = 4] = "Draw";
         ModelType[ModelType["Match"] = 5] = "Match";
+        ModelType[ModelType["Box"] = 6] = "Box";
     })(models.ModelType || (models.ModelType = {}));
     var ModelType = models.ModelType;
 })(models || (models = {}));

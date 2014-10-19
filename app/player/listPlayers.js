@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (player) {
@@ -29,13 +29,15 @@ var jat;
                     return this.find.byId(this.selection.tournament.events, id);
                 }
             };
+
+            listPlayersCtrl.$inject = [
+                'selection',
+                'find'
+            ];
             return listPlayersCtrl;
         })();
 
-        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', [
-            'selection',
-            'find',
-            listPlayersCtrl]);
+        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', listPlayersCtrl);
     })(jat.player || (jat.player = {}));
     var player = jat.player;
 })(jat || (jat = {}));

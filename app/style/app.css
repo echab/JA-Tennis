@@ -408,3 +408,7 @@ tr.error, div.error, span.error {
 .panelbadge.planning {
     background-color: coral;
 }
+
+.table .selected {
+    background-color: #96d3f2 !important;
+}

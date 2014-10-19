@@ -4,7 +4,7 @@ var jat;
     (function (main) {
         /** Main controller for the application */
         var mainCtrl = (function () {
-            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, validation, undo) {
+            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, validation, undo, $window) {
                 var _this = this;
                 this.$modal = $modal;
                 this.selection = selection;
@@ -13,14 +13,32 @@ var jat;
                 this.drawLib = drawLib;
                 this.validation = validation;
                 this.undo = undo;
+                this.$window = $window;
                 this.GenerateType = models.GenerateType;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
-                this.mainLib.loadTournament('/data/tournament8.json').then(function (data) {
-                    _this.mainLib.select(data.events[0].draws[data.events[0].draws.length - 1], 4 /* Draw */);
+                //Load saved tournament if exists
+                this.mainLib.loadTournament().then(function (data) {
+                }, function (reason) {
+                    _this.mainLib.loadTournament('/data/tournament8.json').then(function (data) {
+                    });
                 });
+
+                //Auto save tournament on exit
+                var onBeforeUnloadHandler = function (event) {
+                    _this.mainLib.saveTournament(_this.selection.tournament);
+                };
+                if ($window.addEventListener) {
+                    $window.addEventListener('beforeunload', onBeforeUnloadHandler);
+                } else {
+                    $window.onbeforeunload = onBeforeUnloadHandler;
+                }
             }
             //#region tournament
+            mainCtrl.prototype.newTournament = function () {
+                //TODO browse for file
+                //this.mainLib.loadTournament('xxx.json');
+            };
             mainCtrl.prototype.loadTournament = function () {
                 //TODO browse for file
                 //this.mainLib.loadTournament('xxx.json');
@@ -247,6 +265,15 @@ var jat;
             mainCtrl.prototype.doRedo = function () {
                 this.mainLib.select(this.undo.redo(), this.undo.getMeta());
             };
+            mainCtrl.$inject = [
+                '$modal',
+                'selection',
+                'mainLib',
+                'tournamentLib',
+                'drawLib',
+                'validation',
+                'undo',
+                '$window'];
             return mainCtrl;
         })();
         main.mainCtrl = mainCtrl;
@@ -272,15 +299,7 @@ var jat;
             'jat.draw.box',
             'jat.match.dialog',
             'ec.panels',
-            'ui.bootstrap']).controller('mainCtrl', [
-            '$modal',
-            'selection',
-            'mainLib',
-            'tournamentLib',
-            'drawLib',
-            'validation',
-            'undo',
-            mainCtrl]);
+            'ui.bootstrap']).controller('mainCtrl', mainCtrl);
     })(jat.main || (jat.main = {}));
     var main = jat.main;
 })(jat || (jat = {}));

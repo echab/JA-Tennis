@@ -27,6 +27,11 @@ module jat.player {
             }
         }
 
+        static $inject = [
+            'selection',
+            'find'
+        ];
+
         constructor(
             private selection: jat.service.Selection,
             private find: jat.service.Find) {
@@ -35,9 +40,6 @@ module jat.player {
 
     angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find'])
         .directive('listPlayers', listPlayersDirective)
-        .controller('listPlayersCtrl', [
-            'selection',
-            'find',
-            listPlayersCtrl])
+        .controller('listPlayersCtrl', listPlayersCtrl)
     ;
 }

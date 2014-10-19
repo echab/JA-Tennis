@@ -74,7 +74,7 @@ var jat;
             TournamentLib.prototype.initEvent = function (event, parent) {
                 event._tournament = parent;
 
-                var c = event.draws;
+                var c = event.draws = event.draws || [];
                 if (c) {
                     for (var i = c.length - 1; i >= 0; i--) {
                         var draw = c[i];

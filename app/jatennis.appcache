@@ -1,4 +1,7 @@
 CACHE MANIFEST
+
+# Version {{ VERSION }} - date {{ DATE }}
+
 index.html
 jatennis.min.js
 style/app.min.css
