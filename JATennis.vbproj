@@ -140,6 +140,8 @@
     <Content Include="data\tournament8.json" />
     <Content Include="app\.htaccess" />
     <None Include="app\jatennis.appcache" />
+    <Content Include="data\test1-14-0-0.json" />
+    <Content Include="data\to2006.json" />
     <None Include="test\karma.config.js" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />

@@ -6,7 +6,7 @@
 
         //General info
         name: string;
-        surname?: string;
+        firstname?: string;
         sexe?: string;
         birth?: Date;
         category?: string;

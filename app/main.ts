@@ -30,12 +30,15 @@ module jat.main {
 
             this.selection.tournament = this.tournamentLib.newTournament();
 
+            //var filename = '/data/tournament8.json';
+            var filename = '/data/to2006.json';
+
             //Load saved tournament if exists
-            this.mainLib.loadTournament().then((data) => {
-            }, (reason) => {
-                this.mainLib.loadTournament('/data/tournament8.json').then((data) => {
+            //this.mainLib.loadTournament().then((data) => {
+            //}, (reason) => {
+                this.mainLib.loadTournament(filename).then((data) => {
                 });
-            });
+            //});
 
             //Auto save tournament on exit
             var onBeforeUnloadHandler = (event: Event) => {

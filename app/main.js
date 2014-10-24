@@ -17,13 +17,16 @@ var jat;
                 this.GenerateType = models.GenerateType;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
+                //var filename = '/data/tournament8.json';
+                var filename = '/data/to2006.json';
+
                 //Load saved tournament if exists
-                this.mainLib.loadTournament().then(function (data) {
-                }, function (reason) {
-                    _this.mainLib.loadTournament('/data/tournament8.json').then(function (data) {
-                    });
+                //this.mainLib.loadTournament().then((data) => {
+                //}, (reason) => {
+                this.mainLib.loadTournament(filename).then(function (data) {
                 });
 
+                //});
                 //Auto save tournament on exit
                 var onBeforeUnloadHandler = function (event) {
                     _this.mainLib.saveTournament(_this.selection.tournament);
