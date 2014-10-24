@@ -62,10 +62,13 @@ var jat;
 
                     if (isMatch(box)) {
                         var opponent = positionOpponents(box.position);
-                        ctx.moveTo(x - this.interBoxWidth, draw._points[opponent.pos1].y * this.boxHeight + boxHeight2);
-                        ctx.lineTo(x, y + boxHeight2);
-                        ctx.lineTo(x - this.interBoxWidth, draw._points[opponent.pos2].y * this.boxHeight + boxHeight2);
-                        ctx.stroke();
+                        var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
+                        if (p1 && p2) {
+                            ctx.moveTo(x - this.interBoxWidth, p1.y * this.boxHeight + boxHeight2);
+                            ctx.lineTo(x, y + boxHeight2);
+                            ctx.lineTo(x - this.interBoxWidth, p2.y * this.boxHeight + boxHeight2);
+                            ctx.stroke();
+                        }
                     }
                     ctx.moveTo(x, y + boxHeight2);
                     ctx.lineTo(x + this.boxWidth - this.interBoxWidth, y + boxHeight2);
