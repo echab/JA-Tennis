@@ -35,8 +35,8 @@
         <li class="active"><a href="#/events">events</a></li>
     </ul>-->
 
-    <div ec-panelset="" class="ng-cloak">
-        <div ec-panel="" active="true" class="tournament">
+    <div ec-panelset="" class="ng-cloak" ng-init="tournamentOpened=true; drawsOpened=true;">
+        <div ec-panel="" is-open="tournamentOpened" class="tournament">
             <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
             <div ec-header="">
                 {{main.selection.tournament.info.name}}
@@ -59,7 +59,7 @@
 
                 <div app-version></div>
             </div>
-        </div><div ec-panel="" active="false" class="players">
+        </div><div ec-panel="" is-open="playersOpened" class="players">
             <div ec-badge="" class="players"><i class="icon2-player"></i></div>
             <div ec-header="">
                 <form class="form-horizontal">
@@ -69,7 +69,7 @@
             <div class="content">
                 <div list-players="main.selection.tournament.players"></div>
             </div>
-        </div><div ec-panel="" active="true" class="draws">
+        </div><div ec-panel="" is-open="drawsOpened" class="draws">
             <div ec-badge="" class="draws"><i class="icon2-draw"></i></div>
             <div ec-header="">
                 <form class="form-horizontal">
@@ -117,7 +117,7 @@
         <!--
 
 
-        - -><div ec-badge="" class="planning"><i class="icon2-planning"></i></div><div ec-panel="" active="false" class="planning"><!- -
+        - -><div ec-badge="" class="planning"><i class="icon2-planning"></i></div><div ec-panel="" is-open="false" class="planning"><!- -
             - -><div ec-header="">Planning</div>
             <div class="content">
                 TODO

@@ -318,7 +318,7 @@ tr.error, div.error, span.error {
 }
 .panel {
     background-color: #bbb;
-    transition: max-width .5s;
+    transition: width .5s;
 
     display: inline-block;
     height: 100%;

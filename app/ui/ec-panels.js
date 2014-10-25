@@ -70,27 +70,26 @@ angular.module('ec.panels', [])
 
     ctrl.select = function (panel, select) {
 
-        if (panel.active !== select) {
-            if (select) {
-                ctrl.selectCount++;
-            } else {
-                ctrl.selectCount--;
-            }
-        }
-
-        panel.active = select;
+        //if (panel.isOpen) {
+        //    panel.onSelect();
+        //} else {
+        //    panel.onDeselect();
+        //}
 
         //compute margins
+        ctrl.selectCount = 0;
         for (var i = 0; i < panels.length; i++) {
             panels[i].marginLeft = i;
-            if (panels[i].active) {
+            if (panels[i].isOpen) {
+                ctrl.selectCount++;
                 break;
             }
         }
         var firstActive = i;
         var n = 0;
         for (i = panels.length - 1; i > firstActive; i--) {
-            if (panels[i].active) {
+            if (panels[i].isOpen) {
+                ctrl.selectCount++;
                 n = 0;
             } else {
                 n--;
@@ -102,22 +101,28 @@ angular.module('ec.panels', [])
 
     ctrl.addBadge = function addBadge(badge) {
         badges.push(badge);
+        badge.$on('$destroy', function () {
+            ctrl.removeBadge(badge);
+        });
     };
 
-    ctrl.addPanel = function addPanel(panel, isActive) {
+    ctrl.addPanel = function addPanel(panel) {
         var badge = badges[panels.length];
         badge.panel = panel;
         panel.badge = badge;
         panel.marginLeft = 0;
         panels.push(panel);
-        if (isActive) {
+        if (panel.isOpen) {
             ctrl.selectCount++;
         }
+        panel.$on('$destroy', function () {
+            ctrl.removePanel(panel);
+        });
     };
 
     ctrl.removePanel = function removePanel(panel) {
         var index = panels.indexOf(panel);
-        if (panel.active && panels.length > 1) {
+        if (panel.isOpen) {
             ctrl.selectCount--;
         }
         if (panel.badge) {
@@ -183,9 +188,11 @@ angular.module('ec.panels', [])
         transclude: true,
         scope: {    //isolated scope
             //heading: '@',
-            onSelect: '&select', //This callback is called in contentHeadingTransclude
-            //once it inserts the panel's content into the dom
-            onDeselect: '&deselect'
+            isOpen: '=?',
+            isDisabled: '=?'
+            //,onSelect: '&select', //This callback is called in contentHeadingTransclude
+            ////once it inserts the panel's content into the dom
+            //onDeselect: '&deselect'
         },
         controller: ['$scope', function PanelCtrl($scope) {
             //Empty controller so other directives can require being 'under' a panel
@@ -194,62 +201,23 @@ angular.module('ec.panels', [])
         }],
         link: function postLink(scope, elm, attrs, panelsetCtrl, transclude) {
 
-            scope.marginLeft = 0;
+            //scope.isOpen = scope.isOpen == 'true';
 
-            var getActive, setActive;
-            if (attrs.active) {
-                getActive = $parse(attrs.active);
-                setActive = getActive.assign || angular.noop;
-                scope.$parent.$watch(getActive, function updateActive(value, oldVal) {
-                    // Avoid re-initializing scope.active as it is already initialized
-                    // below. (watcher is called async during init with value ===
-                    // oldVal)
-                    if (value !== oldVal) {
-                        scope.active = !!value;
-                    }
-                });
-                scope.active = getActive(scope.$parent);
-            } else {
-                setActive = getActive = angular.noop;
-            }
+            panelsetCtrl.addPanel(scope);
 
-            scope.$watch('active', function (active) {
-                // Note this watcher also initializes and assigns scope.active to the
-                // attrs.active expression.
-                setActive(scope.$parent, active);
-                panelsetCtrl.select(scope, active);
-                if (active) {
-                    scope.onSelect();
-                } else {
-                    scope.onDeselect();
-                }
+            scope.$watch('isOpen', function (value) {
+                panelsetCtrl.select(scope, !!value);
             });
 
-            scope.disabled = false;
-            if (attrs.disabled) {
-                scope.$parent.$watch($parse(attrs.disabled), function (value) {
-                    scope.disabled = !!value;
-                });
-            }
-
-            scope.select = function (full) {
-                if (!scope.disabled) {
-                    if (scope.active && panelsetCtrl.selectCount <= 1) {
-                        return;
-                    }
-                    scope.active = !scope.active;
+            scope.toggleOpen = function () {
+                if (!scope.isDisabled) {
+                    scope.isOpen = !scope.isOpen;
                 }
             };
 
-            scope.Math = Math;  //use by Math.floor in the template
-            scope.selectCount = function () {
-                return panelsetCtrl.selectCount;
+            scope.getWidth = function () {
+                return Math.floor(100 / panelsetCtrl.selectCount) + '%';
             };
-
-            panelsetCtrl.addPanel(scope, getActive());
-            scope.$on('$destroy', function () {
-                panelsetCtrl.removePanel(scope);
-            });
         }
     };
 }])
@@ -267,9 +235,6 @@ angular.module('ec.panels', [])
             scope.panel = null;
 
             panelsetCtrl.addBadge(scope);
-            scope.$on('$destroy', function () {
-                panelsetCtrl.removeBadge(scope);
-            });
         }
     };
 }])
@@ -289,6 +254,26 @@ angular.module('ec.panels', [])
     };
 }])
 
+//// Use in the accordion-group template to indicate where you want the heading to be transcluded
+//// You must provide the property on the accordion-group controller that will hold the transcluded element
+//// <div class="accordion-group">
+////   <div class="accordion-heading" ><a ... accordion-transclude="heading">...</a></div>
+////   ...
+//// </div>
+//.directive('accordionTransclude', function () {
+//    return {
+//        require: '^accordionGroup',
+//        link: function (scope, element, attr, controller) {
+//            scope.$watch(function () { return controller[attr.accordionTransclude]; }, function (heading) {
+//                if (heading) {
+//                    element.html('');
+//                    element.append(heading);
+//                }
+//            });
+//        }
+//    };
+//})
+
 .run(["$templateCache", function ($templateCache) {
     $templateCache.put("template/panels/panelset.html",
         "<div class='panels'"
@@ -296,17 +281,15 @@ angular.module('ec.panels', [])
             + "</div>");
 
     $templateCache.put("template/panels/badge.html",
-        "<div class='panelbadge' ng-class='{active: panel.active, disabled: panel.disabled}'"
+        "<div class='panelbadge' ng-class='{active: panel.isOpen, disabled: panel.isDisabled}'"
             + " ng-style=\"{'margin-left': (panel.marginLeft) * 3 +'em'}\""
-            + " ng-click='panel.select()' ng-dblclick='panel.select(true)'"
+            + " ng-click='panel.toggleOpen()' ng-dblclick='panel.toggleOpen(true)'"
             + " ng-transclude>"
             + "</div>");
 
     $templateCache.put("template/panels/panel.html",
-        "<div class='panel' ng-class='{active: active, disabled: disabled}'"
-            //+ " ng-style=\"{width: (active ? Math.floor(100 / selectCount()) : 0) + '%'}\""
-            + " ng-style=\"{'max-width': (active ? 'none' : 0)}\""
-            //+ " ng-show='active'"
+        "<div class='panel' ng-class='{active: isOpen, disabled: isDisabled}'"
+            + " ng-style=\"{'width': isOpen ? getWidth() : 0}\""
             + " ng-transclude>"
             + "</div>");
 
