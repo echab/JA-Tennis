@@ -1,27 +1,51 @@
 {
-  "author": "Eloi Chabaud",
-  "name": "JA-Tennis",
-  "version": "0.0.1",
-  "description": "Tennis tournament management system. Offline web application, fully customisable.",
+    "name": "JA-Tennis",
+    "version": "0.0.1",
+    "description": "Tennis tournament management system. Offline web application, fully customisable.",
+    "author": "Eloi Chabaud",
 
-  "homepage": "http://jatennis.free.fr/",
+    "homepage": "http://jatennis.free.fr/",
 
-  "devDependencies": {
-    "grunt": "~0.4.5",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-nodeunit": "~0.4.1",
-    "grunt-contrib-uglify": "~0.6.0",
-    "grunt-inline-angular-templates": "~0.1.5",
-	"grunt-contrib-concat": "~0.3.0",
-	"grunt-contrib-cssmin": "~0.10.0",
-	"grunt-usemin": "~2.0.2",
-	"grunt-contrib-copy": "~0.5.0",
-	"grunt-rev": "~0.1.0",
-	"grunt-contrib-clean": "~0.5.0",
-	"grunt-ng-annotate": "~0.4.0",
-    "grunt-htmlclean": "~2.2.2",
-    "grunt-targethtml": "~0.2.6",
-    "grunt-string-replace":  "~1.0.0",
-	"matchdep": "~0.3.0"
-  }
-}
+    "devDependencies_gulp": {
+        "gulp" : "~3.8.9",
+        "gulp-usemin": "~0.3.8",
+        "gulp-sourcemaps":  "~1.2.4",
+        "gulp-uglify":  "~1.0.1",
+        "gulp-minify-html":  "~0.1.6",
+        "gulp-minify-css": "~0.3.11",
+        "gulp-replace": "~0.4.0",
+        "gulp-concat": "~2.4.1",
+        "gulp-targethtml":  "~0.0.0",
+        "gulp-inline-angular-templates": "~0.1.5",
+        "gulp-angular-templatecache": "~1.4.2",
+        "del": "~0.1.3",
+        "gulp-through": "~0.3.0",
+        "gulp-filelog": "~0.4.0",
+        "gulp-zip":  "~2.0.2",
+        "gulp-ftp":  "~1.0.1",
+        "gulp-notify":  "~2.0.0"
+    },
+    
+    "devDependencies": {
+            "grunt": "~0.4.5",
+            "grunt-contrib-jshint": "~0.10.0",
+            "grunt-contrib-nodeunit": "~0.4.1",
+            "grunt-contrib-uglify": "~0.6.0",
+            "grunt-inline-angular-templates": "~0.1.5",
+            "grunt-contrib-concat": "~0.3.0",
+            "grunt-contrib-cssmin": "~0.10.0",
+            "grunt-usemin": "~2.0.2",
+            "grunt-contrib-copy": "~0.5.0",
+            "grunt-rev": "~0.1.0",
+            "grunt-contrib-clean": "~0.5.0",
+            "grunt-ng-annotate": "~0.4.0",
+            "grunt-htmlclean": "~2.2.2",
+            "grunt-targethtml": "~0.2.6",
+            "grunt-string-replace": "~1.0.0",
+            "grunt-zip": "~0.16.2",
+            "grunt-contrib-compress":  "~0.12.0",
+            "grunt-rename": "~0.1.4",
+            "grunt-ftp-deploy" : "~0.1.9",
+            "matchdep": "~0.3.0"
+        }
+    }

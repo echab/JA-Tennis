@@ -1,0 +1,30 @@
+﻿<form name="infoForm" ng-submit="$close('Ok')"class="modal-form">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} {{dlg.info.name}}</h3>
+    </div>
+    <div class="modal-body Zform-horizontal">
+
+        <div>
+            <label class="">
+                Name:
+                <input type="text" name="name" ng-model="dlg.info.name" required autofocus class="span2" />
+            </label>
+            <!--<span class="error" ng-show="infoForm.name.$error.required">Required!</span>-->
+        </div>
+        <div>
+            <label class="">
+                Begin:
+                <input type="date" name="start" ng-model="dlg.info.start" class="span3"/>
+            </label>
+            <label class="">
+                end:
+                <input type="date" name="end" ng-model="dlg.info.end" class="span3"/>
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!infoForm.$error.required" ng-class="{'disabled': !!infoForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+    </div>
+</form>

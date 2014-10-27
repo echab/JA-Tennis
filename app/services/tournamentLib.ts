@@ -22,6 +22,14 @@ module jat.service {
             return tournament;
         }
 
+        public newInfo(source?: models.TournamentInfo): models.TournamentInfo {
+            var info: models.TournamentInfo = <any>{};
+            if (angular.isObject(source)) {
+                angular.extend(info, source);
+            }
+            return info;
+        }
+
         public initTournament(tournament: models.Tournament): void {
             if (tournament.players) {
                 for (var i = tournament.players.length - 1; i >= 0; i--) {
@@ -93,7 +101,7 @@ module jat.service {
         }
 
         public isRegistred(event: models.Event, player: models.Player): boolean {
-            return player.registration.indexOf(event.id) !== -1;
+            return player.registration && player.registration.indexOf(event.id) !== -1;
         }
 
         public getRegistred(event: models.Event): models.Player[] {
@@ -144,17 +152,13 @@ module jat.service {
 
         public GetJoueursInscrit(draw: models.Draw): models.Player[] {
 
-            function isInscrit(player: models.Player, event: models.Event): boolean {
-                return player.registration.indexOf(event.id) != -1;
-            }
-
             //Récupère les joueurs inscrits
             var players = draw._event._tournament.players,
                 ppJoueur: models.Player[] = [], //new short[nPlayer],
                 nPlayer = 0;
             for (var i = 0; i < players.length; i++) {
                 var pJ = players[i];
-                if (isInscrit(pJ, draw._event)) {
+                if (this.isRegistred(draw._event, pJ)) {
                     if (!pJ.rank
                         || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
                         ppJoueur.push(pJ);	//no du joueur

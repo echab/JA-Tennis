@@ -140,6 +140,43 @@ module.exports = function (grunt) {
                     }]
                 }
             }
+        },
+
+        compress: {
+            main: {
+                options: {
+                    mode: 'zip',
+                    archive: function () {
+                        return '../backup/JA-Tennis_' + grunt.template.today("yyyy-mm-dd_HH_MM_ss") + '.zip';
+                    }
+                },
+                files: [
+                    {
+                        src: [
+                            '**/*.{ts,html,css,ico,png,appcache,cmd,sln,vbproj,config}',
+                            '**/{math-mock,ui-bootstrap-mocks}.js',
+                            'package.json',
+                            '.htaccess',
+                            '.ftppass',
+                            '*file.js',
+                            '!node_modules/**', '!lib/angular/**', '!lib/ui-bootstrap/**', '!lib/typings/**', '!dist/**', '!bin/**'],
+                        dest: '/'
+                    }
+                ]
+            }
+        },
+
+        'ftp-deploy': {
+            free: {
+                auth: {
+                    host: 'ftpperso.free.fr',
+                    port: 21,
+                    authKey: 'free1'
+                },
+                src: 'dist',
+                dest: '/2.0',
+                exclusions: ['dist/**/Thumbs.db']
+            }
         }
 
     });
@@ -150,14 +187,23 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'copy:main',
         'string-replace:version',
-	    //'htmlclean',
-	    'inline_angular_templates',
+        //'htmlclean',
+        'inline_angular_templates',
         'targethtml',
-	    'useminPrepare',
-	    'concat',
-	    'uglify',
-	    'cssmin',
-	    //'filerev', 
-	    'usemin'
+        'useminPrepare',
+        'concat',
+        'uglify',
+        'cssmin',
+        //'filerev', 
+        'usemin'
     ]);
+
+    grunt.registerTask('backup', [
+        'compress:main'
+    ]);
+
+    grunt.registerTask('publish', [
+        'default', 'ftp-deploy:free'
+    ]);
+
 };

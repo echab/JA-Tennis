@@ -1,6 +1,6 @@
 CACHE MANIFEST
 
-# Version {{ VERSION }} - date {{ DATE }}
+# Version {{ VERSION }} - build {{ DATE }}
 
 index.html
 jatennis.min.js

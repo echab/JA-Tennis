@@ -8,8 +8,11 @@ call npm install
 @if errorlevel 1 goto :theend
 
 @echo Build with Grunt
-call grunt
+call grunt %*
+
+rem @echo Build with Gulp
+rem call gulp %*
 
 :theend
-pause
+if errorlevel 1 pause
 popd

@@ -39,13 +39,16 @@
         <div ec-panel="" is-open="tournamentOpened" class="tournament">
             <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
             <div ec-header="">
+                <i class="icon2-info" ng-click="main.editTournament(main.selection.tournament)"></i>
                 {{main.selection.tournament.info.name}}
             </div>
             <div class="content">
 
                 <div class="">
                     <div class="btn-group">
+                        <button ng-click="main.newTournament()" class="btn"><i class="icon-file"></i> New</button>
                         <!--<button ng-click="main.loadTournament()" class="btn"><i class="icon2-open"></i> Open</button>-->
+                        <span ec-input-file onloaded="main.loadTournament(file)"><i class="icon2-open"></i> Open</span>
                         <button ng-click="main.saveTournament()" class="btn"><i class="icon2-save"></i> Save</button>
                     </div>
                     <div class="btn-group">
@@ -162,6 +165,8 @@
 
     <script src="main.js"></script>
 
+    <script src="tournament/dialogInfo.js"></script>
+
     <script src="player/listPlayers.js"></script>
     <script src="player/dialogPlayer.js"></script>
 
@@ -174,6 +179,7 @@
     <script src="draw/dialogMatch.js"></script>
 
     <script src="ui/ec-panels.js"></script>
+    <script src="ui/ec-inputfile.js"></script>
     <!-- endbuild -->
 </body>
 </html>

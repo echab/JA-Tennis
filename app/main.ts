@@ -30,14 +30,14 @@ module jat.main {
 
             this.selection.tournament = this.tournamentLib.newTournament();
 
-            //var filename = '/data/tournament8.json';
-            var filename = '/data/to2006.json';
+            var filename = '/data/tournament8.json';
+            //var filename = '/data/to2006.json';
 
             //Load saved tournament if exists
             //this.mainLib.loadTournament().then((data) => {
             //}, (reason) => {
-                this.mainLib.loadTournament(filename).then((data) => {
-                });
+            this.mainLib.loadTournament(filename).then((data) => {
+            });
             //});
 
             //Auto save tournament on exit
@@ -49,22 +49,42 @@ module jat.main {
             } else {
                 $window.onbeforeunload = onBeforeUnloadHandler;
             }
- 
+
 
         }
 
         //#region tournament
         newTournament(): void {
-            //TODO browse for file
-            //this.mainLib.loadTournament('xxx.json');
+            //TODO confirmation
+            //TODO undo
+            this.mainLib.newTournament();
+            this.editTournament(this.selection.tournament);
         }
-        loadTournament(): void {
-            //TODO browse for file
-            //this.mainLib.loadTournament('xxx.json');
+        loadTournament(file: File): void {
+            this.mainLib.loadTournament(file);
         }
         saveTournament(): void {
             this.mainLib.saveTournament(this.selection.tournament, '');
-            
+
+        }
+        editTournament(tournament: models.Tournament): void {
+
+            var editedInfo = this.tournamentLib.newInfo(this.selection.tournament.info);
+
+            this.$modal.open({
+                templateUrl: 'tournament/dialogInfo.html',
+                controller: 'dialogInfoCtrl as dlg',    //required for resolve
+                resolve: {
+                    title: () => "Edit info",
+                    info: () => editedInfo
+                }
+            }).result.then((result: string) => {
+                    if ('Ok' === result) {
+                        //this.mainLib.editInfo(editedInfo, this.selection.tournament.info);
+                        var c = this.selection.tournament;
+                        this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
+                    }
+                });
         }
         //#endregion tournament
 
@@ -269,6 +289,7 @@ module jat.main {
         'jat.services.validation.roundrobin',
         'jat.services.validation.fft',
 
+        'jat.tournament.dialog',
         'jat.player.dialog',
         'jat.player.list',
         'jat.event.dialog',
@@ -278,6 +299,7 @@ module jat.main {
         'jat.draw.box',
         'jat.match.dialog',
         'ec.panels',
+        'ec.inputFile',
         'ui.bootstrap'])
 
         .controller('mainCtrl', mainCtrl);

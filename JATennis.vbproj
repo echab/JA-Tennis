@@ -86,6 +86,9 @@
     <TypeScriptCompile Include="app\app.ts" />
     <Content Include="app\index.html" />
     <TypeScriptCompile Include="app\services\validation.ts" />
+    <TypeScriptCompile Include="app\tournament\dialogInfo.ts" />
+    <TypeScriptCompile Include="app\ui\ec-inputfile.ts" />
+    <TypeScriptCompile Include="app\ui\ec-panels.ts" />
     <TypeScriptCompile Include="app\utils\tool.ts" />
     <TypeScriptCompile Include="lib\declarations.d.ts" />
     <TypeScriptCompile Include="app\services\selection.ts" />
@@ -103,8 +106,9 @@
     <Content Include="app\player\dialogPlayer.html" />
     <Content Include="app\player\listPlayers.html" />
     <Content Include="app\style\_test-icon2.html" />
-    <Content Include="app\ui\ec-panels.js" />
+    <Content Include="app\tournament\dialogInfo.html" />
     <Content Include="Gruntfile.js" />
+    <Content Include="gulpfile.js" />
     <Content Include="lib\mocks\math-mock.js" />
     <TypeScriptCompile Include="lib\mocks\guid-mock.ts" />
     <TypeScriptCompile Include="lib\typings\angularjs\angular-mocks.d.ts" />
@@ -156,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <!--<Folder Include="My Project\" />-->
+    <Folder Include="My Project\" />
     <Folder Include="test\unit\draw\" />
     <Folder Include="test\unit\event\" />
   </ItemGroup>

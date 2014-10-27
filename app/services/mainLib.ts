@@ -18,40 +18,66 @@
             ) {
         }
 
+        newTournament():models.Tournament {
+            var tournament:models.Tournament = {
+                id: this.guid.create('T'),
+                info: {
+                    name:''
+                },
+                players: [],
+                events:[]
+            };
+            this.select(tournament, models.ModelType.Tournament);
+            return tournament;
+        }
+
         /** This function load tournament data from an url. */
-        loadTournament(url?: string): ng.IPromise<models.Tournament> {
+        loadTournament(file?: File): ng.IPromise<models.Tournament>;
+        loadTournament(url?: string): ng.IPromise<models.Tournament>;
+        loadTournament(file_url?: any): ng.IPromise<models.Tournament> {
             var deferred = this.$q.defer();
-            if (!url) {
+            if (!file_url) {
                 var data = this.$window.localStorage['tournament'];
                 if (data) {
-                    data = angular.fromJson(data);
-                    this.tournamentLib.initTournament(data);
-                    this.loadedTournament(data);
-                    deferred.resolve(data);
+                    var tournament: models.Tournament = angular.fromJson(data);
+                    this.tournamentLib.initTournament(tournament);
+                    this.select(tournament, models.ModelType.Tournament);
+                    deferred.resolve(tournament);
                 } else {
                     deferred.reject('nothing in storage');
                 }
-            } else {
-                this.$http.get(url)
-                    .success((data: models.Tournament, status: number) => {
-                        data._url = url;
-                        this.tournamentLib.initTournament(data);
-                        this.loadedTournament(data);
-                        deferred.resolve(data);
+            } else if ('string' === typeof file_url) {
+                this.$http.get(file_url)
+                    .success((tournament: models.Tournament, status: number) => {
+                        tournament._url = file_url;
+                        this.tournamentLib.initTournament(tournament);
+                        this.select(tournament, models.ModelType.Tournament);
+                        deferred.resolve(tournament);
                     })
                     .error((data: any, status: number) => {
                         deferred.reject(data);
                     });
+            } else {
+                var reader = new FileReader();
+                reader.addEventListener('loadend', () => {
+                    try {
+                        var tournament: models.Tournament = angular.fromJson(reader.result);
+                        tournament._url = file_url;
+                        this.tournamentLib.initTournament(tournament);
+                        this.select(tournament, models.ModelType.Tournament);
+                        deferred.resolve(tournament);
+                    } catch (ex) {
+                        deferred.reject(ex.message);
+                    }
+                });
+                reader.addEventListener('onerror', () =>
+                    deferred.reject(reader.error.name));
+                reader.addEventListener('onabort', () =>
+                    deferred.reject('aborted'));
+
+                reader.readAsText(file_url);
             }
             return deferred.promise;
-        }
-
-        private loadedTournament(tournament: models.Tournament): void {
-            if (tournament.events[0]) {
-                this.select(tournament.events[0].draws[tournament.events[0].draws.length - 1], models.ModelType.Draw);
-            } else {
-                this.select(tournament, models.ModelType.Tournament);
-            }
         }
 
         saveTournament(tournament: models.Tournament, url?: string): void {
@@ -259,11 +285,19 @@
 
                 } else if (type === models.ModelType.Tournament || (r.players && r.events)) { //tournament
                     sel.tournament = r;
-                    sel.event = undefined;
-                    sel.draw = undefined;
+                    if (sel.tournament.events[0]) {
+                        sel.event = sel.tournament.events[0];
+                        sel.draw = sel.event && sel.event.draws ? sel.event.draws[sel.event.draws.length - 1] : undefined;
+                    } else {
+                        sel.event = undefined;
+                        sel.draw = undefined;
+                    }
                     sel.match = undefined;
-                    sel.player = undefined;
+                    if (sel.player && sel.player._tournament !== sel.tournament) {
+                        sel.player = undefined;
+                    }
                 }
+
             } else if (type) {
 
                 switch (type) {
@@ -311,28 +345,28 @@
             'knockoutValidation',
             'roundrobinValidation',
             'fftValidation',
-            //'rank',
+        //'rank',
             'undo',
             'find',
             'guid',
-        (
-            $log: ng.ILogService,
-            $http: ng.IHttpService,
-            $q: ng.IQService,
-            $window: ng.IWindowService,
-            selection: jat.service.Selection,
-            tournamentLib: jat.service.TournamentLib,
-            drawLib: jat.service.DrawLib,
-            knockout: jat.service.Knockout,
-            roundrobin: jat.service.Roundrobin,
-            validation: jat.service.Validation,
-            knockoutValidation: jat.service.KnockoutValidation,
-            roundrobinValidation: jat.service.RoundrobinValidation,
-            fftValidation: jat.service.FFTValidation,
-            //rank: ServiceRank,
-            undo: jat.service.Undo,
-            find: jat.service.Find,
-            guid: jat.service.Guid) => {
-            return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
-        }]);
+            (
+                $log: ng.ILogService,
+                $http: ng.IHttpService,
+                $q: ng.IQService,
+                $window: ng.IWindowService,
+                selection: jat.service.Selection,
+                tournamentLib: jat.service.TournamentLib,
+                drawLib: jat.service.DrawLib,
+                knockout: jat.service.Knockout,
+                roundrobin: jat.service.Roundrobin,
+                validation: jat.service.Validation,
+                knockoutValidation: jat.service.KnockoutValidation,
+                roundrobinValidation: jat.service.RoundrobinValidation,
+                fftValidation: jat.service.FFTValidation,
+                //rank: ServiceRank,
+                undo: jat.service.Undo,
+                find: jat.service.Find,
+                guid: jat.service.Guid) => {
+                return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
+            }]);
 }
