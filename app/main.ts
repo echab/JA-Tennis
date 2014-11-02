@@ -300,6 +300,7 @@ module jat.main {
         'jat.match.dialog',
         'ec.panels',
         'ec.inputFile',
+        //'polyfill',
         'ui.bootstrap'])
 
         .controller('mainCtrl', mainCtrl);

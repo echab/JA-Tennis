@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en" ng-app="test" id="ng-app">
+<head>
+    <title>Test panels</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" href="../../../app/style/app.css" />
+    <link rel="stylesheet" href="../../../app/style/panels.css" />
+    <style type="text/css">
+        .panel.tournament .content {
+            white-space: normal;
+            padding: .5em;
+        }
+        .panel.tournament .footer {
+            background-color: lightcoral;
+        }
+        /*.panelbadge {
+            z-index: 2;
+        }*/
+        p {
+            margin-top: 0px;
+        }
+    </style>
+    <script src="../../../lib/angular/angular.js"></script>
+    <script src="../../../app/ui/ec-panels.js"></script>
+    <script>
+        angular.module('test', ['ec.panels']);
+    </script>
+</head>
+<body>
+
+    <div ec-panelset="" class="ng-cloak" ng-init="tournamentOpened=true; drawsOpened=true;">
+        <div ec-panel="" is-open="tournamentOpened" class="tournament">
+            <div ec-badge="" class="tournament"><i class="icon2-ball">Ball</i></div>
+            <div ec-header="">
+                <i class="icon2-info">Info</i>
+                My tounament
+            </div>
+            <div class="content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum cursus augue vitae nibh elementum tempus vitae sed diam. Donec sit amet sollicitudin augue, id posuere leo. Pellentesque accumsan a ex in malesuada. Maecenas cursus justo sit amet interdum congue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed ut placerat quam. Vestibulum interdum elit a vehicula hendrerit.</p>
+                <p>In sagittis, mi a euismod condimentum, est leo tempor tellus, id fermentum mi dui at diam. Ut congue, orci in lobortis ornare, velit sem accumsan dolor, a gravida quam libero eget mauris. Integer urna ligula, euismod eu ante vitae, consectetur semper orci. Fusce ac pellentesque diam. Sed et arcu eu nisi scelerisque condimentum at eget purus. Nullam et arcu ac justo rutrum molestie et ac sapien. Pellentesque sed fringilla leo, in aliquam nibh. Nam eget orci maximus, aliquet est sodales, ullamcorper tellus. Maecenas a libero nisi. Maecenas ut magna maximus, consequat diam et, hendrerit neque. Aenean ac nisl facilisis, aliquet orci non, ultricies ipsum.</p>
+                <p>Proin vitae lobortis mauris. Nullam sit amet aliquet est. Etiam placerat mi ligula, in hendrerit nibh condimentum a. Nam dapibus sagittis vestibulum. Aliquam iaculis nisi dolor, vel venenatis quam aliquam eget. Mauris ac nibh erat. Nulla facilisi. Aenean scelerisque est ac lacus finibus semper. Mauris pharetra, quam et bibendum suscipit, mi velit ultricies arcu, sit amet condimentum mauris tortor eu ante. Fusce id erat in felis consectetur placerat vitae id felis. Mauris vehicula nibh non ullamcorper posuere.</p>
+                <!--p>Nam at luctus turpis. Mauris ultricies vestibulum ipsum porta dignissim. Ut sapien sem, interdum id convallis ut, aliquam aliquet lectus. Quisque vitae justo tincidunt, aliquet nisi a, elementum nunc. Integer ut urna congue, varius eros et, imperdiet mi. Maecenas ut vehicula enim, at feugiat sapien. Vestibulum eleifend congue purus, vel sagittis eros pretium sed. Aliquam pharetra ut ligula faucibus tempus.</p-->
+            </div>
+            <div class="footer">
+                <i class="icon2-male">Male</i>
+                <i class="icon2-female" style="float: right;">Female</i>
+            </div>
+        </div><div ec-panel="" is-open="playersOpened" class="players">
+            <div ec-badge="" class="players"><i class="icon2-player">Player</i></div>
+            <div ec-header="">
+                <form class="form-horizontal">
+                    <button class="btn"><i class="icon-plus">+</i> Add player</button>
+                </form>
+            </div>
+            <div class="content">
+                <div class="content2">
+                    Lorem ipsum...
+                </div>
+            </div>
+        </div><div ec-panel="" is-open="drawsOpened" class="draws">
+            <div ec-badge="" class="draws"><i class="icon2-draw">Draw</i></div>
+            <div ec-header="">
+                <form class="form-horizontal">
+                    <label>
+                        My draw
+                    </label>
+                </form>
+            </div>
+            <div class="content">
+                <div class="content2">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum cursus augue vitae nibh elementum tempus vitae sed diam. Donec sit amet sollicitudin augue, id posuere leo. Pellentesque accumsan a ex in malesuada. Maecenas cursus justo sit amet interdum congue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed ut placerat quam. Vestibulum interdum elit a vehicula hendrerit.</p>
+                    <p>In sagittis, mi a euismod condimentum, est leo tempor tellus, id fermentum mi dui at diam. Ut congue, orci in lobortis ornare, velit sem accumsan dolor, a gravida quam libero eget mauris. Integer urna ligula, euismod eu ante vitae, consectetur semper orci. Fusce ac pellentesque diam. Sed et arcu eu nisi scelerisque condimentum at eget purus. Nullam et arcu ac justo rutrum molestie et ac sapien. Pellentesque sed fringilla leo, in aliquam nibh. Nam eget orci maximus, aliquet est sodales, ullamcorper tellus. Maecenas a libero nisi. Maecenas ut magna maximus, consequat diam et, hendrerit neque. Aenean ac nisl facilisis, aliquet orci non, ultricies ipsum.</p>
+                    <p>Proin vitae lobortis mauris. Nullam sit amet aliquet est. Etiam placerat mi ligula, in hendrerit nibh condimentum a. Nam dapibus sagittis vestibulum. Aliquam iaculis nisi dolor, vel venenatis quam aliquam eget. Mauris ac nibh erat. Nulla facilisi. Aenean scelerisque est ac lacus finibus semper. Mauris pharetra, quam et bibendum suscipit, mi velit ultricies arcu, sit amet condimentum mauris tortor eu ante. Fusce id erat in felis consectetur placerat vitae id felis. Mauris vehicula nibh non ullamcorper posuere.</p>
+                    <p>Nam at luctus turpis. Mauris ultricies vestibulum ipsum porta dignissim. Ut sapien sem, interdum id convallis ut, aliquam aliquet lectus. Quisque vitae justo tincidunt, aliquet nisi a, elementum nunc. Integer ut urna congue, varius eros et, imperdiet mi. Maecenas ut vehicula enim, at feugiat sapien. Vestibulum eleifend congue purus, vel sagittis eros pretium sed. Aliquam pharetra ut ligula faucibus tempus.</p>
+                    <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In convallis, diam vel sodales interdum, mauris felis bibendum velit, eu aliquam dui est nec ipsum. In dignissim justo at mauris tincidunt commodo. In hac habitasse platea dictumst. Nulla tellus erat, tincidunt sit amet aliquam quis, suscipit sed nisi. Vestibulum lorem enim, pretium sed tristique sit amet, tempus a neque. Maecenas a ultricies neque. Vivamus ut orci convallis, blandit nulla ac, consequat lorem.</p>
+                </div>
+            </div>
+        </div>
+        <!--
+
+
+        - -><div ec-badge="" class="planning"><i class="icon2-planning"></i></div><div ec-panel="" is-open="false" class="planning"><!- -
+            - -><div ec-header="">Planning</div>
+            <div class="content">
+                TODO
+            </div>
+        </div>
+        -->
+    </div>
+
+</body>
+</html>

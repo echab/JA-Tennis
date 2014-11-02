@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="app.css" />
+        <title>Test icons</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <link rel="stylesheet" href="icons.css" />
         <link rel="stylesheet" href="../../scripts/assets/bootstrap.css" />
         <style>
             body {
                 Zbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURc7Ozv///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM6MP0kAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABdJREFUGFdjAANGECCJCSGRBIhgMjAAAAssADP8j1IfAAAAAElFTkSuQmCC);
             }
             i {
-                border:1px solid #f6f6f6;
+                Zborder:1px solid #f6f6f6;
             }
             .zoom {
                 zoom: 1.5;
-                background-color: #EEE;
+            }
+            .background {
+                background-color: #CCC;
+            }
+            div {
+                display: inline-block;
+                vertical-align: top;
             }
         </style>
     </head>
     <body>
+        <img src="glyphicons.png" /><hr/>
         <script>
             (function () {
-                var h = [], a;
+                var h = [], a, n=0;
                 var reIcon = /\.(icon2?-[^ ]+)/gm;
+                h.push('<div>');
 
                 for (var ss in document.styleSheets) {
                     ss = document.styleSheets[ss];
                     for (var r in ss.rules) {
                         r = ss.rules[r];
                         while (a = reIcon.exec(r.selectorText)) {
-                            h.push('<span><i class="' + a[1] + ' zoom"></i> <i class="' + a[1] + '"></i> ' + a[1] + '</span><br/>');
+                            h.push('<span><i class="' + a[1] + ' zoom"></i> <i class="' + a[1] + '"></i> <i class="' + a[1] + ' background"></i> ' + a[1] + '</span><br/>');
+                            if ((n++ % 12) === 11) {
+                                h.push('</div><div>');
+                            }
                         }
                     }
                 }
 
+                h.push('</div>');
                 document.write(h.join(''));
             })();
         </script>

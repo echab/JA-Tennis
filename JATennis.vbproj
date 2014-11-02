@@ -79,6 +79,7 @@
     <TypeScriptCompile Include="app\services\type.d.ts" />
     <TypeScriptCompile Include="app\services\tournamentLib.ts" />
     <Content Include="app\style\app.css" />
+    <Content Include="app\style\draw.css" />
     <Content Include="app\style\favicon.ico" />
     <Content Include="app\style\glyphicons.png" />
     <Content Include="app\index-async.html" />
@@ -89,6 +90,7 @@
     <TypeScriptCompile Include="app\tournament\dialogInfo.ts" />
     <TypeScriptCompile Include="app\ui\ec-inputfile.ts" />
     <TypeScriptCompile Include="app\ui\ec-panels.ts" />
+    <TypeScriptCompile Include="app\ui\polyfill.ts" />
     <TypeScriptCompile Include="app\utils\tool.ts" />
     <TypeScriptCompile Include="lib\declarations.d.ts" />
     <TypeScriptCompile Include="app\services\selection.ts" />
@@ -105,6 +107,8 @@
     <Content Include="app\event\listEvents.html" />
     <Content Include="app\player\dialogPlayer.html" />
     <Content Include="app\player\listPlayers.html" />
+    <Content Include="app\style\icons.css" />
+    <Content Include="app\style\panels.css" />
     <Content Include="app\style\_test-icon2.html" />
     <Content Include="app\tournament\dialogInfo.html" />
     <Content Include="Gruntfile.js" />
@@ -147,6 +151,7 @@
     <Content Include="data\test1-14-0-0.json" />
     <Content Include="data\to2006.json" />
     <None Include="test\karma.config.js" />
+    <Content Include="test\unit\ui\_test_panels.html" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />
     <None Include="test\karma_test.cmd" />

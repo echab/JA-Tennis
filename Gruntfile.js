@@ -203,7 +203,8 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('publish', [
-        'default', 'ftp-deploy:free'
+        //'default',
+        'ftp-deploy:free'
     ]);
 
 };
