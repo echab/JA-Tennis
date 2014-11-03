@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Canvas IE8</title>
+
+    <xml:namespace ns="urn:schemas-microsoft-com:vml" prefix="v" />
+    <style type="text/css">
+        html {
+            background-color: lightgray;
+        }
+        canvas {
+            display: inline-block;
+            overflow: hidden;
+            text-align:left; width:300px;height:150px;
+        }
+        v\:* {
+            behavior: url(#default#VML);
+            display: inline-block;
+            position: absolute;
+        }
+        v\:shape {
+            behavior: url(#default#VML);
+            display: inline-block;
+        }
+        v\:oval {
+            behavior: url(#default#VML);
+            display: inline-block;
+            position: absolute;
+            width: 40px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <v:oval class="tl" fillcolor="red" stroked="true" strokecolor="blue" strokeweight="3px"/>
+
+    <v:shape style="position:absolute;left:100px; top:30px; width:10px;height:10px;"
+             coordorigin="0 0" coordsize="10 10"
+             filled="false" stroked="true" strokecolor="blue" strokeweight="2px"
+             path="m 0,0 L100,0 l 120,20 l 100,40 l 0,40" />
+
+</body>
+</html>

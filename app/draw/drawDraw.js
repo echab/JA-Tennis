@@ -51,28 +51,36 @@ var jat;
                 }
 
                 //draw the lines...
-                var ctx = canvas[0].getContext('2d');
-                ctx.lineWidth = .5;
-                ctx.translate(.5, .5);
-                var boxHeight2 = this.boxHeight >> 1;
+                var _canvas = canvas[0];
+                if (useVML) {
+                    _canvas.getContext = _canvas.getContext || function () {
+                        return new vmlContext(canvas);
+                    };
+                }
+                if (_canvas.getContext) {
+                    var ctx = _canvas.getContext('2d');
+                    ctx.lineWidth = .5;
+                    ctx.translate(.5, .5);
+                    var boxHeight2 = this.boxHeight >> 1;
 
-                for (var i = draw.boxes.length - 1; i >= 0; i--) {
-                    var box = draw.boxes[i];
-                    var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
+                    for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                        var box = draw.boxes[i];
+                        var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
 
-                    if (isMatch(box)) {
-                        var opponent = positionOpponents(box.position);
-                        var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
-                        if (p1 && p2) {
-                            ctx.moveTo(x - this.interBoxWidth, p1.y * this.boxHeight + boxHeight2);
-                            ctx.lineTo(x, y + boxHeight2);
-                            ctx.lineTo(x - this.interBoxWidth, p2.y * this.boxHeight + boxHeight2);
-                            ctx.stroke();
+                        if (isMatch(box)) {
+                            var opponent = positionOpponents(box.position);
+                            var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
+                            if (p1 && p2) {
+                                ctx.moveTo(x - this.interBoxWidth, p1.y * this.boxHeight + boxHeight2);
+                                ctx.lineTo(x, y + boxHeight2);
+                                ctx.lineTo(x - this.interBoxWidth, p2.y * this.boxHeight + boxHeight2);
+                                ctx.stroke();
+                            }
                         }
+                        ctx.moveTo(x, y + boxHeight2);
+                        ctx.lineTo(x + this.boxWidth - this.interBoxWidth, y + boxHeight2);
+                        ctx.stroke();
                     }
-                    ctx.moveTo(x, y + boxHeight2);
-                    ctx.lineTo(x + this.boxWidth - this.interBoxWidth, y + boxHeight2);
-                    ctx.stroke();
                 }
             };
 
@@ -127,6 +135,11 @@ var jat;
                         ctrlDraw.simple = scope.$eval(attrs.simple);
 
                         ctrlDraw.computeCoordinates();
+
+                        //IE8 patch
+                        if (ctrlDraw.isKnockout && useVML) {
+                            ctrlDraw.drawLines(element);
+                        }
                     };
 
                     scope.$watch(attrs.draw, doRefresh);
@@ -140,11 +153,52 @@ var jat;
             };
         }
 
+        //IE8 patch to use VML instead of canvas
+        var useVML = !window.HTMLCanvasElement;
+        var vmlContext;
+        function initVml() {
+            if (!useVML) {
+                return;
+            }
+
+            // create xmlns and stylesheet
+            document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
+            document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML); position:absolute; left:0px; top:0px; width:10px;height:10px;}';
+
+            //emulate canvas context using VML
+            vmlContext = function (element) {
+                this._element = element;
+                var shapes = element[0].getElementsByTagName('shape');
+                for (var i = shapes.length - 1; i >= 0; i--) {
+                    element[0].removeChild(shapes[i]);
+                }
+            };
+            vmlContext.prototype = {
+                _path: [], _tx: 0, _ty: 0,
+                translate: function (tx, ty) {
+                    this._tx = tx;
+                    this._ty = ty;
+                },
+                moveTo: function (x, y) {
+                    this._path.push('m', x, ',', y);
+                },
+                lineTo: function (x, y) {
+                    this._path.push('l', x, ',', y);
+                },
+                stroke: function () {
+                    var shape = angular.element('<v:shape coordorigin="0 0" coordsize="10 10"' + ' filled="false" stroked="true" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"' + ' path="' + this._path.join('') + '" />');
+                    this._element.append(shape);
+                    this._path.splice(0, this._path.length);
+                }
+            };
+        }
+
         function drawLinesDirective() {
             return {
                 restrict: 'A',
                 require: '^draw',
                 link: function (scope, element, attrs, ctrlDraw) {
+                    //attrs.$observe( 'drawLines', () => {
                     scope.$watch(attrs.drawLines, function () {
                         ctrlDraw.drawLines(element);
                     });
@@ -152,7 +206,7 @@ var jat;
             };
         }
 
-        angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockout', 'jat.services.roundrobin', 'jat.services.find']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective);
+        angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockout', 'jat.services.roundrobin', 'jat.services.find']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective).run(initVml);
     })(jat.draw || (jat.draw = {}));
     var draw = jat.draw;
 })(jat || (jat = {}));

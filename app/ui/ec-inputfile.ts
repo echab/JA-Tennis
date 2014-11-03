@@ -11,7 +11,7 @@ module ec.ui {
         target: InputFileEventTarget;
     }
 
-    function ecInputFileDirective() {
+    function ecInputFileDirective(): ng.IDirective {
         return {
             restrict: 'EA',
             //replace: true,
@@ -29,7 +29,7 @@ module ec.ui {
         };
     }
 
-    function templateCache($templateCache: ng.ITemplateCacheService) {
+    function templateCache($templateCache: ng.ITemplateCacheService):void {
         $templateCache.put("template/inputFile.html",
             //"<span style='position: relative;'>"
             "<input type='file' accept='application/json,text/plain'"

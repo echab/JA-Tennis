@@ -9,6 +9,8 @@
     <meta charset="utf-8">
     <title>JA-Tennis</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="application-name" content="JA-Tennis" />
+    <meta name="msapplication-TileColor" content="#ffaaaa" />
     <style type="text/css">
         .ng-cloak {
             display: none;
@@ -30,6 +32,12 @@
     <link rel="icon" href="style/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--[if lte IE 8]>
+    <script src="ui/excanvas.js"></script>
+    <script type="text/javascript">
+        document.createElement('canvas');
+    </script>
+    <![endif]-->
 </head>
 <body ng-controller="mainCtrl as main">
 
@@ -92,7 +100,7 @@
                 </form>
             </div>
             <div class="content">           
-                <div draw="main.selection.draw" class="inline"></div>
+                <div draw="main.selection.draw" class="inline" style="position:relative;"></div>
 
                 <div class="inline">
                     Validation errors:
@@ -142,6 +150,11 @@
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
     <!(endif)-->
+
+    <!--[if lte IE 8]>
+        <script src="ui/polyfill.js"></script>
+    <![endif]-->
+
     <!-- build:js jatennis.min.js -->
     <script src="app.js"></script>
 
@@ -187,9 +200,5 @@
     <script src="ui/ec-inputfile.js"></script>
 
     <!-- endbuild -->
-    <!--[if lte IE 8]>
-        <script src="ui/excanvas.js"></script>
-        <script src="ui/polyfill.js"></script>
-    <![endif]-->
 </body>
 </html>

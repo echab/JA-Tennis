@@ -1,7 +1,7 @@
 'use strict';
 module jat.event {
 
-    function listEventsDirective() {
+    function listEventsDirective(): ng.IDirective {
         var dir = {
             templateUrl: 'event/listEvents.html',
             controller: 'listEventsCtrl',

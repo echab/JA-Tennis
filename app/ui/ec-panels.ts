@@ -107,7 +107,7 @@ module ec.ui {
     class PanelsetController {
         panels: Panel[] = [];
         badges: Badge[] = [];
-        selectCount: number;
+        selectCount: number = 0;
 
         //static $inject = [];
         constructor() {
@@ -198,7 +198,7 @@ module ec.ui {
         }
     }
 
-    function ecPanelsetDirective() {
+    function ecPanelsetDirective(): ng.IDirective {
         return {
             restrict: 'EA',
             transclude: true,
@@ -213,7 +213,7 @@ module ec.ui {
     }
 
     //ecPanelDirective.$inject = ['$parse'];
-    function ecPanelDirective() {   //$parse: ng.IParseService
+    function ecPanelDirective(): ng.IDirective {   //$parse: ng.IParseService
         return {
             require: '^ecPanelset',
             restrict: 'EA',
@@ -246,13 +246,13 @@ module ec.ui {
                 };
 
                 scope.getWidth = () => {
-                    return Math.floor(100 / panelsetCtrl.selectCount) + '%';
+                    return panelsetCtrl.selectCount ? (Math.floor(100 / panelsetCtrl.selectCount) + '%') : 'auto';
                 };
             }
         };
     }
 
-    function ecBadgeDirective() {
+    function ecBadgeDirective(): ng.IDirective {
         return {
             require: '^ecPanelset',
             restrict: 'EA',
@@ -269,7 +269,7 @@ module ec.ui {
         };
     }
 
-    function ecHeaderDirective() {
+    function ecHeaderDirective(): ng.IDirective {
         return {
             require: '^ecPanel',
             restrict: 'EA',
@@ -284,7 +284,7 @@ module ec.ui {
         };
     }
 
-    function templateCache($templateCache: ng.ITemplateCacheService) {
+    function templateCache($templateCache: ng.ITemplateCacheService):void {
         $templateCache.put("template/panels/panelset.html",
             "<div class='panels'"
             + " ng-transclude>"

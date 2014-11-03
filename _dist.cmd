@@ -14,5 +14,6 @@ rem @echo Build with Gulp
 rem call gulp %*
 
 :theend
-if errorlevel 1 pause
+rem if errorlevel 1 pause
+pause
 popd

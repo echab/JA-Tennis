@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var ec;
 (function (ec) {
     (function (ui) {
@@ -34,6 +34,7 @@ var ec;
             function PanelsetController() {
                 this.panels = [];
                 this.badges = [];
+                this.selectCount = 0;
             }
             PanelsetController.prototype.select = function (panel, select) {
                 //if (panel.isOpen) {
@@ -157,7 +158,7 @@ var ec;
                     };
 
                     scope.getWidth = function () {
-                        return Math.floor(100 / panelsetCtrl.selectCount) + '%';
+                        return panelsetCtrl.selectCount ? (Math.floor(100 / panelsetCtrl.selectCount) + '%') : 'auto';
                     };
                 }
             };

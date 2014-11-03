@@ -267,10 +267,10 @@ module jat.main {
         }
         //#endregion match
 
-        public doUndo() {
+        public doUndo(): void {
             this.mainLib.select(this.undo.undo(), this.undo.getMeta());
         }
-        public doRedo() {
+        public doRedo(): void {
             this.mainLib.select(this.undo.redo(), this.undo.getMeta());
         }
     }
@@ -300,7 +300,7 @@ module jat.main {
         'jat.match.dialog',
         'ec.panels',
         'ec.inputFile',
-        //'polyfill',
+    //'polyfill',
         'ui.bootstrap'])
 
         .controller('mainCtrl', mainCtrl);

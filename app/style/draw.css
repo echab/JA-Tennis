@@ -4,10 +4,6 @@
     border: 1px dashed gray;
 }
 
-canvas.draw {
-    position: absolute;
-}
-
 table.roundrobin {
     border: 1px dashed gray;
 }

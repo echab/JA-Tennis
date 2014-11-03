@@ -151,6 +151,7 @@
     <Content Include="data\test1-14-0-0.json" />
     <Content Include="data\to2006.json" />
     <None Include="test\karma.config.js" />
+    <Content Include="test\unit\ui\_test_canvas_ie8.html" />
     <Content Include="test\unit\ui\_test_panels.html" />
     <Content Include="web.config" />
     <Content Include="test\karma_test - debug.cmd" />

@@ -1,7 +1,7 @@
 'use strict';
 module jat.player {
 
-    function listPlayersDirective() {
+    function listPlayersDirective(): ng.IDirective {
         var dir = {
             templateUrl: 'player/listPlayers.html',
             controller: 'listPlayersCtrl',

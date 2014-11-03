@@ -19,7 +19,7 @@ module jat.draw {
         //}
     }
 
-    function drawBoxDirective(validation: jat.service.Validation) {
+    function drawBoxDirective(validation: jat.service.Validation): ng.IDirective {
         return {
             restrict: 'EA',
             scope: true,

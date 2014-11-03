@@ -1,35 +1,44 @@
 ﻿module polyfill {
 
-    interface IWindowVML extends ng.IWindowService {
-        G_vmlCanvasManager: {
-            initElement: (canvas: JQuery) => void
-        }
-    }
-
-    document.createElement('canvas');
-
-    canvasDirective.$inject = ['$window'];
-    function canvasDirective($window: IWindowVML) {
-        return {
-            restrict: 'EA',
-            compile: function compile(element: JQuery, attrs: any, transclude: Function) {
-            return {
-                    pre: function preLink(scope: ng.IScope, element: JQuery, attrs: any) {
-                        $window.G_vmlCanvasManager && $window.G_vmlCanvasManager.initElement(element);  //excanvas for ie8
-                    }
-                    //,post: function postLink(scope:ng.IScope, element: JQuery, attrs: any) {
-                    //    $window.G_vmlCanvasManager && $window.G_vmlCanvasManager.initElement(element);  //excanvas for ie8
-                    //}
-                }
-        }
-            //link: (scope: ng.IScope, element: JQuery, attrs: any) => {
-            //    $window.G_vmlCanvasManager && $window.G_vmlCanvasManager.initElement(element);  //excanvas for ie8
-            //}
+    if (!('console' in window)) {
+        window.console = <any> {
+            info: (): void => { debugger; },
+            log: (): void => { debugger; },
+            warn: (): void => { debugger; },
+            error: (): void => { debugger; }
         };
     }
 
-    angular.module('polyfill', [])
-        .directive('canvas', canvasDirective);
+    //interface IWindowVML extends ng.IWindowService {
+    //    G_vmlCanvasManager: {
+    //        initElement: (canvas: JQuery) => void
+    //    }
+    //}
+
+    //document.createElement('canvas');
+    //
+    //canvasDirective.$inject = ['$window'];
+    //function canvasDirective($window: IWindowVML) {
+    //    return {
+    //        restrict: 'EA',
+    //        compile: function compile(element: JQuery, attrs: any, transclude: Function) {
+    //        return {
+    //                pre: function preLink(scope: ng.IScope, element: JQuery, attrs: any) {
+    //                    $window.G_vmlCanvasManager && $window.G_vmlCanvasManager.initElement(element);  //excanvas for ie8
+    //                }
+    //                //,post: function postLink(scope:ng.IScope, element: JQuery, attrs: any) {
+    //                //    $window.G_vmlCanvasManager && $window.G_vmlCanvasManager.initElement(element);  //excanvas for ie8
+    //                //}
+    //            }
+    //    }
+    //        //link: (scope: ng.IScope, element: JQuery, attrs: any) => {
+    //        //    $window.G_vmlCanvasManager && $window.G_vmlCanvasManager.initElement(element);  //excanvas for ie8
+    //        //}
+    //    };
+    //}
+    //
+    //angular.module('polyfill', [])
+    //    .directive('canvas', canvasDirective);
 
 
     if (!Array.prototype.indexOf) {

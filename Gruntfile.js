@@ -16,11 +16,15 @@ module.exports = function (grunt) {
 
         concat: {
             options: {
-                separator: ';'
+                separator: ''
             },
             dist: {
                 src: ['app/**/*.js', '!**/*.min.js', '!**/_*.js'],
                 dest: 'dist/jatennis.js'
+            },
+            distCss: {
+                src: ['app/**/*.css', '!**/*.min.css', '!**/_*.css'],
+                dest: 'dist/style/app.css'
             }
         },
 
@@ -44,7 +48,7 @@ module.exports = function (grunt) {
         cssmin: {
             minify: {
                 expand: true,
-                cwd: 'app/style/',
+                cwd: 'dist/style/',
                 src: ['*.css', '!*.min.css'],
                 dest: 'dist/style/',
                 ext: '.min.css'
