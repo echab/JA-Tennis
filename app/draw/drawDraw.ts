@@ -71,33 +71,31 @@ module jat.draw {
 
             //draw the lines...
             var _canvas = <HTMLCanvasElement> canvas[0];
-            if (useVML) {
-                _canvas.getContext = _canvas.getContext || function () { return new vmlContext(canvas); };
-            }
-            if (_canvas.getContext) {
-                var ctx = _canvas.getContext('2d');
-                ctx.lineWidth = .5;
-                ctx.translate(.5, .5);
-                var boxHeight2 = this.boxHeight >> 1;
+            var ctx = useVML ? new vmlContext(canvas, this.width, this.height) : _canvas.getContext('2d');
+            ctx.lineWidth = .5;
+            ctx.translate(.5, .5);
+            var boxHeight2 = this.boxHeight >> 1;
 
-                for (var i = draw.boxes.length - 1; i >= 0; i--) {
-                    var box = draw.boxes[i];
-                    var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
+            for (var i = draw.boxes.length - 1; i >= 0; i--) {
+                var box = draw.boxes[i];
+                var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
 
-                    if (isMatch(box)) {
-                        var opponent = positionOpponents(box.position);
-                        var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
-                        if (p1 && p2) {
-                            ctx.moveTo(x - this.interBoxWidth, p1.y * this.boxHeight + boxHeight2);
-                            ctx.lineTo(x, y + boxHeight2);
-                            ctx.lineTo(x - this.interBoxWidth, p2.y * this.boxHeight + boxHeight2);
-                            ctx.stroke();
-                        }
+                if (isMatch(box)) {
+                    var opponent = positionOpponents(box.position);
+                    var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
+                    if (p1 && p2) {
+                        ctx.moveTo(x - this.interBoxWidth, p1.y * this.boxHeight + boxHeight2);
+                        ctx.lineTo(x, y + boxHeight2);
+                        ctx.lineTo(x - this.interBoxWidth, p2.y * this.boxHeight + boxHeight2);
+                        ctx.stroke();
                     }
-                    ctx.moveTo(x, y + boxHeight2);
-                    ctx.lineTo(x + this.boxWidth - this.interBoxWidth, y + boxHeight2);
-                    ctx.stroke();
                 }
+                ctx.moveTo(x, y + boxHeight2);
+                ctx.lineTo(x + this.boxWidth - this.interBoxWidth, y + boxHeight2);
+                ctx.stroke();
+            }
+            if ((<any>ctx).done) {
+                (<any>ctx).done();  //VML
             }
         }
 
@@ -181,35 +179,45 @@ module jat.draw {
 
         // create xmlns and stylesheet
         document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
-        document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML); position:absolute; left:0px; top:0px; width:10px;height:10px;}';
+        document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
 
         //emulate canvas context using VML
-        vmlContext = function (element: JQuery) {
+        vmlContext = function (element: JQuery, width: number, height: number) {
             this._element = element;
-            var shapes = element[0].getElementsByTagName('shape');
-            for (var i = shapes.length - 1; i >= 0; i--) {
-                element[0].removeChild(shapes[i]);
-            }
+            this._width = width;
+            this._height = height;
+            this.beginPath();
+            this._element.find('shape').remove();
         };
         vmlContext.prototype = {
             _path: [], _tx: 0, _ty: 0,
             translate: function (tx: number, ty: number): void {
-                this._tx = tx;
-                this._ty = ty;
+                //this._tx = tx;
+                //this._ty = ty;
+            },
+            beginPath: function (): void {
+                this._path.length = 0;
+                this.lineWidth = 1;
+                this.strokeStyle = 'black';
             },
             moveTo: function (x: number, y: number): void {
-                this._path.push('m', x, ',', y);
+                this._path.push('m', (this._tx + x), ',', (this._ty + y));
             },
             lineTo: function (x: number, y: number): void {
-                this._path.push('l', x, ',', y);
+                this._path.push('l', (this._tx + x), ',', (this._ty + y));
             },
             stroke: function (): void {
-                var shape = angular.element('<v:shape coordorigin="0 0" coordsize="10 10"'
-                    + ' filled="false" stroked="true" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"'
+                this._path.push('e');
+            },
+            done: function (): void {
+                var shape = angular.element('<v:shape'
+                    //+ ' coordorigin="0 0"'
+                    + ' coordsize="' + this._width + ' ' + this._height + '"'
+                    + ' style="position:absolute; left:0px; top:0px; width:' + this._width + 'px; height:' + this._height + 'px;"'
+                    + ' filled="0" stroked="1" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"'
                     + ' path="' + this._path.join('') + '" />');
                 this._element.append(shape);
-                this._path.splice(0, this._path.length);
-            },
+            }
         };
     }
 

@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var ec;
 (function (ec) {
     (function (ui) {

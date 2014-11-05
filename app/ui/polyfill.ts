@@ -1,5 +1,7 @@
 ﻿module polyfill {
 
+    //TODO autofocus directive
+
     if (!('console' in window)) {
         window.console = <any> {
             info: (): void => { debugger; },
