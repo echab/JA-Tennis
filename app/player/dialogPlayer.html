@@ -1,10 +1,10 @@
-<form  name="playerForm" ng-submit="$close('Ok')" ZZZng-controller="dialogPlayerCtrl as dlg" class="modal-form">
+<form name="playerForm" ng-submit="$close('Ok')" zzzng-controller="dialogPlayerCtrl as dlg" class="modal-form form-horizontal">
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
-        <h3>{{dlg.title}} <small>Id: {{dlg.player.id}}</small></h3>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.player.id}}</small>--></h3>
     </div>
-    <div class="modal-body Zform-horizontal" >
+    <div class="modal-body">
 
         <!--<div class="control-group">
             <label for="name" class="control-label">Name:</label>
@@ -13,64 +13,84 @@
             </div>
         </div>-->
 
-        <div>
-            <label>
+        <div class="row">
+            <label class="span3">
                 Name:
-                <input type="text" ng-model="dlg.player.name" required class="span2" /></label>
+                <input type="text" ng-model="dlg.player.name" required class="span2" />
+            </label>
             <!--<span class="error" ng-show="playerForm.name.$error.required">Required!</span>-->
-            <label>
+            <label class="span3">
                 Surname:
-                <input type="text" ng-model="dlg.player.firstname" class="span2" /></label>
+                <input type="text" ng-model="dlg.player.firstname" class="span2" />
+            </label>
         </div>
-        <div>
-            <label>
+        <div class="row">
+            <label class="span3">
                 Rank:
-                    <select type="text" name="rank" ng-model="dlg.player.rank" ng-options="value for value in dlg.ranks" class="span2"></select></label>
+                <select type="text" name="rank" ng-model="dlg.player.rank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
         </div>
 
-        <tabset>
-            <tab heading="General">
-                <label>
-                    Birth:
-                <input type="date" ng-model="dlg.player.birth" class="span2" /></label>
-                <label>
-                    Club:
-                <input type="text" ng-model="dlg.player.club" class="span2" /></label>
-                <label>
-                    Licence:
-                <input type="text" ng-model="dlg.player.licence" class="span2" /></label>
-            </tab>
-            <tab heading="Registration">
-                <label>Events:</label>
-                <ul>
-                    <li ng-repeat="event in dlg.events">
-                        <label><input type="checkbox" check-list="dlg.player.registration" value="{{event.id}}" /> {{event.name}}</label>
-                    </li>
-                </ul>
-            </tab>
-            <tab heading="Coordinates">
-                <label>Adress:</label>
-                <input type="text" ng-model="dlg.player.adress1" class="span3" /><br />
-                <input type="text" ng-model="dlg.player.adress2" class="span3" /><br />
-                <input type="text" ng-model="dlg.player.zipcode" class="span1" />
-                <input type="text" ng-model="dlg.player.city" class="span2" />
-
-                <label>
-                    Phones:
-                    <input type="text" ng-model="dlg.player.phone1" class="span2" />
-                    <input type="text" ng-model="dlg.player.phone2" class="span2" /></label>
-                <label>
-                    eMail:
-                <input type="text" ng-model="dlg.player.email" class="span2" /></label>
-            </tab>
-            <tab heading="Team">
-            </tab>
-            <tab heading="Comment">
-                <label>
-                    Note:
-                <textarea ng-model="dlg.player.note" class="span6"></textarea></label>
-            </tab>
-        </tabset>
+        <div tabset="">
+            <div tab="" heading="General">
+                <div class="row">
+                    <label class="span4">Birth: <input type="date" ng-model="dlg.player.birth" class="span3" /></label>
+                </div>
+                <div class="row">
+                    <label class="span4">Club: <input type="text" ng-model="dlg.player.club" class="span3" /></label>
+                </div>
+                <div class="row">
+                    <label class="span3">Licence: <input type="text" ng-model="dlg.player.licence" class="span2" /></label>
+                </div>
+            </div>
+            <div tab="" heading="Registration">
+                <div class="row">
+                    <label class="span1">Events:</label>
+                    <div class="offset1">
+                        <ul class="span3 unstyled">
+                            <li ng-repeat="event in dlg.events">
+                                <label><input type="checkbox" check-list="dlg.player.registration" value="{{event.id}}" /> {{event.name}}</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div tab="" heading="Coordinates">
+                <div class="row">
+                    <label class="span5">Adress: <input type="text" ng-model="dlg.player.adress1" class="span4" /></label>
+                    <label class="span5"><input type="text" ng-model="dlg.player.adress2" class="span4" /></label>
+                    <label class="span5">
+                        <input type="text" ng-model="dlg.player.zipcode" class="span1" />
+                        <span class="spacer"></span>
+                        <input type="text" ng-model="dlg.player.city" class="span3" />
+                    </label>
+                </div>
+                <div class="row">
+                    <label class="span5">
+                        Phones:
+                        <input type="tel" ng-model="dlg.player.phone1" class="span2" />
+                        <span class="spacer"></span>
+                        <input type="tel" ng-model="dlg.player.phone2" class="span2" />
+                    </label>
+                </div>
+                <div class="row">
+                    <label class="span5">
+                        eMail:
+                        <input type="email" ng-model="dlg.player.email" class="span4" />
+                    </label>
+                </div>
+            </div>
+            <!--<div tab="" heading="Team">
+            </div>-->
+            <div tab="" heading="Comment">
+                <div class="row">
+                    <label class="span6">
+                        Note:
+                        <textarea ng-model="dlg.player.note" class="span5"></textarea>
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="submit" ng-disabled="!!playerForm.$error.required" ng-class="{'disabled': !!playerForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>

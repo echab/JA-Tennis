@@ -3,8 +3,8 @@
     <head>
         <title>Test icons</title>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-        <link rel="stylesheet" href="icons.css" />
-        <link rel="stylesheet" href="../../scripts/assets/bootstrap.css" />
+        <link rel="stylesheet" href="../../../app/style/icons.css" />
+        <link rel="stylesheet" href="../../../lib/ui-bootstrap/assets/bootstrap.css" />
         <style>
             body {
                 Zbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURc7Ozv///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM6MP0kAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAABdJREFUGFdjAANGECCJCSGRBIhgMjAAAAssADP8j1IfAAAAAElFTkSuQmCC);
@@ -25,7 +25,7 @@
         </style>
     </head>
     <body>
-        <img src="glyphicons.png" /><hr/>
+        <img src="../../../app/style/glyphicons.png" /><hr/>
         <script>
             (function () {
                 var h = [], a, n=0;
@@ -33,6 +33,7 @@
                 h.push('<div>');
 
                 for (var ss in document.styleSheets) {
+                    n = 0;
                     ss = document.styleSheets[ss];
                     for (var r in ss.rules) {
                         r = ss.rules[r];
@@ -43,6 +44,7 @@
                             }
                         }
                     }
+                    h.push('</div><div>');
                 }
 
                 h.push('</div>');

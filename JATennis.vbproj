@@ -109,7 +109,7 @@
     <Content Include="app\player\listPlayers.html" />
     <Content Include="app\style\icons.css" />
     <Content Include="app\style\panels.css" />
-    <Content Include="app\style\_test-icon2.html" />
+    <Content Include="test\unit\ui\_test-icon2.html" />
     <Content Include="app\tournament\dialogInfo.html" />
     <Content Include="Gruntfile.js" />
     <Content Include="gulpfile.js" />

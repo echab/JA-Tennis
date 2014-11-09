@@ -32,12 +32,6 @@
     <link rel="icon" href="style/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!--[if lte IE 8]>
-    <script src="ui/excanvas.js"></script>
-    <script type="text/javascript">
-        document.createElement('canvas');
-    </script>
-    <![endif]-->
 </head>
 <body ng-controller="mainCtrl as main">
 
@@ -151,11 +145,8 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
     <!(endif)-->
 
-    <!--[if lte IE 8]>
-        <script src="ui/polyfill.js"></script>
-    <![endif]-->
-
     <!-- build:js jatennis.min.js -->
+    <script src="ui/polyfill.js"></script>
     <script src="app.js"></script>
 
     <script src="utils/tool.js"></script>

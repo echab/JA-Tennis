@@ -4,10 +4,10 @@
 
     if (!('console' in window)) {
         window.console = <any> {
-            info: (): void => { debugger; },
-            log: (): void => { debugger; },
-            warn: (): void => { debugger; },
-            error: (): void => { debugger; }
+            info: angular.noop,
+            log: angular.noop,
+            warn: angular.noop,
+            error: angular.noop
         };
     }
 

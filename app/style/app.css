@@ -23,6 +23,14 @@ input.ng-invalid-required:after {
 
 label {
     display: inline-block;
+    text-align: right;
+}
+label.checkbox {
+    text-align: left;
+}
+span.spacer {
+    display: inline-block;
+    width: 12px;
 }
 
 tr.error, div.error, span.error {
