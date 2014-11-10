@@ -6,17 +6,25 @@ describe('services.mainLib', () => {
         drawLib: jat.service.DrawLib,
         undo: jat.service.Undo,
         find: jat.service.Find,
+        guid: jat.service.Guid,
         math: mock.Math;
 
     beforeEach(module('jat.services.mainLib'));
     beforeEach(module('jat.services.guid.mock'));
     beforeEach(module('math.mock'));
 
-    beforeEach(inject((_mainLib_: jat.service.MainLib, _drawLib_: jat.service.DrawLib, _undo_: jat.service.Undo, _find_: jat.service.Find, _guid_: jat.service.Guid, _math_: mock.Math) => {
+    beforeEach(inject((
+        _mainLib_: jat.service.MainLib,
+        _drawLib_: jat.service.DrawLib,
+        _undo_: jat.service.Undo,
+        _find_: jat.service.Find,
+        _guid_: jat.service.Guid,
+        _math_: mock.Math) => {
         main = _mainLib_;
         drawLib = _drawLib_;
         undo = _undo_;
         find = _find_;
+        guid = _guid_;
         math = _math_;
     }));
 

@@ -19,6 +19,14 @@ var jat;
                 return tournament;
             };
 
+            TournamentLib.prototype.newInfo = function (source) {
+                var info = {};
+                if (angular.isObject(source)) {
+                    angular.extend(info, source);
+                }
+                return info;
+            };
+
             TournamentLib.prototype.initTournament = function (tournament) {
                 if (tournament.players) {
                     for (var i = tournament.players.length - 1; i >= 0; i--) {
@@ -88,7 +96,7 @@ var jat;
             };
 
             TournamentLib.prototype.isRegistred = function (event, player) {
-                return player.registration.indexOf(event.id) !== -1;
+                return player.registration && player.registration.indexOf(event.id) !== -1;
             };
 
             TournamentLib.prototype.getRegistred = function (event) {
@@ -135,15 +143,11 @@ var jat;
             };
 
             TournamentLib.prototype.GetJoueursInscrit = function (draw) {
-                function isInscrit(player, event) {
-                    return player.registration.indexOf(event.id) != -1;
-                }
-
                 //Récupère les joueurs inscrits
                 var players = draw._event._tournament.players, ppJoueur = [], nPlayer = 0;
                 for (var i = 0; i < players.length; i++) {
                     var pJ = players[i];
-                    if (isInscrit(pJ, draw._event)) {
+                    if (this.isRegistred(draw._event, pJ)) {
                         if (!pJ.rank || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
                             ppJoueur.push(pJ); //no du joueur
                         }

@@ -6,6 +6,8 @@ module jat.main {
     export class mainCtrl {
 
         public GenerateType = models.GenerateType;
+        public ModelType = models.ModelType;
+        public Mode = models.Mode;
 
         static $inject = [
             '$modal',
@@ -88,8 +90,8 @@ module jat.main {
         }
         //#endregion tournament
 
-        select(item: any): void {
-            this.mainLib.select(item);
+        select(item: any, type?: models.ModelType): void {
+            this.mainLib.select(item, type);
         }
 
         //#region player
@@ -225,11 +227,6 @@ module jat.main {
                 });
         }
 
-        lockDraw(draw: models.Draw, lock: boolean): void {
-            //TODO
-            draw.locked = lock;
-        }
-
         validateDraw(draw: models.Draw): void {
             this.mainLib.validateDraw(draw);
         }
@@ -248,6 +245,9 @@ module jat.main {
         //#endregion draw
 
         //#region match
+        isMatch(box: models.Box): boolean {
+            return box && 'score' in box;
+        }
         editMatch(match: models.Match): void {
 
             var editedMatch = <models.Match> this.drawLib.newBox(match._draw, match);
@@ -264,6 +264,12 @@ module jat.main {
                         this.mainLib.editMatch(editedMatch, match);
                     }
                 });
+        }
+        erasePlayer(box: models.Box): void {
+            this.mainLib.erasePlayer(box);
+        }
+        swapPlayer(box: models.Box): void {
+            //TODO
         }
         //#endregion match
 

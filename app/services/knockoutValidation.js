@@ -580,7 +580,14 @@
         }
 
         angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type']).factory('knockoutValidation', [
-            'validation', 'knockout', 'drawLib', 'tournamentLib', 'rank', 'category', 'score', 'find',
+            'validation',
+            'knockout',
+            'drawLib',
+            'tournamentLib',
+            'rank',
+            'category',
+            'score',
+            'find',
             function (validation, knockout, drawLib, tournamentLib, rank, category, score, find) {
                 return new KnockoutValidation(validation, knockout, drawLib, tournamentLib, rank, category, score, find);
             }]);

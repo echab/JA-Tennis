@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     (function (main) {
@@ -15,11 +15,13 @@ var jat;
                 this.undo = undo;
                 this.$window = $window;
                 this.GenerateType = models.GenerateType;
+                this.ModelType = models.ModelType;
+                this.Mode = models.Mode;
                 this.selection.tournament = this.tournamentLib.newTournament();
 
-                //var filename = '/data/tournament8.json';
-                var filename = '/data/to2006.json';
+                var filename = '/data/tournament8.json';
 
+                //var filename = '/data/to2006.json';
                 //Load saved tournament if exists
                 //this.mainLib.loadTournament().then((data) => {
                 //}, (reason) => {
@@ -39,20 +41,44 @@ var jat;
             }
             //#region tournament
             mainCtrl.prototype.newTournament = function () {
-                //TODO browse for file
-                //this.mainLib.loadTournament('xxx.json');
+                //TODO confirmation
+                //TODO undo
+                this.mainLib.newTournament();
+                this.editTournament(this.selection.tournament);
             };
-            mainCtrl.prototype.loadTournament = function () {
-                //TODO browse for file
-                //this.mainLib.loadTournament('xxx.json');
+            mainCtrl.prototype.loadTournament = function (file) {
+                this.mainLib.loadTournament(file);
             };
             mainCtrl.prototype.saveTournament = function () {
                 this.mainLib.saveTournament(this.selection.tournament, '');
             };
+            mainCtrl.prototype.editTournament = function (tournament) {
+                var _this = this;
+                var editedInfo = this.tournamentLib.newInfo(this.selection.tournament.info);
+
+                this.$modal.open({
+                    templateUrl: 'tournament/dialogInfo.html',
+                    controller: 'dialogInfoCtrl as dlg',
+                    resolve: {
+                        title: function () {
+                            return "Edit info";
+                        },
+                        info: function () {
+                            return editedInfo;
+                        }
+                    }
+                }).result.then(function (result) {
+                    if ('Ok' === result) {
+                        //this.mainLib.editInfo(editedInfo, this.selection.tournament.info);
+                        var c = _this.selection.tournament;
+                        _this.undo.update(_this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
+                    }
+                });
+            };
 
             //#endregion tournament
-            mainCtrl.prototype.select = function (item) {
-                this.mainLib.select(item);
+            mainCtrl.prototype.select = function (item, type) {
+                this.mainLib.select(item, type);
             };
 
             //#region player
@@ -216,11 +242,6 @@ var jat;
                 });
             };
 
-            mainCtrl.prototype.lockDraw = function (draw, lock) {
-                //TODO
-                draw.locked = lock;
-            };
-
             mainCtrl.prototype.validateDraw = function (draw) {
                 this.mainLib.validateDraw(draw);
             };
@@ -239,6 +260,9 @@ var jat;
 
             //#endregion draw
             //#region match
+            mainCtrl.prototype.isMatch = function (box) {
+                return box && 'score' in box;
+            };
             mainCtrl.prototype.editMatch = function (match) {
                 var _this = this;
                 var editedMatch = this.drawLib.newBox(match._draw, match);
@@ -259,6 +283,12 @@ var jat;
                         _this.mainLib.editMatch(editedMatch, match);
                     }
                 });
+            };
+            mainCtrl.prototype.erasePlayer = function (box) {
+                this.mainLib.erasePlayer(box);
+            };
+            mainCtrl.prototype.swapPlayer = function (box) {
+                //TODO
             };
 
             //#endregion match
@@ -293,6 +323,7 @@ var jat;
             'jat.services.validation.knockout',
             'jat.services.validation.roundrobin',
             'jat.services.validation.fft',
+            'jat.tournament.dialog',
             'jat.player.dialog',
             'jat.player.list',
             'jat.event.dialog',
@@ -302,6 +333,7 @@ var jat;
             'jat.draw.box',
             'jat.match.dialog',
             'ec.panels',
+            'ec.inputFile',
             'ui.bootstrap']).controller('mainCtrl', mainCtrl);
     })(jat.main || (jat.main = {}));
     var main = jat.main;

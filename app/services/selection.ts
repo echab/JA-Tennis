@@ -8,7 +8,7 @@ module jat.service {
         public tournament: models.Tournament;
         public event: models.Event;
         public draw: models.Draw;
-        public match: models.Match;
+        public box: models.Box;
         public player: models.Player;
     }
 

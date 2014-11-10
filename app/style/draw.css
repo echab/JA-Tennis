@@ -1,11 +1,10 @@
 ﻿div.draw {
     position: relative;
-    /*background-color: lightgray;*/
-    border: 1px dashed gray;
+    /*border: 1px dashed gray;*/
 }
 
 table.roundrobin {
-    border: 1px dashed gray;
+    /*border: 1px dashed gray;*/
 }
 
 div.inline {
@@ -52,6 +51,11 @@ div.inline {
     opacity: 1;
 }
 
+.box .selected {
+    background-color: rgba(150, 211, 242, .4) !important;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mOYdvlTGgAHIALCPurcFAAAAABJRU5ErkJggg==);
+}
+
 .seeded {
     font-weight: bold;
     background-color: darkgray;
@@ -70,3 +74,13 @@ div.inline {
     float: right;
 }
 
+.action {
+    position:absolute;
+    background-color: #ccc;
+    box-shadow: 0px 2px 5px #888888;
+    z-index: 3;
+}
+.action .btn, .btn-group .btn  {
+    padding-left: 6px;
+    padding-right: 6px;
+}

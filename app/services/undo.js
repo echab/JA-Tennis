@@ -1,14 +1,20 @@
-'use strict';
+﻿'use strict';
 
 var jat;
 (function (jat) {
     (function (service) {
+        /**
+        * Undo manager for typescript models.
+        */
         var Undo = (function () {
             function Undo() {
                 this.stack = [];
                 this.head = -1;
                 this.maxUndo = 20;
             }
+            /**
+            * Reset the undo stacks
+            */
             Undo.prototype.reset = function () {
                 this.stack = [];
                 this.head = -1;
@@ -16,10 +22,10 @@ var jat;
             };
 
             Undo.prototype.action = function (fnDo, fnUndo, message, meta) {
-                if ("public" != typeof fnDo) {
+                if ("public" !== typeof fnDo) {
                     throw "Undo action: invalid fnDo";
                 }
-                if ("public" != typeof fnUndo) {
+                if ("public" !== typeof fnUndo) {
                     throw "Undo action: invalid fnUndo";
                 }
                 var action = {
@@ -29,8 +35,9 @@ var jat;
                     message: message || "",
                     meta: meta
                 };
-                fnDo();
+                var r = fnDo();
                 this._pushAction(action);
+                return r;
             };
 
             Undo.prototype.update = function (obj, member, value, message, meta) {
@@ -52,7 +59,7 @@ var jat;
                     meta: meta
                 };
                 if (obj.splice) {
-                    if ("number" != typeof member || member < 0 || obj.length <= member) {
+                    if ("number" !== typeof member || member < 0 || obj.length <= member) {
                         throw "Bad array position to update";
                     }
                 }
@@ -71,7 +78,7 @@ var jat;
                     throw "Undo insert: invalid value";
                 }
                 if (obj.splice) {
-                    if ("number" != typeof member || member < 0 || member > obj.length) {
+                    if ("number" !== typeof member || member < 0 || member > obj.length) {
                         member = obj.length;
                     }
                 }
@@ -107,7 +114,7 @@ var jat;
                     meta: meta
                 };
                 if (obj.splice) {
-                    if ("number" != typeof member || member < 0 || obj.length <= member) {
+                    if ("number" !== typeof member || member < 0 || obj.length <= member) {
                         throw "Bad array position to remove";
                     }
                     obj.splice(member, 1);
@@ -125,7 +132,7 @@ var jat;
                 if ("undefined" === typeof obj.slice) {
                     throw "Undo splice: invalid obj not an array";
                 }
-                if ("number" != typeof index) {
+                if ("number" !== typeof index) {
                     throw "Undo splice: invalid index";
                 }
                 if (index < 0 || obj.length < index) {
@@ -161,6 +168,9 @@ var jat;
                     this.stack.splice(this.head, this.stack.length, action);
                     this._maxUndoOverflow();
                 }
+                if ("function" === typeof action.meta) {
+                    action.meta();
+                }
             };
 
             Undo.prototype.newGroup = function (message, fnGroup, meta) {
@@ -173,7 +183,7 @@ var jat;
                     message: message || "",
                     meta: meta
                 };
-                if ("undefined" != typeof fnGroup) {
+                if ("undefined" !== typeof fnGroup) {
                     if (fnGroup()) {
                         this.endGroup();
                     } else {
@@ -205,19 +215,20 @@ var jat;
                     var r;
                     if (bUndo) {
                         for (var i = action.stack.length - 1; i >= 0; i--) {
-                            r = this._do(action.stack[i], bUndo);
+                            r = this._do(action.stack[i], true);
                         }
                     } else {
                         for (i = 0; i < action.stack.length; i++) {
-                            r = this._do(action.stack[i], bUndo);
+                            r = this._do(action.stack[i], false);
                         }
                     }
+                    this.meta = action.meta;
                     return r;
                 } else if (action.type === Undo.ActionType.ACTION) {
                     if (bUndo) {
-                        action.fnUndo();
+                        return action.fnUndo();
                     } else {
-                        action.fnDo();
+                        return action.fnDo();
                     }
                 } else if (action.type === Undo.ActionType.UPDATE) {
                     var temp = action.obj[action.member];
@@ -250,9 +261,10 @@ var jat;
                 if (!this.canUndo()) {
                     throw "Can't undo";
                 }
+                var meta = this.stack[this.head].meta;
                 var r = this._do(this.stack[this.head], true);
                 this.head--;
-                return r;
+                return "function" === typeof meta ? meta() : r;
             };
 
             Undo.prototype.redo = function () {
@@ -260,7 +272,9 @@ var jat;
                     throw "Can't redo";
                 }
                 this.head++;
-                return this._do(this.stack[this.head], false);
+                var meta = this.stack[this.head].meta;
+                var r = this._do(this.stack[this.head], false);
+                return "function" === typeof meta ? meta() : r;
             };
 
             Undo.prototype.canUndo = function () {
@@ -280,7 +294,7 @@ var jat;
             };
 
             Undo.prototype.setMaxUndo = function (v) {
-                if ("number" != typeof v) {
+                if ("number" !== typeof v) {
                     throw "Invalid maxUndo value";
                 }
                 this.maxUndo = v;

@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var models;
 (function (models) {
     (function (DrawType) {
@@ -28,5 +28,13 @@ var models;
         ModelType[ModelType["Box"] = 6] = "Box";
     })(models.ModelType || (models.ModelType = {}));
     var ModelType = models.ModelType;
+
+    (function (Mode) {
+        Mode[Mode["Build"] = 0] = "Build";
+        Mode[Mode["Plan"] = 1] = "Plan";
+        Mode[Mode["Play"] = 2] = "Play";
+        Mode[Mode["Lock"] = 3] = "Lock";
+    })(models.Mode || (models.Mode = {}));
+    var Mode = models.Mode;
 })(models || (models = {}));
 //# sourceMappingURL=model.js.map

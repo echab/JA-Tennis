@@ -1,6 +1,6 @@
 ﻿'use strict';
 describe('services.mainLib', function () {
-    var main, drawLib, undo, find, math;
+    var main, drawLib, undo, find, guid, math;
 
     beforeEach(module('jat.services.mainLib'));
     beforeEach(module('jat.services.guid.mock'));
@@ -11,6 +11,7 @@ describe('services.mainLib', function () {
         drawLib = _drawLib_;
         undo = _undo_;
         find = _find_;
+        guid = _guid_;
         math = _math_;
     }));
 

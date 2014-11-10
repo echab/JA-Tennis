@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 describe('services.undo', function () {
     var undo;
 
@@ -33,15 +33,17 @@ describe('services.undo', function () {
         });
 
         it('should undo insert e', function () {
-            undo.undo();
+            var r = undo.undo();
             expect(a.toString()).toEqual("a,b,c,d");
             expect(undo.canRedo()).toBe(true);
             expect(undo.messageRedo()).toEqual("Add e");
+            expect(r).toBeUndefined();
         });
 
         it('should redo insert e', function () {
-            undo.redo();
+            var r = undo.redo();
             expect(a.toString()).toEqual("a,b,c,d,e");
+            expect(r).toBe('e');
         });
     });
 
@@ -57,14 +59,16 @@ describe('services.undo', function () {
             expect(undo.canUndo());
             expect(undo.messageUndo()).toEqual("Insert e");
 
-            undo.undo();
+            var r = undo.undo();
             expect(a.toString()).toEqual("a,b,c,d");
+            expect(r).toBeUndefined();
 
             expect(undo.canRedo());
             expect(undo.messageRedo()).toEqual("Insert e");
 
-            undo.redo();
+            r = undo.redo();
             expect(a.toString()).toEqual("a,b,e,c,d");
+            expect(r).toBe('e');
         });
     });
 
@@ -86,24 +90,28 @@ describe('services.undo', function () {
             expect(undo.canUndo());
             expect(undo.messageUndo()).toEqual("Insert e");
 
-            undo.undo();
+            var r = undo.undo();
             expect(a.toString()).toEqual("c,d,a,b");
+            expect(r).toBeUndefined();
 
             expect(undo.canUndo());
             expect(undo.messageUndo()).toEqual("Insert d");
 
-            undo.undo();
+            r = undo.undo();
             expect(a.toString()).toEqual("c,a,b");
+            expect(r).toBeUndefined();
 
             expect(undo.canRedo());
             expect(undo.messageRedo()).toEqual("Insert d");
             expect(undo.messageUndo()).toEqual("Insert c");
 
-            undo.redo();
+            r = undo.redo();
             expect(a.toString()).toEqual("c,d,a,b");
+            expect(r).toBe('d');
 
-            undo.redo();
+            r = undo.redo();
             expect(a.toString()).toEqual("c,e,d,a,b");
+            expect(r).toBe('e');
 
             expect(!undo.canRedo());
         });
@@ -121,16 +129,18 @@ describe('services.undo', function () {
             undo.insert(a, -1, "d", "Insert d");
             expect(a.toString()).toEqual("a,b,c,d");
 
-            undo.undo();
+            var r = undo.undo();
             expect(a.toString()).toEqual("a,b,c");
+            expect(r).toBeUndefined();
 
             undo.insert(a, -1, "e", "Insert e");
             expect(a.toString()).toEqual("a,b,c,e");
 
             expect(!undo.canRedo());
 
-            undo.undo();
+            r = undo.undo();
             expect(a.toString()).toEqual("a,b,c");
+            expect(r).toBeUndefined();
         });
     });
 
@@ -147,11 +157,13 @@ describe('services.undo', function () {
             expect(a).toEqual({ a: "aa", b: "bb", "e": "ee" });
 
             expect(undo.canUndo());
-            undo.undo();
+            var r = undo.undo();
             expect(a).toEqual({ a: "aa", b: "bb" });
+            expect(r).toBeUndefined();
 
-            undo.redo();
+            r = undo.redo();
             expect(a).toEqual({ a: "aa", b: "bb", "e": "ee" });
+            expect(r).toBe('ee');
         });
     });
 
@@ -162,14 +174,16 @@ describe('services.undo', function () {
 
         it('should do it', function () {
             undo.remove(a, 1, "Remove b");
-            expect(a.toString()).toEqual('a,c');
+            expect(a.toString()).toBe('a,c');
 
             expect(undo.canUndo());
-            undo.undo();
-            expect(a.toString()).toEqual('a,b,c');
+            var r = undo.undo();
+            expect(a.toString()).toBe('a,b,c');
+            expect(r).toBe('b');
 
-            undo.redo();
-            expect(a.toString()).toEqual('a,c');
+            r = undo.redo();
+            expect(a.toString()).toBe('a,c');
+            expect(r).toBeUndefined();
         });
     });
 
@@ -187,13 +201,15 @@ describe('services.undo', function () {
             expect(a).toEqual({ a: "aa", c: "cc" });
 
             expect(undo.canUndo());
-            undo.undo();
+            var r = undo.undo();
 
             //expect( a).toEqual({a:"aa",c:"cc",b:"bb"});
             expect(a).toEqual({ a: "aa", b: "bb", c: "cc" });
+            expect(r).toBe('bb');
 
-            undo.redo();
+            r = undo.redo();
             expect(a).toEqual({ a: "aa", c: "cc" });
+            expect(r).toBeUndefined(); //?
         });
     });
 
@@ -211,11 +227,42 @@ describe('services.undo', function () {
             expect(a).toEqual({ a: "aa", b: "bbb", c: "cc" });
 
             expect(undo.canUndo());
-            undo.undo();
+            var r = undo.undo();
             expect(a).toEqual({ a: "aa", b: "bb", c: "cc" });
+            expect(r).toBe('bbb');
 
-            undo.redo();
+            r = undo.redo();
             expect(a).toEqual({ a: "aa", b: "bbb", c: "cc" });
+            expect(r).toBe('bb');
+        });
+    });
+
+    describe('testObjectUpdateMeta', function () {
+        var a = {
+            a: "aa", _a: "_aa",
+            b: "bb", _b: "_bb"
+        };
+
+        it('should reset undo', initTest);
+
+        function postProcess(a, member) {
+            a['_' + member] = '_' + a[member];
+        }
+
+        it('should do it', function () {
+            undo.update(a, "b", "bbb", "Change b to bbb", function () {
+                return postProcess(a, 'b');
+            });
+            expect(a).toEqual({ a: "aa", _a: "_aa", b: "bbb", _b: "_bbb" });
+
+            expect(undo.canUndo());
+            var r = undo.undo();
+            expect(a).toEqual({ a: "aa", _a: "_aa", b: "bb", _b: "_bb" });
+            expect(r).toBeUndefined();
+
+            r = undo.redo();
+            expect(a).toEqual({ a: "aa", _a: "_aa", b: "bbb", _b: "_bbb" });
+            expect(r).toBeUndefined();
         });
     });
 
@@ -226,14 +273,16 @@ describe('services.undo', function () {
 
         it('should do it', function () {
             undo.update(a, 1, "bb", "Change b to bb");
-            expect(a.toString()).toEqual('a,bb,c');
+            expect(a.toString()).toBe('a,bb,c');
 
             expect(undo.canUndo());
-            undo.undo();
-            expect(a.toString()).toEqual('a,b,c');
+            var r = undo.undo();
+            expect(a.toString()).toBe('a,b,c');
+            expect(r).toBe('bb');
 
-            undo.redo();
-            expect(a.toString()).toEqual('a,bb,c');
+            r = undo.redo();
+            expect(a.toString()).toBe('a,bb,c');
+            expect(r).toBe('b');
         });
     });
 
@@ -258,11 +307,12 @@ describe('services.undo', function () {
         });
 
         it('should undo 3 times', function () {
-            undo.undo();
-            undo.undo();
-            undo.undo();
+            var r = undo.undo();
+            r = undo.undo();
+            r = undo.undo();
             expect(a.v).toBe(0);
             expect(undo.canUndo()).toBe(false);
+            expect(r).toBe(1);
         });
 
         it('should update a.v to 1,2,3,4', function () {
@@ -274,11 +324,12 @@ describe('services.undo', function () {
         });
 
         it('should undo 3 times', function () {
-            undo.undo();
-            undo.undo();
-            undo.undo();
+            var r = undo.undo();
+            r = undo.undo();
+            r = undo.undo();
             expect(a.v).toBe(1);
             expect(undo.canUndo()).toBe(false);
+            expect(r).toBe(2);
         });
     });
 
@@ -310,16 +361,18 @@ describe('services.undo', function () {
         });
 
         it('should undo the group', function () {
-            undo.undo();
+            var r = undo.undo();
             expect(a.v).toBe(0);
             expect(a.w).toBe(1);
             expect(undo.canUndo()).toBe(false);
+            expect(r).toBe(2);
         });
 
         it('should redo the group', function () {
-            undo.redo();
+            var r = undo.redo();
             expect(a.v).toBe(2);
             expect(a.w).toBe(3);
+            expect(r).toBe(1);
         });
     });
 
@@ -372,7 +425,44 @@ describe('services.undo', function () {
             expect(a.w).toBe(3);
             expect(undo.canUndo()).toBe(true);
             expect(undo.messageUndo()).toBe("group1");
-            undo.undo();
+            var r = undo.undo();
+            expect(r).toBe(2);
+        });
+
+        it('should cancel a group', function () {
+            undo.newGroup("group1", function () {
+                undo.update(a, "v", 2, 'update to 2');
+                undo.update(a, "w", 3, 'update to 3');
+                return false;
+            });
+            expect(a.v).toBe(0);
+            expect(a.w).toBe(1);
+            expect(undo.canUndo()).toBe(false);
+        });
+    });
+
+    describe('group function meta', function () {
+        var a = {
+            v: 0,
+            w: 1
+        };
+
+        it('should reset undo', initTest);
+
+        it('should create a group', function () {
+            undo.newGroup("group1", function () {
+                undo.update(a, "v", 2, 'update to 2');
+                undo.update(a, "w", 3, 'update to 3');
+                return true;
+            }, a);
+            expect(a.v).toBe(2);
+            expect(a.w).toBe(3);
+            expect(undo.canUndo()).toBe(true);
+            expect(undo.messageUndo()).toBe("group1");
+            expect(undo.getMeta()).toBeUndefined();
+            var r = undo.undo();
+            expect(r).toBe(2);
+            expect(undo.getMeta()).toEqual(a);
         });
 
         it('should cancel a group', function () {
@@ -421,14 +511,16 @@ describe('services.undo', function () {
     //        expect(undo.messageUndo()).toBe("Remove b and add d,e");
     //    });
     //    it('should undo remove b and insert d,e', () => {
-    //        undo.undo();
+    //        var r = undo.undo();
     //        expect(a).toEqual(["a", "b", "c"]);
     //        expect(undo.canRedo()).toBe(true);
     //        expect(undo.messageRedo()).toBe("Remove b and add d,e");
+    //        expect(r).toBeUndefined();
     //    });
     //    it('should redo Remove b and add d,e', () => {
-    //        undo.redo();
+    //        var r = undo.redo();
     //        expect(a).toEqual(["a", "e", "d", "c"]);
+    //        expect(r).toBe('ee');
     //    });
     //});
     describe('testSplice array', function () {
@@ -445,15 +537,16 @@ describe('services.undo', function () {
 
         it('should undo remove b and insert d,e', function () {
             var r = undo.undo();
-            expect(r).toEqual('b');
+            expect(r).toBe('b');
             expect(a).toEqual(["a", "b", "c"]);
             expect(undo.canRedo()).toBe(true);
             expect(undo.messageRedo()).toBe("Remove b and add d,e");
         });
 
         it('should redo Remove b and add d,e', function () {
-            undo.redo();
+            var r = undo.redo();
             expect(a).toEqual(["a", "e", "d", "c"]);
+            expect(r).toBe('e'); //?
         });
     });
     //*/

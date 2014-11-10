@@ -338,7 +338,10 @@ var jat;
         }
 
         angular.module('jat.services.validation.fft', ['jat.services.validation']).factory('fftValidation', [
-            'validation', 'drawLib', 'knockout', 'find',
+            'validation',
+            'drawLib',
+            'knockout',
+            'find',
             function (validation, drawLib, knockout, find) {
                 return new FFTValidation(validation, drawLib, knockout, find);
             }]);

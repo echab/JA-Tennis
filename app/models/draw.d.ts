@@ -21,7 +21,7 @@ declare module models {
         //matches: Match[];
         boxes: Box[];
 
-        locked?: boolean;
+        mode?: Mode;
 
         _points?: IPoint[];
 

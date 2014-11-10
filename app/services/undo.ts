@@ -4,8 +4,8 @@
 
 interface IUndoAction {
     type: number;
-    fnDo? (): void;
-    fnUndo? (): void;
+    fnDo? (): any;
+    fnUndo? (): any;
     obj?: any;
     index?: number;
     message: string;
@@ -19,6 +19,9 @@ interface IUndoAction {
 
 module jat.service {
 
+    /**
+      * Undo manager for typescript models.
+      */
     export class Undo {
 
         private stack: IUndoAction[] = [];
@@ -28,17 +31,20 @@ module jat.service {
         private static ActionType = { UPDATE: 1, INSERT: 2, REMOVE: 3, GROUP: 4, ACTION: 5, SPLICE: 6 };
         private meta: any;
 
+        /**
+          * Reset the undo stacks
+          */
         public reset() {
             this.stack = [];
             this.head = -1;
             this.group = null;
         }
 
-        public action(fnDo: () => void, fnUndo: () => void, message: string, meta?: any): void {
-            if ("public" != typeof fnDo) {
+        public action(fnDo: () => any, fnUndo: () => any, message: string, meta?: any): any {
+            if ("public" !== typeof fnDo) {
                 throw "Undo action: invalid fnDo";
             }
-            if ("public" != typeof fnUndo) {
+            if ("public" !== typeof fnUndo) {
                 throw "Undo action: invalid fnUndo";
             }
             var action = {
@@ -48,13 +54,22 @@ module jat.service {
                 message: message || "",
                 meta: meta
             };
-            fnDo();
+            var r = fnDo();
             this._pushAction(action);
+            return r;
         }
 
-        public update(obj: any[], member: number, value: any, message: string, meta?: any): void;
-        public update(obj: Object, member: string, value: any, message: string, meta?: any): void;
-        public update(obj: any, member: any, value: any, message: string, meta?: any): void {
+        /**
+          * Update an item of an array or the member of an object..
+          * @param obj      an array or an object.
+          * @param member   an item number if obj is an array, a member name is obj is an object.
+          * @param value    the new value to be set.
+          * @param message  (optional).
+          * @param meta     (optional).
+          */
+        public update(obj: any[], member: number, value: any, message?: string, meta?: any): void;
+        public update(obj: Object, member: string, value: any, message?: string, meta?: any): void;
+        public update(obj: any, member: any, value: any, message?: string, meta?: any): void {
             if ("undefined" === typeof obj) {
                 throw "Undo update: invalid obj";
             }
@@ -73,7 +88,7 @@ module jat.service {
                 meta: meta
             };
             if (obj.splice) {
-                if ("number" != typeof member || member < 0 || obj.length <= member) {
+                if ("number" !== typeof member || member < 0 || obj.length <= member) {
                     throw "Bad array position to update";
                 }
             }
@@ -94,7 +109,7 @@ module jat.service {
                 throw "Undo insert: invalid value";
             }
             if (obj.splice) {
-                if ("number" != typeof member || member < 0 || member > obj.length) {
+                if ("number" !== typeof member || member < 0 || member > obj.length) {
                     member = obj.length;
                 }
             }
@@ -130,7 +145,7 @@ module jat.service {
                 meta: meta
             };
             if (obj.splice) {
-                if ("number" != typeof member || member < 0 || obj.length <= member) {
+                if ("number" !== typeof member || member < 0 || obj.length <= member) {
                     throw "Bad array position to remove";
                 }
                 obj.splice(member, 1);
@@ -148,7 +163,7 @@ module jat.service {
             if ("undefined" === typeof obj.slice) {
                 throw "Undo splice: invalid obj not an array";
             }
-            if ("number" != typeof index) {
+            if ("number" !== typeof index) {
                 throw "Undo splice: invalid index";
             }
             if (index < 0 || obj.length < index) {
@@ -185,9 +200,12 @@ module jat.service {
                 this.stack.splice(this.head, this.stack.length, action);
                 this._maxUndoOverflow();
             }
+            if ("function" === typeof action.meta) {
+                action.meta();
+            }
         }
 
-        public newGroup(message: string, fnGroup?: () => void, meta?: any): void {
+        public newGroup(message: string, fnGroup?: () => boolean, meta?: any): void {
             if (this.group) {
                 throw "Cannot imbricate group";
             }
@@ -197,7 +215,7 @@ module jat.service {
                 message: message || "",
                 meta: meta
             };
-            if ("undefined" != typeof fnGroup) {
+            if ("undefined" !== typeof fnGroup) {
                 if (fnGroup()) {
                     this.endGroup();
                 } else {
@@ -229,20 +247,21 @@ module jat.service {
                 var r: any;
                 if (bUndo) {
                     for (var i = action.stack.length - 1; i >= 0; i--) {
-                        r = this._do(action.stack[i], bUndo);
+                        r = this._do(action.stack[i], true);
                     }
                 } else {
                     for (i = 0; i < action.stack.length; i++) {
-                        r = this._do(action.stack[i], bUndo);
+                        r = this._do(action.stack[i], false);
                     }
                 }
+                this.meta = action.meta;
                 return r;
 
             } else if (action.type === Undo.ActionType.ACTION) {
                 if (bUndo) {
-                    action.fnUndo();
+                    return action.fnUndo();
                 } else {
-                    action.fnDo();
+                    return action.fnDo();
                 }
 
             } else if (action.type === Undo.ActionType.UPDATE) {
@@ -280,9 +299,10 @@ module jat.service {
             if (!this.canUndo()) {
                 throw "Can't undo";
             }
+            var meta = this.stack[this.head].meta;
             var r = this._do(this.stack[this.head], true);
             this.head--;
-            return r;
+            return "function" === typeof meta ? meta() : r;
         }
 
         public redo(): void {
@@ -290,7 +310,9 @@ module jat.service {
                 throw "Can't redo";
             }
             this.head++;
-            return this._do(this.stack[this.head], false);
+            var meta = this.stack[this.head].meta;
+            var r = this._do(this.stack[this.head], false);
+            return "function" === typeof meta ? meta() : r;
         }
 
         public canUndo(): boolean {
@@ -310,7 +332,7 @@ module jat.service {
         }
 
         public setMaxUndo(v: number): void {
-            if ("number" != typeof v) {
+            if ("number" !== typeof v) {
                 throw "Invalid maxUndo value";
             }
             this.maxUndo = v;

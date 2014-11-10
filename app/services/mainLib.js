@@ -16,39 +16,64 @@
                 this.find = find;
                 this.guid = guid;
             }
-            /** This function load tournament data from an url. */
-            MainLib.prototype.loadTournament = function (url) {
+            MainLib.prototype.newTournament = function () {
+                var tournament = {
+                    id: this.guid.create('T'),
+                    info: {
+                        name: ''
+                    },
+                    players: [],
+                    events: []
+                };
+                this.select(tournament, 1 /* Tournament */);
+                return tournament;
+            };
+
+            MainLib.prototype.loadTournament = function (file_url) {
                 var _this = this;
                 var deferred = this.$q.defer();
-                if (!url) {
+                if (!file_url) {
                     var data = this.$window.localStorage['tournament'];
                     if (data) {
-                        data = angular.fromJson(data);
-                        this.tournamentLib.initTournament(data);
-                        this.loadedTournament(data);
-                        deferred.resolve(data);
+                        var tournament = angular.fromJson(data);
+                        this.tournamentLib.initTournament(tournament);
+                        this.select(tournament, 1 /* Tournament */);
+                        deferred.resolve(tournament);
                     } else {
                         deferred.reject('nothing in storage');
                     }
-                } else {
-                    this.$http.get(url).success(function (data, status) {
-                        data._url = url;
-                        _this.tournamentLib.initTournament(data);
-                        _this.loadedTournament(data);
-                        deferred.resolve(data);
+                } else if ('string' === typeof file_url) {
+                    this.$http.get(file_url).success(function (tournament, status) {
+                        tournament._url = file_url;
+                        _this.tournamentLib.initTournament(tournament);
+                        _this.select(tournament, 1 /* Tournament */);
+                        deferred.resolve(tournament);
                     }).error(function (data, status) {
                         deferred.reject(data);
                     });
+                } else {
+                    var reader = new FileReader();
+                    reader.addEventListener('loadend', function () {
+                        try  {
+                            var tournament = angular.fromJson(reader.result);
+                            tournament._url = file_url;
+                            _this.tournamentLib.initTournament(tournament);
+                            _this.select(tournament, 1 /* Tournament */);
+                            deferred.resolve(tournament);
+                        } catch (ex) {
+                            deferred.reject(ex.message);
+                        }
+                    });
+                    reader.addEventListener('onerror', function () {
+                        return deferred.reject(reader.error.name);
+                    });
+                    reader.addEventListener('onabort', function () {
+                        return deferred.reject('aborted');
+                    });
+
+                    reader.readAsText(file_url);
                 }
                 return deferred.promise;
-            };
-
-            MainLib.prototype.loadedTournament = function (tournament) {
-                if (tournament.events[0]) {
-                    this.select(tournament.events[0].draws[tournament.events[0].draws.length - 1], 4 /* Draw */);
-                } else {
-                    this.select(tournament, 1 /* Tournament */);
-                }
             };
 
             MainLib.prototype.saveTournament = function (tournament, url) {
@@ -135,7 +160,7 @@
                     if (!draws || !draws.length) {
                         return;
                     }
-                    this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, 4 /* Draw */);
+                    this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, 4 /* Draw */); //c.splice( i, 1, draws);
 
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
@@ -179,9 +204,11 @@
             };
 
             MainLib.prototype.updateQualif = function (draw) {
-                this.undo.newGroup('Update qualified', undefined, draw);
-                this.drawLib.updateQualif(draw);
-                this.undo.endGroup();
+                var _this = this;
+                this.undo.newGroup('Update qualified', function () {
+                    _this.drawLib.updateQualif(draw);
+                    return true;
+                }, draw);
             };
 
             MainLib.prototype.removeDraw = function (draw) {
@@ -204,53 +231,76 @@
             //#endregion draw
             //#region match
             MainLib.prototype.editMatch = function (editedMatch, match) {
+                var _this = this;
                 this.drawLib.initBox(editedMatch, editedMatch._draw);
                 var c = match._draw.boxes;
                 var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
-                this.undo.newGroup("Edit match");
-                this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, 5 /* Match */); //c[i] = editedMatch;
-                if (editedMatch.qualifOut) {
-                    //report qualified player to next draw
-                    var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
-                    if (nextGroup) {
-                        var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
-                        if (boxIn) {
-                            this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player'); //boxIn.playerId = editedMatch.playerId;
-                            this.undo.update(boxIn, '_player', editedMatch._player, 'Set player'); //boxIn._player = editedMatch._player;
+                this.undo.newGroup("Edit match", function () {
+                    _this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, 5 /* Match */); //c[i] = editedMatch;
+                    if (editedMatch.qualifOut) {
+                        //report qualified player to next draw
+                        var nextGroup = _this.drawLib.nextGroup(editedMatch._draw);
+                        if (nextGroup) {
+                            var boxIn = _this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
+                            if (boxIn) {
+                                //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
+                                //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
+                                _this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player', function () {
+                                    return _this.drawLib.initBox(boxIn, boxIn._draw);
+                                }); //boxIn.playerId = editedMatch.playerId;
+                            }
                         }
                     }
-                }
-                this.undo.endGroup();
+                    return true;
+                });
+            };
+            MainLib.prototype.erasePlayer = function (box) {
+                var _this = this;
+                //this.undo.newGroup("Erase player", () => {
+                //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
+                //    this.undo.update(box, '_player', null);  //box._player = undefined;
+                //    return true;
+                //}, box);
+                this.undo.update(box, 'playerId', null, "Erase player", function () {
+                    return _this.drawLib.initBox(box, box._draw);
+                }); //box.playerId = undefined;
             };
 
             //#endregion match
             MainLib.prototype.select = function (r, type) {
                 var sel = this.selection;
                 if (r) {
-                    if (type === 6 /* Box */ || (r.playerId && r._draw)) {
+                    if (type === 6 /* Box */ || ('_player' in r && r._draw)) {
                         sel.tournament = r._draw._event._tournament;
                         sel.event = r._draw._event;
                         sel.draw = r._draw;
-                        sel.match = r;
+                        sel.box = r;
                     } else if (type === 4 /* Draw */ || r._event) {
                         sel.tournament = r._event._tournament;
                         sel.event = r._event;
                         sel.draw = r;
-                        sel.match = undefined;
+                        sel.box = undefined;
                     } else if (type === 3 /* Event */ || (r.draws && r._tournament)) {
                         sel.tournament = r._tournament;
                         sel.event = r;
                         sel.draw = r.draws ? r.draws[0] : undefined;
-                        sel.match = undefined;
+                        sel.box = undefined;
                     } else if (type === 2 /* Player */ || (r.name && r._tournament)) {
                         sel.tournament = r._tournament;
                         sel.player = r;
                     } else if (type === 1 /* Tournament */ || (r.players && r.events)) {
                         sel.tournament = r;
-                        sel.event = undefined;
-                        sel.draw = undefined;
-                        sel.match = undefined;
-                        sel.player = undefined;
+                        if (sel.tournament.events[0]) {
+                            sel.event = sel.tournament.events[0];
+                            sel.draw = sel.event && sel.event.draws ? sel.event.draws[sel.event.draws.length - 1] : undefined;
+                        } else {
+                            sel.event = undefined;
+                            sel.draw = undefined;
+                        }
+                        sel.box = undefined;
+                        if (sel.player && sel.player._tournament !== sel.tournament) {
+                            sel.player = undefined;
+                        }
                     }
                 } else if (type) {
                     switch (type) {
@@ -261,8 +311,8 @@
                             sel.event = undefined;
                         case 4 /* Draw */:
                             sel.draw = undefined;
-                        case 5 /* Match */:
-                            sel.match = undefined;
+                        case 6 /* Box */:
+                            sel.box = undefined;
                             break;
                         case 2 /* Player */:
                             sel.player = undefined;
@@ -283,7 +333,10 @@
             'jat.services.drawLib',
             'jat.services.knockout',
             'jat.services.roundrobin',
-            'jat.services.validation'
+            'jat.services.validation',
+            'jat.services.validation.knockout',
+            'jat.services.validation.roundrobin',
+            'jat.services.validation.fft'
         ]).factory('mainLib', [
             '$log',
             '$http',

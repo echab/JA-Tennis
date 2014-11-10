@@ -411,8 +411,14 @@ module jat.service {
 
     angular.module('jat.services.validation.fft', ['jat.services.validation'])
         .factory('fftValidation', [
-            'validation', 'drawLib', 'knockout', 'find',
-            (validation: jat.service.Validation, drawLib: jat.service.DrawLib, knockout: jat.service.Knockout, find: jat.service.Find) => {
+            'validation',
+            'drawLib',
+            'knockout',
+            'find',
+            (validation: jat.service.Validation,
+                drawLib: jat.service.DrawLib,
+                knockout: jat.service.Knockout,
+                find: jat.service.Find) => {
             return new FFTValidation(validation, drawLib, knockout, find);
         }]);
 

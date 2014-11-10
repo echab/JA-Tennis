@@ -18,14 +18,14 @@
             ) {
         }
 
-        newTournament():models.Tournament {
-            var tournament:models.Tournament = {
+        newTournament(): models.Tournament {
+            var tournament: models.Tournament = {
                 id: this.guid.create('T'),
                 info: {
-                    name:''
+                    name: ''
                 },
                 players: [],
-                events:[]
+                events: []
             };
             this.select(tournament, models.ModelType.Tournament);
             return tournament;
@@ -167,7 +167,7 @@
                 if (!draws || !draws.length) {
                     return;
                 }
-                this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, models.ModelType.Draw);
+                this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, models.ModelType.Draw); //c.splice( i, 1, draws);
 
                 for (var i = 0; i < draws.length; i++) {
                     this.drawLib.initDraw(draws[i], draw._event);
@@ -212,9 +212,10 @@
         }
 
         updateQualif(draw: models.Draw): void {
-            this.undo.newGroup('Update qualified', undefined, draw);
-            this.drawLib.updateQualif(draw);
-            this.undo.endGroup();
+            this.undo.newGroup('Update qualified', () => {
+                this.drawLib.updateQualif(draw);
+                return true;
+            }, draw);
         }
 
         removeDraw(draw: models.Draw): void {
@@ -240,20 +241,33 @@
             this.drawLib.initBox(editedMatch, editedMatch._draw);
             var c = match._draw.boxes;
             var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
-            this.undo.newGroup("Edit match");
-            this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, models.ModelType.Match); //c[i] = editedMatch;
-            if (editedMatch.qualifOut) {
-                //report qualified player to next draw
-                var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
-                if (nextGroup) {
-                    var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
-                    if (boxIn) {
-                        this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
-                        this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
+            this.undo.newGroup("Edit match", () => {
+                this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, models.ModelType.Match); //c[i] = editedMatch;
+                if (editedMatch.qualifOut) {
+                    //report qualified player to next draw
+                    var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
+                    if (nextGroup) {
+                        var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
+                        if (boxIn) {
+                            //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
+                            //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
+                            this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player',
+                                () => this.drawLib.initBox(boxIn, boxIn._draw));  //boxIn.playerId = editedMatch.playerId;
+                        }
                     }
                 }
-            }
-            this.undo.endGroup();
+                return true;
+            });
+        }
+        erasePlayer(box: models.Box): void {
+            //this.undo.newGroup("Erase player", () => {
+            //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
+            //    this.undo.update(box, '_player', null);  //box._player = undefined;
+            //    return true;
+            //}, box);
+            this.undo.update(box, 'playerId', null, "Erase player",
+                () => this.drawLib.initBox(box, box._draw)
+                );  //box.playerId = undefined;
         }
         //#endregion match
 
@@ -261,23 +275,23 @@
 
             var sel = this.selection;
             if (r) {
-                if (type === models.ModelType.Box || (r.playerId && r._draw)) { //box
+                if (type === models.ModelType.Box || ('_player' in r && r._draw)) { //box
                     sel.tournament = r._draw._event._tournament;
                     sel.event = r._draw._event;
                     sel.draw = r._draw;
-                    sel.match = r;
+                    sel.box = r;
 
                 } else if (type === models.ModelType.Draw || r._event) { //draw
                     sel.tournament = r._event._tournament;
                     sel.event = r._event;
                     sel.draw = r;
-                    sel.match = undefined;
+                    sel.box = undefined;
 
                 } else if (type === models.ModelType.Event || (r.draws && r._tournament)) { //event
                     sel.tournament = r._tournament;
                     sel.event = r;
                     sel.draw = r.draws ? r.draws[0] : undefined;
-                    sel.match = undefined;
+                    sel.box = undefined;
 
                 } else if (type === models.ModelType.Player || (r.name && r._tournament)) {   //player
                     sel.tournament = r._tournament;
@@ -292,7 +306,7 @@
                         sel.event = undefined;
                         sel.draw = undefined;
                     }
-                    sel.match = undefined;
+                    sel.box = undefined;
                     if (sel.player && sel.player._tournament !== sel.tournament) {
                         sel.player = undefined;
                     }
@@ -308,8 +322,8 @@
                         sel.event = undefined;
                     case models.ModelType.Draw:
                         sel.draw = undefined;
-                    case models.ModelType.Match:
-                        sel.match = undefined;
+                    case models.ModelType.Box:
+                        sel.box = undefined;
                         break;
                     case models.ModelType.Player:
                         sel.player = undefined;
@@ -328,7 +342,10 @@
         'jat.services.drawLib',
         'jat.services.knockout',
         'jat.services.roundrobin',
-        'jat.services.validation'
+        'jat.services.validation',
+        'jat.services.validation.knockout',
+        'jat.services.validation.roundrobin',
+        'jat.services.validation.fft'
     ])
         .factory('mainLib',
         [
