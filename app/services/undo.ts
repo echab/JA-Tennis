@@ -4,8 +4,7 @@
 
 interface IUndoAction {
     type: number;
-    fnDo? (): any;
-    fnUndo? (): any;
+    fnAction? (bUndo?:boolean): any;
     obj?: any;
     index?: number;
     message: string;
@@ -40,27 +39,24 @@ module jat.service {
             this.group = null;
         }
 
-        public action(fnDo: () => any, fnUndo: () => any, message: string, meta?: any): any {
-            if ("public" !== typeof fnDo) {
-                throw "Undo action: invalid fnDo";
-            }
-            if ("public" !== typeof fnUndo) {
-                throw "Undo action: invalid fnUndo";
+        public action(fnAction: (bUndo?: boolean) => any, message: string, meta?: any): any {
+            if ("function" !== typeof fnAction) {
+                throw "Undo action: invalid fnAction";
             }
             var action = {
                 type: Undo.ActionType.ACTION,
-                fnDo: fnDo,
-                fnUndo: fnUndo,
+                fnAction: fnAction,
                 message: message || "",
                 meta: meta
             };
-            var r = fnDo();
+            var r = fnAction(false);
             this._pushAction(action);
             return r;
         }
 
         /**
           * Update an item of an array or the member of an object..
+          *
           * @param obj      an array or an object.
           * @param member   an item number if obj is an array, a member name is obj is an object.
           * @param value    the new value to be set.
@@ -200,9 +196,6 @@ module jat.service {
                 this.stack.splice(this.head, this.stack.length, action);
                 this._maxUndoOverflow();
             }
-            if ("function" === typeof action.meta) {
-                action.meta();
-            }
         }
 
         public newGroup(message: string, fnGroup?: () => boolean, meta?: any): void {
@@ -241,7 +234,7 @@ module jat.service {
             this.group = null;
         }
 
-        public _do(action: IUndoAction, bUndo: boolean): any {
+        private _do(action: IUndoAction, bUndo: boolean): any {
             this.meta = action.meta;
             if (action.type === Undo.ActionType.GROUP) {
                 var r: any;
@@ -258,11 +251,7 @@ module jat.service {
                 return r;
 
             } else if (action.type === Undo.ActionType.ACTION) {
-                if (bUndo) {
-                    return action.fnUndo();
-                } else {
-                    return action.fnDo();
-                }
+                return action.fnAction(bUndo);
 
             } else if (action.type === Undo.ActionType.UPDATE) {
                 var temp = action.obj[action.member];
@@ -299,10 +288,9 @@ module jat.service {
             if (!this.canUndo()) {
                 throw "Can't undo";
             }
-            var meta = this.stack[this.head].meta;
             var r = this._do(this.stack[this.head], true);
             this.head--;
-            return "function" === typeof meta ? meta() : r;
+            return r;
         }
 
         public redo(): void {
@@ -310,9 +298,7 @@ module jat.service {
                 throw "Can't redo";
             }
             this.head++;
-            var meta = this.stack[this.head].meta;
-            var r = this._do(this.stack[this.head], false);
-            return "function" === typeof meta ? meta() : r;
+            return this._do(this.stack[this.head], false);
         }
 
         public canUndo(): boolean {

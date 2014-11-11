@@ -78,7 +78,7 @@ var jat;
 
             //#endregion tournament
             mainCtrl.prototype.select = function (item, type) {
-                this.mainLib.select(item, type);
+                this.selection.select(item, type);
             };
 
             //#region player
@@ -284,19 +284,13 @@ var jat;
                     }
                 });
             };
-            mainCtrl.prototype.erasePlayer = function (box) {
-                this.mainLib.erasePlayer(box);
-            };
-            mainCtrl.prototype.swapPlayer = function (box) {
-                //TODO
-            };
 
             //#endregion match
             mainCtrl.prototype.doUndo = function () {
-                this.mainLib.select(this.undo.undo(), this.undo.getMeta());
+                this.selection.select(this.undo.undo(), this.undo.getMeta());
             };
             mainCtrl.prototype.doRedo = function () {
-                this.mainLib.select(this.undo.redo(), this.undo.getMeta());
+                this.selection.select(this.undo.redo(), this.undo.getMeta());
             };
             mainCtrl.$inject = [
                 '$modal',

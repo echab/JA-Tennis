@@ -3,17 +3,37 @@ var jat;
 (function (jat) {
     (function (_draw) {
         var drawCtrl = (function () {
-            function drawCtrl(drawLib, knockout, roundrobin, find) {
+            function drawCtrl(drawLib, //private knockout: jat.service.Knockout, //for dependencies
+            //private roundrobin: jat.service.Roundrobin, //for dependencies
+            tournamentLib, find, undo, selection) {
                 this.drawLib = drawLib;
-                this.knockout = knockout;
-                this.roundrobin = roundrobin;
+                this.tournamentLib = tournamentLib;
                 this.find = find;
+                this.undo = undo;
+                this.selection = selection;
                 this.boxWidth = 150;
                 this.boxHeight = 40;
                 this.interBoxWidth = 10;
                 this.interBoxHeight = 10;
                 this.simple = false;
             }
+            drawCtrl.prototype.init = function () {
+                if (!this.draw || this.simple) {
+                    return;
+                }
+
+                this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
+
+                //qualifs in
+                this.qualifsIn = [1, 2, 3, 4]; //TODO;
+
+                //qualifs out
+                this.qualifsOut = [];
+                for (var i = 1; i <= this.draw.nbOut; i++) {
+                    this.qualifsOut.push(i);
+                }
+            };
+
             drawCtrl.prototype.computeCoordinates = function () {
                 if (!this.draw) {
                     return;
@@ -61,7 +81,7 @@ var jat;
                     var box = draw.boxes[i];
                     var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
 
-                    if (isMatch(box)) {
+                    if (this.isMatch(box)) {
                         var opponent = positionOpponents(box.position);
                         var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
                         if (p1 && p2) {
@@ -99,12 +119,62 @@ var jat;
                 }
                 return a;
             };
+            drawCtrl.prototype.getQualifsIn = function () {
+                return this.qualifsIn;
+            };
+            drawCtrl.prototype.getQualifsOut = function () {
+                return this.qualifsOut;
+            };
+            drawCtrl.prototype.getPlayers = function () {
+                return this.players;
+            };
+            drawCtrl.prototype.findQualifIn = function (qualifIn) {
+                return this.draw && this.find.by(this.draw.boxes, 'qualifIn', qualifIn);
+            };
+            drawCtrl.prototype.findPlayer = function (player) {
+                return this.draw && this.find.by(this.draw.boxes, 'playerId', player.id);
+            };
+
+            drawCtrl.prototype.setPlayer = function (box, playerId, qualifIn) {
+                var _this = this;
+                var prevPlayer = box.playerId;
+                this.undo.action(function (bUndo) {
+                    box.playerId = bUndo ? prevPlayer : playerId;
+                    _this.drawLib.initBox(box, box._draw);
+                    _this.selection.select(box, 6 /* Box */);
+                }, playerId ? 'Set player' : 'Erase player');
+            };
+            drawCtrl.prototype.swapPlayer = function (box) {
+                //TODO
+            };
+            drawCtrl.prototype.setQualifIn = function (box, qualifIn) {
+                var _this = this;
+                var prev = box.qualifIn;
+                this.undo.action(function (bUndo) {
+                    //box.qualifIn = bUndo ? prev : qualifIn;
+                    _this.drawLib.SetQualifieEntrant(box, bUndo ? prev : qualifIn);
+                    _this.selection.select(box, 6 /* Box */);
+                }, qualifIn ? 'Set qualified' : 'Erase qualified');
+            };
+            drawCtrl.prototype.eraseScore = function (match) {
+                var _this = this;
+                this.undo.newGroup("Erase score", function () {
+                    _this.undo.update(match, 'score', ''); //box.score = '';
+                    return true;
+                }, match);
+            };
+
+            drawCtrl.prototype.isMatch = function (box) {
+                return box && ('score' in box);
+            };
+            drawCtrl.$inject = [
+                'drawLib',
+                'tournamentLib',
+                'find',
+                'undo',
+                'selection'];
             return drawCtrl;
         })();
-
-        function isMatch(box) {
-            return box && ('score' in box);
-        }
 
         function positionOpponents(pos) {
             return {
@@ -118,7 +188,7 @@ var jat;
                 restrict: 'EA',
                 scope: true,
                 templateUrl: 'draw/drawDraw.html',
-                controller: ['drawLib', 'knockout', 'roundrobin', 'find', drawCtrl],
+                controller: drawCtrl,
                 controllerAs: 'ctrlDraw',
                 link: function (scope, element, attrs, ctrlDraw) {
                     var doRefresh = function (draw, oldValue) {
@@ -130,6 +200,7 @@ var jat;
                         ctrlDraw.interBoxHeight = scope.$eval(attrs.interBoxHeight) || 10;
                         ctrlDraw.simple = scope.$eval(attrs.simple);
 
+                        ctrlDraw.init();
                         ctrlDraw.computeCoordinates();
 
                         //IE8 patch
@@ -209,7 +280,14 @@ var jat;
             };
         }
 
-        angular.module('jat.draw.list', ['jat.services.drawLib', 'jat.services.knockout', 'jat.services.roundrobin', 'jat.services.find']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective).run(initVml);
+        angular.module('jat.draw.list', [
+            'jat.services.drawLib',
+            'jat.services.knockout',
+            'jat.services.roundrobin',
+            'jat.services.tournamentLib',
+            'jat.services.find',
+            'jat.services.undo',
+            'jat.services.selection']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective).run(initVml);
     })(jat.draw || (jat.draw = {}));
     var draw = jat.draw;
 })(jat || (jat = {}));

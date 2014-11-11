@@ -18,7 +18,9 @@ module jat.service {
             };
             for (var i = 0; i < array.length; i++) {
                 var a: any = array[i];
-                idx[a[member]] = i;
+                if (a !== undefined) {
+                    idx[a[member]] = i;
+                }
             }
             array["_FindBy" + member] = idx;
         }

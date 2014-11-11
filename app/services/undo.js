@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 var jat;
 (function (jat) {
@@ -21,21 +21,17 @@ var jat;
                 this.group = null;
             };
 
-            Undo.prototype.action = function (fnDo, fnUndo, message, meta) {
-                if ("public" !== typeof fnDo) {
-                    throw "Undo action: invalid fnDo";
-                }
-                if ("public" !== typeof fnUndo) {
-                    throw "Undo action: invalid fnUndo";
+            Undo.prototype.action = function (fnAction, message, meta) {
+                if ("function" !== typeof fnAction) {
+                    throw "Undo action: invalid fnAction";
                 }
                 var action = {
                     type: Undo.ActionType.ACTION,
-                    fnDo: fnDo,
-                    fnUndo: fnUndo,
+                    fnAction: fnAction,
                     message: message || "",
                     meta: meta
                 };
-                var r = fnDo();
+                var r = fnAction(false);
                 this._pushAction(action);
                 return r;
             };
@@ -168,9 +164,6 @@ var jat;
                     this.stack.splice(this.head, this.stack.length, action);
                     this._maxUndoOverflow();
                 }
-                if ("function" === typeof action.meta) {
-                    action.meta();
-                }
             };
 
             Undo.prototype.newGroup = function (message, fnGroup, meta) {
@@ -225,11 +218,7 @@ var jat;
                     this.meta = action.meta;
                     return r;
                 } else if (action.type === Undo.ActionType.ACTION) {
-                    if (bUndo) {
-                        return action.fnUndo();
-                    } else {
-                        return action.fnDo();
-                    }
+                    return action.fnAction(bUndo);
                 } else if (action.type === Undo.ActionType.UPDATE) {
                     var temp = action.obj[action.member];
                     action.obj[action.member] = action.value;
@@ -261,10 +250,9 @@ var jat;
                 if (!this.canUndo()) {
                     throw "Can't undo";
                 }
-                var meta = this.stack[this.head].meta;
                 var r = this._do(this.stack[this.head], true);
                 this.head--;
-                return "function" === typeof meta ? meta() : r;
+                return r;
             };
 
             Undo.prototype.redo = function () {
@@ -272,9 +260,7 @@ var jat;
                     throw "Can't redo";
                 }
                 this.head++;
-                var meta = this.stack[this.head].meta;
-                var r = this._do(this.stack[this.head], false);
-                return "function" === typeof meta ? meta() : r;
+                return this._do(this.stack[this.head], false);
             };
 
             Undo.prototype.canUndo = function () {

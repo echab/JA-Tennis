@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 var jat;
 (function (jat) {
     // Find service
@@ -12,7 +12,9 @@ var jat;
                 };
                 for (var i = 0; i < array.length; i++) {
                     var a = array[i];
-                    idx[a[member]] = i;
+                    if (a !== undefined) {
+                        idx[a[member]] = i;
+                    }
                 }
                 array["_FindBy" + member] = idx;
             };

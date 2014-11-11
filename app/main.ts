@@ -91,7 +91,7 @@ module jat.main {
         //#endregion tournament
 
         select(item: any, type?: models.ModelType): void {
-            this.mainLib.select(item, type);
+            this.selection.select(item, type);
         }
 
         //#region player
@@ -265,19 +265,13 @@ module jat.main {
                     }
                 });
         }
-        erasePlayer(box: models.Box): void {
-            this.mainLib.erasePlayer(box);
-        }
-        swapPlayer(box: models.Box): void {
-            //TODO
-        }
         //#endregion match
 
         public doUndo(): void {
-            this.mainLib.select(this.undo.undo(), this.undo.getMeta());
+            this.selection.select(this.undo.undo(), this.undo.getMeta());
         }
         public doRedo(): void {
-            this.mainLib.select(this.undo.redo(), this.undo.getMeta());
+            this.selection.select(this.undo.redo(), this.undo.getMeta());
         }
     }
 

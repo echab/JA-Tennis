@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 describe('services.undo', function () {
     var undo;
 
@@ -20,6 +20,43 @@ describe('services.undo', function () {
     }
 
     //*
+    describe('testAction', function () {
+        var a = {
+            a: "aa",
+            b: "bb"
+        };
+
+        it('should reset undo', initTest);
+
+        it('should insert e', function () {
+            var r = undo.action(function (bUndo) {
+                if (!bUndo) {
+                    a.e = 'ee';
+                } else {
+                    delete a.e;
+                }
+            }, "Add e");
+            expect(a).toEqual({ a: 'aa', b: 'bb', e: 'ee' });
+            expect(undo.canUndo()).toBe(true);
+            expect(undo.messageUndo()).toEqual("Add e");
+            expect(r).toBeUndefined();
+        });
+
+        it('should undo insert e', function () {
+            var r = undo.undo();
+            expect(a).toEqual({ a: 'aa', b: 'bb' });
+            expect(undo.canRedo()).toBe(true);
+            expect(undo.messageRedo()).toEqual("Add e");
+            expect(r).toBeUndefined();
+        });
+
+        it('should redo insert e', function () {
+            var r = undo.redo();
+            expect(a).toEqual({ a: 'aa', b: 'bb', e: 'ee' });
+            expect(r).toBeUndefined();
+        });
+    });
+
     describe('testArrayAdd', function () {
         var a = ["a", "b", "c", "d"];
 
@@ -237,35 +274,27 @@ describe('services.undo', function () {
         });
     });
 
-    describe('testObjectUpdateMeta', function () {
-        var a = {
-            a: "aa", _a: "_aa",
-            b: "bb", _b: "_bb"
-        };
-
-        it('should reset undo', initTest);
-
-        function postProcess(a, member) {
-            a['_' + member] = '_' + a[member];
-        }
-
-        it('should do it', function () {
-            undo.update(a, "b", "bbb", "Change b to bbb", function () {
-                return postProcess(a, 'b');
-            });
-            expect(a).toEqual({ a: "aa", _a: "_aa", b: "bbb", _b: "_bbb" });
-
-            expect(undo.canUndo());
-            var r = undo.undo();
-            expect(a).toEqual({ a: "aa", _a: "_aa", b: "bb", _b: "_bb" });
-            expect(r).toBeUndefined();
-
-            r = undo.redo();
-            expect(a).toEqual({ a: "aa", _a: "_aa", b: "bbb", _b: "_bbb" });
-            expect(r).toBeUndefined();
-        });
-    });
-
+    //describe('testObjectUpdateMeta', () => {
+    //    var a = {
+    //        a: "aa", _a: "_aa",
+    //        b: "bb", _b: "_bb"
+    //    };
+    //    it('should reset undo', initTest);
+    //    function postProcess(a: any, member: string) {
+    //        a['_' + member] = '_' + a[member];
+    //    }
+    //    it('should do it', () => {
+    //        undo.update(a, "b", "bbb", "Change b to bbb", () => postProcess(a, 'b'));
+    //        expect(a).toEqual({ a: "aa", _a: "_aa", b: "bbb", _b: "_bbb" });
+    //        expect(undo.canUndo());
+    //        var r = undo.undo();
+    //        expect(a).toEqual({ a: "aa", _a: "_aa", b: "bb", _b: "_bb" });
+    //        expect(r).toBeUndefined();
+    //        r = undo.redo();
+    //        expect(a).toEqual({ a: "aa", _a: "_aa", b: "bbb", _b: "_bbb" });
+    //        expect(r).toBeUndefined();
+    //    });
+    //});
     describe('testArrayUpdate', function () {
         var a = ["a", "b", "c"];
 

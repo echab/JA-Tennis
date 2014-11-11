@@ -27,7 +27,7 @@
                 players: [],
                 events: []
             };
-            this.select(tournament, models.ModelType.Tournament);
+            this.selection.select(tournament, models.ModelType.Tournament);
             return tournament;
         }
 
@@ -41,7 +41,7 @@
                 if (data) {
                     var tournament: models.Tournament = angular.fromJson(data);
                     this.tournamentLib.initTournament(tournament);
-                    this.select(tournament, models.ModelType.Tournament);
+                    this.selection.select(tournament, models.ModelType.Tournament);
                     deferred.resolve(tournament);
                 } else {
                     deferred.reject('nothing in storage');
@@ -51,7 +51,7 @@
                     .success((tournament: models.Tournament, status: number) => {
                         tournament._url = file_url;
                         this.tournamentLib.initTournament(tournament);
-                        this.select(tournament, models.ModelType.Tournament);
+                        this.selection.select(tournament, models.ModelType.Tournament);
                         deferred.resolve(tournament);
                     })
                     .error((data: any, status: number) => {
@@ -64,7 +64,7 @@
                         var tournament: models.Tournament = angular.fromJson(reader.result);
                         tournament._url = file_url;
                         this.tournamentLib.initTournament(tournament);
-                        this.select(tournament, models.ModelType.Tournament);
+                        this.selection.select(tournament, models.ModelType.Tournament);
                         deferred.resolve(tournament);
                     } catch (ex) {
                         deferred.reject(ex.message);
@@ -103,7 +103,7 @@
             newPlayer.id = this.guid.create('p');
 
             this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, models.ModelType.Player); //c.push( newPlayer);
-            this.select(newPlayer, models.ModelType.Player);
+            this.selection.select(newPlayer, models.ModelType.Player);
         }
 
         editPlayer(editedPlayer: models.Player, player: models.Player): void {
@@ -112,7 +112,7 @@
             var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
             this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, models.ModelType.Player); //c[i] = editedPlayer;
             if (isSelected) {
-                this.select(editedPlayer, models.ModelType.Player);
+                this.selection.select(editedPlayer, models.ModelType.Player);
             }
         }
 
@@ -121,7 +121,7 @@
             var i = this.find.indexOf(c, "id", player.id, "Player to remove not found");
             this.undo.remove(c, i, "Delete " + player.name + " " + i, models.ModelType.Player);   //c.splice( i, 1);
             if (this.selection.player === player) {
-                this.select(c[i] || c[i - 1], models.ModelType.Player); //select next or previous
+                this.selection.select(c[i] || c[i - 1], models.ModelType.Player); //select next or previous
             }
         }
         //#endregion player
@@ -133,7 +133,7 @@
 
             newEvent.id = this.guid.create('e');
             this.undo.insert(c, index, newEvent, "Add " + newEvent.name, models.ModelType.Event);   //c.push( newEvent);
-            this.select(newEvent, models.ModelType.Event);
+            this.selection.select(newEvent, models.ModelType.Event);
         }
 
         editEvent(editedEvent: models.Event, event: models.Event): void {
@@ -142,7 +142,7 @@
             var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
             this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, models.ModelType.Event);   //c[i] = editedEvent;
             if (isSelected) {
-                this.select(editedEvent, models.ModelType.Event);
+                this.selection.select(editedEvent, models.ModelType.Event);
             }
         }
 
@@ -151,7 +151,7 @@
             var i = this.find.indexOf(c, "id", event.id, "Event to remove not found");
             this.undo.remove(c, i, "Delete " + c[i].name + " " + i, models.ModelType.Event); //c.splice( i, 1);
             if (this.selection.event === event) {
-                this.select(c[i] || c[i - 1], models.ModelType.Event);
+                this.selection.select(c[i] || c[i - 1], models.ModelType.Event);
             }
         }
         //#endregion event
@@ -172,12 +172,12 @@
                 for (var i = 0; i < draws.length; i++) {
                     this.drawLib.initDraw(draws[i], draw._event);
                 }
-                this.select(draws[0], models.ModelType.Draw);
+                this.selection.select(draws[0], models.ModelType.Draw);
 
             } else {
                 draw.id = this.guid.create('d');
                 this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, models.ModelType.Draw); //c.push( draw);
-                this.select(draw, models.ModelType.Draw);
+                this.selection.select(draw, models.ModelType.Draw);
             }
         }
 
@@ -206,7 +206,7 @@
                 this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, models.ModelType.Draw); //c[i] = draw;
             }
             if (isSelected || generate) {
-                this.select(draw, models.ModelType.Draw);
+                this.selection.select(draw, models.ModelType.Draw);
                 this.drawLib.refresh(draw);  //force angular refresh
             }
         }
@@ -223,7 +223,7 @@
             var i = this.find.indexOf(c, "id", draw.id, "Draw to remove not found");
             this.undo.remove(c, i, "Delete " + draw.name + " " + i, models.ModelType.Draw); //c.splice( i, 1);
             if (this.selection.draw === draw) {
-                this.select(c[i] || c[i - 1], models.ModelType.Draw);   //select next or previous
+                this.selection.select(c[i] || c[i - 1], models.ModelType.Draw);   //select next or previous
             }
         }
 
@@ -259,77 +259,42 @@
                 return true;
             });
         }
-        erasePlayer(box: models.Box): void {
-            //this.undo.newGroup("Erase player", () => {
-            //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
-            //    this.undo.update(box, '_player', null);  //box._player = undefined;
-            //    return true;
-            //}, box);
-            this.undo.update(box, 'playerId', null, "Erase player",
-                () => this.drawLib.initBox(box, box._draw)
-                );  //box.playerId = undefined;
+        //erasePlayer(box: models.Box): void {
+        //    //this.undo.newGroup("Erase player", () => {
+        //    //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
+        //    //    this.undo.update(box, '_player', null);  //box._player = undefined;
+        //    //    return true;
+        //    //}, box);
+
+        //    //this.undo.update(box, 'playerId', null, "Erase player",     //box.playerId = undefined;
+        //    //    () => this.drawLib.initBox(box, box._draw)
+        //    //    );  
+
+        //    var prev = box.playerId;
+        //    this.undo.action((bUndo: boolean) => {
+        //        box.playerId = bUndo ? prev : undefined;
+        //        this.drawLib.initBox(box, box._draw)
+        //        this.selection.select(box, models.ModelType.Box);
+        //    }, "Erase player");
+        //}
+        //eraseScore(match: models.Match): void {
+        //    this.undo.newGroup("Erase score", () => {
+        //        this.undo.update(match, 'score', '');  //box.score = '';
+        //        return true;
+        //    }, match);
+        //}
+        erasePlanning(match: models.Match): void {
+            this.undo.newGroup("Erase player", () => {
+                this.undo.update(match, 'place', null); //match.place = undefined;
+                this.undo.update(match, 'date', null);  //match.date = undefined;
+                return true;
+            }, match);
         }
         //#endregion match
 
-        public select(r: any, type?: models.ModelType): void {
-
-            var sel = this.selection;
-            if (r) {
-                if (type === models.ModelType.Box || ('_player' in r && r._draw)) { //box
-                    sel.tournament = r._draw._event._tournament;
-                    sel.event = r._draw._event;
-                    sel.draw = r._draw;
-                    sel.box = r;
-
-                } else if (type === models.ModelType.Draw || r._event) { //draw
-                    sel.tournament = r._event._tournament;
-                    sel.event = r._event;
-                    sel.draw = r;
-                    sel.box = undefined;
-
-                } else if (type === models.ModelType.Event || (r.draws && r._tournament)) { //event
-                    sel.tournament = r._tournament;
-                    sel.event = r;
-                    sel.draw = r.draws ? r.draws[0] : undefined;
-                    sel.box = undefined;
-
-                } else if (type === models.ModelType.Player || (r.name && r._tournament)) {   //player
-                    sel.tournament = r._tournament;
-                    sel.player = r;
-
-                } else if (type === models.ModelType.Tournament || (r.players && r.events)) { //tournament
-                    sel.tournament = r;
-                    if (sel.tournament.events[0]) {
-                        sel.event = sel.tournament.events[0];
-                        sel.draw = sel.event && sel.event.draws ? sel.event.draws[sel.event.draws.length - 1] : undefined;
-                    } else {
-                        sel.event = undefined;
-                        sel.draw = undefined;
-                    }
-                    sel.box = undefined;
-                    if (sel.player && sel.player._tournament !== sel.tournament) {
-                        sel.player = undefined;
-                    }
-                }
-
-            } else if (type) {
-
-                switch (type) {
-                    case models.ModelType.Tournament:
-                        sel.tournament = undefined;
-                        sel.player = undefined;
-                    case models.ModelType.Event:
-                        sel.event = undefined;
-                    case models.ModelType.Draw:
-                        sel.draw = undefined;
-                    case models.ModelType.Box:
-                        sel.box = undefined;
-                        break;
-                    case models.ModelType.Player:
-                        sel.player = undefined;
-                }
-            }
-        }
+        //public select(r: any, type?: models.ModelType): void {
+        //    this.selection.select(r, type);
+        //}
     }
 
     angular.module('jat.services.mainLib', [

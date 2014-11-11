@@ -25,7 +25,7 @@
                     players: [],
                     events: []
                 };
-                this.select(tournament, 1 /* Tournament */);
+                this.selection.select(tournament, 1 /* Tournament */);
                 return tournament;
             };
 
@@ -37,7 +37,7 @@
                     if (data) {
                         var tournament = angular.fromJson(data);
                         this.tournamentLib.initTournament(tournament);
-                        this.select(tournament, 1 /* Tournament */);
+                        this.selection.select(tournament, 1 /* Tournament */);
                         deferred.resolve(tournament);
                     } else {
                         deferred.reject('nothing in storage');
@@ -46,7 +46,7 @@
                     this.$http.get(file_url).success(function (tournament, status) {
                         tournament._url = file_url;
                         _this.tournamentLib.initTournament(tournament);
-                        _this.select(tournament, 1 /* Tournament */);
+                        _this.selection.select(tournament, 1 /* Tournament */);
                         deferred.resolve(tournament);
                     }).error(function (data, status) {
                         deferred.reject(data);
@@ -58,7 +58,7 @@
                             var tournament = angular.fromJson(reader.result);
                             tournament._url = file_url;
                             _this.tournamentLib.initTournament(tournament);
-                            _this.select(tournament, 1 /* Tournament */);
+                            _this.selection.select(tournament, 1 /* Tournament */);
                             deferred.resolve(tournament);
                         } catch (ex) {
                             deferred.reject(ex.message);
@@ -97,7 +97,7 @@
                 newPlayer.id = this.guid.create('p');
 
                 this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, 2 /* Player */); //c.push( newPlayer);
-                this.select(newPlayer, 2 /* Player */);
+                this.selection.select(newPlayer, 2 /* Player */);
             };
 
             MainLib.prototype.editPlayer = function (editedPlayer, player) {
@@ -106,7 +106,7 @@
                 var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
                 this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, 2 /* Player */); //c[i] = editedPlayer;
                 if (isSelected) {
-                    this.select(editedPlayer, 2 /* Player */);
+                    this.selection.select(editedPlayer, 2 /* Player */);
                 }
             };
 
@@ -115,7 +115,7 @@
                 var i = this.find.indexOf(c, "id", player.id, "Player to remove not found");
                 this.undo.remove(c, i, "Delete " + player.name + " " + i, 2 /* Player */); //c.splice( i, 1);
                 if (this.selection.player === player) {
-                    this.select(c[i] || c[i - 1], 2 /* Player */); //select next or previous
+                    this.selection.select(c[i] || c[i - 1], 2 /* Player */); //select next or previous
                 }
             };
 
@@ -127,7 +127,7 @@
 
                 newEvent.id = this.guid.create('e');
                 this.undo.insert(c, index, newEvent, "Add " + newEvent.name, 3 /* Event */); //c.push( newEvent);
-                this.select(newEvent, 3 /* Event */);
+                this.selection.select(newEvent, 3 /* Event */);
             };
 
             MainLib.prototype.editEvent = function (editedEvent, event) {
@@ -136,7 +136,7 @@
                 var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
                 this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, 3 /* Event */); //c[i] = editedEvent;
                 if (isSelected) {
-                    this.select(editedEvent, 3 /* Event */);
+                    this.selection.select(editedEvent, 3 /* Event */);
                 }
             };
 
@@ -145,7 +145,7 @@
                 var i = this.find.indexOf(c, "id", event.id, "Event to remove not found");
                 this.undo.remove(c, i, "Delete " + c[i].name + " " + i, 3 /* Event */); //c.splice( i, 1);
                 if (this.selection.event === event) {
-                    this.select(c[i] || c[i - 1], 3 /* Event */);
+                    this.selection.select(c[i] || c[i - 1], 3 /* Event */);
                 }
             };
 
@@ -165,11 +165,11 @@
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
                     }
-                    this.select(draws[0], 4 /* Draw */);
+                    this.selection.select(draws[0], 4 /* Draw */);
                 } else {
                     draw.id = this.guid.create('d');
                     this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, 4 /* Draw */); //c.push( draw);
-                    this.select(draw, 4 /* Draw */);
+                    this.selection.select(draw, 4 /* Draw */);
                 }
             };
 
@@ -198,7 +198,7 @@
                     this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, 4 /* Draw */); //c[i] = draw;
                 }
                 if (isSelected || generate) {
-                    this.select(draw, 4 /* Draw */);
+                    this.selection.select(draw, 4 /* Draw */);
                     this.drawLib.refresh(draw); //force angular refresh
                 }
             };
@@ -216,7 +216,7 @@
                 var i = this.find.indexOf(c, "id", draw.id, "Draw to remove not found");
                 this.undo.remove(c, i, "Delete " + draw.name + " " + i, 4 /* Draw */); //c.splice( i, 1);
                 if (this.selection.draw === draw) {
-                    this.select(c[i] || c[i - 1], 4 /* Draw */); //select next or previous
+                    this.selection.select(c[i] || c[i - 1], 4 /* Draw */); //select next or previous
                 }
             };
 
@@ -254,70 +254,36 @@
                     return true;
                 });
             };
-            MainLib.prototype.erasePlayer = function (box) {
-                var _this = this;
-                //this.undo.newGroup("Erase player", () => {
-                //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
-                //    this.undo.update(box, '_player', null);  //box._player = undefined;
-                //    return true;
-                //}, box);
-                this.undo.update(box, 'playerId', null, "Erase player", function () {
-                    return _this.drawLib.initBox(box, box._draw);
-                }); //box.playerId = undefined;
-            };
 
-            //#endregion match
-            MainLib.prototype.select = function (r, type) {
-                var sel = this.selection;
-                if (r) {
-                    if (type === 6 /* Box */ || ('_player' in r && r._draw)) {
-                        sel.tournament = r._draw._event._tournament;
-                        sel.event = r._draw._event;
-                        sel.draw = r._draw;
-                        sel.box = r;
-                    } else if (type === 4 /* Draw */ || r._event) {
-                        sel.tournament = r._event._tournament;
-                        sel.event = r._event;
-                        sel.draw = r;
-                        sel.box = undefined;
-                    } else if (type === 3 /* Event */ || (r.draws && r._tournament)) {
-                        sel.tournament = r._tournament;
-                        sel.event = r;
-                        sel.draw = r.draws ? r.draws[0] : undefined;
-                        sel.box = undefined;
-                    } else if (type === 2 /* Player */ || (r.name && r._tournament)) {
-                        sel.tournament = r._tournament;
-                        sel.player = r;
-                    } else if (type === 1 /* Tournament */ || (r.players && r.events)) {
-                        sel.tournament = r;
-                        if (sel.tournament.events[0]) {
-                            sel.event = sel.tournament.events[0];
-                            sel.draw = sel.event && sel.event.draws ? sel.event.draws[sel.event.draws.length - 1] : undefined;
-                        } else {
-                            sel.event = undefined;
-                            sel.draw = undefined;
-                        }
-                        sel.box = undefined;
-                        if (sel.player && sel.player._tournament !== sel.tournament) {
-                            sel.player = undefined;
-                        }
-                    }
-                } else if (type) {
-                    switch (type) {
-                        case 1 /* Tournament */:
-                            sel.tournament = undefined;
-                            sel.player = undefined;
-                        case 3 /* Event */:
-                            sel.event = undefined;
-                        case 4 /* Draw */:
-                            sel.draw = undefined;
-                        case 6 /* Box */:
-                            sel.box = undefined;
-                            break;
-                        case 2 /* Player */:
-                            sel.player = undefined;
-                    }
-                }
+            //erasePlayer(box: models.Box): void {
+            //    //this.undo.newGroup("Erase player", () => {
+            //    //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
+            //    //    this.undo.update(box, '_player', null);  //box._player = undefined;
+            //    //    return true;
+            //    //}, box);
+            //    //this.undo.update(box, 'playerId', null, "Erase player",     //box.playerId = undefined;
+            //    //    () => this.drawLib.initBox(box, box._draw)
+            //    //    );
+            //    var prev = box.playerId;
+            //    this.undo.action((bUndo: boolean) => {
+            //        box.playerId = bUndo ? prev : undefined;
+            //        this.drawLib.initBox(box, box._draw)
+            //        this.selection.select(box, models.ModelType.Box);
+            //    }, "Erase player");
+            //}
+            //eraseScore(match: models.Match): void {
+            //    this.undo.newGroup("Erase score", () => {
+            //        this.undo.update(match, 'score', '');  //box.score = '';
+            //        return true;
+            //    }, match);
+            //}
+            MainLib.prototype.erasePlanning = function (match) {
+                var _this = this;
+                this.undo.newGroup("Erase player", function () {
+                    _this.undo.update(match, 'place', null); //match.place = undefined;
+                    _this.undo.update(match, 'date', null); //match.date = undefined;
+                    return true;
+                }, match);
             };
             return MainLib;
         })();
