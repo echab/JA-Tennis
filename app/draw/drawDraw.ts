@@ -16,7 +16,7 @@ module jat.draw {
         draw: models.Draw;
         isKnockout: boolean;
         players: models.Player[];
-        qualifsIn: number[];
+        qualifsIn: models.Match[];
         qualifsOut: number[];
         _refresh: Date;
         width: number;
@@ -56,7 +56,8 @@ module jat.draw {
             this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
 
             //qualifs in
-            this.qualifsIn = [1, 2, 3, 4];   //TODO;
+            var prev = this.drawLib.previousGroup(this.draw);
+            this.qualifsIn = prev ? this.drawLib.FindAllQualifieSortantBox(prev) : undefined;
 
             //qualifs out
             this.qualifsOut = [];
@@ -150,7 +151,7 @@ module jat.draw {
             }
             return a;
         }
-        getQualifsIn(): number[] {
+        getQualifsIn(): models.Match[] {
             return this.qualifsIn;
         }
         getQualifsOut(): number[] {
@@ -159,31 +160,28 @@ module jat.draw {
         getPlayers(): models.Player[] {
             return this.players;
         }
-        findQualifIn(qualifIn: number): models.Box {
-            return this.draw && this.find.by(this.draw.boxes, 'qualifIn', qualifIn);
+        findQualifIn(qualifIn: number): boolean {
+            return this.draw && !!this.find.by(this.draw.boxes, 'qualifIn', qualifIn);
         }
-        findPlayer(player: models.Player): models.Box {
-            return this.draw && this.find.by(this.draw.boxes, 'playerId', player.id);
+        findPlayer(playerId: string): boolean {
+            return this.draw && playerId && !!this.find.by(this.draw.boxes, 'playerId', playerId);
         }
 
-        setPlayer(box: models.PlayerIn, playerId?: string, qualifIn?: number) {
-            var prevPlayer = box.playerId;
+        setPlayer(box: models.PlayerIn, player?: models.Player, qualifIn?: number) {
+            var prevPlayer = box._player;
+            var prevQualif = box.qualifIn;
             this.undo.action((bUndo: boolean) => {
-                box.playerId = bUndo ? prevPlayer : playerId;
-                this.drawLib.initBox(box, box._draw)
+                if (prevQualif || qualifIn) {
+                    this.drawLib.SetQualifieEntrant(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
+                } else {
+                    box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
+                    this.drawLib.initBox(box, box._draw);
+                }
                 this.selection.select(box, models.ModelType.Box);
-            }, playerId ? 'Set player' : 'Erase player');
+            }, player ? 'Set player' : 'Erase player');
         }
         swapPlayer(box: models.PlayerIn): void {
             //TODO
-        }
-        setQualifIn(box: models.PlayerIn, qualifIn: number) {
-            var prev = box.qualifIn;
-            this.undo.action((bUndo: boolean) => {
-                //box.qualifIn = bUndo ? prev : qualifIn;
-                this.drawLib.SetQualifieEntrant(box, bUndo ? prev : qualifIn);
-                this.selection.select(box, models.ModelType.Box);
-            }, qualifIn ? 'Set qualified' : 'Erase qualified');
         }
         eraseScore(match: models.Match): void {
             this.undo.newGroup("Erase score", () => {

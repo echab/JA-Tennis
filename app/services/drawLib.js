@@ -275,6 +275,28 @@ var jat;
                 }
             };
 
+            DrawLib.prototype.FindAllQualifieSortantBox = function (origin) {
+                //Récupère les qualifiés sortants du tableau
+                var group = angular.isArray(origin) ? origin : this.group(origin);
+                if (group) {
+                    var a = [], m;
+                    for (var i = 1; i <= MAX_QUALIF; i++) {
+                        if (m = this.FindQualifieSortant(group, i)) {
+                            a.push(m);
+                        }
+                    }
+                    return a;
+                }
+            };
+
+            /**
+            * Fill or erase a box with qualified in and/or player
+            * setPlayerIn
+            *
+            * @param box
+            * @param inNumber (optional)
+            * @param player   (optional)
+            */
             DrawLib.prototype.SetQualifieEntrant = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
                 return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);

@@ -25,7 +25,8 @@ var jat;
                 this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
 
                 //qualifs in
-                this.qualifsIn = [1, 2, 3, 4]; //TODO;
+                var prev = this.drawLib.previousGroup(this.draw);
+                this.qualifsIn = prev ? this.drawLib.FindAllQualifieSortantBox(prev) : undefined;
 
                 //qualifs out
                 this.qualifsOut = [];
@@ -129,32 +130,28 @@ var jat;
                 return this.players;
             };
             drawCtrl.prototype.findQualifIn = function (qualifIn) {
-                return this.draw && this.find.by(this.draw.boxes, 'qualifIn', qualifIn);
+                return this.draw && !!this.find.by(this.draw.boxes, 'qualifIn', qualifIn);
             };
-            drawCtrl.prototype.findPlayer = function (player) {
-                return this.draw && this.find.by(this.draw.boxes, 'playerId', player.id);
+            drawCtrl.prototype.findPlayer = function (playerId) {
+                return this.draw && playerId && !!this.find.by(this.draw.boxes, 'playerId', playerId);
             };
 
-            drawCtrl.prototype.setPlayer = function (box, playerId, qualifIn) {
+            drawCtrl.prototype.setPlayer = function (box, player, qualifIn) {
                 var _this = this;
-                var prevPlayer = box.playerId;
+                var prevPlayer = box._player;
+                var prevQualif = box.qualifIn;
                 this.undo.action(function (bUndo) {
-                    box.playerId = bUndo ? prevPlayer : playerId;
-                    _this.drawLib.initBox(box, box._draw);
+                    if (prevQualif || qualifIn) {
+                        _this.drawLib.SetQualifieEntrant(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
+                    } else {
+                        box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
+                        _this.drawLib.initBox(box, box._draw);
+                    }
                     _this.selection.select(box, 6 /* Box */);
-                }, playerId ? 'Set player' : 'Erase player');
+                }, player ? 'Set player' : 'Erase player');
             };
             drawCtrl.prototype.swapPlayer = function (box) {
                 //TODO
-            };
-            drawCtrl.prototype.setQualifIn = function (box, qualifIn) {
-                var _this = this;
-                var prev = box.qualifIn;
-                this.undo.action(function (bUndo) {
-                    //box.qualifIn = bUndo ? prev : qualifIn;
-                    _this.drawLib.SetQualifieEntrant(box, bUndo ? prev : qualifIn);
-                    _this.selection.select(box, 6 /* Box */);
-                }, qualifIn ? 'Set qualified' : 'Erase qualified');
             };
             drawCtrl.prototype.eraseScore = function (match) {
                 var _this = this;

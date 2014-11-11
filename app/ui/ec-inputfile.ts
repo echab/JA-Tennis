@@ -33,7 +33,7 @@ module ec.ui {
         $templateCache.put("template/inputFile.html",
             //"<span style='position: relative;'>"
             "<input type='file' accept='application/json,text/plain'"
-            + " style='position: relative; text-align: right; -moz-opacity:0; filter: alpha(opacity: 0); opacity: 0; z-index: 2; width: 80px;'>"
+            + " style='position: relative; text-align: right; -webkit-opacity:0; -moz-opacity:0; filter: alpha(opacity: 0); opacity: 0; z-index: 2; width: 80px;'>"
             + "<button style='position:absolute; left:0px; width:100%; z-index:1;' class='btn' ng-transclude></button>"
         //+ "<span style='position:absolute; left:0px; width:100%; z-index:1;' ng-transclude></span>"
         //+ "</span>"
@@ -78,6 +78,7 @@ module ec.ui {
             input[type="file"] {
                 position: relative;
                 text-align: right;
+                -webkit-opacity:0 ;
                 -moz-opacity:0 ;
                 filter:alpha(opacity: 0);
                 opacity: 0;

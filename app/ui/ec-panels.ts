@@ -24,6 +24,7 @@ module ec.ui {
         display: inline-block;
         height: 100%;
         background-color: #bbb;
+        -webkit-transition: width .5s;
         transition: width .5s;
     }
 
@@ -33,6 +34,7 @@ module ec.ui {
         height: 3em;
         background-color: #f8f8f8;
         border-color: #e7e7e7;
+        -webkit-transition: margin-left .5s;
         transition: margin-left .5s;
     }
     .panelbadge {
@@ -46,6 +48,7 @@ module ec.ui {
         text-align:center;
         z-index: 2;
         -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+        -webkit-transition: all .5s;
         transition: all .5s;
     }
     .panel .header .title {

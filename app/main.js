@@ -4,7 +4,7 @@ var jat;
     (function (main) {
         /** Main controller for the application */
         var mainCtrl = (function () {
-            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, validation, undo, $window) {
+            function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, validation, undo, $window, $timeout) {
                 var _this = this;
                 this.$modal = $modal;
                 this.selection = selection;
@@ -14,6 +14,7 @@ var jat;
                 this.validation = validation;
                 this.undo = undo;
                 this.$window = $window;
+                this.$timeout = $timeout;
                 this.GenerateType = models.GenerateType;
                 this.ModelType = models.ModelType;
                 this.Mode = models.Mode;
@@ -78,6 +79,17 @@ var jat;
 
             //#endregion tournament
             mainCtrl.prototype.select = function (item, type) {
+                var _this = this;
+                if (item && type) {
+                    //first unselect any item to close the actions dropdown
+                    this.selection.select(undefined, type);
+
+                    //then select the new box
+                    this.$timeout(function () {
+                        return _this.selection.select(item, type);
+                    }, 0);
+                    return;
+                }
                 this.selection.select(item, type);
             };
 
@@ -300,7 +312,9 @@ var jat;
                 'drawLib',
                 'validation',
                 'undo',
-                '$window'];
+                '$window',
+                '$timeout'
+            ];
             return mainCtrl;
         })();
         main.mainCtrl = mainCtrl;

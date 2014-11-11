@@ -10,6 +10,7 @@
 
 .panel {
     background-color: #bbb;
+    -webkit-transition: width .5s;
     transition: width .5s;
     display: inline-block;
     height: 100%;
@@ -36,6 +37,7 @@
         line-height: 3em;
         background-color: #f8f8f8;
         border-color: #e7e7e7;
+        -webkit-transition: margin-left .5s;
         transition: margin-left .5s;
         Zbox-shadow: rgba(200,200,200,5) -2px -2px inset;
         border-bottom: 1px solid #DDD;
@@ -59,6 +61,7 @@
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    -webkit-transition: all .5s;
     transition: all .5s;
 }
 

@@ -17,7 +17,9 @@ module jat.main {
             'drawLib',
             'validation',
             'undo',
-            '$window'];
+            '$window',
+            '$timeout',
+        ];
 
         constructor(
             private $modal: uib.IModalService<string>,
@@ -27,7 +29,8 @@ module jat.main {
             private drawLib: jat.service.DrawLib,
             public validation: jat.service.Validation,
             private undo: jat.service.Undo,
-            private $window: ng.IWindowService
+            private $window: ng.IWindowService,
+            private $timeout: ng.ITimeoutService
             ) {
 
             this.selection.tournament = this.tournamentLib.newTournament();
@@ -91,6 +94,13 @@ module jat.main {
         //#endregion tournament
 
         select(item: any, type?: models.ModelType): void {
+            if (item && type) {
+                //first unselect any item to close the actions dropdown
+                this.selection.select(undefined, type);
+                //then select the new box
+                this.$timeout(() => this.selection.select(item, type), 0);
+                return;
+            }
             this.selection.select(item, type);
         }
 

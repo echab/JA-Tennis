@@ -323,6 +323,30 @@ module jat.service {
             }
         }
 
+        public FindAllQualifieSortantBox(group: models.Draw[]): models.Match[];
+        public FindAllQualifieSortantBox(draw: models.Draw): models.Match[];
+        public FindAllQualifieSortantBox(origin: any): models.Match[] {
+            //Récupère les qualifiés sortants du tableau
+            var group = angular.isArray(origin) ? origin : this.group(origin);
+            if (group) {
+                var a: models.Match[] = [], m:models.Match;
+                for (var i = 1; i <= MAX_QUALIF; i++) {
+                    if (m = this.FindQualifieSortant(group, i)) {
+                        a.push(m);
+                    }
+                }
+                return a;
+            }
+        }
+
+        /**
+          * Fill or erase a box with qualified in and/or player
+          * setPlayerIn
+          * 
+          * @param box 
+          * @param inNumber (optional)
+          * @param player   (optional)
+          */
         public SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean {
             // inNumber=0 => enlève qualifié
             return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);

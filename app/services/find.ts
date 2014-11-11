@@ -17,9 +17,9 @@ module jat.service {
                 _length: array.length
             };
             for (var i = 0; i < array.length; i++) {
-                var a: any = array[i];
-                if (a !== undefined) {
-                    idx[a[member]] = i;
+                var a: any = array[i], j = a[member];
+                if (j !== undefined) {
+                    idx[j] = i;
                 }
             }
             array["_FindBy" + member] = idx;
