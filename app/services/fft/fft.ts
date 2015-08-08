@@ -8,11 +8,5 @@ namespace jat.fft {
         'jat.services.fft.rank',
         'jat.services.fft.ranking'
     ])
-        // .service('score', Score)
-        // .service('category', Category)
-        // .service('licence', Licence)
-        // .service('matchFormat', MatchFormat)
-        // .service('rank', Rank)
-        // .service('ranking', ['score', Ranking])
     ;
 }    
