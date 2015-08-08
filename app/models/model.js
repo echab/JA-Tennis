@@ -8,7 +8,6 @@ var models;
         DrawType[DrawType["PouleAR"] = 3] = "PouleAR";
     })(models.DrawType || (models.DrawType = {}));
     var DrawType = models.DrawType;
-
     (function (GenerateType) {
         GenerateType[GenerateType["None"] = 0] = "None";
         GenerateType[GenerateType["Create"] = 1] = "Create";
@@ -17,7 +16,6 @@ var models;
         GenerateType[GenerateType["Mix"] = 4] = "Mix";
     })(models.GenerateType || (models.GenerateType = {}));
     var GenerateType = models.GenerateType;
-
     (function (ModelType) {
         ModelType[ModelType["None"] = 0] = "None";
         ModelType[ModelType["Tournament"] = 1] = "Tournament";
@@ -28,7 +26,6 @@ var models;
         ModelType[ModelType["Box"] = 6] = "Box";
     })(models.ModelType || (models.ModelType = {}));
     var ModelType = models.ModelType;
-
     (function (Mode) {
         Mode[Mode["Build"] = 0] = "Build";
         Mode[Mode["Plan"] = 1] = "Plan";
@@ -37,4 +34,3 @@ var models;
     })(models.Mode || (models.Mode = {}));
     var Mode = models.Mode;
 })(models || (models = {}));
-//# sourceMappingURL=model.js.map

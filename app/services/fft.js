@@ -1,7 +1,8 @@
 'use strict';
+// FFT type services
 var jat;
 (function (jat) {
-    // FFT type services
+    var service;
     (function (service) {
         var Rank = (function () {
             function Rank() {
@@ -32,44 +33,36 @@ var jat;
             Rank.prototype.list = function () {
                 return this._ranks;
             };
-
             Rank.prototype.isValid = function (rank) {
                 return this._index[rank] >= 0;
             };
-
             Rank.prototype.isNC = function (rank) {
                 return rank === "NC";
             };
-
             Rank.prototype.next = function (rank) {
                 var i = this._index[rank];
                 return this._ranks[i + 1];
             };
-
             Rank.prototype.previous = function (rank) {
                 var i = this._index[rank];
                 return this._ranks[i - 1];
             };
-
             Rank.prototype.compare = function (rank1, rank2) {
                 var i = this._index[rank1], j = this._index[rank2];
                 return i - j;
             };
-
             Rank.prototype.within = function (rank, rank1, rank2) {
-                return (!rank1 || this.compare(rank1, rank) <= 0) && (!rank2 || this.compare(rank, rank2) <= 0);
+                return (!rank1 || this.compare(rank1, rank) <= 0)
+                    && (!rank2 || this.compare(rank, rank2) <= 0);
             };
-
             Rank.prototype.groups = function () {
                 return this._groups;
             };
-
             Rank.prototype.groupOf = function (rank) {
                 return this._groupOf[rank];
             };
             return Rank;
         })();
-
         //===========================================
         var Category = (function () {
             function Category() {
@@ -100,9 +93,8 @@ var jat;
                 this._categories = [];
                 this._index = {};
                 var now = new Date();
-                var refDate = new Date(now.getFullYear(), 9, 1);
+                var refDate = new Date(now.getFullYear(), 9, 1); //1er Octobre
                 this.currentYear = now.getFullYear() + (now > refDate ? 1 : 0);
-
                 for (var c in this._category) {
                     this._categories.push(c);
                 }
@@ -113,81 +105,71 @@ var jat;
             Category.prototype.list = function () {
                 return this._categories;
             };
-
             Category.prototype.isValid = function (category) {
                 return this._index[category] >= 0;
             };
-
             Category.prototype.compare = function (category1, category2) {
                 var i = this._index[category1], j = this._index[category2];
                 return i - j;
             };
-
             Category.prototype.getAge = function (date) {
                 //var age = (new Date(refDate - date)).getFullYear() - _beginOfTime.getFullYear() -1;
                 var age = this.currentYear - date.getFullYear();
                 return age;
             };
-
             Category.prototype.ofDate = function (date) {
                 var age = this.getAge(date), i, prev;
                 for (i in this._category) {
                     var categ = this._category[i];
-
                     if (categ.ageMax && categ.ageMax < age) {
-                        continue;
+                        continue; //too old
                     }
                     if (categ.ageMin) {
                         if (categ.ageMin <= age) {
                             prev = i;
                             continue;
-                        } else {
+                        }
+                        else {
                             return prev;
                         }
                     }
                     return i;
                 }
             };
-
             Category.prototype.isCompatible = function (eventCategory, playerCategory) {
                 if (playerCategory || !eventCategory) {
                     return true;
                 }
-
                 //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.
                 var idxSenior = this._index['Senior'];
                 var idxEvent = this._index[eventCategory];
-
                 //Epreuve senior
                 if (idxEvent === idxSenior) {
                     return true;
                 }
-
                 var catEvent = this._category[eventCategory];
                 var catPlayer = this._category[playerCategory];
-
                 if (idxEvent < idxSenior) {
                     //Epreuve jeunes
                     if (catPlayer.ageMax <= catEvent.ageMax) {
                         return true;
                     }
-                } else {
+                }
+                else {
                     //Epreuve vétérans
                     if (catEvent.ageMin <= catPlayer.ageMin) {
                         return true;
                     }
                 }
-
                 return false;
                 //TODO? 2006/08/28	AgeMin() < playerCategory.AgeMin()	//vétéran
                 //	return playerCategory.isVide() || isVide()
-                //		(playerCategory.AgeMin() <= AgeMax()
+                //		(playerCategory.AgeMin() <= AgeMax() 
                 //		&& AgeMin() <= playerCategory.AgeMax() );
             };
             return Category;
         })();
         service.Category = Category;
-
         //===========================================
         var MatchFormat = (function () {
             function MatchFormat() {
@@ -208,49 +190,41 @@ var jat;
             };
             return MatchFormat;
         })();
-
         //===========================================
         var Score = (function () {
             function Score() {
             }
             Score.prototype.isValid = function (score) {
                 var a = Score.reScore.exec(score + " ");
-
                 if (a === null) {
                     return false;
                 }
-
                 //check score
                 var sets = score.split(/\s+/);
                 var nSet1 = 0, nSet2 = 0;
                 for (var i = 0; i < sets.length; i++) {
                     var games = sets[i].split("/");
-
                     var j1 = parseInt(games[0]);
                     var j2 = parseInt(games[1]);
-
                     if (j1 > j2 && j1 >= 6) {
                         if (j1 >= 7 && j2 < 5) {
                             return false;
                         }
                         nSet1++;
-                    } else if (j2 > j1 && j2 >= 6) {
+                    }
+                    else if (j2 > j1 && j2 >= 6) {
                         if (j2 >= 7 && j1 < 5) {
                             return false;
                         }
                         nSet2++;
                     }
-                    //TODO check score
                 }
-
                 return true;
             };
             Score.reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
             return Score;
         })();
-
         var MAX_SET = 5;
-
         var ScoreFFT = (function () {
             function ScoreFFT(score, fm) {
                 //TODO parse
@@ -263,15 +237,13 @@ var jat;
                 }
                 return i - 1;
             };
-
-            ScoreFFT.prototype.deltaSet = function (bVainqueur /*, BOOL bEquipe */ ) {
+            ScoreFFT.prototype.deltaSet = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                     n += (this.m_Jeu[i].j1 > this.m_Jeu[i].j2) ? 1 : this.m_Jeu[i].j1 < this.m_Jeu[i].j2 ? -1 : 0;
                 }
                 var dSet;
-
                 //        if (isWO())
                 //            return bVainqueur ? 3 : -3;	//dSet2
                 //        if (isAbandon()) {
@@ -334,17 +306,13 @@ var jat;
                 //        }
                 return dSet;
             };
-
-            ScoreFFT.prototype.deltaJeu = function (bVainqueur /*, BOOL bEquipe */ ) {
+            ScoreFFT.prototype.deltaJeu = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
-
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
                 }
-
                 var dJeu;
-
                 //    if (isWO())
                 //        return bVainqueur ? 5 : -5;
                 //    if (isAbandon()) {
@@ -407,17 +375,13 @@ var jat;
                 //    }
                 return dJeu;
             };
-
-            ScoreFFT.prototype.deltaPoint = function (bVainqueur /*, BOOL bEquipe */ ) {
+            ScoreFFT.prototype.deltaPoint = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
-
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
                 }
-
                 var dSet, dJeu;
-
                 //    if (isWO())
                 //        return bVainqueur ? 2 : 0;
                 //    else
@@ -435,29 +399,24 @@ var jat;
             };
             return ScoreFFT;
         })();
-
         //===========================================
         var Licence = (function () {
             function Licence() {
             }
             Licence.prototype.isValid = function (licence) {
                 var a = Licence.reLicence.exec(licence + " ");
-
                 if (a === null) {
                     return false;
                 }
-
                 //check licence key
                 var v = parseInt(a[1]);
                 var k = Licence.keys.charAt(v % 23);
-
                 return k == a[2];
             };
             Licence.reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;
             Licence.keys = "ABCDEFGHJKLMNPRSTUVWXYZ";
             return Licence;
         })();
-
         //===========================================
         var Ranking = (function () {
             function Ranking(score) {
@@ -481,47 +440,40 @@ var jat;
             Ranking.prototype.Empty = function () {
                 this.Points = 0;
             };
-
             Ranking.prototype.isVide = function () {
                 return this.Points === 0;
             };
-
             Ranking.prototype.NomChamp = function (iChamp) {
                 return this._champs[iChamp];
             };
-
             Ranking.prototype.ValeurChamp = function (iChamp) {
                 switch (iChamp) {
-                    case 0:
-                        return this.dPoint.toString();
-                    case 1:
-                        return Math.floor(this.dSet2 / 2).toString();
-                    case 2:
-                        return this.dJeu.toString();
+                    case 0: return this.dPoint.toString();
+                    case 1: return Math.floor(this.dSet2 / 2).toString();
+                    case 2: return this.dJeu.toString();
                 }
             };
-
             Ranking.prototype.AddResultat = function (bVictoire, score, fm) {
                 //bVictoire: -1=défaite, 0=nul, 1=victoire
                 var sc = new ScoreFFT(score, fm);
-
                 //Compte la différence de Set
                 this.dPoint += sc.deltaPoint(bVictoire > 0); //TODO bEquipe ???
                 this.dSet2 += sc.deltaSet(bVictoire > 0); //TODO bEquipe ???
                 this.dJeu += sc.deltaJeu(bVictoire > 0); //TODO bEquipe ???
-
                 return true;
             };
-
             Ranking.prototype.Ordre = function () {
                 return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
             };
             return Ranking;
         })();
-
         //===========================================
-        angular.module('jat.services.type', []).service('rank', Rank).service('category', Category).service('matchFormat', MatchFormat).service('score', Score).service('licence', Licence).service('ranking', ['score', Ranking]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.type', [])
+            .service('rank', Rank)
+            .service('category', Category)
+            .service('matchFormat', MatchFormat)
+            .service('score', Score)
+            .service('licence', Licence)
+            .service('ranking', ['score', Ranking]);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=fft.js.map

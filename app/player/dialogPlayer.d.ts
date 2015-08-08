@@ -1,7 +1,7 @@
 export interface DialogPlayerScope extends ng.IScope {
     title: string;
     player: models.Player;
-    selection: ISelectionService;
+    selection: Selection;
     ranks: RankString[];
     categories: CategoryString[];
 }

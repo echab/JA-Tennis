@@ -4,7 +4,10 @@
 # ignore included libraries and generated js debug files
 /lib/angular
 /lib/ui-bootstrap
+/node_modules
 *.js.map
+*.url
+*.lnk
 
 # User-specific files
 *.suo

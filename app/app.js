@@ -8,8 +8,10 @@ angular.module('jat', [
     'jat.services.undo',
     'jat.services.type',
     'jat.main'
-]).constant('appName', 'JA-Tennis').constant('appVersion', '0.1').directive('appVersion', [
-    'appName', 'appVersion',
+])
+    .constant('appName', 'JA-Tennis')
+    .constant('appVersion', '0.1')
+    .directive('appVersion', ['appName', 'appVersion',
     function (appName, appVersion) {
         return {
             template: appName + ' v' + appVersion
@@ -17,18 +19,17 @@ angular.module('jat', [
     }]);
 /*
 .config([<any>'$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {
-//routes
-$routeProvider.when('/players', {
-templateUrl: 'players.html',
-controller: controllers.Players
-});
-$routeProvider.when('/player/:id', {
-templateUrl: 'player.html',
-controller: controllers.Player
-});
-$routeProvider.otherwise({
-redirectTo: '/players'
-});
+    //routes
+    $routeProvider.when('/players', {
+        templateUrl: 'players.html',
+        controller: controllers.Players
+    });
+    $routeProvider.when('/player/:id', {
+        templateUrl: 'player.html',
+        controller: controllers.Player
+    });
+    $routeProvider.otherwise({
+        redirectTo: '/players'
+    });
 }])
 //*/
-//# sourceMappingURL=app.js.map

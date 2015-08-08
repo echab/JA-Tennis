@@ -1,6 +1,6 @@
 ﻿<div ng-if="ctrlDraw.isKnockout" class="draw knockout" ng-style="{width: ctrlDraw.width +'px', height: ctrlDraw.height +'px'}"
      ng-click="main.select(null,main.ModelType.Box)">
-    <canvas draw-lines="ctrlDraw._refresh"></canvas>
+    <canvas draw-lines="ctrlDraw._refresh"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
     <div ng-repeat="box in ctrlDraw.draw.boxes" ng-if="!ctrlDraw.simple">
         <div draw-box="box" class="box"
              ng-style="{left:(box._x * ctrlDraw.boxWidth) +'px', top:(box._y * ctrlDraw.boxHeight) +'px'}"></div>

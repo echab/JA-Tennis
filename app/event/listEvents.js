@@ -1,6 +1,7 @@
 'use strict';
 var jat;
 (function (jat) {
+    var event;
     (function (event) {
         function listEventsDirective() {
             var dir = {
@@ -17,15 +18,13 @@ var jat;
             };
             return dir;
         }
-
         var listEventsCtrl = (function () {
             function listEventsCtrl() {
             }
             return listEventsCtrl;
         })();
-
-        angular.module('jat.event.list', []).directive('listEvents', listEventsDirective).controller('listEventsCtrl', listEventsCtrl);
-    })(jat.event || (jat.event = {}));
-    var event = jat.event;
+        angular.module('jat.event.list', [])
+            .directive('listEvents', listEventsDirective)
+            .controller('listEventsCtrl', listEventsCtrl);
+    })(event = jat.event || (jat.event = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=listEvents.js.map

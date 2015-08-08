@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+
+
+<html lang="en" ng-app="jat" id="ng-app" manifest="jatennis.appcache">
+
+<head>
+    <meta charset="utf-8">
+    <title>JA-Tennis</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="application-name" content="JA-Tennis">
+    <meta name="msapplication-TileColor" content="#ffaaaa">
+    <style type="text/css">
+        .ng-cloak {
+            display: none;
+        }
+    </style>
+    
+    
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
+    
+    <link rel="stylesheet" href="style/app.min.css"/>
+
+    <link rel="icon" href="style/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body ng-controller="mainCtrl as main">
+
+<!-- Begin Templates -->
+<script type="text/ng-template" id="draw/dialogDraw.html">
+<form name="drawForm" ng-submit="$close('Ok')" zzzng-controller="dialogDrawCtrl as dlg" class="modal-form form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.draw.id}}</small>--> {{dlg.draw.name}}</h3>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <label class="span4">
+                Name:
+                <input type="text" name="name" ng-model="dlg.draw.name" required class="span3" autofocus />
+            </label>
+            <!--<span class="error" ng-show="drawForm.name.$error.required">Required!</span>-->
+        </div>
+
+        <div class="row">
+            <label class="span3">
+                Type:
+                <select name="type" ng-model="dlg.draw.type" ng-options="type.value as type.label for type in dlg.drawTypes" required class="span2"></select>
+            </label>
+            <!--<span class="error" ng-show="drawForm.name.$error.required">Required!</span>-->
+        </div>
+
+        <div class="row">
+            <label class="span3">
+                Rank, from:
+                <select name="minRank" ng-model="dlg.draw.minRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+            <label class="span3">
+                to:
+                <select name="maxRank" ng-model="dlg.draw.maxRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+        </div>
+
+        <div class="row">
+            <div class="offset1">
+                <label>{{dlg.getRegisteredCount()}} registered</label>
+            </div>
+        </div>
+
+        <fieldset>
+            <legend>Dimensions:</legend>
+            <!--<div class="row">
+                <label class="span2">
+                    Entries:
+                    <input type="number" readonly ng-model="dlg.getNbEntry()" class="span1"/>
+                </label>
+            </div>-->
+            <div class="row">
+                <label class="span2">
+                    Columns:
+                    <input type="number" name="nbColumn" ng-model="dlg.draw.nbColumn" min="2" max="9" required class="span1" />
+                </label>
+                <label class="span2">
+                    Outputs:
+                    <input type="number" name="nbOut" ng-model="dlg.draw.nbOut" min="1" max="16" required class="span1" />
+                </label>
+            </div>
+        </fieldset>
+    </div>
+    <div class="modal-footer">
+        <button type="button" ng-click="$close('Generate')" ng-disabled="!!drawForm.$error.required" ng-class="{'disabled': !!drawForm.$error.required}" class="btn btn-success"><i class="icon2-draw-generate"></i> Generate</button>
+        <button type="submit" ng-disabled="!!drawForm.$error.required" ng-class="{'disabled': !!drawForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i> OK</button>
+        <a href="#" ng-click="$close('Del')"><i class="icon-trash"></i></a>
+    </div>
+</form>
+
+</script>
+
+<script type="text/ng-template" id="draw/dialogMatch.html">
+<form name="matchForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.match.id}}</small>--></h3>
+    </div>
+    <div class="modal-body">
+
+            <div class="row">
+                <label class="span1">Winner:</label>
+                <div class="offset1">
+                    <label class="radio"><input type="radio" ng-model="dlg.match.playerId" ng-value="dlg.player1.id" /> {{dlg.player1.name}} {{dlg.player1.rank}}</label><br />
+                    <label class="radio"><input type="radio" ng-model="dlg.match.playerId" ng-value="dlg.player2.id" /> {{dlg.player2.name}} {{dlg.player2.rank}}</label>
+                </div>
+            </div>
+            <div class="row">
+                <label class="span4">
+                    Score:
+                    <input type="text" name="score" ng-model="dlg.match.score" class="span3" />
+                </label>
+                <!--<span class="error" ng-show="matchForm.name.$error.required">Required!</span>-->
+                <label class="checkbox span1"><input type="checkbox" ng-model="dlg.match.wo" />WO</label>
+            </div>
+            <div class="row">
+                <div class="offset1">
+                    <label class="checkbox span2"><input type="checkbox" ng-model="dlg.match.canceled" />Canceled</label>
+                    <label class="checkbox span2"><input type="checkbox" ng-model="dlg.match.vainqDef" />Vainqueur defaillant</label>
+                </div>
+            </div>
+        <div tabset="">
+            <div tab="" heading="Planning">
+                <div class="row">
+                    <label class="span3">Court: <select ng-model="dlg.match.place" ng-options="place for place in dlg.places" class="span2"></select></label>
+                    <label class="span3">Date: <input type="datetime" ng-model="dlg.match.date" class="span2" /></label>
+                </div>
+                <div class="row">
+                    <label class="span2">{{dlg.player1.name}} :</label>
+                    <label class="checkbox span2"><input type="checkbox" ng-model="dlg.match.aware1" />Aware</label>
+                    <label class="checkbox span2"><input type="checkbox" ng-model="dlg.match.receive1" />Receive</label>
+                </div>
+                <div class="row">
+                    <label class="span2">{{dlg.player2.name}} :</label>
+                    <label class="checkbox span2"><input type="checkbox" ng-model="dlg.match.aware2" />Aware</label>
+                    <label class="checkbox span2"><input type="checkbox" ng-model="dlg.match.receive2" />Receive</label>
+                </div>
+            </div>
+            <div tab="" heading="Comment">
+                <div class="row">
+                    <label class="span5">Format: <select ng-model="dlg.match.matchFormat" ng-options="key as matchFormat.name for (key,matchFormat) in dlg.matchFormats" class="span4"></select></label>
+                </div>
+
+                <div class="row">
+                    <label class="span6">Note: <textarea ng-model="dlg.match.note" class="span5"></textarea></label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!matchForm.$error.required" ng-class="{'disabled': !!matchForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i> OK</button>
+        <!--<a href="#" ng-click="$close('Del')"><i class="icon-trash"></i></a>-->
+    </div>
+</form>
+
+</script>
+
+<script type="text/ng-template" id="draw/drawBox.html">
+<div ng-class="{match: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.isPlayed(), hidden: ctrlBox.box.hidden, selected: ctrlBox.box === main.selection.box, error: ctrlBox.error}"
+     title="{{ctrlBox.error ? ctrlBox.error.message +' '+ ctrlBox.error.detail : ''}}"
+     ng-click="main.select(ctrlBox.box, main.ModelType.Box); $event.stopPropagation();"
+     ng-switch="ctrlBox.isMatch">
+    <span ng-if="ctrlBox.box.qualifIn" class="qualifIn">{{ctrlBox.box.qualifIn === -1 ? 'Q?' : 'Q' + ctrlBox.box.qualifIn}}</span>
+    <span ng-if="ctrlBox.box.seeded" class="seeded">{{ctrlBox.box.seeded}}</span>
+    {{ctrlBox.box._player.name}}
+    <span ng-switch-when="false" class="rank">{{ctrlBox.box._player.rank}}</span>
+    <span ng-if="ctrlBox.box.qualifOut" class="qualifOut">Q{{ctrlBox.box.qualifOut}}</span>
+    <br />
+    <span ng-switch-when="true">
+        <span class="place">{{ctrlBox.box.place}}</span>
+        <span class="date">{{ctrlBox.box.date}}</span>
+        <span class="score">{{ctrlBox.box.score}}</span>
+    </span>
+    <span ng-switch-when="false" class="club">{{ctrlBox.box._player.club}}</span>
+    &nbsp;
+</div>
+</script>
+
+<script type="text/ng-template" id="draw/drawDraw.html">
+<div ng-if="ctrlDraw.isKnockout" class="draw knockout" ng-style="{width: ctrlDraw.width +'px', height: ctrlDraw.height +'px'}"
+     ng-click="main.select(null,main.ModelType.Box)">
+    <canvas draw-lines="ctrlDraw._refresh"></canvas>
+    <div ng-repeat="box in ctrlDraw.draw.boxes" ng-if="!ctrlDraw.simple">
+        <div draw-box="box" class="box"
+             ng-style="{left:(box._x * ctrlDraw.boxWidth) +'px', top:(box._y * ctrlDraw.boxHeight) +'px'}"></div>
+    </div>
+</div>
+<table ng-if="!ctrlDraw.isKnockout" class="draw roundrobin"
+       ng-click="main.select(null,main.ModelType.Box)">
+    <tbody>
+        <tr ng-style="{height: ctrlDraw.boxHeight +'px'}">
+            <td ng-style="{width: ctrlDraw.boxWidth +'px'}"></td>
+            <td ng-repeat="row in ctrlDraw.rows" ng-style="{width: ctrlDraw.boxWidth +'px'}">
+                <div draw-box="ctrlDraw.getBox(row[0])" ng-if="!ctrlDraw.simple"></div>
+            </td>
+            <td>
+                <div ng-repeat="i in ctrlDraw.range(1, ctrlDraw.draw.nbOut)" class="qualifOut">Q{{i}}</div>
+            </td>
+        </tr>
+        <tr ng-repeat="row in ctrlDraw.rows" ng-style="{height: ctrlDraw.boxHeight +'px'}">
+            <td ng-repeat="col in row" ng-class="{diag: ctrlDraw.isDiag(col)}">
+                <div draw-box="ctrlDraw.getBox(col)" ng-if="!ctrlDraw.simple"></div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="action"
+     ng-if="!ctrlDraw.simple && main.selection.box"
+     ng-style="{left:(1+ main.selection.box._x * ctrlDraw.boxWidth) +'px', top:((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}"
+     ng-switch="ctrlDraw.draw.mode">
+    <div class="btn-group" ng-switch-when="0">
+        <button class="btn dropdown-toggle" ng-disabled="ctrlDraw.isMatch(main.selection.box)" title="Select the qualified">
+            <i class="icon2-qualif-in"></i><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li ng-repeat="q in ctrlDraw.getQualifsIn()">
+                <a ng-click="ctrlDraw.setPlayer(main.selection.box, q._player, q.qualifOut)">
+                    <i class="icon2-white" ng-class="{'icon2-checkmark':ctrlDraw.findQualifIn(q.qualifOut)}"></i><!-- -->
+                    {{'Q' + q.qualifOut + ' ' + q._player.name}}
+                </a>
+            </li>
+        </ul>
+    </div><div class="btn-group" ng-switch-when="0">
+        <button class="btn dropdown-toggle" ng-disabled="ctrlDraw.isMatch(main.selection.box)" title="Edit the player">
+            <i class="icon2-player"></i><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a ng-click="main.editPlayer(main.selection.box._player)"><i class="icon2-info"></i> Edit</a></li>
+            <li class="divider"></li>
+            <li ng-repeat="player in ctrlDraw.getPlayers()">
+                <a ng-click="ctrlDraw.setPlayer(main.selection.box, player)">
+                    <i class="icon2-white" ng-class="{'icon2-checkmark':ctrlDraw.findPlayer(player.id)}"></i>
+                    {{player.name +' '+ player.rank}}
+                </a>
+            </li>
+        </ul>
+    </div><button class="btn" ng-switch-when="0" ng-disabled="!main.selection.box.playerId"
+                  ng-click="ctrlDraw.swapPlayer(main.selection.box)" title="Swap the player">
+        <i class="icon2-switch"></i>
+    </button><button class="btn" ng-switch-when="0" ng-disabled="!main.selection.box.playerId && !main.selection.box.qualifIn"
+                     ng-click="ctrlDraw.setPlayer(main.selection.box)" title="Remove the player">
+        <i class="icon2-erase"></i>
+    </button>
+
+    <button class="btn" ng-switch-when="1" ng-disabled="!ctrlDraw.isMatch(main.selection.box)"
+            ng-click="main.editMatch(main.selection.box)" title="Set the date and hour of the match">
+        <i class="icon2-planning"></i>
+    </button><button class="btn" ng-switch-when="1" ng-disabled="!ctrlDraw.isMatch(main.selection.box)"
+                     ng-click="main.editMatch(main.selection.box)" title="Change the match place">
+        <i class="icon-map-marker"></i>
+    </button><button class="btn" ng-switch-when="1" ng-disabled="!main.selection.box.place && !main.selection.box.date"
+                     ng-click="main.editMatch(main.selection.box)" title="Remove the place and date of the match">
+        <i class="icon2-erase"></i>
+    </button>
+
+    <button class="btn" ng-switch-when="2" ng-disabled="!ctrlDraw.isMatch(main.selection.box)"
+            ng-click="main.editMatch(main.selection.box)" title="Edit the match">
+        <i class="icon2-match"></i>
+    </button><button class="btn" ng-switch-when="2" ng-disabled="!main.selection.box.playerId"
+                     ng-click="main.editMatch(main.selection.box)" title="Remove the result">
+        <i class="icon2-erase"></i>
+    </button>
+</div>
+
+</script>
+
+<script type="text/ng-template" id="event/dialogEvent.html">
+<form name="eventForm" ng-submit="$close('Ok')" zzzng-controller="dialogEventCtrl as dlg" class="modal-form form-horizontal">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.event.id}}</small>--> {{dlg.event.name}}</h3>
+    </div>
+    <div class="modal-body">
+
+        <!--<div class="control-group">
+                <label for="name" class="control-label">Name:</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" ng-model="event.name" required />*
+                </div>
+            </div>-->
+
+        <div class="row">
+            <label class="span4">
+                Name:
+                <input type="text" name="name" ng-model="dlg.event.name" required class="span3" autofocus />
+            </label>
+            <!--<span class="error" ng-show="eventForm.name.$error.required">Required!</span>-->
+        </div>
+        <div class="row">
+            <label class="span3">
+                Category:
+                <select type="text" name="category" ng-model="dlg.event.category" ng-options="value for value in dlg.categories" class="span2"></select>
+            </label>
+            <label class="span3">
+                Max Rank:
+                <select type="text" name="maxRank" ng-model="dlg.event.maxRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+        </div>
+        <div class="row">
+            <label class="span3">
+                Date start:
+                <input type="date" name="start" ng-model="dlg.event.start" class="span2" />
+            </label>
+            <label class="span3">
+                end:
+                <input type="date" name="end" ng-model="dlg.event.end" class="span2" />
+            </label>
+        </div>
+        <!--<div class="row">
+            <label class="span2">Registrations:</label>
+            <div class="offset2">
+                <ul class="span3 unstyled">
+                    <li ng-repeat="player in dlg.registred">
+                        <label><input type="checkbox" check-list="player.registration" value="{{event.id}}" /> {{player.name}}</label>
+                    </li>
+                </ul>
+            </div>
+        </div>-->
+        <hr/>
+        <div class="row">
+            <span class="span1">Draws:</span>
+            <div class="offset1">
+                <ul class="unstyled">
+                    <li ng-repeat="draw in dlg.event.draws">
+                        <span><i class="icon2-draw"></i> {{draw.name}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!eventForm.$error.required" ng-class="{'disabled': !!eventForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+        <a href="#" ng-click="$close('Del')"><i class="icon-trash"></i></a>
+    </div>
+    <!--<fieldset>
+            <legend>Coordinate</legend>
+            <div>
+            </div>
+
+            <div>
+                <label>
+                    Rank:
+            <select type="text" name="rank" ng-model="dlg.event.rank" ng-options="value for value in dlg.ranks"></select></label>
+            </div>
+        </fieldset>-->
+    <!--{{ eventForm.$error }}-->
+</form>
+
+</script>
+
+<script type="text/ng-template" id="event/event.html">
+<div ng-show="!!show">
+    <div class="modal-backdrop" ng-click="show = !show"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+            <h3>{{title}} <small>Id: {{event.id}}</small></h3>
+        </div>
+        <form ng-controller="controllers.Event" name="eventForm" class="modal-body Zform-horizontal">
+
+            <!--<div class="control-group">
+                <label for="name" class="control-label">Name:</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" ng-model="event.name" required />*
+                </div>
+            </div>-->
+
+            <div>
+                <label class="">
+                    Name:
+                    <input type="text" name="name" ng-model="event.name" required class="span2" /></label>
+                <!--<span class="error" ng-show="eventForm.name.$error.required">Required!</span>-->
+            </div>
+            <div>
+                <label class="">
+                    Category:
+                     <select type="text" name="category" ng-model="event.category" ng-options="value for value in categories" class="span2"></select></label>
+            </div>
+            <div>
+                <label class="">
+                    Max Rank:
+                     <select type="text" name="maxRank" ng-model="event.maxRank" ng-options="value for value in ranks" class="span2"></select></label>
+            </div>
+            <div>
+                <label class="">
+                    Dates:
+                     <input type="date" name="start" ng-model="event.start" class="span2"></input></label>
+                <label class="">
+                    and:
+                     <input type="date" name="end" ng-model="event.end" class="span2"></input></label>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button ng-click="ok()" ng-disabled="!!eventForm.$error.required" ng-class="{'disabled': !!eventForm.$error.required}" class="btn btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+            <a href="#" ng-click="remove()">
+                <i class="icon-trash"></i>
+            </a>
+        </div>
+    </div>
+    <!--<fieldset>
+            <legend>Coordinate</legend>
+            <div>
+            </div>
+
+            <div>
+                <label>
+                    Rank:
+            <select type="text" name="rank" ng-model="event.rank" ng-options="value for value in ranks"></select></label>
+            </div>
+        </fieldset>-->
+    <!--{{ eventForm.$error }}-->
+</div>
+
+</script>
+
+<script type="text/ng-template" id="event/listEvents.html">
+<table class="table table-hover table-condensed" style="width:auto;">
+    <!--<caption>Events</caption>-->
+    <thead>
+        <tr>
+            <!--<th class="span1"><input type="checkbox" /></th>-->
+            <th>Event name</th>
+            <th>Draws</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="event in list.events" ng-class="{info:event === main.selection.event}">
+            <!--<td><input type="checkbox" /> <small>{{event.id}}</small></td>-->
+            <td ng-class="{selected: event === main.selection.event}">
+                <i class="icon2-info" ng-click="main.editEvent(event)"></i>
+                <span ng-click="main.select(event)">{{event.name}}</span>
+                <i class="icon-trash" ng-click="main.removeEvent(event)"></i>
+            </td>
+            <td>
+                <div ng-repeat="draw in event.draws" class="inline" ng-class="{error:main.validation.hasErrorDraw(draw), selected: draw === main.selection.draw}" style="border-left: solid 1px blue; padding-left: 3px;">
+                    <i class="icon2-info" ng-click="main.editDraw(draw)"></i>
+                    <span ng-click="main.select(draw)">{{draw.name}} {{draw.suite ? '(S)' : ''}}</span>
+                    <i class="icon-trash" ng-click="main.removeDraw(draw)"></i>
+                    <div draw="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
+                         style="position:relative;"
+                         ng-click="main.select(draw)">
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr ng-show="list.events.length == 0">
+            <td colspan="3">No event</td>
+        </tr>
+    </tbody>
+</table>
+<!--<div class="action"
+     ng-show="main.selection.event"
+     ng-style="{left:(4 + main.selection.box._x * ctrlDraw.boxWidth) +'px', top:((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}">
+    <button class="btn" ng-click="main.editEvent(main.selection.event)" title="Edit the selected event properties">
+        <i class="icon2-info"></i>
+    </button><button class="btn" ng-click="main.removeEvent(main.selection.event)" title="Remove the selected event">
+        <i class="icon-trash"></i>
+    </button><button class="btn" ng-click="main.editDraw(main.selection.draw)" title="Edit the selected draw properties">
+        <i class="icon2-info"></i>
+    </button><button class="btn" ng-disabled="!main.isMatch(main.selection.box)" ng-click="main.removeDraw(main.selection.draw)" title="Remove the selected draw">
+        <i class="icon-trash"></i>
+    </button>
+</div>-->
+
+</script>
+
+<script type="text/ng-template" id="player/dialogPlayer.html">
+<form name="playerForm" ng-submit="$close('Ok')" zzzng-controller="dialogPlayerCtrl as dlg" class="modal-form form-horizontal">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.player.id}}</small>--></h3>
+    </div>
+    <div class="modal-body">
+
+        <!--<div class="control-group">
+            <label for="name" class="control-label">Name:</label>
+            <div class="controls">
+                <input type="text" id="name" name="name" ng-model="player.name" required />*
+            </div>
+        </div>-->
+
+        <div class="row">
+            <label class="span3">
+                Name:
+                <input type="text" ng-model="dlg.player.name" required class="span2" />
+            </label>
+            <!--<span class="error" ng-show="playerForm.name.$error.required">Required!</span>-->
+            <label class="span3">
+                Surname:
+                <input type="text" ng-model="dlg.player.firstname" class="span2" />
+            </label>
+        </div>
+        <div class="row">
+            <label class="span3">
+                Rank:
+                <select type="text" name="rank" ng-model="dlg.player.rank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+        </div>
+
+        <div tabset="">
+            <div tab="" heading="General">
+                <div class="row">
+                    <label class="span4">Birth: <input type="date" ng-model="dlg.player.birth" class="span3" /></label>
+                </div>
+                <div class="row">
+                    <label class="span4">Club: <input type="text" ng-model="dlg.player.club" class="span3" /></label>
+                </div>
+                <div class="row">
+                    <label class="span3">Licence: <input type="text" ng-model="dlg.player.licence" class="span2" /></label>
+                </div>
+            </div>
+            <div tab="" heading="Registration">
+                <div class="row">
+                    <label class="span1">Events:</label>
+                    <div class="offset1">
+                        <ul class="span3 unstyled">
+                            <li ng-repeat="event in dlg.events">
+                                <label><input type="checkbox" check-list="dlg.player.registration" value="{{event.id}}" /> {{event.name}}</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div tab="" heading="Coordinates">
+                <div class="row">
+                    <label class="span5">Adress: <input type="text" ng-model="dlg.player.adress1" class="span4" /></label>
+                    <label class="span5"><input type="text" ng-model="dlg.player.adress2" class="span4" /></label>
+                    <label class="span5">
+                        <input type="text" ng-model="dlg.player.zipcode" class="span1" />
+                        <span class="spacer"></span>
+                        <input type="text" ng-model="dlg.player.city" class="span3" />
+                    </label>
+                </div>
+                <div class="row">
+                    <label class="span5">
+                        Phones:
+                        <input type="tel" ng-model="dlg.player.phone1" class="span2" />
+                        <span class="spacer"></span>
+                        <input type="tel" ng-model="dlg.player.phone2" class="span2" />
+                    </label>
+                </div>
+                <div class="row">
+                    <label class="span5">
+                        eMail:
+                        <input type="email" ng-model="dlg.player.email" class="span4" />
+                    </label>
+                </div>
+            </div>
+            <!--<div tab="" heading="Team">
+            </div>-->
+            <div tab="" heading="Comment">
+                <div class="row">
+                    <label class="span6">
+                        Note:
+                        <textarea ng-model="dlg.player.note" class="span5"></textarea>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!playerForm.$error.required" ng-class="{'disabled': !!playerForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+        <a href="#" ng-click="$close('Del')">
+            <i class="icon-trash"></i>
+        </a>
+    </div>
+    <!--<fieldset>
+            <legend>Coordinate</legend>
+            <div>
+            </div>
+
+            <div>
+                <label>
+                    Rank:
+            <select type="text" name="rank" ng-model="player.rank" ng-options="value for value in ranks"></select></label>
+            </div>
+        </fieldset>-->
+    <!--{{ playerForm.$error }}-->
+</form>
+
+</script>
+
+<script type="text/ng-template" id="player/listPlayers.html">
+<!-- <span class="input-append text-right" style="text-align:right;">
+    <input placeholder="Search player list" type="search" class="span2"/>
+    <button type="submit" class="btn">Search</button>
+</span>-->
+<table class="table table-hover table-condensed" style="width:auto;">
+    <!--<caption>Players</caption>-->
+    <thead>
+        <tr>
+            <th class="span1"><input type="checkbox" /></th>
+            <th>Player name</th>
+            <th>Rank</th>
+            <th>Registrations</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="player in list.players" ng-class="{info:player === main.selection.player}">
+            <td><input type="checkbox" ng-model="selected"/> <!--<small>{{player.id}}</small>--></td>
+            <td><i class="icon2-info" ng-click="main.editPlayer(player)"></i>{{player.name}} {{player.firstname}}</td>
+            <td>{{player.rank}}</td>
+            <td><span ng-repeat="eventId in player.registration">{{list.eventById(eventId).name}}{{$last ? '' : ', '}}</span></td>
+            <td><i class="icon-trash" ng-click="main.removePlayer(player)"></i></td>
+        </tr>
+        <tr ng-show="list.players.length == 0">
+            <td colspan="3">No player</td>
+        </tr>
+    </tbody>
+</table>
+<!--<p>Total: {{players.length}}</p>-->
+
+</script>
+
+<script type="text/ng-template" id="tournament/dialogInfo.html">
+<form name="infoForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} {{dlg.info.name}}</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="span4">Name: <input type="text" name="name" ng-model="dlg.info.name" required autofocus class="span3" /></label>
+            <!--<span class="error help-inline" ng-show="infoForm.name.$error.required">Required!</span>-->
+        </div>
+        <div class="row">
+            <label class="span3">Begin: <input type="date" name="start" ng-model="dlg.info.start" class="span2" /></label>
+            <label class="span3">End: <input type="date" name="end" ng-model="dlg.info.end" class="span2" /></label>
+        </div>
+        <div class="row">
+            <label class="span6">Homologation: <input type="text" ng-model="dlg.info.homologation" class="span2" /></label>
+        </div>
+
+        <div tabset="">
+            <div tab="" heading="Club">
+                <div class="row">
+                    <label class="span4">Name: <input type="text" ng-model="dlg.info.club.name" class="offset1 span3" /></label>
+                </div>
+                <div class="row">
+                    <label class="span4">Adress: <input type="text" ng-model="dlg.info.club.adress1" class="span3" /></label>
+                    <label class="span4"><input type="text" ng-model="dlg.info.club.adress2" class="span3" /></label>
+                    <label class="span4">
+                        <input type="text" ng-model="dlg.info.club.zipcode" class="span1" />
+                        <span class="spacer"></span>
+                        <input type="text" ng-model="dlg.info.club.city" class="span2" />
+                    </label>
+                </div>
+            </div>
+
+            <div tab="" heading="Referee">
+                <div class="row">
+                    <label class="span4">Name: <input type="text" ng-model="dlg.info.referee.name" class="offset1 span3" /></label>
+                </div>
+                <div class="row">
+                    <label class="span3">Licence: <input type="text" ng-model="dlg.info.referee.licence" class="offset1 span2" /></label>
+                </div>
+                <div class="row">
+                    <label class="span4">Adress: <input type="text" ng-model="dlg.info.referee.adress1" class="span3" /></label>
+                    <label class="span4"><input type="text" ng-model="dlg.info.referee.adress2" class="span3" /></label>
+                    <label class="span4">
+                        <input type="text" ng-model="dlg.info.referee.zipcode" class="span1" />
+                        <span class="spacer"></span>
+                        <input type="text" ng-model="dlg.info.referee.city" class="span2" />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!infoForm.$error.required" ng-class="{'disabled': !!infoForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+    </div>
+</form>
+
+</script>
+<!-- End Templates -->
+
+
+
+    <!--<div id="splash" ng-if="false">Loading application...</div>-->
+    <!--    <ul class="nav nav-pills">
+        <li class="active"><a href="#/players">players</a></li>
+        <li class="active"><a href="#/events">events</a></li>
+    </ul>-->
+
+    <div ec-panelset="" class="ng-cloak" ng-init="tournamentOpened=true; drawsOpened=true; planningOpen=false;">
+        <div ec-panel="" is-open="tournamentOpened" class="tournament">
+            <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
+            <div ec-header="">
+                <i class="icon2-info" ng-click="main.editTournament(main.selection.tournament)"></i>
+                {{main.selection.tournament.info.name}}
+            </div>
+            <div class="content">
+                <div list-events="main.selection.tournament.events" class="inline"></div>
+
+                <div app-version=""></div>
+            </div>
+            <div class="footer">
+                <div class="btn-group">
+                    <button ng-click="main.newTournament()" class="btn"><i class="icon-file"></i> New</button>
+                    <!--<button ng-click="main.loadTournament()" class="btn"><i class="icon2-open"></i> Open</button>-->
+                    <span ec-input-file="" onloaded="main.loadTournament(file)"><i class="icon2-open"></i> Open</span>
+                    <button ng-click="main.saveTournament()" class="btn"><i class="icon2-save"></i> Save</button>
+                </div>
+                <div class="btn-group">
+                    <button ng-disabled="!main.undo.canUndo()" ng-click="main.doUndo()" class="btn"><i class="icon2-undo" title="Undo {{main.undo.messageUndo()}}"></i></button>
+                    <button ng-disabled="!main.undo.canRedo()" ng-click="main.doRedo()" class="btn"><i class="icon2-redo" title="Redo {{main.undo.messageRedo()}}"></i></button>
+                </div>
+                <button ng-click="main.addEvent(main.selection.event)" class="btn"><i class="icon-plus"></i> Add event</button>
+            </div>
+        </div><div ec-panel="" is-open="playersOpened" class="players">
+            <div ec-badge="" class="players"><i class="icon2-player"></i></div>
+            <div ec-header="">
+                Players
+            </div>
+            <div class="content">
+                <div list-players="main.selection.tournament.players"></div>
+            </div>
+            <div class="footer">
+                <form class="form-horizontal">
+                    <button ng-click="main.addPlayer()" class="btn"><i class="icon-plus"></i> Add player</button>
+                </form>
+            </div>
+        </div><div ec-panel="" is-open="drawsOpened" class="draws">
+            <div ec-badge="" class="draws"><i class="icon2-draw"></i></div>
+            <div ec-header="">
+                <form class="form-horizontal">
+                    <label>
+                        <select ng-model="main.selection.event" ng-change="main.select(main.selection.event)" ng-options="event.name for event in main.selection.tournament.events" class="span2"></select>
+                    </label>
+                    <label>
+                        <i class="icon2-info" ng-click="main.editDraw(main.selection.draw)" ng-disabled="!main.selection.draw"></i>
+                        <select ng-model="main.selection.draw" ng-change="main.select(main.selection.draw)" ng-options="draw.name for draw in main.selection.event.draws" class="span2"></select>
+                        <!--<i class="icon2-locker" ng-click="main.lockDraw(main.selection.draw, !main.selection.draw.locked)" ng-disabled="!main.selection.draw" title="Lock/unlock the draw modifications"></i>-->
+                        <div class="btn-group" title="Lock/unlock the draw modifications">
+                            <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Build" ng-disabled="!main.selection.draw" title="Switch to draw build mode"><i class="icon2-draw"></i></button>
+                            <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Plan" ng-disabled="!main.selection.draw" title="Switch to planning mode"><i class="icon2-planning"></i></button>
+                            <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Play" ng-disabled="!main.selection.draw" title="Switch to match mode"><i class="icon2-match"></i></button>
+                            <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Lock" ng-disabled="!main.selection.draw" title="Lock the draw"><i class="icon2-locker" ng-click="main.lockDraw(main.selection.draw, !main.selection.draw.locked)"></i></button>
+                        </div>
+                    </label>
+                </form>
+            </div>
+            <div class="content">           
+                <div draw="main.selection.draw" class="inline" style="position:relative;"></div>
+
+                <div class="inline">
+                    Validation errors:
+                    <ul>
+                        <li ng-repeat="error in main.validation.getErrorDraw(main.selection.draw)">{{error.message + ' '+ error.detail}}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer">
+                <form class="form-horizontal">
+                    <label ng-switch="main.selection.draw.mode">
+                        <button ng-click="main.addDraw(main.selection.draw)" class="btn" ng-disabled="!main.selection.event"><i class="icon-plus"></i> Add draw</button>
+                        <button type="button" class="btn" ng-switch-when="0" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Create)" ng-disabled="!main.selection.draw">
+                            <i class="icon2-draw-generate"></i> Generate
+                        </button>
+                        <div class="btn-group" ng-switch-when="0">
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEchelonne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw more"><i class="icon2-draw-left"></i></button>
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEnLigne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
+                            <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Mix)" ng-disabled="!main.selection.draw" class="btn" title="Mix the players"><i class="icon2-random"></i></button>
+                        </div>
+                        <div class="btn-group" ng-switch-when="0">
+                            <button type="button" ng-click="main.updateQualif(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" ng-click="main.validateDraw(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Check the draw"><i class="icon2-checkmark"></i> Check</button>
+                        </div>
+                    </label>
+                </form>
+            </div>
+        </div><div ec-panel="" is-open="planningOpened" class="planning">
+            <div ec-badge="" class="planning"><i class="icon2-planning"></i></div>    
+            <div ec-header="">Planning</div>
+            <div class="content">
+                Not implemented.
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+        -->
+    </div>
+
+    
+    
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
+    
+
+    <script src="jatennis.min.js"></script>
+</body>
+</html>

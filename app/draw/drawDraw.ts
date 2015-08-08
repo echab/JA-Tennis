@@ -250,16 +250,19 @@ module jat.draw {
         }
 
         // create xmlns and stylesheet
-        document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
-        document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
+        //document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
+        //document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
 
         //emulate canvas context using VML
         vmlContext = function (element: JQuery, width: number, height: number) {
-            this._element = element;
             this._width = width;
             this._height = height;
             this.beginPath();
+            this._element = element;
             this._element.find('shape').remove();
+            //this._element = element.find('shape');
+            //this._element.css({ width: this._width + 'px', height: this._height + 'px' });
+            debugger;
         };
         vmlContext.prototype = {
             _path: [], _tx: 0, _ty: 0,
@@ -279,16 +282,21 @@ module jat.draw {
                 this._path.push('l', (this._tx + x), ',', (this._ty + y));
             },
             stroke: function (): void {
-                this._path.push('e');
+                //this._path.push('e');
             },
             done: function (): void {
                 var shape = angular.element('<v:shape'
-                //+ ' coordorigin="0 0"'
                     + ' coordsize="' + this._width + ' ' + this._height + '"'
                     + ' style="position:absolute; left:0px; top:0px; width:' + this._width + 'px; height:' + this._height + 'px;"'
                     + ' filled="0" stroked="1" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"'
                     + ' path="' + this._path.join('') + '" />');
                 this._element.append(shape);
+                //this._element.attr('coordsize', this._width + ' ' + this._height)
+                //    .attr('filled', 0)
+                //    .attr('stroked', 1)
+                //    .attr('strokecolor', this.strokeStyle)
+                //    .attr('strokeweight', this.lineWidth + 'px')
+                //    .attr('path', this._path.join(''));
             }
         };
     }

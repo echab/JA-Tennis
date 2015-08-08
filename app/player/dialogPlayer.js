@@ -1,7 +1,8 @@
 'use strict';
 var jat;
 (function (jat) {
-    (function (_player) {
+    var player;
+    (function (player_1) {
         var dialogPlayerCtrl = (function () {
             function dialogPlayerCtrl(title, player, events, rank, category) {
                 this.title = title;
@@ -19,10 +20,8 @@ var jat;
             ];
             return dialogPlayerCtrl;
         })();
-        _player.dialogPlayerCtrl = dialogPlayerCtrl;
-
-        angular.module('jat.player.dialog', ['jat.utils.checkList']).controller('dialogPlayerCtrl', dialogPlayerCtrl);
-    })(jat.player || (jat.player = {}));
-    var player = jat.player;
+        player_1.dialogPlayerCtrl = dialogPlayerCtrl;
+        angular.module('jat.player.dialog', ['jat.utils.checkList'])
+            .controller('dialogPlayerCtrl', dialogPlayerCtrl);
+    })(player = jat.player || (jat.player = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogPlayer.js.map

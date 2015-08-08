@@ -1,7 +1,8 @@
 'use strict';
 var jat;
 (function (jat) {
-    (function (_event) {
+    var event;
+    (function (event_1) {
         var dialogEventCtrl = (function () {
             function dialogEventCtrl(selection, title, event, tournamentLib, rank, category) {
                 this.selection = selection;
@@ -10,7 +11,6 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.ranks = rank.list();
                 this.categories = category.list();
-
                 this.registred = tournamentLib.getRegistred(event);
             }
             dialogEventCtrl.$inject = [
@@ -23,9 +23,7 @@ var jat;
             ];
             return dialogEventCtrl;
         })();
-
-        angular.module('jat.event.dialog', []).controller('dialogEventCtrl', dialogEventCtrl);
-    })(jat.event || (jat.event = {}));
-    var event = jat.event;
+        angular.module('jat.event.dialog', [])
+            .controller('dialogEventCtrl', dialogEventCtrl);
+    })(event = jat.event || (jat.event = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogEvent.js.map

@@ -1,7 +1,8 @@
-﻿'use strict';
+'use strict';
+// FFT validation services
 var jat;
 (function (jat) {
-    // FFT validation services
+    var service;
     (function (service) {
         var FFTValidation = (function () {
             function FFTValidation(validation, drawLib, knockout, find) {
@@ -13,7 +14,6 @@ var jat;
             }
             FFTValidation.prototype.validatePlayer = function (player) {
                 var bRes = true;
-
                 //if (player.sexe == 'F'
                 //    && player.rank
                 //    && !player.rank.Division()
@@ -24,85 +24,52 @@ var jat;
                 //}
                 return bRes;
             };
-
             FFTValidation.prototype.validateDraw = function (draw) {
                 var bRes = true;
-
                 var isTypePoule = draw.type >= 2;
-
                 var pColClast = {};
-
                 var nqe = 0;
-
+                //TODOjs
                 for (var i = 0; i < draw.boxes.length; i++) {
                     var box = draw.boxes[i];
                     var boxIn = !isMatch(box) ? box : undefined;
                     var match = isMatch(box) ? box : undefined;
-
                     var player = box._player;
-
                     //VERIFIE //1   //progression des classements
                     //rank progress, no more than two ranks difference into a column
                     if (player && !isTypePoule) {
                         var c = column(box.position);
-
                         var colRank = pColClast[player.rank];
                         if (!colRank) {
                             pColClast[player.rank] = c;
-                        } else if (Math.abs(colRank - c) > 1) {
+                        }
+                        else if (Math.abs(colRank - c) > 1) {
                             this.validation.errorDraw('IDS_ERR_CLAST_PROGR2', draw, box, player.rank);
                             bRes = false;
                         }
                     }
-
                     if (isTypePoule) {
-                        //DONE 01/08/19 (00/12/20): Dans Poule, date des matches différentes pour un même joueur
-                        ////TODOjs
-                        ////VERIFIE //2
-                        ////matches précédents de la colonne
-                        //for (var j = iHautCol(iColPoule(i, m_nColonne)); j > i; j--) {
-                        //    if (isMatch(j) && !boxes[j].m_Date.isVide()
-                        //        && boxes[i].m_Date == boxes[j].m_Date) {
-                        //        this.validation.errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i)].m_iJoueur, iEpreuve, iTableau, i);
-                        //        bRes = false;
-                        //        break;
-                        //    }
-                        //}
-                        //if (j <= i) {
-                        //    //matches précédents de la ligne
-                        //    for (var j = ADVERSAIRE1(i) - GetnColonne(); j > i; j -= GetnColonne()) {
-                        //        if (isMatch(j) && !boxes[j].m_Date.isVide()
-                        //            && boxes[i].m_Date == boxes[j].m_Date) {
-                        //            this.validation.errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i)].m_iJoueur, iEpreuve, iTableau, i);
-                        //            bRes = false;
-                        //            break;
-                        //        }
-                        //    }
-                        //}
                     }
-
                     //VERIFIE	//3
                     //DONE 00/03/04: CTableau, Deux qualifiés entrants se rencontrent
                     if (!isTypePoule && match) {
                         var opponent = this.knockout.boxesOpponents(match);
-                        if (opponent.box1.qualifIn && opponent.box2.qualifIn) {
+                        if (opponent.box1.qualifIn
+                            && opponent.box2.qualifIn) {
                             this.validation.errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1);
                             bRes = false;
                         }
                     }
-
                     //VERIFIE	//4
                     if (boxIn && boxIn.qualifIn) {
                         nqe++;
                     }
-
                     if (isTypePoule && nqe > 1) {
                         this.validation.errorDraw('IDS_ERR_POULE_ENTRANT_OVR', draw, box);
                         bRes = false;
                     }
                 }
-
-                if (draw.type === 1 /* Final */) {
+                if (draw.type === models.DrawType.Final) {
                     //VERIFIE	//5
                     var boxT = this.drawLib.FindTeteSerie(draw, 1);
                     if (!boxT) {
@@ -111,7 +78,6 @@ var jat;
                         bRes = false;
                     }
                 }
-
                 //******************SAME old code using lpfn******************
                 //ST_EPREUVE epreuve;
                 //ST_TABLEAU tableau;
@@ -312,32 +278,30 @@ var jat;
             return FFTValidation;
         })();
         service.FFTValidation = FFTValidation;
-
         function isMatch(box) {
             return 'score' in box;
         }
-
         function column(pos) {
             //TODO, use a table
             var col = -1;
-            for (pos++; pos; pos >>= 1, col++) {
-            }
+            for (pos++; pos; pos >>= 1, col++) { }
             return col;
         }
-
         function columnMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? nCol - 1 : column(nQ - 2) + nCol;
+            return !nQ || nQ === 1
+                ? nCol - 1
+                : column(nQ - 2) + nCol;
         }
-
         function positionTopCol(col) {
             return (1 << (col + 1)) - 2;
         }
-
         function positionMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? (1 << nCol) - 2 : positionTopCol(columnMax(nCol, nQ));
+            return !nQ || nQ === 1
+                ? (1 << nCol) - 2 //iHautCol
+                : positionTopCol(columnMax(nCol, nQ));
         }
-
-        angular.module('jat.services.validation.fft', ['jat.services.validation']).factory('fftValidation', [
+        angular.module('jat.services.validation.fft', ['jat.services.validation'])
+            .factory('fftValidation', [
             'validation',
             'drawLib',
             'knockout',
@@ -345,7 +309,5 @@ var jat;
             function (validation, drawLib, knockout, find) {
                 return new FFTValidation(validation, drawLib, knockout, find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=fftValidation.js.map

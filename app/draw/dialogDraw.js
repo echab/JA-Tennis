@@ -1,10 +1,12 @@
 'use strict';
 var jat;
 (function (jat) {
-    (function (_draw) {
+    var draw;
+    (function (draw_1) {
         var dialogDrawCtrl = (function () {
-            function dialogDrawCtrl(title, draw, //private selection: jat.service.Selection,
-            rank, category, drawLib, tournamentLib, $scope) {
+            function dialogDrawCtrl(title, draw, 
+                //private selection: jat.service.Selection,
+                rank, category, drawLib, tournamentLib, $scope) {
                 var _this = this;
                 this.title = title;
                 this.draw = draw;
@@ -15,10 +17,8 @@ var jat;
                 for (var i = 0; i < 4; i++) {
                     this.drawTypes[i] = { value: i, label: models.DrawType[i] };
                 }
-
                 this.ranks = rank.list();
                 this.categories = category.list();
-
                 //Force minRank <= maxRank
                 $scope.$watch('dlg.draw.minRank', function (minRank) {
                     if (!_this.draw.maxRank || _this.rank.compare(minRank, _this.draw.maxRank) > 0) {
@@ -42,10 +42,13 @@ var jat;
                 }
                 return n;
             };
-
+            //getNbEntry(): number {
+            //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
+            //}
             dialogDrawCtrl.$inject = [
                 'title',
                 'draw',
+                //'selection',
                 'rank',
                 'category',
                 'drawLib',
@@ -53,9 +56,7 @@ var jat;
                 '$scope'];
             return dialogDrawCtrl;
         })();
-
-        angular.module('jat.draw.dialog', []).controller('dialogDrawCtrl', dialogDrawCtrl);
-    })(jat.draw || (jat.draw = {}));
-    var draw = jat.draw;
+        angular.module('jat.draw.dialog', [])
+            .controller('dialogDrawCtrl', dialogDrawCtrl);
+    })(draw = jat.draw || (jat.draw = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogDraw.js.map

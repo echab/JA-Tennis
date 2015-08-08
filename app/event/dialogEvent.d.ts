@@ -1,7 +1,7 @@
 export interface DialogEventScope extends ng.IScope {
     title: string;
     event: models.Event;
-    selection: ISelectionService;
+    selection: Selection;
     ranks: RankString[];
     categories: RankString[];
 }

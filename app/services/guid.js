@@ -1,6 +1,7 @@
-﻿'use strict';
+'use strict';
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var Guid = (function () {
             function Guid() {
@@ -12,9 +13,7 @@ var jat;
             return Guid;
         })();
         service.Guid = Guid;
-
-        angular.module('jat.services.guid', []).service('guid', Guid);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.guid', [])
+            .service('guid', Guid);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=guid.js.map

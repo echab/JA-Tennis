@@ -1,24 +1,24 @@
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MIN_COL = 0, MAX_COL = 9, MAX_QUALIF = 32, QEMPTY = -1, WITH_TDS_HAUTBAS = true;
-
         /**
-        
+    
         ---14---
-        >-- 6---.
+                >-- 6---.
         ---13---	    |
-        >-- 2---.
+                        >-- 2---.
         ---12---    	|   	|
-        >-- 5---'	    |
+                >-- 5---'	    |
         ---11---		        |
-        >-- 0---
+                                >-- 0---
         ---10---		        |
-        >-- 4---.	    |
+                >-- 4---.	    |
         --- 9---	    |   	|
-        >-- 1---'
+                        >-- 1---'
         --- 8---	    |
-        >-- 3---'
+                >-- 3---'
         --- 7---
         */
         var Knockout = (function () {
@@ -27,7 +27,9 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.rank = rank;
                 this.find = find;
-                drawLib._drawLibs[0 /* Normal */] = drawLib._drawLibs[1 /* Final */] = this;
+                drawLib._drawLibs[models.DrawType.Normal]
+                    = drawLib._drawLibs[models.DrawType.Final]
+                        = this;
             }
             Knockout.prototype.findBox = function (draw, position, create) {
                 var box = this.find.by(draw.boxes, 'position', position);
@@ -36,26 +38,19 @@ var jat;
                 }
                 return box;
             };
-
             Knockout.prototype.nbColumnForPlayers = function (draw, nJoueur) {
                 var colMin = columnMin(draw.nbOut);
-
                 for (var c = colMin + 1; countInCol(c, draw.nbOut) < nJoueur && c < MAX_COL; c++) {
                 }
-
                 if (MAX_COL <= c) {
                     throw 'Max_COL is reached ' + c;
                 }
-
                 return c - colMin + 1;
             };
-
             Knockout.prototype.resize = function (draw, oldDraw, nJoueur) {
                 if (nJoueur) {
                     draw.nbColumn = this.nbColumnForPlayers(draw, nJoueur);
-                    //draw.nbEntry = countInCol(iColMax(draw), draw.nbOut);
                 }
-
                 //Shift the boxes
                 if (oldDraw && draw.nbOut !== oldDraw.nbOut) {
                     var n = columnMax(draw.nbColumn, draw.nbOut) - columnMax(oldDraw.nbColumn, oldDraw.nbOut);
@@ -68,68 +63,57 @@ var jat;
                     }
                 }
             };
-
             Knockout.prototype.generateDraw = function (draw, generate, afterIndex) {
-                if (generate === 1 /* Create */) {
+                if (generate === models.GenerateType.Create) {
                     var m_nMatchCol = tool.filledArray(MAX_COL, 0);
-
                     var players = this.tournamentLib.GetJoueursInscrit(draw);
-
                     //Récupère les qualifiés sortants du tableau précédent
-                    var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous;
+                    var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = this.drawLib.previousGroup(draw);
                     if (prev) {
                         players = players.concat(this.drawLib.FindAllQualifieSortant(prev, true));
                     }
-
                     this.drawLib.resetDraw(draw, players.length);
                     this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
-                } else {
+                }
+                else {
                     m_nMatchCol = this.CompteMatchs(draw);
-                    if (generate === 2 /* PlusEchelonne */) {
+                    if (generate === models.GenerateType.PlusEchelonne) {
                         if (!this.TirageEchelonne(draw, m_nMatchCol)) {
                             return;
                         }
-                    } else if (generate === 3 /* PlusEnLigne */) {
+                    }
+                    else if (generate === models.GenerateType.PlusEnLigne) {
                         if (!this.TirageEnLigne(draw, m_nMatchCol)) {
                             return;
                         }
                     }
                     players = this.GetJoueursTableau(draw);
                 }
-
                 //Tri et Mélange les joueurs de même classement
                 this.tournamentLib.TriJoueurs(players);
-
                 draw = this.ConstruitMatch(draw, m_nMatchCol, players);
                 return [draw];
             };
-
             Knockout.prototype.RempliMatchs = function (draw, m_nMatchCol, nMatchRestant, colGauche) {
                 var colMin = columnMin(draw.nbOut);
-
                 colGauche = colGauche || colMin;
-
                 for (var i = colGauche; i <= MAX_COL; i++) {
                     m_nMatchCol[i] = 0;
                 }
-
+                //Rempli les autres matches de gauche normalement
                 for (var c = Math.max(colGauche, colMin); nMatchRestant && c < MAX_COL; c++) {
                     var iMax = Math.min(nMatchRestant, countInCol(c, draw.nbOut));
                     if (colMin < c) {
                         iMax = Math.min(iMax, 2 * m_nMatchCol[c - 1]);
                     }
-
                     m_nMatchCol[c] = iMax;
                     nMatchRestant -= iMax;
                 }
             };
-
             //Init m_nMatchCol à partir du tableau existant
             Knockout.prototype.CompteMatchs = function (draw) {
                 var b, c2, n, bColSansMatch;
-
                 var m_nMatchCol = new Array(MAX_COL);
-
                 //Compte le nombre de joueurs entrants ou qualifié de la colonne
                 var colMin = columnMin(draw.nbOut);
                 var c = colMin;
@@ -145,20 +129,17 @@ var jat;
                             n++;
                         }
                     }
-
                     //En déduit le nombre de matches de la colonne
                     m_nMatchCol[c] = 2 * m_nMatchCol[c - 1] - n;
-
                     nMatchRestant += n - m_nMatchCol[c];
                     if (!n) {
                         c2 = c;
                     }
-
                     if (!m_nMatchCol[c]) {
                         break;
                     }
                 }
-
+                //Contrôle si il n'y a pas d'autres joueurs plus à gauche
                 for (c++; c <= colMax; c++) {
                     n = 0;
                     var bottom = positionBottomCol(c), top = positionTopCol(c);
@@ -168,8 +149,7 @@ var jat;
                             n++;
                         }
                     }
-
-                    //TODO 00/04/13: CTableau, CompteMatch à refaire pour cas tordus
+                    //TODO 00/04/13: CTableau, CompteMatch à refaire pour cas tordus		
                     //-------.
                     //       |---A---.
                     //-------'       |
@@ -178,14 +158,12 @@ var jat;
                     //       |---B---'
                     //---D---'
                     nMatchRestant += n;
-
                     //Ajoute un match par joueur trouvé
                     if (n) {
                         this.RempliMatchs(draw, m_nMatchCol, n, c2);
                         break;
                     }
                 }
-
                 //Compte tous les joueurs entrant ou qualifiés
                 c = colMin;
                 nMatchRestant = -m_nMatchCol[c];
@@ -200,32 +178,28 @@ var jat;
                     }
                     nMatchRestant += n;
                 }
-
                 for (c = colMin; c <= colMax; c++) {
                     if (m_nMatchCol[c] > nMatchRestant) {
                         this.RempliMatchs(draw, m_nMatchCol, nMatchRestant, c);
                         break;
                     }
-
                     nMatchRestant -= m_nMatchCol[c];
                 }
-
                 //Contrôle si il n'y a pas une colonne sans match
                 bColSansMatch = false;
                 for (nMatchRestant = 0, c = colMin; c < colMax; c++) {
                     nMatchRestant += m_nMatchCol[c];
-
                     if (m_nMatchCol[c]) {
                         if (bColSansMatch) {
                             //Refait la répartition tout à droite
                             this.RempliMatchs(draw, m_nMatchCol, nMatchRestant, c + 1);
                             break;
                         }
-                    } else {
+                    }
+                    else {
                         bColSansMatch = true;
                     }
                 }
-
                 ////TODO Contrôle qu'il n'y a pas trop de match pour les joueurs
                 //bColSansMatch = false;
                 //for( nMatchRestant = 0, c = iColMin( draw); c< colMax; c++) {
@@ -235,18 +209,17 @@ var jat;
                 //        if( bColSansMatch) {
                 //            //Refait la répartition tout à droite
                 //            this.RempliMatchs(draw, nMatchRestant, c+1);
-                //            break;
+                //            break; 
                 //        }
                 //    } else
                 //        bColSansMatch = true;
-                //}
+                //}	
                 return m_nMatchCol;
             };
-
             Knockout.prototype.TirageEchelonne = function (draw, m_nMatchCol) {
                 var colMin = columnMin(draw.nbOut);
                 var colMax = columnMax(draw.nbColumn, draw.nbOut);
-
+                //Enlève le premier match possible en partant de la gauche
                 for (var c = MAX_COL - 1; c > colMin; c--) {
                     if (undefined === m_nMatchCol[c]) {
                         continue;
@@ -255,22 +228,17 @@ var jat;
                         if ((m_nMatchCol[c + 1] + 1) > 2 * (m_nMatchCol[c] - 1)) {
                             continue;
                         }
-
                         m_nMatchCol[c]--;
-
                         //Remet le match plus à droite
                         c++;
                         m_nMatchCol[c]++;
-
                         return true;
                     }
                 }
                 return false;
             };
-
             Knockout.prototype.TirageEnLigne = function (draw, m_nMatchCol) {
                 var colMin = columnMin(draw.nbOut);
-
                 //Cherche où est-ce qu'on peut ajouter un match en partant de la gauche
                 var nMatchRestant = 0;
                 for (var c = MAX_COL - 1; c > colMin; c--) {
@@ -285,17 +253,14 @@ var jat;
                         //Ajoute le match en question
                         m_nMatchCol[c]++;
                         nMatchRestant--;
-
                         //Reset les autres matches de gauche
                         this.RempliMatchs(draw, m_nMatchCol, nMatchRestant, c + 1);
                         return true;
                     }
-
                     nMatchRestant += m_nMatchCol[c];
                 }
                 return false;
             };
-
             Knockout.prototype.GetJoueursTableau = function (draw) {
                 //Récupère les joueurs du tableau
                 var ppJoueur = [];
@@ -304,25 +269,21 @@ var jat;
                     if (!boxIn) {
                         continue;
                     }
-
                     //Récupérer les joueurs et les Qualifiés entrants
                     if (boxIn.qualifIn) {
                         ppJoueur.push(boxIn.qualifIn); //no qualifie entrant
-                    } else if (this.isJoueurNouveau(boxIn)) {
+                    }
+                    else if (this.isJoueurNouveau(boxIn)) {
                         ppJoueur.push(boxIn._player); //no du joueur
                     }
                 }
-
                 return ppJoueur;
             };
-
             //Place les matches dans l'ordre
             Knockout.prototype.ConstruitMatch = function (oldDraw, m_nMatchCol, players) {
                 var draw = this.drawLib.newDraw(oldDraw._event, oldDraw);
                 draw.boxes = [];
-
                 var colMin = columnMin(draw.nbOut), colMax = columnMax(draw.nbColumn, draw.nbOut);
-
                 //Calcule OrdreInv
                 var pOrdreInv = [];
                 for (var c = colMin; c <= colMax; c++) {
@@ -330,21 +291,19 @@ var jat;
                     for (var i = bottom; i <= top; i++) {
                         if (WITH_TDS_HAUTBAS) {
                             pOrdreInv[iOrdreQhb(i, draw.nbOut)] = i;
-                        } else {
+                        }
+                        else {
                             pOrdreInv[iOrdreQ(i, draw.nbOut)] = i;
                         }
                     }
                 }
-
                 //Nombre de Tête de série
                 var nTeteSerie = draw.nbOut;
                 if (nTeteSerie == 1) {
                     nTeteSerie = countInCol((colMax - colMin) >> 1);
                 }
-
                 var max = positionMax(draw.nbColumn, draw.nbOut);
                 var pbMatch = new Array(max + 1);
-
                 var iJoueur = 0, m = 0, nj = 0;
                 c = -1;
                 for (var o = 0; o <= max; o++) {
@@ -354,38 +313,33 @@ var jat;
                     }
                     if (column(b) != c) {
                         c = column(b);
-
                         m = m_nMatchCol[c] || 0;
                         nj = c > colMin ? 2 * m_nMatchCol[c - 1] - m : 0;
                     }
-
                     //fou les joueurs
                     var posMatch = positionMatch(b);
                     if (nj > 0) {
                         if (pbMatch[posMatch]) {
                             iJoueur++;
                             nj--;
-
                             var box = this.drawLib.newBox(draw, draw._event.matchFormat, b);
                             draw.boxes.push(box);
                         }
-                    } else {
+                    }
+                    else {
                         //fou les matches
                         if (m > 0 && (c === colMin || pbMatch[posMatch])) {
                             pbMatch[b] = true;
                             m--;
-
                             var match = this.drawLib.newBox(draw, draw._event.matchFormat, b);
                             match.score = '';
                             draw.boxes.push(match);
                         }
                     }
-
                     if (iJoueur >= players.length) {
                         break;
                     }
                 }
-
                 //fou les joueurs en commençant par les qualifiés entrants
                 iJoueur = 0; //players.length - 1;
                 for (; o > 0; o--) {
@@ -393,7 +347,6 @@ var jat;
                     if (b === -1) {
                         continue;
                     }
-
                     //fou les joueurs
                     if (!pbMatch[b] && pbMatch[positionMatch(b)]) {
                         //Qualifiés entrants se rencontrent
@@ -401,6 +354,7 @@ var jat;
                         if (qualif) {
                             var boxIn2 = this.findBox(draw, positionOpponent(b));
                             if (boxIn2 && boxIn2.qualifIn) {
+                                //2 Qualifiés entrants se rencontrent
                                 for (var t = iJoueur + 1; t >= nTeteSerie; t--) {
                                     if (angular.isObject(players[t])) {
                                         //switch
@@ -413,20 +367,21 @@ var jat;
                                 }
                             }
                         }
-
                         var boxIn = this.findBox(draw, b);
                         if (boxIn) {
                             delete boxIn.score; //not a match
                             if (qualif) {
                                 this.drawLib.SetQualifieEntrant(boxIn, qualif);
-                            } else {
+                            }
+                            else {
                                 this.drawLib.MetJoueur(boxIn, players[iJoueur]);
-
-                                if ((!draw.minRank || !this.rank.isNC(draw.minRank)) || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
+                                if ((!draw.minRank || !this.rank.isNC(draw.minRank))
+                                    || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
                                     //Mets les têtes de série (sauf tableau NC)
                                     if (WITH_TDS_HAUTBAS) {
                                         t = iTeteSerieQhb(b, draw.nbOut);
-                                    } else {
+                                    }
+                                    else {
                                         t = iTeteSerieQ(b, draw.nbOut);
                                     }
                                     if (t <= nTeteSerie && !this.drawLib.FindTeteSerie(draw, t)) {
@@ -437,16 +392,14 @@ var jat;
                             iJoueur++;
                         }
                     }
-
                     if (iJoueur > players.length) {
                         break;
                     }
                 }
-
                 //	for( b=positionBottomCol(columnMin(draw.nbOut)); b<=positionMax(draw.nbColumn, draw.nbOut); b++)
                 //		draw.boxes[ b].setLockMatch( false);
                 //Mets les qualifiés sortants
-                if (draw.type !== 1 /* Final */) {
+                if (draw.type !== models.DrawType.Final) {
                     //Find the first unused qualif number
                     var group = this.drawLib.group(draw);
                     if (group) {
@@ -455,10 +408,10 @@ var jat;
                                 break;
                             }
                         }
-                    } else {
+                    }
+                    else {
                         i = 1;
                     }
-
                     bottom = positionBottomCol(colMin);
                     top = positionTopCol(colMin);
                     for (var b = top; b >= bottom && i <= MAX_QUALIF; b--, i++) {
@@ -468,10 +421,8 @@ var jat;
                         }
                     }
                 }
-
                 return draw;
             };
-
             Knockout.prototype.boxesOpponents = function (match) {
                 var pos1 = positionOpponent1(match.position), pos2 = positionOpponent2(match.position);
                 return {
@@ -479,62 +430,56 @@ var jat;
                     box2: this.find.by(match._draw.boxes, 'position', pos2)
                 };
             };
-
             Knockout.prototype.getSize = function (draw) {
                 if (!draw || !draw.nbColumn || !draw.nbOut) {
-                    return { width: 1, height: 1 };
+                    return { width: 1, height: 1 }; //{ width: dimensions.boxWidth, height: dimensions.boxHeight };
                 }
-
                 return {
                     width: draw.nbColumn,
                     height: countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut)
                 };
             };
-
             Knockout.prototype.computePositions = function (draw) {
                 if (!draw || !draw.nbColumn || !draw.nbOut || !draw.boxes || !draw.boxes.length) {
                     return;
                 }
-
                 var positions = [];
-
                 //var heights = <number[]> [];  //TODO variable height
                 var minPos = positionMin(draw.nbOut), maxPos = positionMax(draw.nbColumn, draw.nbOut), c0 = draw.nbColumn - 1 + columnMin(draw.nbOut);
                 for (var pos = maxPos; pos >= minPos; pos--) {
                     var col = column(pos), topPos = positionTopCol(col), c = c0 - col, g = positionTopCol(c - 1) + 2;
-
                     positions[pos] = {
                         x: c,
                         y: (topPos - pos) * g + g / 2 - 0.5
                     };
-
                     var box = this.find.by(draw.boxes, 'position', pos);
                     if (box) {
                         box._x = positions[pos].x;
                         box._y = positions[pos].y;
                     }
                 }
-
                 return positions;
             };
-
             Knockout.prototype.CalculeScore = function (draw) {
                 return true;
             };
-
             Knockout.prototype.isJoueurNouveau = function (box) {
                 if (!box) {
                     return false;
                 }
                 var boxIn = box;
                 var opponents = this.boxesOpponents(box);
-                return box.playerId && (!!boxIn.qualifIn || !((opponents.box1 && opponents.box1.playerId) || (opponents.box2 && opponents.box2.playerId)));
+                return box.playerId
+                    &&
+                        (!!boxIn.qualifIn
+                            ||
+                                !((opponents.box1 && opponents.box1.playerId)
+                                    ||
+                                        (opponents.box2 && opponents.box2.playerId)));
             };
-
             Knockout.prototype.SetQualifieEntrant = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
                 var draw = box._draw;
-
                 //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
                 if (inNumber) {
                     var prev = this.drawLib.previousGroup(draw);
@@ -545,48 +490,41 @@ var jat;
                             player = boxOut._player;
                         }
                     }
-
                     if (box.qualifIn) {
                         if (!this.SetQualifieEntrant(box)) {
                             ASSERT(false);
                         }
                     }
-
                     if (player) {
                         if (!this.drawLib.MetJoueur(box, player)) {
                             ASSERT(false);
                         }
                     }
-
                     //Qualifié entrant pas déjà pris
-                    if (inNumber === QEMPTY || !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
+                    if (inNumber === QEMPTY ||
+                        !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
                         box.qualifIn = inNumber;
-
                         //Cache les boites de gauche
                         this.iBoiteDeGauche(box.position, draw, true, function (box) {
                             box.hidden = true; //TODOjs delete the box from draw.boxes
                         });
                     }
-                } else {
+                }
+                else {
                     box.qualifIn = 0;
-
                     if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                         ASSERT(false);
                     }
-
                     //Réaffiche les boites de gauche
                     this.iBoiteDeGauche(box.position, draw, true, function (box) {
                         delete box.hidden;
                     });
                 }
-
                 return true;
             };
-
             Knockout.prototype.SetQualifieSortant = function (box, outNumber) {
                 // outNumber=0 => enlève qualifié
                 var next = this.drawLib.nextGroup(box._draw);
-
                 //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
                 if (outNumber) {
                     //Met à jour le tableau suivant
@@ -599,22 +537,20 @@ var jat;
                             }
                         }
                     }
-
                     //Enlève le précédent n° de qualifié sortant
                     if (box.qualifOut) {
                         if (!this.SetQualifieSortant(box)) {
                             ASSERT(false);
                         }
                     }
-
                     box.qualifOut = outNumber;
-
                     //Met à jour le tableau suivant
                     if (next && box.playerId && boxIn) {
                         if (!this.drawLib.MetJoueur(boxIn, box._player, true)) {
                         }
                     }
-                } else {
+                }
+                else {
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
                         var boxIn = this.drawLib.FindQualifieEntrant(next, box.qualifOut);
@@ -625,20 +561,15 @@ var jat;
                             }
                         }
                     }
-
                     delete box.qualifOut;
                 }
-
                 return true;
             };
-
             Knockout.prototype.FindQualifieEntrant = function (draw, iQualifie) {
                 ASSERT(0 <= iQualifie);
-
                 if (!draw.boxes) {
                     return;
                 }
-
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var boxIn = draw.boxes[i];
                     if (!boxIn) {
@@ -650,17 +581,13 @@ var jat;
                     }
                 }
             };
-
             Knockout.prototype.FindQualifieSortant = function (draw, iQualifie) {
                 ASSERT(0 < iQualifie);
-
                 if (iQualifie === QEMPTY || !draw.boxes) {
                     return;
                 }
-
                 return this.find.by(draw.boxes, "qualifOut", iQualifie);
             };
-
             //private box1(match: models.Match): models.Box {
             //    var pos = positionOpponent1(match.position);
             //    return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
@@ -687,20 +614,18 @@ var jat;
             Knockout.prototype.iBoiteDeGauche = function (iBoite, draw, bToutesBoites, callback) {
                 var b;
                 var bOk = false;
-
-                for (var iBoiteCourante = iBoite; ;) {
+                //ASSERT_VALID(pTableau);
+                for (var iBoiteCourante = iBoite;;) {
                     var j = iBoiteCourante - iBoite * exp2(log2(iBoiteCourante + 1) - log2(iBoite + 1));
                     do {
                         j++;
                         b = j + iBoite * exp2(log2(j + 1));
-
                         var box = this.findBox(draw, b);
                         if (!box) {
                             return;
                         }
                         bOk = ((box.playerId) || bToutesBoites);
-                    } while(!bOk);
-
+                    } while (!bOk);
                     if (bOk) {
                         callback(box);
                     }
@@ -710,69 +635,66 @@ var jat;
             return Knockout;
         })();
         service.Knockout = Knockout;
-
         function ASSERT(b, message) {
             if (!b) {
                 debugger;
                 throw message || 'Assertion is false';
             }
         }
-
         function column(pos) {
             //TODO, use a table
             var col = -1;
-            for (pos++; pos; pos >>= 1, col++) {
-            }
+            for (pos++; pos; pos >>= 1, col++) { }
             return col;
         }
-
         function columnMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? nCol - 1 : column(nQ - 2) + nCol;
+            return !nQ || nQ === 1
+                ? nCol - 1
+                : column(nQ - 2) + nCol;
         }
-
         function columnMin(nQ) {
-            return !nQ || nQ === 1 ? 0 : column(nQ - 2) + 1;
+            return !nQ || nQ === 1
+                ? 0
+                : column(nQ - 2) + 1;
         }
-
         function positionTopCol(col) {
             return (1 << (col + 1)) - 2;
         }
-
         function positionBottomCol(col, nQ) {
-            return !nQ || nQ === 1 ? (1 << col) - 1 : (positionTopCol(col) - countInCol(col, nQ) + 1);
+            return !nQ || nQ === 1
+                ? (1 << col) - 1 //iBasCol
+                : (positionTopCol(col) - countInCol(col, nQ) + 1);
         }
-
         function countInCol(col, nQ) {
-            return !nQ || nQ === 1 ? (1 << col) : nQ * countInCol(col - columnMin(nQ), 1);
+            return !nQ || nQ === 1
+                ? (1 << col) //countInCol
+                : nQ * countInCol(col - columnMin(nQ), 1);
         }
-
         function positionMin(nQ) {
-            return !nQ || nQ === 1 ? 0 : positionBottomCol(columnMin(nQ), nQ);
+            return !nQ || nQ === 1
+                ? 0
+                : positionBottomCol(columnMin(nQ), nQ);
         }
-
         function positionMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? (1 << nCol) - 2 : positionTopCol(columnMax(nCol, nQ));
+            return !nQ || nQ === 1
+                ? (1 << nCol) - 2 //iHautCol
+                : positionTopCol(columnMax(nCol, nQ));
         }
-
         function positionMatch(pos) {
             return (pos - 1) >> 1;
         }
-
         function positionOpponent(pos) {
             return pos & 1 ? pos + 1 : pos - 1;
         }
-
         function positionOpponent1(pos) {
             return (pos << 1) + 2;
         }
         function positionOpponent2(pos) {
             return (pos << 1) + 1;
         }
-
         function positionPivotLeft(pos, pivot) {
             return pos + pivot * exp2(log2(pos + 1));
         }
-
         function log2(x) {
             ASSERT(x > 0);
             var sh = x;
@@ -780,52 +702,51 @@ var jat;
                 ;
             return i;
         }
-
         function exp2(col) {
             return 1 << col;
         }
-
         //Têtes de série de bas en haut (FFT)
         //Numéro du tête de série d'une boite (identique dans plusieurs boites)
         function iTeteSerieQ(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-
             if (column(i) === columnMin(nQualifie)) {
                 //Colonne de droite, numéroter 1 à n en partant du bas (OK!)
                 if (nQualifie === 1 << column(nQualifie - 1)) {
-                    return i === 0 ? 1 : iTeteSerieQ(i, 1);
-                } else {
+                    return i === 0 ? 1 : iTeteSerieQ(i, 1); // TODO à corriger
+                }
+                else {
                     return 1 + iPartieQ(i, nQualifie);
                 }
-            } else {
+            }
+            else {
                 //Tête de série précédente (de droite)
                 var t = iTeteSerieQ(positionMatch(i), nQualifie), v, d, c;
-
                 if (nQualifie == 1 << column(nQualifie - 1)) {
                     d = i;
-                } else {
+                }
+                else {
                     d = iDecaleGaucheQ(i, nQualifie);
                 }
-
                 v = !!(d & 1); //Ok pour demi-partie basse
-
-                if ((c = column(d)) > 1 && d > positionTopCol(c) - (countInCol(c, nQualifie) >> 1)) {
+                if ((c = column(d)) > 1
+                    && d > positionTopCol(c) - (countInCol(c, nQualifie) >> 1)) {
                     v = !v; //Inverse pour le demi-partie haute
                 }
-
-                return v ? t : 1 + countInCol(column(i), nQualifie) - t;
+                return v ?
+                    t :
+                    1 + countInCol(column(i), nQualifie) - t; //Nouvelle tête de série complémentaire
             }
         }
-
         //Ordre de remplissage des boites en partant de la droite
         //et en suivant les têtes de série
         function iOrdreQ(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-            return iTeteSerieQ(i, nQualifie) - 1 + countInCol(column(i), nQualifie) - nQualifie;
+            return iTeteSerieQ(i, nQualifie) - 1
+                + countInCol(column(i), nQualifie)
+                - nQualifie;
         }
-
         //Partie du tableau de i par rapport au qualifié sortant
         //retour: 0 à nQualifie-1, en partant du bas
         function iPartieQ(i, nQualifie) {
@@ -837,79 +758,81 @@ var jat;
             //TODOjs? pb division entière
         }
         service.iPartieQ = iPartieQ;
-
         //Numére de boite de la partie de tableau, ramenée à un seul qualifié
         function iDecaleGaucheQ(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-            return i - iPartieQ(i, nQualifie) * countInCol(c - columnMin(nQualifie)) - positionBottomCol(c, nQualifie) + positionBottomCol(c - columnMin(nQualifie));
+            return i
+                - iPartieQ(i, nQualifie) * countInCol(c - columnMin(nQualifie))
+                - positionBottomCol(c, nQualifie)
+                + positionBottomCol(c - columnMin(nQualifie));
         }
-
         //Têtes de série de haut en bas (non FFT)
         //Numéro du tête de série d'une boite (identique dans plusieurs boites)
         function iTeteSerieQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-
             if (column(i) === columnMin(nQualifie)) {
                 //Colonne de droite, numéroter 1 à n en partant du bas (OK!)
                 if (nQualifie === 1 << column(nQualifie - 1))
-                    return i == 0 ? 1 : iTeteSerieQhb(i, 1);
+                    return i == 0 ? 1 : iTeteSerieQhb(i, 1); // TODO à corriger
                 else
                     return 1 + iPartieQhb(i, nQualifie);
-            } else {
+            }
+            else {
                 //Tête de série précédente (de droite)
                 var t = iTeteSerieQhb(positionMatch(i), nQualifie), v, d, c;
-
                 if (nQualifie === 1 << column(nQualifie - 1)) {
                     d = i;
-                } else {
+                }
+                else {
                     d = iDecaleGaucheQhb(i, nQualifie);
                 }
                 v = !!(d & 1); //Ok pour demi-partie basse
-
-                if ((c = column(d)) > 1 && d <= positionTopCol(c) - (countInCol(c) >> 1)) {
+                if ((c = column(d)) > 1
+                    && d <= positionTopCol(c) - (countInCol(c) >> 1)) {
                     v = !v; //Inverse pour le demi-partie basse		//v1.11.0.1 (décommenté)
                 }
-                return !v ? t : 1 + countInCol(column(i), nQualifie) - t;
+                return !v ?
+                    t :
+                    1 + countInCol(column(i), nQualifie) - t; //Nouvelle tête de série complémentaire
             }
         }
-
         //Ordre de remplissage des boites en partant de la droite
         //et en suivant les têtes de série
         function iOrdreQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-            return iTeteSerieQhb(i, nQualifie) - 1 + countInCol(column(i), nQualifie) - nQualifie;
+            return iTeteSerieQhb(i, nQualifie) - 1
+                + countInCol(column(i), nQualifie)
+                - nQualifie;
         }
-
         //Partie du tableau de i par rapport au qualifié sortant
         //retour: 0 à nQualifie-1, en partant du bas
         function iPartieQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-
-            //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );
+            //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );  
             return (nQualifie - 1) - Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
             // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
             //TODOjs? pb division entière
         }
-
         function iDecaleGaucheQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-            return i - (nQualifie - 1 - iPartieQhb(i, nQualifie)) * countInCol(c - columnMin(nQualifie)) - positionBottomCol(c, nQualifie) + positionBottomCol(c - columnMin(nQualifie));
+            return i
+                - (nQualifie - 1 - iPartieQhb(i, nQualifie)) * countInCol(c - columnMin(nQualifie))
+                - positionBottomCol(c, nQualifie)
+                + positionBottomCol(c - columnMin(nQualifie));
         }
-
-        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('knockout', [
+        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
+            .factory('knockout', [
             'drawLib', 'tournamentLib', 'rank', 'find',
             function (drawLib, tournamentLib, rank, find) {
                 return new Knockout(drawLib, tournamentLib, rank, find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=knockout.js.map

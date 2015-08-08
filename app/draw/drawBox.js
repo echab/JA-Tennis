@@ -1,6 +1,7 @@
-﻿'use strict';
+'use strict';
 var jat;
 (function (jat) {
+    var draw;
     (function (draw) {
         var boxCtrl = (function () {
             function boxCtrl() {
@@ -10,7 +11,6 @@ var jat;
             };
             return boxCtrl;
         })();
-
         function drawBoxDirective(validation) {
             return {
                 restrict: 'EA',
@@ -27,13 +27,10 @@ var jat;
                 }
             };
         }
-
         function isMatch(box) {
             return box && ('score' in box);
         }
-
-        angular.module('jat.draw.box', ['jat.services.find']).directive('drawBox', ['validation', drawBoxDirective]);
-    })(jat.draw || (jat.draw = {}));
-    var draw = jat.draw;
+        angular.module('jat.draw.box', ['jat.services.find'])
+            .directive('drawBox', ['validation', drawBoxDirective]);
+    })(draw = jat.draw || (jat.draw = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=drawBox.js.map

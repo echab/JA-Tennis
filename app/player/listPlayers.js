@@ -1,6 +1,7 @@
 'use strict';
 var jat;
 (function (jat) {
+    var player;
     (function (player) {
         function listPlayersDirective() {
             var dir = {
@@ -17,7 +18,6 @@ var jat;
             };
             return dir;
         }
-
         var listPlayersCtrl = (function () {
             function listPlayersCtrl(selection, find) {
                 this.selection = selection;
@@ -29,16 +29,14 @@ var jat;
                     return this.find.byId(this.selection.tournament.events, id);
                 }
             };
-
             listPlayersCtrl.$inject = [
                 'selection',
                 'find'
             ];
             return listPlayersCtrl;
         })();
-
-        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', listPlayersCtrl);
-    })(jat.player || (jat.player = {}));
-    var player = jat.player;
+        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find'])
+            .directive('listPlayers', listPlayersDirective)
+            .controller('listPlayersCtrl', listPlayersCtrl);
+    })(player = jat.player || (jat.player = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=listPlayers.js.map
