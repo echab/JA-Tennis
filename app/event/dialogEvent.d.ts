@@ -1,4 +1,4 @@
-export interface DialogEventScope extends ng.IScope {
+interface DialogEventScope extends ng.IScope {
     title: string;
     event: models.Event;
     selection: Selection;

@@ -18,7 +18,7 @@ module jat.main {
             'validation',
             'undo',
             '$window',
-            '$timeout',
+            '$timeout'
         ];
 
         constructor(

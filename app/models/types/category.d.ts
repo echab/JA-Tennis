@@ -1,7 +1,7 @@
 interface CategoryString extends String { }
 
 interface ServiceCategory {
-    //currentYear: number;
+    //currentYear: number;    //public for Spec
     list(): CategoryString[];
     isValid(category: CategoryString): boolean;
     isCompatible(eventCategory: CategoryString, playerCategory: CategoryString): boolean

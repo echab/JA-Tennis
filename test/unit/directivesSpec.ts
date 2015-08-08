@@ -1,6 +1,6 @@
-/// <reference path="../../lib/typescript/angular/angular.d.ts" />
-/// <reference path="../../lib/typescript/angular/angular-mocks.d.ts" />
-/// <reference path="../../lib/typescript/jasmine/jasmine.d.ts" />
+/// <reference path="../../lib/typings/jasmine/jasmine.d.ts" />
+/// <reference path="../../lib/typings/angularjs/angular.d.ts" />
+/// <reference path="../../lib/typings/angularjs/angular-mocks.d.ts" />
 'use strict';
 
 /* jasmine specs for directives go here */

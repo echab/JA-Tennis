@@ -3151,72 +3151,10 @@ var jat;
             }]);
     })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-'use strict';
-// FFT type services
 var jat;
 (function (jat) {
-    var service;
-    (function (service) {
-        var Rank = (function () {
-            function Rank() {
-                this._group = {
-                    "4e série": "NC,40,30/5,30/4,30/3,30/2,30/1",
-                    "3e série": "30,15/5,15/4,15/3,15/2,15/1",
-                    "2e série": "15,5/6,4/6,3/6,2/6,1/6",
-                    "1e série": "0,-1/6,-2/6,-3/6,-4/6,-5/6",
-                    "promotion": "-15,-30"
-                };
-                this._groups = [];
-                this._groupOf = {};
-                this._ranks = [];
-                this._index = {};
-                var i;
-                for (i in this._group) {
-                    this._groups.push(i);
-                    var g = this._group[i].split(",");
-                    this._ranks = this._ranks.concat(g);
-                    for (var j = g.length - 1; j >= 0; j--) {
-                        this._groupOf[g[j]] = i;
-                    }
-                }
-                for (var j = this._ranks.length - 1; j >= 0; j--) {
-                    this._index[this._ranks[j]] = j;
-                }
-            }
-            Rank.prototype.list = function () {
-                return this._ranks;
-            };
-            Rank.prototype.isValid = function (rank) {
-                return this._index[rank] >= 0;
-            };
-            Rank.prototype.isNC = function (rank) {
-                return rank === "NC";
-            };
-            Rank.prototype.next = function (rank) {
-                var i = this._index[rank];
-                return this._ranks[i + 1];
-            };
-            Rank.prototype.previous = function (rank) {
-                var i = this._index[rank];
-                return this._ranks[i - 1];
-            };
-            Rank.prototype.compare = function (rank1, rank2) {
-                var i = this._index[rank1], j = this._index[rank2];
-                return i - j;
-            };
-            Rank.prototype.within = function (rank, rank1, rank2) {
-                return (!rank1 || this.compare(rank1, rank) <= 0)
-                    && (!rank2 || this.compare(rank, rank2) <= 0);
-            };
-            Rank.prototype.groups = function () {
-                return this._groups;
-            };
-            Rank.prototype.groupOf = function (rank) {
-                return this._groupOf[rank];
-            };
-            return Rank;
-        })();
-        //===========================================
+    var fft;
+    (function (fft) {
         var Category = (function () {
             function Category() {
                 // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf
@@ -3322,8 +3260,59 @@ var jat;
             };
             return Category;
         })();
-        service.Category = Category;
-        //===========================================
+        fft.Category = Category;
+        angular.module('jat.services.fft.category', []);
+    })(fft = jat.fft || (jat.fft = {}));
+})(jat || (jat = {}));
+var jat;
+(function (jat) {
+    var fft;
+    (function (fft) {
+        angular.module('jat.services.type', [
+            'jat.services.fft.score',
+            'jat.services.fft.category',
+            'jat.services.fft.licence',
+            'jat.services.fft.matchFormat',
+            'jat.services.fft.rank',
+            'jat.services.fft.ranking'
+        ])
+            .service('score', fft.Score)
+            .service('category', fft.Category)
+            .service('licence', fft.Licence)
+            .service('matchFormat', fft.MatchFormat)
+            .service('rank', fft.Rank)
+            .service('ranking', ['score', fft.Ranking]);
+    })(fft = jat.fft || (jat.fft = {}));
+})(jat || (jat = {}));
+var jat;
+(function (jat) {
+    var fft;
+    (function (fft) {
+        var Licence = (function () {
+            function Licence() {
+            }
+            Licence.prototype.isValid = function (licence) {
+                var a = Licence.reLicence.exec(licence + " ");
+                if (a === null) {
+                    return false;
+                }
+                //check licence key
+                var v = parseInt(a[1]);
+                var k = Licence.keys.charAt(v % 23);
+                return k == a[2];
+            };
+            Licence.reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;
+            Licence.keys = "ABCDEFGHJKLMNPRSTUVWXYZ";
+            return Licence;
+        })();
+        fft.Licence = Licence;
+        angular.module('jat.services.fft.licence', []);
+    })(fft = jat.fft || (jat.fft = {}));
+})(jat || (jat = {}));
+var jat;
+(function (jat) {
+    var fft;
+    (function (fft) {
         var MatchFormat = (function () {
             function MatchFormat() {
                 this._matchFormats = {
@@ -3343,7 +3332,138 @@ var jat;
             };
             return MatchFormat;
         })();
-        //===========================================
+        fft.MatchFormat = MatchFormat;
+        angular.module('jat.services.fft.matchFormat', []);
+    })(fft = jat.fft || (jat.fft = {}));
+})(jat || (jat = {}));
+var jat;
+(function (jat) {
+    var fft;
+    (function (fft) {
+        var Rank = (function () {
+            function Rank() {
+                this._group = {
+                    "4e série": "NC,40,30/5,30/4,30/3,30/2,30/1",
+                    "3e série": "30,15/5,15/4,15/3,15/2,15/1",
+                    "2e série": "15,5/6,4/6,3/6,2/6,1/6",
+                    "1e série": "0,-1/6,-2/6,-3/6,-4/6,-5/6",
+                    "promotion": "-15,-30"
+                };
+                this._groups = [];
+                this._groupOf = {};
+                this._ranks = [];
+                this._index = {};
+                var i;
+                for (i in this._group) {
+                    this._groups.push(i);
+                    var g = this._group[i].split(",");
+                    this._ranks = this._ranks.concat(g);
+                    for (var j = g.length - 1; j >= 0; j--) {
+                        this._groupOf[g[j]] = i;
+                    }
+                }
+                for (var j = this._ranks.length - 1; j >= 0; j--) {
+                    this._index[this._ranks[j]] = j;
+                }
+            }
+            Rank.prototype.list = function () {
+                return this._ranks;
+            };
+            Rank.prototype.isValid = function (rank) {
+                return this._index[rank] >= 0;
+            };
+            Rank.prototype.isNC = function (rank) {
+                return rank === "NC";
+            };
+            Rank.prototype.next = function (rank) {
+                var i = this._index[rank];
+                return this._ranks[i + 1];
+            };
+            Rank.prototype.previous = function (rank) {
+                var i = this._index[rank];
+                return this._ranks[i - 1];
+            };
+            Rank.prototype.compare = function (rank1, rank2) {
+                var i = this._index[rank1], j = this._index[rank2];
+                return i - j;
+            };
+            Rank.prototype.within = function (rank, rank1, rank2) {
+                return (!rank1 || this.compare(rank1, rank) <= 0)
+                    && (!rank2 || this.compare(rank, rank2) <= 0);
+            };
+            Rank.prototype.groups = function () {
+                return this._groups;
+            };
+            Rank.prototype.groupOf = function (rank) {
+                return this._groupOf[rank];
+            };
+            return Rank;
+        })();
+        fft.Rank = Rank;
+        angular.module('jat.services.fft.rank', []);
+    })(fft = jat.fft || (jat.fft = {}));
+})(jat || (jat = {}));
+var jat;
+(function (jat) {
+    var fft;
+    (function (fft) {
+        var Ranking = (function () {
+            function Ranking(score) {
+                this._champs = [
+                    "Points:",
+                    "Différence de Sets:",
+                    "Différence de Jeux:"
+                ];
+                this.Points = 0;
+                this._serviceScore = score;
+            }
+            //- le nombre de sets des matchs (3 ou 5)
+            //art52               |  Points  |   Sets   |   Jeux   |
+            //- Vainqueur         |    +2    |Différence|Différence|
+            //- Battu             |    +1    |Différence|Différence|
+            //- Vainqueur abandon |    +2    |          |          |
+            //- Battu abandon     |    +1    |          |          |
+            //- Vainqueur WO      |    +2    |   +1,5   |    +5    |
+            //- Battu WO          |     0    |   -1,5   |    -5    |
+            //- Match nul         |     0    |          |          |
+            Ranking.prototype.Empty = function () {
+                this.Points = 0;
+            };
+            Ranking.prototype.isVide = function () {
+                return this.Points === 0;
+            };
+            Ranking.prototype.NomChamp = function (iChamp) {
+                return this._champs[iChamp];
+            };
+            Ranking.prototype.ValeurChamp = function (iChamp) {
+                switch (iChamp) {
+                    case 0: return this.dPoint.toString();
+                    case 1: return Math.floor(this.dSet2 / 2).toString();
+                    case 2: return this.dJeu.toString();
+                }
+            };
+            Ranking.prototype.AddResultat = function (bVictoire, score, fm) {
+                //bVictoire: -1=défaite, 0=nul, 1=victoire
+                var sc = new fft.ScoreFFT(score, fm);
+                //Compte la différence de Set
+                this.dPoint += sc.deltaPoint(bVictoire > 0); //TODO bEquipe ???
+                this.dSet2 += sc.deltaSet(bVictoire > 0); //TODO bEquipe ???
+                this.dJeu += sc.deltaJeu(bVictoire > 0); //TODO bEquipe ???
+                return true;
+            };
+            Ranking.prototype.Ordre = function () {
+                return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
+            };
+            return Ranking;
+        })();
+        fft.Ranking = Ranking;
+        angular.module('jat.services.fft.ranking', []);
+    })(fft = jat.fft || (jat.fft = {}));
+})(jat || (jat = {}));
+var jat;
+(function (jat) {
+    var fft;
+    (function (fft) {
         var Score = (function () {
             function Score() {
             }
@@ -3377,6 +3497,7 @@ var jat;
             Score.reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
             return Score;
         })();
+        fft.Score = Score;
         var MAX_SET = 5;
         var ScoreFFT = (function () {
             function ScoreFFT(score, fm) {
@@ -3552,83 +3673,9 @@ var jat;
             };
             return ScoreFFT;
         })();
-        //===========================================
-        var Licence = (function () {
-            function Licence() {
-            }
-            Licence.prototype.isValid = function (licence) {
-                var a = Licence.reLicence.exec(licence + " ");
-                if (a === null) {
-                    return false;
-                }
-                //check licence key
-                var v = parseInt(a[1]);
-                var k = Licence.keys.charAt(v % 23);
-                return k == a[2];
-            };
-            Licence.reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;
-            Licence.keys = "ABCDEFGHJKLMNPRSTUVWXYZ";
-            return Licence;
-        })();
-        //===========================================
-        var Ranking = (function () {
-            function Ranking(score) {
-                this._champs = [
-                    "Points:",
-                    "Différence de Sets:",
-                    "Différence de Jeux:"
-                ];
-                this.Points = 0;
-                this._serviceScore = score;
-            }
-            //- le nombre de sets des matchs (3 ou 5)
-            //art52               |  Points  |   Sets   |   Jeux   |
-            //- Vainqueur         |    +2    |Différence|Différence|
-            //- Battu             |    +1    |Différence|Différence|
-            //- Vainqueur abandon |    +2    |          |          |
-            //- Battu abandon     |    +1    |          |          |
-            //- Vainqueur WO      |    +2    |   +1,5   |    +5    |
-            //- Battu WO          |     0    |   -1,5   |    -5    |
-            //- Match nul         |     0    |          |          |
-            Ranking.prototype.Empty = function () {
-                this.Points = 0;
-            };
-            Ranking.prototype.isVide = function () {
-                return this.Points === 0;
-            };
-            Ranking.prototype.NomChamp = function (iChamp) {
-                return this._champs[iChamp];
-            };
-            Ranking.prototype.ValeurChamp = function (iChamp) {
-                switch (iChamp) {
-                    case 0: return this.dPoint.toString();
-                    case 1: return Math.floor(this.dSet2 / 2).toString();
-                    case 2: return this.dJeu.toString();
-                }
-            };
-            Ranking.prototype.AddResultat = function (bVictoire, score, fm) {
-                //bVictoire: -1=défaite, 0=nul, 1=victoire
-                var sc = new ScoreFFT(score, fm);
-                //Compte la différence de Set
-                this.dPoint += sc.deltaPoint(bVictoire > 0); //TODO bEquipe ???
-                this.dSet2 += sc.deltaSet(bVictoire > 0); //TODO bEquipe ???
-                this.dJeu += sc.deltaJeu(bVictoire > 0); //TODO bEquipe ???
-                return true;
-            };
-            Ranking.prototype.Ordre = function () {
-                return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
-            };
-            return Ranking;
-        })();
-        //===========================================
-        angular.module('jat.services.type', [])
-            .service('rank', Rank)
-            .service('category', Category)
-            .service('matchFormat', MatchFormat)
-            .service('score', Score)
-            .service('licence', Licence)
-            .service('ranking', ['score', Ranking]);
-    })(service = jat.service || (jat.service = {}));
+        fft.ScoreFFT = ScoreFFT;
+        angular.module('jat.services.fft.score', []);
+    })(fft = jat.fft || (jat.fft = {}));
 })(jat || (jat = {}));
 'use strict';
 // FFT validation services

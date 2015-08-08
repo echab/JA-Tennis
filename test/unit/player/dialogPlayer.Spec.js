@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 describe('Player dialog', function () {
     //var dlg: jat.player.dialogPlayerCtrl, scope:ng.IScope, $modal: uib.IModalService<string>;
     //beforeEach(module('jat.player.dialog'));
@@ -36,4 +36,3 @@ describe('Player dialog', function () {
     //    //dlg.categories
     //});
 });
-//# sourceMappingURL=dialogPlayer.Spec.js.map

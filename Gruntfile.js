@@ -9,6 +9,7 @@ module.exports = function (grunt) {
                     /* The main feature is to put files in your tsconfig.json file based on this filesGlob... */
                     filesGlob: [
                         "./app/**/*.ts",
+                        "./test/unit/**/*Spec.ts",
                         "./lib/**/*.d.ts",
                         "!./app/JATennis.d.ts",
                         "!./lib/**/*mock*.d.ts",
@@ -29,7 +30,8 @@ module.exports = function (grunt) {
                             "declaration": false,
                             "noImplicitAny": false,
                             "removeComments": false,
-                            "noLib": false
+                            "noLib": false,
+                            "sourceMap": true
                         }
                     }
                 }

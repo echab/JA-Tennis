@@ -1,4 +1,6 @@
-﻿'use strict';
+﻿/// <reference path="../../../lib/typings/mocks/math-mock.d.ts" />
+
+'use strict';
 
 describe('services.mainLib', () => {
 

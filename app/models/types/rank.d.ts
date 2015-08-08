@@ -4,7 +4,7 @@ interface RankString extends String {
 interface RankGroupString extends String {    
 }
 
-interface IRank {
+interface ServiceRank {
     list(): RankString[];
     isValid(rank: RankString): boolean;
     next(rank: RankString): RankString;

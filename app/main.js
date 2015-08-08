@@ -256,7 +256,7 @@ var jat;
                 'validation',
                 'undo',
                 '$window',
-                '$timeout',
+                '$timeout'
             ];
             return mainCtrl;
         })();

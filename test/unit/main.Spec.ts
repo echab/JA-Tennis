@@ -1,4 +1,8 @@
-﻿'use strict';
+﻿///<reference path="../../lib/typings/jasmine/jasmine.d.ts"/>
+///<reference path="../../lib/typings/angularjs/angular-mocks.d.ts"/>
+///<reference path="../../lib/typings/ui-bootstrap/ui-bootstrap-mocks.d.ts"/>
+
+'use strict';
 
 describe('main controller', () => {
 

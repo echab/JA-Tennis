@@ -1,29 +1,24 @@
-﻿'use strict';
+///<reference path="../../lib/typings/jasmine/jasmine.d.ts"/>
+///<reference path="../../lib/typings/angularjs/angular-mocks.d.ts"/>
+///<reference path="../../lib/typings/ui-bootstrap/ui-bootstrap-mocks.d.ts"/>
+'use strict';
 describe('main controller', function () {
     var main, $modal;
-
     beforeEach(module('jat.main'));
     beforeEach(module('ui.bootstrap.mock')); //for $modal mock
-
     beforeEach(inject(function ($controller, _$modal_) {
         main = $controller('mainCtrl');
         $modal = _$modal_;
     }));
-
     describe('Players management', function () {
         var tournament1 = {
             id: 't1', info: { name: 'Tournament 1' },
             players: [],
             events: []
         };
-
         var player1 = { id: 'p1', name: 'Eloi', rank: '30/3', registration: [] };
-
         //clean tournament1
-        afterEach(function () {
-            return tournament1.players.splice(0, tournament1.players.length);
-        });
-
+        afterEach(function () { return tournament1.players.splice(0, tournament1.players.length); });
         it('should add player', function () {
             expect(tournament1.players.length).toBe(0);
             //main.select(tournament1);
@@ -38,14 +33,12 @@ describe('main controller', function () {
             //expect(tournament1.players[1].name).toBe('Eloi');
             //expect(tournament1.players[1].rank).toBe('30/3');
         });
-
         it('should remove player', function () {
             //main.select(tournament1);
             //tournament1.players.push(player1);
             //main.removePlayer(player1);
             expect(tournament1.players.length).toBe(0);
         });
-
         it('should edit player', function () {
             //main.select(tournament1);
             //tournament1.players.push(player1);
@@ -57,11 +50,8 @@ describe('main controller', function () {
             //expect(tournament1.players[0].name).toBe('Denis');
         });
     });
-
     describe('Events management', function () {
     });
-
     describe('Draws management', function () {
     });
 });
-//# sourceMappingURL=main.Spec.js.map

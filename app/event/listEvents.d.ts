@@ -1,3 +1,3 @@
-export interface ListEventsScope extends ng.IScope { //MainScope {
+interface ListEventsScope extends ng.IScope { //MainScope {
     events: models.Event[];
 }

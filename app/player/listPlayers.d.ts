@@ -1,3 +1,3 @@
-export interface ListPlayersScope extends ng.IScope { //MainScope {
+interface ListPlayersScope extends ng.IScope { //MainScope {
     players: models.Player[];
 }
