@@ -1,5 +1,6 @@
-declare module models {
-    export interface Box extends Model {
+declare namespace models {
+    
+    export interface Box {
         id: string;
         position: number;
 

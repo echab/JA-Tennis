@@ -46,6 +46,7 @@
             "grunt-contrib-compress":  "~0.12.0",
             "grunt-rename": "~0.1.4",
             "grunt-ftp-deploy" : "~0.1.9",
-            "matchdep": "~0.3.0"
+            "matchdep": "~0.3.0",
+            "grunt-tsconfig": "~0.1.0"
         }
     }

@@ -1,6 +1,6 @@
-﻿declare module models {
+﻿declare namespace models {
 
-    export interface Player extends Model {
+    export interface Player {
 
         id: string;
 

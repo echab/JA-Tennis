@@ -1,6 +1,6 @@
-declare module models {
+declare namespace models {
 
-    export interface Event extends Model {
+    export interface Event {
 
         id: string;
 

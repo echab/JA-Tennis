@@ -1,6 +1,6 @@
-declare module models {
+declare namespace models {
 
-    export interface Tournament extends Model {
+    export interface Tournament {
 
         id: string;
 
@@ -15,7 +15,7 @@ declare module models {
         _url?: string;
 
         _dayCount?: number;
-        _day?: models.Match[][]; //list of matches by day
+        _day?: Match[][]; //list of matches by day
     }
 
     export interface TournamentInfo {

@@ -1,4 +1,5 @@
-declare module models {
+declare namespace models {
+    
     export interface PlayerIn extends Box {
 
         seeded ?: number;

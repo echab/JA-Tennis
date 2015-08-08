@@ -1,6 +1,6 @@
-declare module models {
+declare namespace models {
 
-    export interface Draw extends Model {
+    export interface Draw {
         id: string; //new draw has no id
 
         name: string;

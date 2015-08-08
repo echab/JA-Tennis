@@ -1,4 +1,5 @@
-declare module models {
+declare namespace models {
+    
     export interface Match extends Box {
 
         //winner: number; //1 or 2 (or undefined)
@@ -17,7 +18,7 @@ declare module models {
 
         note?: string;
 
-        _player1: models.Player;    //TODO for planning and dialog match
-        _player2: models.Player;
+        _player1: Player;    //TODO for planning and dialog match
+        _player2: Player;
     }
 }

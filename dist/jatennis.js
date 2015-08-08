@@ -1604,8 +1604,10 @@ angular.module('jat', [
     'jat.services.undo',
     'jat.services.type',
     'jat.main'
-]).constant('appName', 'JA-Tennis').constant('appVersion', '0.1').directive('appVersion', [
-    'appName', 'appVersion',
+])
+    .constant('appName', 'JA-Tennis')
+    .constant('appVersion', '0.1')
+    .directive('appVersion', ['appName', 'appVersion',
     function (appName, appVersion) {
         return {
             template: appName + ' v' + appVersion
@@ -1613,28 +1615,29 @@ angular.module('jat', [
     }]);
 /*
 .config([<any>'$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {
-//routes
-$routeProvider.when('/players', {
-templateUrl: 'players.html',
-controller: controllers.Players
-});
-$routeProvider.when('/player/:id', {
-templateUrl: 'player.html',
-controller: controllers.Player
-});
-$routeProvider.otherwise({
-redirectTo: '/players'
-});
+    //routes
+    $routeProvider.when('/players', {
+        templateUrl: 'players.html',
+        controller: controllers.Players
+    });
+    $routeProvider.when('/player/:id', {
+        templateUrl: 'player.html',
+        controller: controllers.Player
+    });
+    $routeProvider.otherwise({
+        redirectTo: '/players'
+    });
 }])
 //*/
-//# sourceMappingURL=app.js.map
 'use strict';
 var jat;
 (function (jat) {
-    (function (_draw) {
+    var draw;
+    (function (draw_1) {
         var dialogDrawCtrl = (function () {
-            function dialogDrawCtrl(title, draw, //private selection: jat.service.Selection,
-            rank, category, drawLib, tournamentLib, $scope) {
+            function dialogDrawCtrl(title, draw, 
+                //private selection: jat.service.Selection,
+                rank, category, drawLib, tournamentLib, $scope) {
                 var _this = this;
                 this.title = title;
                 this.draw = draw;
@@ -1645,10 +1648,8 @@ var jat;
                 for (var i = 0; i < 4; i++) {
                     this.drawTypes[i] = { value: i, label: models.DrawType[i] };
                 }
-
                 this.ranks = rank.list();
                 this.categories = category.list();
-
                 //Force minRank <= maxRank
                 $scope.$watch('dlg.draw.minRank', function (minRank) {
                     if (!_this.draw.maxRank || _this.rank.compare(minRank, _this.draw.maxRank) > 0) {
@@ -1672,10 +1673,13 @@ var jat;
                 }
                 return n;
             };
-
+            //getNbEntry(): number {
+            //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
+            //}
             dialogDrawCtrl.$inject = [
                 'title',
                 'draw',
+                //'selection',
                 'rank',
                 'category',
                 'drawLib',
@@ -1683,26 +1687,23 @@ var jat;
                 '$scope'];
             return dialogDrawCtrl;
         })();
-
-        angular.module('jat.draw.dialog', []).controller('dialogDrawCtrl', dialogDrawCtrl);
-    })(jat.draw || (jat.draw = {}));
-    var draw = jat.draw;
+        angular.module('jat.draw.dialog', [])
+            .controller('dialogDrawCtrl', dialogDrawCtrl);
+    })(draw = jat.draw || (jat.draw = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogDraw.js.map
 'use strict';
 var jat;
 (function (jat) {
-    (function (_match) {
+    var match;
+    (function (match_1) {
         var dialogMatchCtrl = (function () {
             function dialogMatchCtrl(title, match, find, drawLib, matchFormat) {
                 this.title = title;
                 this.match = match;
                 var tournament = match._draw._event._tournament;
-
                 var opponents = drawLib.boxesOpponents(match);
                 this.player1 = find.byId(tournament.players, opponents.box1.playerId);
                 this.player2 = find.byId(tournament.players, opponents.box2.playerId);
-
                 this.places = tournament.places;
                 this.matchFormats = matchFormat.list();
             }
@@ -1715,15 +1716,14 @@ var jat;
             ];
             return dialogMatchCtrl;
         })();
-
-        angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type']).controller('dialogMatchCtrl', dialogMatchCtrl);
-    })(jat.match || (jat.match = {}));
-    var match = jat.match;
+        angular.module('jat.match.dialog', ['jat.services.drawLib', 'jat.services.find', 'jat.services.type'])
+            .controller('dialogMatchCtrl', dialogMatchCtrl);
+    })(match = jat.match || (jat.match = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogMatch.js.map
 'use strict';
 var jat;
 (function (jat) {
+    var draw;
     (function (draw) {
         var boxCtrl = (function () {
             function boxCtrl() {
@@ -1733,7 +1733,6 @@ var jat;
             };
             return boxCtrl;
         })();
-
         function drawBoxDirective(validation) {
             return {
                 restrict: 'EA',
@@ -1750,24 +1749,23 @@ var jat;
                 }
             };
         }
-
         function isMatch(box) {
             return box && ('score' in box);
         }
-
-        angular.module('jat.draw.box', ['jat.services.find']).directive('drawBox', ['validation', drawBoxDirective]);
-    })(jat.draw || (jat.draw = {}));
-    var draw = jat.draw;
+        angular.module('jat.draw.box', ['jat.services.find'])
+            .directive('drawBox', ['validation', drawBoxDirective]);
+    })(draw = jat.draw || (jat.draw = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=drawBox.js.map
 'use strict';
 var jat;
 (function (jat) {
-    (function (_draw) {
+    var draw;
+    (function (draw_1) {
         var drawCtrl = (function () {
-            function drawCtrl(drawLib, //private knockout: jat.service.Knockout, //for dependencies
-            //private roundrobin: jat.service.Roundrobin, //for dependencies
-            tournamentLib, find, undo, selection) {
+            function drawCtrl(drawLib, 
+                //private knockout: jat.service.Knockout, //for dependencies
+                //private roundrobin: jat.service.Roundrobin, //for dependencies
+                tournamentLib, find, undo, selection) {
                 this.drawLib = drawLib;
                 this.tournamentLib = tournamentLib;
                 this.find = find;
@@ -1783,20 +1781,16 @@ var jat;
                 if (!this.draw || this.simple) {
                     return;
                 }
-
                 this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
-
                 //qualifs in
                 var prev = this.drawLib.previousGroup(this.draw);
                 this.qualifsIn = prev ? this.drawLib.FindAllQualifieSortantBox(prev) : undefined;
-
                 //qualifs out
                 this.qualifsOut = [];
                 for (var i = 1; i <= this.draw.nbOut; i++) {
                     this.qualifsOut.push(i);
                 }
             };
-
             drawCtrl.prototype.computeCoordinates = function () {
                 if (!this.draw) {
                     return;
@@ -1805,17 +1799,14 @@ var jat;
                 var size = this.drawLib.getSize(draw);
                 this.width = size.width * this.boxWidth - this.interBoxWidth;
                 this.height = size.height * this.boxHeight;
-
                 draw._points = this.drawLib.computePositions(draw); //TODO to be moved into drawLib when draw changes
                 this._refresh = new Date(); //to refresh lines
-
                 if (!this.isKnockout) {
                     //for roundrobin, fill the list of rows/columns for the view
                     var n = draw.nbColumn;
                     this.rows = new Array(n);
                     for (var r = 0; r < n; r++) {
                         var cols = new Array(n + 1);
-
                         var b = (n + 1) * n - r - 1;
                         for (var c = 0; c <= n; c++) {
                             cols[c] = b;
@@ -1825,25 +1816,21 @@ var jat;
                     }
                 }
             };
-
             drawCtrl.prototype.drawLines = function (canvas) {
                 canvas.attr('width', this.width).attr('height', this.height);
                 var draw = this.draw;
                 if (!draw || !draw.boxes || !draw.boxes.length || 2 <= draw.type) {
                     return;
                 }
-
                 //draw the lines...
                 var _canvas = canvas[0];
                 var ctx = useVML ? new vmlContext(canvas, this.width, this.height) : _canvas.getContext('2d');
                 ctx.lineWidth = .5;
                 ctx.translate(.5, .5);
                 var boxHeight2 = this.boxHeight >> 1;
-
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var box = draw.boxes[i];
                     var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
-
                     if (this.isMatch(box)) {
                         var opponent = positionOpponents(box.position);
                         var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
@@ -1862,7 +1849,6 @@ var jat;
                     ctx.done(); //VML
                 }
             };
-
             drawCtrl.prototype.getBox = function (position) {
                 if (this.draw && this.draw.boxes) {
                     return this.find.by(this.draw.boxes, 'position', position);
@@ -1897,7 +1883,6 @@ var jat;
             drawCtrl.prototype.findPlayer = function (playerId) {
                 return this.draw && playerId && !!this.find.by(this.draw.boxes, 'playerId', playerId);
             };
-
             drawCtrl.prototype.setPlayer = function (box, player, qualifIn) {
                 var _this = this;
                 var prevPlayer = box._player;
@@ -1905,11 +1890,12 @@ var jat;
                 this.undo.action(function (bUndo) {
                     if (prevQualif || qualifIn) {
                         _this.drawLib.SetQualifieEntrant(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
-                    } else {
+                    }
+                    else {
                         box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
                         _this.drawLib.initBox(box, box._draw);
                     }
-                    _this.selection.select(box, 6 /* Box */);
+                    _this.selection.select(box, models.ModelType.Box);
                 }, player ? 'Set player' : 'Erase player');
             };
             drawCtrl.prototype.swapPlayer = function (box) {
@@ -1922,26 +1908,25 @@ var jat;
                     return true;
                 }, match);
             };
-
             drawCtrl.prototype.isMatch = function (box) {
                 return box && ('score' in box);
             };
             drawCtrl.$inject = [
                 'drawLib',
+                //'knockout',
+                //'roundrobin',
                 'tournamentLib',
                 'find',
                 'undo',
                 'selection'];
             return drawCtrl;
         })();
-
         function positionOpponents(pos) {
             return {
                 pos1: (pos << 1) + 2,
                 pos2: (pos << 1) + 1
             };
         }
-
         function drawDirective() {
             return {
                 restrict: 'EA',
@@ -1958,18 +1943,14 @@ var jat;
                         ctrlDraw.interBoxWidth = scope.$eval(attrs.interBoxWidth) || 10;
                         ctrlDraw.interBoxHeight = scope.$eval(attrs.interBoxHeight) || 10;
                         ctrlDraw.simple = scope.$eval(attrs.simple);
-
                         ctrlDraw.init();
                         ctrlDraw.computeCoordinates();
-
                         //IE8 patch
                         if (ctrlDraw.isKnockout && useVML) {
                             ctrlDraw.drawLines(element);
                         }
                     };
-
                     scope.$watch(attrs.draw, doRefresh);
-
                     scope.$watch(attrs.draw + '._refresh', function (refesh, oldRefresh) {
                         if (refesh !== oldRefresh) {
                             doRefresh(ctrlDraw.draw);
@@ -1978,7 +1959,6 @@ var jat;
                 }
             };
         }
-
         //IE8 patch to use VML instead of canvas
         var useVML = !window.HTMLCanvasElement;
         var vmlContext;
@@ -1986,18 +1966,19 @@ var jat;
             if (!useVML) {
                 return;
             }
-
             // create xmlns and stylesheet
-            document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
-            document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
-
+            //document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
+            //document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
             //emulate canvas context using VML
             vmlContext = function (element, width, height) {
-                this._element = element;
                 this._width = width;
                 this._height = height;
                 this.beginPath();
+                this._element = element;
                 this._element.find('shape').remove();
+                //this._element = element.find('shape');
+                //this._element.css({ width: this._width + 'px', height: this._height + 'px' });
+                debugger;
             };
             vmlContext.prototype = {
                 _path: [], _tx: 0, _ty: 0,
@@ -2017,15 +1998,24 @@ var jat;
                     this._path.push('l', (this._tx + x), ',', (this._ty + y));
                 },
                 stroke: function () {
-                    this._path.push('e');
+                    //this._path.push('e');
                 },
                 done: function () {
-                    var shape = angular.element('<v:shape' + ' coordsize="' + this._width + ' ' + this._height + '"' + ' style="position:absolute; left:0px; top:0px; width:' + this._width + 'px; height:' + this._height + 'px;"' + ' filled="0" stroked="1" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"' + ' path="' + this._path.join('') + '" />');
+                    var shape = angular.element('<v:shape'
+                        + ' coordsize="' + this._width + ' ' + this._height + '"'
+                        + ' style="position:absolute; left:0px; top:0px; width:' + this._width + 'px; height:' + this._height + 'px;"'
+                        + ' filled="0" stroked="1" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"'
+                        + ' path="' + this._path.join('') + '" />');
                     this._element.append(shape);
+                    //this._element.attr('coordsize', this._width + ' ' + this._height)
+                    //    .attr('filled', 0)
+                    //    .attr('stroked', 1)
+                    //    .attr('strokecolor', this.strokeStyle)
+                    //    .attr('strokeweight', this.lineWidth + 'px')
+                    //    .attr('path', this._path.join(''));
                 }
             };
         }
-
         function drawLinesDirective() {
             return {
                 restrict: 'A',
@@ -2038,7 +2028,6 @@ var jat;
                 }
             };
         }
-
         angular.module('jat.draw.list', [
             'jat.services.drawLib',
             'jat.services.knockout',
@@ -2046,15 +2035,17 @@ var jat;
             'jat.services.tournamentLib',
             'jat.services.find',
             'jat.services.undo',
-            'jat.services.selection']).directive('draw', drawDirective).directive('drawLines', drawLinesDirective).run(initVml);
-    })(jat.draw || (jat.draw = {}));
-    var draw = jat.draw;
+            'jat.services.selection'])
+            .directive('draw', drawDirective)
+            .directive('drawLines', drawLinesDirective)
+            .run(initVml);
+    })(draw = jat.draw || (jat.draw = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=drawDraw.js.map
 'use strict';
 var jat;
 (function (jat) {
-    (function (_event) {
+    var event;
+    (function (event_1) {
         var dialogEventCtrl = (function () {
             function dialogEventCtrl(selection, title, event, tournamentLib, rank, category) {
                 this.selection = selection;
@@ -2063,7 +2054,6 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.ranks = rank.list();
                 this.categories = category.list();
-
                 this.registred = tournamentLib.getRegistred(event);
             }
             dialogEventCtrl.$inject = [
@@ -2076,12 +2066,10 @@ var jat;
             ];
             return dialogEventCtrl;
         })();
-
-        angular.module('jat.event.dialog', []).controller('dialogEventCtrl', dialogEventCtrl);
-    })(jat.event || (jat.event = {}));
-    var event = jat.event;
+        angular.module('jat.event.dialog', [])
+            .controller('dialogEventCtrl', dialogEventCtrl);
+    })(event = jat.event || (jat.event = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogEvent.js.map
 /// <reference path="../../lib/typescript/angular/angular.d.ts" />
 /// <reference path="../../lib/declarations.d.ts" />
 /// <reference path="../../services/selection.ts" />
@@ -2114,6 +2102,7 @@ angular.module('jat.views.dialogs.eventDialog', []).directive('event', function 
 'use strict';
 var jat;
 (function (jat) {
+    var event;
     (function (event) {
         function listEventsDirective() {
             var dir = {
@@ -2130,21 +2119,20 @@ var jat;
             };
             return dir;
         }
-
         var listEventsCtrl = (function () {
             function listEventsCtrl() {
             }
             return listEventsCtrl;
         })();
-
-        angular.module('jat.event.list', []).directive('listEvents', listEventsDirective).controller('listEventsCtrl', listEventsCtrl);
-    })(jat.event || (jat.event = {}));
-    var event = jat.event;
+        angular.module('jat.event.list', [])
+            .directive('listEvents', listEventsDirective)
+            .controller('listEventsCtrl', listEventsCtrl);
+    })(event = jat.event || (jat.event = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=listEvents.js.map
 'use strict';
 var jat;
 (function (jat) {
+    var main;
     (function (main) {
         /** Main controller for the application */
         var mainCtrl = (function () {
@@ -2163,16 +2151,13 @@ var jat;
                 this.ModelType = models.ModelType;
                 this.Mode = models.Mode;
                 this.selection.tournament = this.tournamentLib.newTournament();
-
                 var filename = '/data/tournament8.json';
-
                 //var filename = '/data/to2006.json';
                 //Load saved tournament if exists
                 //this.mainLib.loadTournament().then((data) => {
                 //}, (reason) => {
                 this.mainLib.loadTournament(filename).then(function (data) {
                 });
-
                 //});
                 //Auto save tournament on exit
                 var onBeforeUnloadHandler = function (event) {
@@ -2180,7 +2165,8 @@ var jat;
                 };
                 if ($window.addEventListener) {
                     $window.addEventListener('beforeunload', onBeforeUnloadHandler);
-                } else {
+                }
+                else {
                     $window.onbeforeunload = onBeforeUnloadHandler;
                 }
             }
@@ -2200,17 +2186,12 @@ var jat;
             mainCtrl.prototype.editTournament = function (tournament) {
                 var _this = this;
                 var editedInfo = this.tournamentLib.newInfo(this.selection.tournament.info);
-
                 this.$modal.open({
                     templateUrl: 'tournament/dialogInfo.html',
                     controller: 'dialogInfoCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "Edit info";
-                        },
-                        info: function () {
-                            return editedInfo;
-                        }
+                        title: function () { return "Edit info"; },
+                        info: function () { return editedInfo; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
@@ -2220,41 +2201,29 @@ var jat;
                     }
                 });
             };
-
             //#endregion tournament
             mainCtrl.prototype.select = function (item, type) {
                 var _this = this;
                 if (item && type) {
                     //first unselect any item to close the actions dropdown
                     this.selection.select(undefined, type);
-
                     //then select the new box
-                    this.$timeout(function () {
-                        return _this.selection.select(item, type);
-                    }, 0);
+                    this.$timeout(function () { return _this.selection.select(item, type); }, 0);
                     return;
                 }
                 this.selection.select(item, type);
             };
-
             //#region player
             mainCtrl.prototype.addPlayer = function () {
                 var _this = this;
                 var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament);
-
                 this.$modal.open({
                     templateUrl: 'player/dialogPlayer.html',
                     controller: 'dialogPlayerCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "New player";
-                        },
-                        player: function () {
-                            return newPlayer;
-                        },
-                        events: function () {
-                            return _this.selection.tournament.events;
-                        }
+                        title: function () { return "New player"; },
+                        player: function () { return newPlayer; },
+                        events: function () { return _this.selection.tournament.events; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
@@ -2262,29 +2231,22 @@ var jat;
                     }
                 });
             };
-
             mainCtrl.prototype.editPlayer = function (player) {
                 var _this = this;
                 var editedPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);
-
                 this.$modal.open({
                     templateUrl: 'player/dialogPlayer.html',
                     controller: 'dialogPlayerCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "Edit player";
-                        },
-                        player: function () {
-                            return editedPlayer;
-                        },
-                        events: function () {
-                            return _this.selection.tournament.events;
-                        }
+                        title: function () { return "Edit player"; },
+                        player: function () { return editedPlayer; },
+                        events: function () { return _this.selection.tournament.events; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
                         _this.mainLib.editPlayer(editedPlayer, player);
-                    } else if ('Del' === result) {
+                    }
+                    else if ('Del' === result) {
                         _this.mainLib.removePlayer(player);
                     }
                 });
@@ -2292,23 +2254,17 @@ var jat;
             mainCtrl.prototype.removePlayer = function (player) {
                 this.mainLib.removePlayer(player);
             };
-
             //#endregion player
             //#region event
             mainCtrl.prototype.addEvent = function (after) {
                 var _this = this;
                 var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
-
                 this.$modal.open({
                     templateUrl: 'event/dialogEvent.html',
                     controller: 'dialogEventCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "New event";
-                        },
-                        event: function () {
-                            return newEvent;
-                        }
+                        title: function () { return "New event"; },
+                        event: function () { return newEvent; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
@@ -2316,104 +2272,84 @@ var jat;
                     }
                 });
             };
-
             mainCtrl.prototype.editEvent = function (event) {
                 var _this = this;
                 var editedEvent = this.tournamentLib.newEvent(this.selection.tournament, event);
-
                 this.$modal.open({
                     templateUrl: 'event/dialogEvent.html',
                     controller: 'dialogEventCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "Edit event";
-                        },
-                        event: function () {
-                            return editedEvent;
-                        }
+                        title: function () { return "Edit event"; },
+                        event: function () { return editedEvent; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
                         _this.mainLib.editEvent(editedEvent, event);
-                    } else if ('Del' === result) {
+                    }
+                    else if ('Del' === result) {
                         _this.mainLib.removeEvent(event);
                     }
                 });
             };
-
             mainCtrl.prototype.removeEvent = function (event) {
                 this.mainLib.removeEvent(event);
             };
-
             //#endregion event
             //#region draw
             mainCtrl.prototype.addDraw = function (after) {
                 var _this = this;
                 var newDraw = this.drawLib.newDraw(this.selection.event, undefined, after);
-
                 this.$modal.open({
                     templateUrl: 'draw/dialogDraw.html',
                     controller: 'dialogDrawCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "New draw";
-                        },
-                        draw: function () {
-                            return newDraw;
-                        }
+                        title: function () { return "New draw"; },
+                        draw: function () { return newDraw; }
                     }
                 }).result.then(function (result) {
                     //TODO add event after selected draw
                     if ('Ok' === result) {
                         _this.mainLib.addDraw(newDraw, 0, after);
-                    } else if ('Generate' === result) {
+                    }
+                    else if ('Generate' === result) {
                         _this.mainLib.addDraw(newDraw, 1, after);
                     }
                 });
             };
-
             mainCtrl.prototype.editDraw = function (draw) {
                 var _this = this;
                 var editedDraw = this.drawLib.newDraw(draw._event, draw);
-
                 this.$modal.open({
                     templateUrl: 'draw/dialogDraw.html',
                     controller: 'dialogDrawCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "Edit draw";
-                        },
-                        draw: function () {
-                            return editedDraw;
-                        }
+                        title: function () { return "Edit draw"; },
+                        draw: function () { return editedDraw; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
                         _this.mainLib.updateDraw(editedDraw, draw);
-                    } else if ('Generate' === result) {
+                    }
+                    else if ('Generate' === result) {
                         _this.mainLib.updateDraw(editedDraw, draw, 1);
-                    } else if ('Del' === result) {
+                    }
+                    else if ('Del' === result) {
                         _this.mainLib.removeDraw(draw);
                     }
                 });
             };
-
             mainCtrl.prototype.validateDraw = function (draw) {
                 this.mainLib.validateDraw(draw);
             };
-
             mainCtrl.prototype.generateDraw = function (draw, generate) {
-                this.mainLib.updateDraw(draw, undefined, generate || 1 /* Create */);
+                this.mainLib.updateDraw(draw, undefined, generate || models.GenerateType.Create);
             };
-
             mainCtrl.prototype.updateQualif = function (draw) {
                 this.mainLib.updateQualif(draw);
             };
-
             mainCtrl.prototype.removeDraw = function (draw) {
                 this.mainLib.removeDraw(draw);
             };
-
             //#endregion draw
             //#region match
             mainCtrl.prototype.isMatch = function (box) {
@@ -2422,17 +2358,12 @@ var jat;
             mainCtrl.prototype.editMatch = function (match) {
                 var _this = this;
                 var editedMatch = this.drawLib.newBox(match._draw, match);
-
                 this.$modal.open({
                     templateUrl: 'draw/dialogMatch.html',
                     controller: 'dialogMatchCtrl as dlg',
                     resolve: {
-                        title: function () {
-                            return "Edit match";
-                        },
-                        match: function () {
-                            return editedMatch;
-                        }
+                        title: function () { return "Edit match"; },
+                        match: function () { return editedMatch; }
                     }
                 }).result.then(function (result) {
                     if ('Ok' === result) {
@@ -2440,7 +2371,6 @@ var jat;
                     }
                 });
             };
-
             //#endregion match
             mainCtrl.prototype.doUndo = function () {
                 this.selection.select(this.undo.undo(), this.undo.getMeta());
@@ -2457,12 +2387,11 @@ var jat;
                 'validation',
                 'undo',
                 '$window',
-                '$timeout'
+                '$timeout',
             ];
             return mainCtrl;
         })();
         main.mainCtrl = mainCtrl;
-
         angular.module('jat.main', [
             'jat.services.mainLib',
             'jat.services.selection',
@@ -2486,55 +2415,16 @@ var jat;
             'jat.match.dialog',
             'ec.panels',
             'ec.inputFile',
-            'ui.bootstrap']).controller('mainCtrl', mainCtrl);
-    })(jat.main || (jat.main = {}));
-    var main = jat.main;
+            //'polyfill',
+            'ui.bootstrap'])
+            .controller('mainCtrl', mainCtrl);
+    })(main = jat.main || (jat.main = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=main.js.map
-'use strict';
-var models;
-(function (models) {
-    (function (DrawType) {
-        DrawType[DrawType["Normal"] = 0] = "Normal";
-        DrawType[DrawType["Final"] = 1] = "Final";
-        DrawType[DrawType["PouleSimple"] = 2] = "PouleSimple";
-        DrawType[DrawType["PouleAR"] = 3] = "PouleAR";
-    })(models.DrawType || (models.DrawType = {}));
-    var DrawType = models.DrawType;
-
-    (function (GenerateType) {
-        GenerateType[GenerateType["None"] = 0] = "None";
-        GenerateType[GenerateType["Create"] = 1] = "Create";
-        GenerateType[GenerateType["PlusEchelonne"] = 2] = "PlusEchelonne";
-        GenerateType[GenerateType["PlusEnLigne"] = 3] = "PlusEnLigne";
-        GenerateType[GenerateType["Mix"] = 4] = "Mix";
-    })(models.GenerateType || (models.GenerateType = {}));
-    var GenerateType = models.GenerateType;
-
-    (function (ModelType) {
-        ModelType[ModelType["None"] = 0] = "None";
-        ModelType[ModelType["Tournament"] = 1] = "Tournament";
-        ModelType[ModelType["Player"] = 2] = "Player";
-        ModelType[ModelType["Event"] = 3] = "Event";
-        ModelType[ModelType["Draw"] = 4] = "Draw";
-        ModelType[ModelType["Match"] = 5] = "Match";
-        ModelType[ModelType["Box"] = 6] = "Box";
-    })(models.ModelType || (models.ModelType = {}));
-    var ModelType = models.ModelType;
-
-    (function (Mode) {
-        Mode[Mode["Build"] = 0] = "Build";
-        Mode[Mode["Plan"] = 1] = "Plan";
-        Mode[Mode["Play"] = 2] = "Play";
-        Mode[Mode["Lock"] = 3] = "Lock";
-    })(models.Mode || (models.Mode = {}));
-    var Mode = models.Mode;
-})(models || (models = {}));
-//# sourceMappingURL=model.js.map
 'use strict';
 var jat;
 (function (jat) {
-    (function (_player) {
+    var player;
+    (function (player_1) {
         var dialogPlayerCtrl = (function () {
             function dialogPlayerCtrl(title, player, events, rank, category) {
                 this.title = title;
@@ -2552,16 +2442,15 @@ var jat;
             ];
             return dialogPlayerCtrl;
         })();
-        _player.dialogPlayerCtrl = dialogPlayerCtrl;
-
-        angular.module('jat.player.dialog', ['jat.utils.checkList']).controller('dialogPlayerCtrl', dialogPlayerCtrl);
-    })(jat.player || (jat.player = {}));
-    var player = jat.player;
+        player_1.dialogPlayerCtrl = dialogPlayerCtrl;
+        angular.module('jat.player.dialog', ['jat.utils.checkList'])
+            .controller('dialogPlayerCtrl', dialogPlayerCtrl);
+    })(player = jat.player || (jat.player = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogPlayer.js.map
 'use strict';
 var jat;
 (function (jat) {
+    var player;
     (function (player) {
         function listPlayersDirective() {
             var dir = {
@@ -2578,7 +2467,6 @@ var jat;
             };
             return dir;
         }
-
         var listPlayersCtrl = (function () {
             function listPlayersCtrl(selection, find) {
                 this.selection = selection;
@@ -2590,26 +2478,23 @@ var jat;
                     return this.find.byId(this.selection.tournament.events, id);
                 }
             };
-
             listPlayersCtrl.$inject = [
                 'selection',
                 'find'
             ];
             return listPlayersCtrl;
         })();
-
-        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find']).directive('listPlayers', listPlayersDirective).controller('listPlayersCtrl', listPlayersCtrl);
-    })(jat.player || (jat.player = {}));
-    var player = jat.player;
+        angular.module('jat.player.list', ['jat.services.selection', 'jat.services.find'])
+            .directive('listPlayers', listPlayersDirective)
+            .controller('listPlayersCtrl', listPlayersCtrl);
+    })(player = jat.player || (jat.player = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=listPlayers.js.map
 ;
-
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MAX_TETESERIE = 32, MAX_QUALIF = 32, QEMPTY = -1;
-
         var DrawLib = (function () {
             function DrawLib(find, rank, guid) {
                 this.find = find;
@@ -2624,14 +2509,12 @@ var jat;
                 }
                 draw.id = draw.id || this.guid.create('d');
                 delete draw.$$hashKey; //remove angular id
-
                 //default values
-                draw.type = draw.type || 0 /* Normal */;
+                draw.type = draw.type || models.DrawType.Normal;
                 draw.nbColumn = draw.nbColumn || 3;
                 draw.nbOut = draw.nbOut || 1;
                 if (after) {
                     draw._previous = after;
-                    //TODO? after._next = draw;
                 }
                 if (!draw.minRank) {
                     draw.minRank = after && after.maxRank ? this.rank.next(after.maxRank) : 'NC';
@@ -2639,18 +2522,14 @@ var jat;
                 if (draw.maxRank && this.rank.compare(draw.minRank, draw.maxRank) > 0) {
                     draw.maxRank = draw.minRank;
                 }
-
                 draw._event = parent;
                 return draw;
             };
-
             DrawLib.prototype.initDraw = function (draw, parent) {
                 draw._event = parent;
-
                 draw.type = draw.type || 0;
                 draw.nbColumn = draw.nbColumn || 0;
                 draw.nbOut = draw.nbOut || 0;
-
                 //init boxes
                 if (!draw.boxes) {
                     return;
@@ -2660,7 +2539,6 @@ var jat;
                     this.initBox(box, draw);
                 }
             };
-
             DrawLib.prototype.resetDraw = function (draw, nPlayer) {
                 //remove qualif out
                 var next = this.nextGroup(draw);
@@ -2677,19 +2555,16 @@ var jat;
                         }
                     }
                 }
-
                 //reset boxes
                 draw.boxes = [];
                 draw.nbColumn = this._drawLibs[draw.type].nbColumnForPlayers(draw, nPlayer);
             };
-
             DrawLib.prototype.newBox = function (parent, source, position) {
                 var box = {};
                 if (angular.isObject(source)) {
                     angular.extend(box, source);
-                    //box.id = undefined;
-                    //box.position= undefined;
-                } else if (angular.isString(source)) {
+                }
+                else if (angular.isString(source)) {
                     var match = box;
                     match.score = undefined;
                     match.matchFormat = source;
@@ -2700,12 +2575,10 @@ var jat;
                 this.initBox(box, parent);
                 return box;
             };
-
             DrawLib.prototype.initBox = function (box, parent) {
                 box._draw = parent;
                 box._player = this.getPlayer(box);
             };
-
             DrawLib.prototype.nbColumnForPlayers = function (draw, nJoueur) {
                 return this._drawLibs[draw.type].nbColumnForPlayers(draw, nJoueur);
             };
@@ -2718,15 +2591,12 @@ var jat;
             DrawLib.prototype.resize = function (draw, oldDraw, nJoueur) {
                 this._drawLibs[draw.type].resize(draw, oldDraw, nJoueur);
             };
-
             DrawLib.prototype.generateDraw = function (draw, generate, afterIndex) {
                 return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
             };
-
             DrawLib.prototype.refresh = function (draw) {
                 draw._refresh = new Date(); //force angular refresh
             };
-
             DrawLib.prototype.updateQualif = function (draw) {
                 //retreive qualifIn box
                 var qualifs = [];
@@ -2736,22 +2606,19 @@ var jat;
                         qualifs.push(boxIn);
                     }
                 }
-
                 tool.shuffle(qualifs);
-
+                //remove old qualif numbers
                 for (i = qualifs.length - 1; i >= 0; i--) {
                     this.SetQualifieEntrant(qualifs[i], 0);
                 }
-
+                //assign new qualif number
                 for (i = qualifs.length - 1; i >= 0; i--) {
                     this.SetQualifieEntrant(qualifs[i], i + 1);
                 }
             };
-
             DrawLib.prototype.getPlayer = function (box) {
                 return this.find.byId(box._draw._event._tournament.players, box.playerId);
             };
-
             DrawLib.prototype.groupBegin = function (draw) {
                 //return the first Draw of the suite
                 var p = draw;
@@ -2762,7 +2629,6 @@ var jat;
                 }
                 return p;
             };
-
             DrawLib.prototype.groupEnd = function (draw) {
                 //return the last Draw of the suite
                 var p = this.groupBegin(draw);
@@ -2770,7 +2636,6 @@ var jat;
                     p = p._next;
                 return p;
             };
-
             //** return the group of draw of the given draw (mainly for group of round robin). */
             DrawLib.prototype.group = function (draw) {
                 var draws = [];
@@ -2784,19 +2649,16 @@ var jat;
                 }
                 return draws;
             };
-
             //** return the draws of the previous group. */
             DrawLib.prototype.previousGroup = function (draw) {
                 var p = this.groupBegin(draw);
                 return p && p._previous ? this.group(p._previous) : null;
             };
-
             //** return the draws of the next group. */
             DrawLib.prototype.nextGroup = function (draw) {
                 var p = this.groupEnd(draw);
                 return p && p._next ? this.group(p._next) : null;
             };
-
             //public setType(BYTE iType) {
             //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
             //    if ((m_iType & TABLEAU_POULE ? 1 : 0) != (iType & TABLEAU_POULE ? 1 : 0)) {
@@ -2813,7 +2675,6 @@ var jat;
             DrawLib.prototype.isCreneau = function (box) {
                 return box && ('score' in box) && ((box.place) || box.date);
             };
-
             DrawLib.prototype.FindTeteSerie = function (origin, iTeteSerie) {
                 ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
@@ -2828,7 +2689,6 @@ var jat;
                 }
                 return null;
             };
-
             DrawLib.prototype.FindQualifieEntrant = function (origin, iQualifie) {
                 ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
@@ -2840,7 +2700,6 @@ var jat;
                     }
                 }
             };
-
             DrawLib.prototype.FindQualifieSortant = function (origin, iQualifie) {
                 ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
@@ -2851,7 +2710,6 @@ var jat;
                         return boxOut;
                     }
                 }
-
                 //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
                 var outCount = 0;
                 for (var i = 0; i < group.length; i++) {
@@ -2861,11 +2719,10 @@ var jat;
                     }
                 }
                 if (iQualifie <= outCount) {
-                    return -2;
+                    return -2; //TODO
                 }
                 return null;
             };
-
             DrawLib.prototype.FindAllQualifieSortant = function (origin, hideNumbers) {
                 //Récupère les qualifiés sortants du tableau
                 var group = angular.isArray(origin) ? origin : this.group(origin);
@@ -2879,7 +2736,6 @@ var jat;
                     return a;
                 }
             };
-
             DrawLib.prototype.FindAllQualifieSortantBox = function (origin) {
                 //Récupère les qualifiés sortants du tableau
                 var group = angular.isArray(origin) ? origin : this.group(origin);
@@ -2893,29 +2749,25 @@ var jat;
                     return a;
                 }
             };
-
             /**
-            * Fill or erase a box with qualified in and/or player
-            * setPlayerIn
-            *
-            * @param box
-            * @param inNumber (optional)
-            * @param player   (optional)
-            */
+              * Fill or erase a box with qualified in and/or player
+              * setPlayerIn
+              *
+              * @param box
+              * @param inNumber (optional)
+              * @param player   (optional)
+              */
             DrawLib.prototype.SetQualifieEntrant = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
                 return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);
             };
-
             DrawLib.prototype.SetQualifieSortant = function (box, outNumber) {
                 // iQualifie=0 => enlève qualifié
                 return this._drawLibs[box._draw.type].SetQualifieSortant(box, outNumber);
             };
-
             DrawLib.prototype.CalculeScore = function (draw) {
                 return this._drawLibs[draw.type].CalculeScore(draw);
             };
-
             //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
             DrawLib.prototype.MetJoueur = function (box, player, bForce) {
                 //ASSERT(MetJoueurOk(box, iJoueur, bForce));
@@ -2924,34 +2776,31 @@ var jat;
                         throw 'Error';
                     }
                 }
-
                 var boxIn = box;
                 var match = isMatch(box) ? box : undefined;
                 box.playerId = player.id;
                 box._player = player;
-
                 //boxIn.order = 0;
                 //match.score = '';
                 if (isGauchePoule(box)) {
-                    //TODO boxIn.rank = 0;   //classement de la poule
-                } else if (match) {
+                }
+                else if (match) {
                     match.date = undefined;
                     match.place = undefined;
                 }
-
                 var boxOut = box;
                 if (boxOut.qualifOut) {
                     var next = this.nextGroup(box._draw);
                     if (next) {
                         var boxIn = this.FindQualifieEntrant(next, boxOut.qualifOut);
                         if (boxIn) {
-                            if (!boxIn.playerId && !this.MetJoueur(boxIn, player, true)) {
+                            if (!boxIn.playerId
+                                && !this.MetJoueur(boxIn, player, true)) {
                                 throw 'Error';
                             }
                         }
                     }
                 }
-
                 ////Lock les adversaires (+ tableau précédent si qualifié entrant)
                 //if( isMatchJoue( box))	//if( isMatchJouable( box))
                 //{
@@ -2981,8 +2830,8 @@ var jat;
                 //    CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
                 //    //TODO Poule, Lock
                 //} else
-                //if( iBoiteMin() <= IAUTRE( box)
-                // && iBoiteMin() <= IMATCH( box)
+                //if( iBoiteMin() <= IAUTRE( box) 
+                // && iBoiteMin() <= IMATCH( box) 
                 // && boxes[ IAUTRE( box)]->isJoueur()
                 // && boxes[ IMATCH( box)]->isJoueur()) {
                 //    LockBoite( box);
@@ -2990,7 +2839,6 @@ var jat;
                 //}
                 return true;
             };
-
             //Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la boite
             DrawLib.prototype.SetResultat = function (box, boite) {
                 //ASSERT(SetResultatOk(box, boite));
@@ -3007,38 +2855,29 @@ var jat;
                     if (!this.MetJoueur(box, boite._player)) {
                         throw 'Error';
                     }
-                } else if (!this.EnleveJoueur(box)) {
+                }
+                else if (!this.EnleveJoueur(box)) {
                     throw 'Error';
                 }
-
                 box.score = boite.score;
-
                 this.CalculeScore(box._draw);
-
                 return true;
             };
-
             //Planification d'un match : met le court, la date et l'heure
             DrawLib.prototype.MetCreneau = function (box, boite) {
                 ASSERT(isMatch(box));
-
                 //ASSERT(MetCreneauOk(box, boite));
                 box.place = boite.place;
                 box.date = boite.date;
-
                 return true;
             };
-
             DrawLib.prototype.EnleveCreneau = function (box) {
                 ASSERT(isMatch(box));
-
                 //ASSERT(EnleveCreneauOk(box));
                 box.place = undefined;
                 box.date = undefined;
-
                 return true;
             };
-
             DrawLib.prototype.MetPointage = function (box, boite) {
                 //ASSERT(MetPointageOk(box, boite));
                 //TODO
@@ -3047,14 +2886,12 @@ var jat;
                 //box.setRecoit(box, boite.isRecoit(box));
                 return true;
             };
-
             //Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
             DrawLib.prototype.EnleveJoueur = function (box, bForce) {
                 var match = box;
                 if (!match.playerId && !match.score) {
                     return true;
                 }
-
                 //ASSERT(EnleveJoueurOk(box, bForce));
                 var next = this.nextGroup(box._draw);
                 var boxOut = box;
@@ -3067,99 +2904,89 @@ var jat;
                         }
                     }
                 }
-
                 box.playerId = box._player = undefined;
                 if (isMatch(box)) {
                     match.score = '';
                 }
-
                 var boxIn = box;
-
                 //delete boxIn.order;
                 /*
-                //Delock les adversaires
-                if( isTypePoule()) {
-                if( isMatch( box)) {
-                //Si pas d'autre matches dans la ligne, ni dans la colonne
-                BOOL bMatch = false;
+                    //Delock les adversaires
+                    if( isTypePoule()) {
+                        if( isMatch( box)) {
+                            //Si pas d'autre matches dans la ligne, ni dans la colonne
+                            BOOL bMatch = false;
+    
+                            //matches de la ligne
+                            for( i=ADVERSAIRE1( box) - GetnColonne();
+                                i>= iBoiteMin() && !bMatch;
+                                i -= GetnColonne())
+                            {
+                                if( i != box && boxes[ i]->isLock()) {
+                                    bMatch = true;
+                                    break;
+                                }
+                            }
+                            //matches de la colonne
+                            for( i=iHautCol( iRowPoule( ADVERSAIRE1( box), GetnColonne()));
+                                i>= iBasColQ( iRowPoule( ADVERSAIRE1( box), GetnColonne())) && !bMatch;
+                                i --)
+                            {
+                                if( i != box && boxes[ i]->isLock()) {
+                                    bMatch = true;
+                                    break;
+                                }
+                            }
+                            if( !bMatch)
+                                DelockBoite( ADVERSAIRE1(box));
+    
+                            bMatch = false;
+                            //matches de la ligne
+                            for( i=ADVERSAIRE2( box) - GetnColonne();
+                                i>= iBoiteMin() && !bMatch;
+                                i -= GetnColonne())
+                            {
+                                if( i != box && boxes[ i]->isLock()) {
+                                    bMatch = true;
+                                    break;
+                                }
+                            }
+                            //matches de la colonne
+                            for( i=iHautCol( iRowPoule( ADVERSAIRE2( box), GetnColonne()));
+                                i>= iBasColQ( iRowPoule( ADVERSAIRE2( box), GetnColonne())) && !bMatch;
+                                i --)
+                            {
+                                if( i != box && boxes[ i]->isLock()) {
+                                    bMatch = true;
+                                    break;
+                                }
+                            }
+                            if( !bMatch)
+                                DelockBoite( ADVERSAIRE2(box));
                 
-                //matches de la ligne
-                for( i=ADVERSAIRE1( box) - GetnColonne();
-                i>= iBoiteMin() && !bMatch;
-                i -= GetnColonne())
-                {
-                if( i != box && boxes[ i]->isLock()) {
-                bMatch = true;
-                break;
-                }
-                }
-                //matches de la colonne
-                for( i=iHautCol( iRowPoule( ADVERSAIRE1( box), GetnColonne()));
-                i>= iBasColQ( iRowPoule( ADVERSAIRE1( box), GetnColonne())) && !bMatch;
-                i --)
-                {
-                if( i != box && boxes[ i]->isLock()) {
-                bMatch = true;
-                break;
-                }
-                }
-                if( !bMatch)
-                DelockBoite( ADVERSAIRE1(box));
-                
-                bMatch = false;
-                //matches de la ligne
-                for( i=ADVERSAIRE2( box) - GetnColonne();
-                i>= iBoiteMin() && !bMatch;
-                i -= GetnColonne())
-                {
-                if( i != box && boxes[ i]->isLock()) {
-                bMatch = true;
-                break;
-                }
-                }
-                //matches de la colonne
-                for( i=iHautCol( iRowPoule( ADVERSAIRE2( box), GetnColonne()));
-                i>= iBasColQ( iRowPoule( ADVERSAIRE2( box), GetnColonne())) && !bMatch;
-                i --)
-                {
-                if( i != box && boxes[ i]->isLock()) {
-                bMatch = true;
-                break;
-                }
-                }
-                if( !bMatch)
-                DelockBoite( ADVERSAIRE2(box));
-                
-                }
-                
-                this.CalculeScore(box._draw);
-                //TODO Poule, Unlock
-                } else
-                if(  ADVERSAIRE1(box) <= iBoiteMax()) {
-                DelockBoite( ADVERSAIRE1(box));
-                DelockBoite( ADVERSAIRE2(box));
-                }
+                        }
+    
+                        this.CalculeScore(box._draw);
+                        //TODO Poule, Unlock
+                    } else
+                    if(  ADVERSAIRE1(box) <= iBoiteMax()) {
+                        DelockBoite( ADVERSAIRE1(box));
+                        DelockBoite( ADVERSAIRE2(box));
+                    }
                 */
                 return true;
             };
-
             //Avec report sur le tableau suivant
             DrawLib.prototype.LockBoite = function (box) {
                 ASSERT(!!box);
-
                 if (iDiagonale(box) === box.position) {
-                    ///TODO box = ADVERSAIRE1(box);
                 }
-
                 ASSERT(!!box);
-
                 //ASSERT(box.isJoueur());
                 if (box.hidden) {
                     return true;
                 }
-
                 box.locked = true;
-
                 var prev = this.previousGroup(box._draw);
                 if (prev) {
                     var boxIn = box;
@@ -3170,18 +2997,14 @@ var jat;
                         }
                     }
                 }
-
                 return true;
             };
-
             //Avec report sur le tableau précédent
             DrawLib.prototype.DelockBoite = function (box) {
                 if (box.hidden) {
                     return true;
                 }
-
                 delete box.locked;
-
                 var prev = this.previousGroup(box._draw);
                 if (prev) {
                     var boxIn = box;
@@ -3192,10 +3015,8 @@ var jat;
                         }
                     }
                 }
-
                 return true;
             };
-
             //Rempli une boite proprement
             DrawLib.prototype.RempliBoite = function (box, boite) {
                 //ASSERT(RempliBoiteOk(box, boite));
@@ -3203,34 +3024,33 @@ var jat;
                 var boiteIn = boite;
                 var match = isMatch(box) ? box : undefined;
                 var boiteMatch = isMatch(boite) ? boite : undefined;
-
-                if (boxIn.qualifIn && boxIn.qualifIn != boiteIn.qualifIn) {
+                if (boxIn.qualifIn
+                    && boxIn.qualifIn != boiteIn.qualifIn) {
                     if (!this.SetQualifieEntrant(box)) {
                         throw 'Error';
                     }
-                } else {
+                }
+                else {
                     //Vide la boite écrasée
                     if (!this.EnleveJoueur(box)) {
                         throw 'Error';
                     }
-
                     delete boxIn.qualifIn;
                     delete boxIn.seeded;
                     delete match.qualifOut;
-
                     if (this.isCreneau(match)) {
                         if (!this.EnleveCreneau(match)) {
                             throw 'Error';
                         }
                     }
                 }
-
                 //Rempli avec les nouvelles valeurs
                 if (boiteIn.qualifIn) {
                     if (!this.SetQualifieEntrant(box, boiteIn.qualifIn, boite._player)) {
                         throw 'Error';
                     }
-                } else {
+                }
+                else {
                     if (boite.playerId) {
                         if (!this.MetJoueur(box, boite._player)) {
                             throw 'Error';
@@ -3239,71 +3059,57 @@ var jat;
                             match.score = boiteMatch.score;
                         }
                     }
-
                     if (!isTypePoule(box._draw) && boiteIn.seeded) {
                         boxIn.seeded = boiteIn.seeded;
                     }
-
                     if (match) {
                         if (boiteMatch.qualifOut) {
                             if (!this.SetQualifieSortant(match, boiteMatch.qualifOut)) {
                                 throw 'Error';
                             }
                         }
-
                         //if( isCreneau( box))
                         //v0998
                         var opponents = this.boxesOpponents(match);
-                        if (opponents.box1 && opponents.box2 && (boiteMatch.place || boiteMatch.date)) {
+                        if (opponents.box1 && opponents.box2
+                            && (boiteMatch.place || boiteMatch.date)) {
                             if (!this.MetCreneau(match, boiteMatch)) {
                                 throw 'Error';
                             }
                         }
-
                         if (!this.MetPointage(box, boite)) {
                             throw 'Error';
                         }
                         match.matchFormat = boiteMatch.matchFormat;
-
                         match.note = match.note;
                     }
                 }
-
                 this.CalculeScore(box._draw);
-
                 return true;
             };
-
             DrawLib.prototype.DeplaceJoueur = function (box, boiteSrc, pBoite) {
                 //ASSERT(DeplaceJoueurOk(box, iBoiteSrc, pBoite));
                 boiteSrc = this.newBox(box._draw, boiteSrc);
-
                 if (!this.RempliBoite(boiteSrc, pBoite)) {
                     throw 'Error';
                 }
-
                 if (!this.RempliBoite(box, boiteSrc)) {
                     throw 'Error';
                 }
-
                 return true;
             };
-
             DrawLib.prototype.boxesOpponents = function (match) {
                 return this._drawLibs[match._draw.type].boxesOpponents(match);
             };
             return DrawLib;
         })();
         service.DrawLib = DrawLib;
-
         function isMatch(box) {
             return box && ('score' in box);
         }
-
         function isTypePoule(draw) {
-            return draw.type === 2 /* PouleSimple */ || draw.type === 3 /* PouleAR */;
+            return draw.type === models.DrawType.PouleSimple || draw.type === models.DrawType.PouleAR;
         }
-
         function iDiagonale(box) {
             var draw = box._draw;
             return isTypePoule(box._draw) ? (box.position % draw.nbColumn) * (draw.nbColumn + 1) : box.position;
@@ -3311,12 +3117,12 @@ var jat;
         function isGauchePoule(box) {
             return isTypePoule(box._draw) ? (box.position >= (box._draw.nbColumn * box._draw.nbColumn)) : false;
         }
-
         function ADVERSAIRE1(box) {
             if (isTypePoule(box._draw)) {
                 var n = box._draw.nbColumn;
                 return box.position % n + n * n;
-            } else {
+            }
+            else {
                 return (box.position << 1) + 2;
             }
         }
@@ -3325,32 +3131,31 @@ var jat;
             if (isTypePoule(box._draw)) {
                 var n = box._draw.nbColumn;
                 return Math.floor(box.position / n) + n * n;
-            } else {
+            }
+            else {
                 return (box.position << 1) + 1;
             }
         }
         ;
-
         function ASSERT(b, message) {
             if (!b) {
                 debugger;
                 throw message || 'Assertion is false';
             }
         }
-
-        angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid']).factory('drawLib', [
+        angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid'])
+            .factory('drawLib', [
             'find', 'rank', 'guid',
             function (find, rank, guid) {
                 return new DrawLib(find, rank, guid);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=drawLib.js.map
 'use strict';
+// FFT type services
 var jat;
 (function (jat) {
-    // FFT type services
+    var service;
     (function (service) {
         var Rank = (function () {
             function Rank() {
@@ -3381,44 +3186,36 @@ var jat;
             Rank.prototype.list = function () {
                 return this._ranks;
             };
-
             Rank.prototype.isValid = function (rank) {
                 return this._index[rank] >= 0;
             };
-
             Rank.prototype.isNC = function (rank) {
                 return rank === "NC";
             };
-
             Rank.prototype.next = function (rank) {
                 var i = this._index[rank];
                 return this._ranks[i + 1];
             };
-
             Rank.prototype.previous = function (rank) {
                 var i = this._index[rank];
                 return this._ranks[i - 1];
             };
-
             Rank.prototype.compare = function (rank1, rank2) {
                 var i = this._index[rank1], j = this._index[rank2];
                 return i - j;
             };
-
             Rank.prototype.within = function (rank, rank1, rank2) {
-                return (!rank1 || this.compare(rank1, rank) <= 0) && (!rank2 || this.compare(rank, rank2) <= 0);
+                return (!rank1 || this.compare(rank1, rank) <= 0)
+                    && (!rank2 || this.compare(rank, rank2) <= 0);
             };
-
             Rank.prototype.groups = function () {
                 return this._groups;
             };
-
             Rank.prototype.groupOf = function (rank) {
                 return this._groupOf[rank];
             };
             return Rank;
         })();
-
         //===========================================
         var Category = (function () {
             function Category() {
@@ -3449,9 +3246,8 @@ var jat;
                 this._categories = [];
                 this._index = {};
                 var now = new Date();
-                var refDate = new Date(now.getFullYear(), 9, 1);
+                var refDate = new Date(now.getFullYear(), 9, 1); //1er Octobre
                 this.currentYear = now.getFullYear() + (now > refDate ? 1 : 0);
-
                 for (var c in this._category) {
                     this._categories.push(c);
                 }
@@ -3462,81 +3258,71 @@ var jat;
             Category.prototype.list = function () {
                 return this._categories;
             };
-
             Category.prototype.isValid = function (category) {
                 return this._index[category] >= 0;
             };
-
             Category.prototype.compare = function (category1, category2) {
                 var i = this._index[category1], j = this._index[category2];
                 return i - j;
             };
-
             Category.prototype.getAge = function (date) {
                 //var age = (new Date(refDate - date)).getFullYear() - _beginOfTime.getFullYear() -1;
                 var age = this.currentYear - date.getFullYear();
                 return age;
             };
-
             Category.prototype.ofDate = function (date) {
                 var age = this.getAge(date), i, prev;
                 for (i in this._category) {
                     var categ = this._category[i];
-
                     if (categ.ageMax && categ.ageMax < age) {
-                        continue;
+                        continue; //too old
                     }
                     if (categ.ageMin) {
                         if (categ.ageMin <= age) {
                             prev = i;
                             continue;
-                        } else {
+                        }
+                        else {
                             return prev;
                         }
                     }
                     return i;
                 }
             };
-
             Category.prototype.isCompatible = function (eventCategory, playerCategory) {
                 if (playerCategory || !eventCategory) {
                     return true;
                 }
-
                 //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.
                 var idxSenior = this._index['Senior'];
                 var idxEvent = this._index[eventCategory];
-
                 //Epreuve senior
                 if (idxEvent === idxSenior) {
                     return true;
                 }
-
                 var catEvent = this._category[eventCategory];
                 var catPlayer = this._category[playerCategory];
-
                 if (idxEvent < idxSenior) {
                     //Epreuve jeunes
                     if (catPlayer.ageMax <= catEvent.ageMax) {
                         return true;
                     }
-                } else {
+                }
+                else {
                     //Epreuve vétérans
                     if (catEvent.ageMin <= catPlayer.ageMin) {
                         return true;
                     }
                 }
-
                 return false;
                 //TODO? 2006/08/28	AgeMin() < playerCategory.AgeMin()	//vétéran
                 //	return playerCategory.isVide() || isVide()
-                //		(playerCategory.AgeMin() <= AgeMax()
+                //		(playerCategory.AgeMin() <= AgeMax() 
                 //		&& AgeMin() <= playerCategory.AgeMax() );
             };
             return Category;
         })();
         service.Category = Category;
-
         //===========================================
         var MatchFormat = (function () {
             function MatchFormat() {
@@ -3557,49 +3343,41 @@ var jat;
             };
             return MatchFormat;
         })();
-
         //===========================================
         var Score = (function () {
             function Score() {
             }
             Score.prototype.isValid = function (score) {
                 var a = Score.reScore.exec(score + " ");
-
                 if (a === null) {
                     return false;
                 }
-
                 //check score
                 var sets = score.split(/\s+/);
                 var nSet1 = 0, nSet2 = 0;
                 for (var i = 0; i < sets.length; i++) {
                     var games = sets[i].split("/");
-
                     var j1 = parseInt(games[0]);
                     var j2 = parseInt(games[1]);
-
                     if (j1 > j2 && j1 >= 6) {
                         if (j1 >= 7 && j2 < 5) {
                             return false;
                         }
                         nSet1++;
-                    } else if (j2 > j1 && j2 >= 6) {
+                    }
+                    else if (j2 > j1 && j2 >= 6) {
                         if (j2 >= 7 && j1 < 5) {
                             return false;
                         }
                         nSet2++;
                     }
-                    //TODO check score
                 }
-
                 return true;
             };
             Score.reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
             return Score;
         })();
-
         var MAX_SET = 5;
-
         var ScoreFFT = (function () {
             function ScoreFFT(score, fm) {
                 //TODO parse
@@ -3612,15 +3390,13 @@ var jat;
                 }
                 return i - 1;
             };
-
-            ScoreFFT.prototype.deltaSet = function (bVainqueur /*, BOOL bEquipe */ ) {
+            ScoreFFT.prototype.deltaSet = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                     n += (this.m_Jeu[i].j1 > this.m_Jeu[i].j2) ? 1 : this.m_Jeu[i].j1 < this.m_Jeu[i].j2 ? -1 : 0;
                 }
                 var dSet;
-
                 //        if (isWO())
                 //            return bVainqueur ? 3 : -3;	//dSet2
                 //        if (isAbandon()) {
@@ -3683,17 +3459,13 @@ var jat;
                 //        }
                 return dSet;
             };
-
-            ScoreFFT.prototype.deltaJeu = function (bVainqueur /*, BOOL bEquipe */ ) {
+            ScoreFFT.prototype.deltaJeu = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
-
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
                 }
-
                 var dJeu;
-
                 //    if (isWO())
                 //        return bVainqueur ? 5 : -5;
                 //    if (isAbandon()) {
@@ -3756,17 +3528,13 @@ var jat;
                 //    }
                 return dJeu;
             };
-
-            ScoreFFT.prototype.deltaPoint = function (bVainqueur /*, BOOL bEquipe */ ) {
+            ScoreFFT.prototype.deltaPoint = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
-
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
                     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
                 }
-
                 var dSet, dJeu;
-
                 //    if (isWO())
                 //        return bVainqueur ? 2 : 0;
                 //    else
@@ -3784,29 +3552,24 @@ var jat;
             };
             return ScoreFFT;
         })();
-
         //===========================================
         var Licence = (function () {
             function Licence() {
             }
             Licence.prototype.isValid = function (licence) {
                 var a = Licence.reLicence.exec(licence + " ");
-
                 if (a === null) {
                     return false;
                 }
-
                 //check licence key
                 var v = parseInt(a[1]);
                 var k = Licence.keys.charAt(v % 23);
-
                 return k == a[2];
             };
             Licence.reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;
             Licence.keys = "ABCDEFGHJKLMNPRSTUVWXYZ";
             return Licence;
         })();
-
         //===========================================
         var Ranking = (function () {
             function Ranking(score) {
@@ -3830,54 +3593,48 @@ var jat;
             Ranking.prototype.Empty = function () {
                 this.Points = 0;
             };
-
             Ranking.prototype.isVide = function () {
                 return this.Points === 0;
             };
-
             Ranking.prototype.NomChamp = function (iChamp) {
                 return this._champs[iChamp];
             };
-
             Ranking.prototype.ValeurChamp = function (iChamp) {
                 switch (iChamp) {
-                    case 0:
-                        return this.dPoint.toString();
-                    case 1:
-                        return Math.floor(this.dSet2 / 2).toString();
-                    case 2:
-                        return this.dJeu.toString();
+                    case 0: return this.dPoint.toString();
+                    case 1: return Math.floor(this.dSet2 / 2).toString();
+                    case 2: return this.dJeu.toString();
                 }
             };
-
             Ranking.prototype.AddResultat = function (bVictoire, score, fm) {
                 //bVictoire: -1=défaite, 0=nul, 1=victoire
                 var sc = new ScoreFFT(score, fm);
-
                 //Compte la différence de Set
                 this.dPoint += sc.deltaPoint(bVictoire > 0); //TODO bEquipe ???
                 this.dSet2 += sc.deltaSet(bVictoire > 0); //TODO bEquipe ???
                 this.dJeu += sc.deltaJeu(bVictoire > 0); //TODO bEquipe ???
-
                 return true;
             };
-
             Ranking.prototype.Ordre = function () {
                 return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
             };
             return Ranking;
         })();
-
         //===========================================
-        angular.module('jat.services.type', []).service('rank', Rank).service('category', Category).service('matchFormat', MatchFormat).service('score', Score).service('licence', Licence).service('ranking', ['score', Ranking]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.type', [])
+            .service('rank', Rank)
+            .service('category', Category)
+            .service('matchFormat', MatchFormat)
+            .service('score', Score)
+            .service('licence', Licence)
+            .service('ranking', ['score', Ranking]);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=fft.js.map
 'use strict';
+// FFT validation services
 var jat;
 (function (jat) {
-    // FFT validation services
+    var service;
     (function (service) {
         var FFTValidation = (function () {
             function FFTValidation(validation, drawLib, knockout, find) {
@@ -3889,7 +3646,6 @@ var jat;
             }
             FFTValidation.prototype.validatePlayer = function (player) {
                 var bRes = true;
-
                 //if (player.sexe == 'F'
                 //    && player.rank
                 //    && !player.rank.Division()
@@ -3900,85 +3656,52 @@ var jat;
                 //}
                 return bRes;
             };
-
             FFTValidation.prototype.validateDraw = function (draw) {
                 var bRes = true;
-
                 var isTypePoule = draw.type >= 2;
-
                 var pColClast = {};
-
                 var nqe = 0;
-
+                //TODOjs
                 for (var i = 0; i < draw.boxes.length; i++) {
                     var box = draw.boxes[i];
                     var boxIn = !isMatch(box) ? box : undefined;
                     var match = isMatch(box) ? box : undefined;
-
                     var player = box._player;
-
                     //VERIFIE //1   //progression des classements
                     //rank progress, no more than two ranks difference into a column
                     if (player && !isTypePoule) {
                         var c = column(box.position);
-
                         var colRank = pColClast[player.rank];
                         if (!colRank) {
                             pColClast[player.rank] = c;
-                        } else if (Math.abs(colRank - c) > 1) {
+                        }
+                        else if (Math.abs(colRank - c) > 1) {
                             this.validation.errorDraw('IDS_ERR_CLAST_PROGR2', draw, box, player.rank);
                             bRes = false;
                         }
                     }
-
                     if (isTypePoule) {
-                        //DONE 01/08/19 (00/12/20): Dans Poule, date des matches différentes pour un même joueur
-                        ////TODOjs
-                        ////VERIFIE //2
-                        ////matches précédents de la colonne
-                        //for (var j = iHautCol(iColPoule(i, m_nColonne)); j > i; j--) {
-                        //    if (isMatch(j) && !boxes[j].m_Date.isVide()
-                        //        && boxes[i].m_Date == boxes[j].m_Date) {
-                        //        this.validation.errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i)].m_iJoueur, iEpreuve, iTableau, i);
-                        //        bRes = false;
-                        //        break;
-                        //    }
-                        //}
-                        //if (j <= i) {
-                        //    //matches précédents de la ligne
-                        //    for (var j = ADVERSAIRE1(i) - GetnColonne(); j > i; j -= GetnColonne()) {
-                        //        if (isMatch(j) && !boxes[j].m_Date.isVide()
-                        //            && boxes[i].m_Date == boxes[j].m_Date) {
-                        //            this.validation.errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i)].m_iJoueur, iEpreuve, iTableau, i);
-                        //            bRes = false;
-                        //            break;
-                        //        }
-                        //    }
-                        //}
                     }
-
                     //VERIFIE	//3
                     //DONE 00/03/04: CTableau, Deux qualifiés entrants se rencontrent
                     if (!isTypePoule && match) {
                         var opponent = this.knockout.boxesOpponents(match);
-                        if (opponent.box1.qualifIn && opponent.box2.qualifIn) {
+                        if (opponent.box1.qualifIn
+                            && opponent.box2.qualifIn) {
                             this.validation.errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1);
                             bRes = false;
                         }
                     }
-
                     //VERIFIE	//4
                     if (boxIn && boxIn.qualifIn) {
                         nqe++;
                     }
-
                     if (isTypePoule && nqe > 1) {
                         this.validation.errorDraw('IDS_ERR_POULE_ENTRANT_OVR', draw, box);
                         bRes = false;
                     }
                 }
-
-                if (draw.type === 1 /* Final */) {
+                if (draw.type === models.DrawType.Final) {
                     //VERIFIE	//5
                     var boxT = this.drawLib.FindTeteSerie(draw, 1);
                     if (!boxT) {
@@ -3987,7 +3710,6 @@ var jat;
                         bRes = false;
                     }
                 }
-
                 //******************SAME old code using lpfn******************
                 //ST_EPREUVE epreuve;
                 //ST_TABLEAU tableau;
@@ -4188,32 +3910,30 @@ var jat;
             return FFTValidation;
         })();
         service.FFTValidation = FFTValidation;
-
         function isMatch(box) {
             return 'score' in box;
         }
-
         function column(pos) {
             //TODO, use a table
             var col = -1;
-            for (pos++; pos; pos >>= 1, col++) {
-            }
+            for (pos++; pos; pos >>= 1, col++) { }
             return col;
         }
-
         function columnMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? nCol - 1 : column(nQ - 2) + nCol;
+            return !nQ || nQ === 1
+                ? nCol - 1
+                : column(nQ - 2) + nCol;
         }
-
         function positionTopCol(col) {
             return (1 << (col + 1)) - 2;
         }
-
         function positionMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? (1 << nCol) - 2 : positionTopCol(columnMax(nCol, nQ));
+            return !nQ || nQ === 1
+                ? (1 << nCol) - 2 //iHautCol
+                : positionTopCol(columnMax(nCol, nQ));
         }
-
-        angular.module('jat.services.validation.fft', ['jat.services.validation']).factory('fftValidation', [
+        angular.module('jat.services.validation.fft', ['jat.services.validation'])
+            .factory('fftValidation', [
             'validation',
             'drawLib',
             'knockout',
@@ -4221,14 +3941,13 @@ var jat;
             function (validation, drawLib, knockout, find) {
                 return new FFTValidation(validation, drawLib, knockout, find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=fftValidation.js.map
 'use strict';
+// Find service
 var jat;
 (function (jat) {
-    // Find service
+    var service;
     (function (service) {
         var Find = (function () {
             function Find() {
@@ -4245,29 +3964,25 @@ var jat;
                 }
                 array["_FindBy" + member] = idx;
             };
-
             /**
-            * Returns the index of an object in the array. Or -1 if not found.
-            */
+              * Returns the index of an object in the array. Or -1 if not found.
+              */
             Find.prototype.indexOf = function (array, member, value, error) {
                 var i, a;
-
                 if (null == value) {
                     return null;
                 }
-
                 var idxName = "_FindBy" + member;
                 if (!(idxName in array)) {
                     Find._reindex(array, member);
                 }
-
                 var idx = array[idxName];
-
                 if (!(value in idx) || idx._length !== array.length) {
                     Find._reindex(array, member);
                     a = array[idxName];
                     i = a[value];
-                } else {
+                }
+                else {
                     i = idx[value];
                     a = array[i];
                     if (a[member] !== value) {
@@ -4276,22 +3991,18 @@ var jat;
                         i = a[value];
                     }
                 }
-
                 if (error && i === undefined) {
                     throw error;
                 }
-
                 return i !== undefined ? i : -1;
             };
-
             /**
-            * Returns an object in the array by member. Or undefined if not found.
-            */
+              * Returns an object in the array by member. Or undefined if not found.
+              */
             Find.prototype.by = function (array, member, value, error) {
                 var i = this.indexOf(array, member, value, error);
                 return array[i];
             };
-
             Find.prototype.byId = function (array, value, error) {
                 var i = this.indexOf(array, "id", value, error);
                 return array[i];
@@ -4299,15 +4010,14 @@ var jat;
             return Find;
         })();
         service.Find = Find;
-
-        angular.module('jat.services.find', []).service('find', Find);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.find', [])
+            .service('find', Find);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=find.js.map
 'use strict';
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var Guid = (function () {
             function Guid() {
@@ -4319,33 +4029,31 @@ var jat;
             return Guid;
         })();
         service.Guid = Guid;
-
-        angular.module('jat.services.guid', []).service('guid', Guid);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.guid', [])
+            .service('guid', Guid);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=guid.js.map
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MIN_COL = 0, MAX_COL = 9, MAX_QUALIF = 32, QEMPTY = -1, WITH_TDS_HAUTBAS = true;
-
         /**
-        
+    
         ---14---
-        >-- 6---.
+                >-- 6---.
         ---13---	    |
-        >-- 2---.
+                        >-- 2---.
         ---12---    	|   	|
-        >-- 5---'	    |
+                >-- 5---'	    |
         ---11---		        |
-        >-- 0---
+                                >-- 0---
         ---10---		        |
-        >-- 4---.	    |
+                >-- 4---.	    |
         --- 9---	    |   	|
-        >-- 1---'
+                        >-- 1---'
         --- 8---	    |
-        >-- 3---'
+                >-- 3---'
         --- 7---
         */
         var Knockout = (function () {
@@ -4354,7 +4062,9 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.rank = rank;
                 this.find = find;
-                drawLib._drawLibs[0 /* Normal */] = drawLib._drawLibs[1 /* Final */] = this;
+                drawLib._drawLibs[models.DrawType.Normal]
+                    = drawLib._drawLibs[models.DrawType.Final]
+                        = this;
             }
             Knockout.prototype.findBox = function (draw, position, create) {
                 var box = this.find.by(draw.boxes, 'position', position);
@@ -4363,26 +4073,19 @@ var jat;
                 }
                 return box;
             };
-
             Knockout.prototype.nbColumnForPlayers = function (draw, nJoueur) {
                 var colMin = columnMin(draw.nbOut);
-
                 for (var c = colMin + 1; countInCol(c, draw.nbOut) < nJoueur && c < MAX_COL; c++) {
                 }
-
                 if (MAX_COL <= c) {
                     throw 'Max_COL is reached ' + c;
                 }
-
                 return c - colMin + 1;
             };
-
             Knockout.prototype.resize = function (draw, oldDraw, nJoueur) {
                 if (nJoueur) {
                     draw.nbColumn = this.nbColumnForPlayers(draw, nJoueur);
-                    //draw.nbEntry = countInCol(iColMax(draw), draw.nbOut);
                 }
-
                 //Shift the boxes
                 if (oldDraw && draw.nbOut !== oldDraw.nbOut) {
                     var n = columnMax(draw.nbColumn, draw.nbOut) - columnMax(oldDraw.nbColumn, oldDraw.nbOut);
@@ -4395,68 +4098,57 @@ var jat;
                     }
                 }
             };
-
             Knockout.prototype.generateDraw = function (draw, generate, afterIndex) {
-                if (generate === 1 /* Create */) {
+                if (generate === models.GenerateType.Create) {
                     var m_nMatchCol = tool.filledArray(MAX_COL, 0);
-
                     var players = this.tournamentLib.GetJoueursInscrit(draw);
-
                     //Récupère les qualifiés sortants du tableau précédent
-                    var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous;
+                    var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = this.drawLib.previousGroup(draw);
                     if (prev) {
                         players = players.concat(this.drawLib.FindAllQualifieSortant(prev, true));
                     }
-
                     this.drawLib.resetDraw(draw, players.length);
                     this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
-                } else {
+                }
+                else {
                     m_nMatchCol = this.CompteMatchs(draw);
-                    if (generate === 2 /* PlusEchelonne */) {
+                    if (generate === models.GenerateType.PlusEchelonne) {
                         if (!this.TirageEchelonne(draw, m_nMatchCol)) {
                             return;
                         }
-                    } else if (generate === 3 /* PlusEnLigne */) {
+                    }
+                    else if (generate === models.GenerateType.PlusEnLigne) {
                         if (!this.TirageEnLigne(draw, m_nMatchCol)) {
                             return;
                         }
                     }
                     players = this.GetJoueursTableau(draw);
                 }
-
                 //Tri et Mélange les joueurs de même classement
                 this.tournamentLib.TriJoueurs(players);
-
                 draw = this.ConstruitMatch(draw, m_nMatchCol, players);
                 return [draw];
             };
-
             Knockout.prototype.RempliMatchs = function (draw, m_nMatchCol, nMatchRestant, colGauche) {
                 var colMin = columnMin(draw.nbOut);
-
                 colGauche = colGauche || colMin;
-
                 for (var i = colGauche; i <= MAX_COL; i++) {
                     m_nMatchCol[i] = 0;
                 }
-
+                //Rempli les autres matches de gauche normalement
                 for (var c = Math.max(colGauche, colMin); nMatchRestant && c < MAX_COL; c++) {
                     var iMax = Math.min(nMatchRestant, countInCol(c, draw.nbOut));
                     if (colMin < c) {
                         iMax = Math.min(iMax, 2 * m_nMatchCol[c - 1]);
                     }
-
                     m_nMatchCol[c] = iMax;
                     nMatchRestant -= iMax;
                 }
             };
-
             //Init m_nMatchCol à partir du tableau existant
             Knockout.prototype.CompteMatchs = function (draw) {
                 var b, c2, n, bColSansMatch;
-
                 var m_nMatchCol = new Array(MAX_COL);
-
                 //Compte le nombre de joueurs entrants ou qualifié de la colonne
                 var colMin = columnMin(draw.nbOut);
                 var c = colMin;
@@ -4472,20 +4164,17 @@ var jat;
                             n++;
                         }
                     }
-
                     //En déduit le nombre de matches de la colonne
                     m_nMatchCol[c] = 2 * m_nMatchCol[c - 1] - n;
-
                     nMatchRestant += n - m_nMatchCol[c];
                     if (!n) {
                         c2 = c;
                     }
-
                     if (!m_nMatchCol[c]) {
                         break;
                     }
                 }
-
+                //Contrôle si il n'y a pas d'autres joueurs plus à gauche
                 for (c++; c <= colMax; c++) {
                     n = 0;
                     var bottom = positionBottomCol(c), top = positionTopCol(c);
@@ -4495,8 +4184,7 @@ var jat;
                             n++;
                         }
                     }
-
-                    //TODO 00/04/13: CTableau, CompteMatch à refaire pour cas tordus
+                    //TODO 00/04/13: CTableau, CompteMatch à refaire pour cas tordus		
                     //-------.
                     //       |---A---.
                     //-------'       |
@@ -4505,14 +4193,12 @@ var jat;
                     //       |---B---'
                     //---D---'
                     nMatchRestant += n;
-
                     //Ajoute un match par joueur trouvé
                     if (n) {
                         this.RempliMatchs(draw, m_nMatchCol, n, c2);
                         break;
                     }
                 }
-
                 //Compte tous les joueurs entrant ou qualifiés
                 c = colMin;
                 nMatchRestant = -m_nMatchCol[c];
@@ -4527,32 +4213,28 @@ var jat;
                     }
                     nMatchRestant += n;
                 }
-
                 for (c = colMin; c <= colMax; c++) {
                     if (m_nMatchCol[c] > nMatchRestant) {
                         this.RempliMatchs(draw, m_nMatchCol, nMatchRestant, c);
                         break;
                     }
-
                     nMatchRestant -= m_nMatchCol[c];
                 }
-
                 //Contrôle si il n'y a pas une colonne sans match
                 bColSansMatch = false;
                 for (nMatchRestant = 0, c = colMin; c < colMax; c++) {
                     nMatchRestant += m_nMatchCol[c];
-
                     if (m_nMatchCol[c]) {
                         if (bColSansMatch) {
                             //Refait la répartition tout à droite
                             this.RempliMatchs(draw, m_nMatchCol, nMatchRestant, c + 1);
                             break;
                         }
-                    } else {
+                    }
+                    else {
                         bColSansMatch = true;
                     }
                 }
-
                 ////TODO Contrôle qu'il n'y a pas trop de match pour les joueurs
                 //bColSansMatch = false;
                 //for( nMatchRestant = 0, c = iColMin( draw); c< colMax; c++) {
@@ -4562,18 +4244,17 @@ var jat;
                 //        if( bColSansMatch) {
                 //            //Refait la répartition tout à droite
                 //            this.RempliMatchs(draw, nMatchRestant, c+1);
-                //            break;
+                //            break; 
                 //        }
                 //    } else
                 //        bColSansMatch = true;
-                //}
+                //}	
                 return m_nMatchCol;
             };
-
             Knockout.prototype.TirageEchelonne = function (draw, m_nMatchCol) {
                 var colMin = columnMin(draw.nbOut);
                 var colMax = columnMax(draw.nbColumn, draw.nbOut);
-
+                //Enlève le premier match possible en partant de la gauche
                 for (var c = MAX_COL - 1; c > colMin; c--) {
                     if (undefined === m_nMatchCol[c]) {
                         continue;
@@ -4582,22 +4263,17 @@ var jat;
                         if ((m_nMatchCol[c + 1] + 1) > 2 * (m_nMatchCol[c] - 1)) {
                             continue;
                         }
-
                         m_nMatchCol[c]--;
-
                         //Remet le match plus à droite
                         c++;
                         m_nMatchCol[c]++;
-
                         return true;
                     }
                 }
                 return false;
             };
-
             Knockout.prototype.TirageEnLigne = function (draw, m_nMatchCol) {
                 var colMin = columnMin(draw.nbOut);
-
                 //Cherche où est-ce qu'on peut ajouter un match en partant de la gauche
                 var nMatchRestant = 0;
                 for (var c = MAX_COL - 1; c > colMin; c--) {
@@ -4612,17 +4288,14 @@ var jat;
                         //Ajoute le match en question
                         m_nMatchCol[c]++;
                         nMatchRestant--;
-
                         //Reset les autres matches de gauche
                         this.RempliMatchs(draw, m_nMatchCol, nMatchRestant, c + 1);
                         return true;
                     }
-
                     nMatchRestant += m_nMatchCol[c];
                 }
                 return false;
             };
-
             Knockout.prototype.GetJoueursTableau = function (draw) {
                 //Récupère les joueurs du tableau
                 var ppJoueur = [];
@@ -4631,25 +4304,21 @@ var jat;
                     if (!boxIn) {
                         continue;
                     }
-
                     //Récupérer les joueurs et les Qualifiés entrants
                     if (boxIn.qualifIn) {
                         ppJoueur.push(boxIn.qualifIn); //no qualifie entrant
-                    } else if (this.isJoueurNouveau(boxIn)) {
+                    }
+                    else if (this.isJoueurNouveau(boxIn)) {
                         ppJoueur.push(boxIn._player); //no du joueur
                     }
                 }
-
                 return ppJoueur;
             };
-
             //Place les matches dans l'ordre
             Knockout.prototype.ConstruitMatch = function (oldDraw, m_nMatchCol, players) {
                 var draw = this.drawLib.newDraw(oldDraw._event, oldDraw);
                 draw.boxes = [];
-
                 var colMin = columnMin(draw.nbOut), colMax = columnMax(draw.nbColumn, draw.nbOut);
-
                 //Calcule OrdreInv
                 var pOrdreInv = [];
                 for (var c = colMin; c <= colMax; c++) {
@@ -4657,21 +4326,19 @@ var jat;
                     for (var i = bottom; i <= top; i++) {
                         if (WITH_TDS_HAUTBAS) {
                             pOrdreInv[iOrdreQhb(i, draw.nbOut)] = i;
-                        } else {
+                        }
+                        else {
                             pOrdreInv[iOrdreQ(i, draw.nbOut)] = i;
                         }
                     }
                 }
-
                 //Nombre de Tête de série
                 var nTeteSerie = draw.nbOut;
                 if (nTeteSerie == 1) {
                     nTeteSerie = countInCol((colMax - colMin) >> 1);
                 }
-
                 var max = positionMax(draw.nbColumn, draw.nbOut);
                 var pbMatch = new Array(max + 1);
-
                 var iJoueur = 0, m = 0, nj = 0;
                 c = -1;
                 for (var o = 0; o <= max; o++) {
@@ -4681,38 +4348,33 @@ var jat;
                     }
                     if (column(b) != c) {
                         c = column(b);
-
                         m = m_nMatchCol[c] || 0;
                         nj = c > colMin ? 2 * m_nMatchCol[c - 1] - m : 0;
                     }
-
                     //fou les joueurs
                     var posMatch = positionMatch(b);
                     if (nj > 0) {
                         if (pbMatch[posMatch]) {
                             iJoueur++;
                             nj--;
-
                             var box = this.drawLib.newBox(draw, draw._event.matchFormat, b);
                             draw.boxes.push(box);
                         }
-                    } else {
+                    }
+                    else {
                         //fou les matches
                         if (m > 0 && (c === colMin || pbMatch[posMatch])) {
                             pbMatch[b] = true;
                             m--;
-
                             var match = this.drawLib.newBox(draw, draw._event.matchFormat, b);
                             match.score = '';
                             draw.boxes.push(match);
                         }
                     }
-
                     if (iJoueur >= players.length) {
                         break;
                     }
                 }
-
                 //fou les joueurs en commençant par les qualifiés entrants
                 iJoueur = 0; //players.length - 1;
                 for (; o > 0; o--) {
@@ -4720,7 +4382,6 @@ var jat;
                     if (b === -1) {
                         continue;
                     }
-
                     //fou les joueurs
                     if (!pbMatch[b] && pbMatch[positionMatch(b)]) {
                         //Qualifiés entrants se rencontrent
@@ -4728,6 +4389,7 @@ var jat;
                         if (qualif) {
                             var boxIn2 = this.findBox(draw, positionOpponent(b));
                             if (boxIn2 && boxIn2.qualifIn) {
+                                //2 Qualifiés entrants se rencontrent
                                 for (var t = iJoueur + 1; t >= nTeteSerie; t--) {
                                     if (angular.isObject(players[t])) {
                                         //switch
@@ -4740,20 +4402,21 @@ var jat;
                                 }
                             }
                         }
-
                         var boxIn = this.findBox(draw, b);
                         if (boxIn) {
                             delete boxIn.score; //not a match
                             if (qualif) {
                                 this.drawLib.SetQualifieEntrant(boxIn, qualif);
-                            } else {
+                            }
+                            else {
                                 this.drawLib.MetJoueur(boxIn, players[iJoueur]);
-
-                                if ((!draw.minRank || !this.rank.isNC(draw.minRank)) || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
+                                if ((!draw.minRank || !this.rank.isNC(draw.minRank))
+                                    || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
                                     //Mets les têtes de série (sauf tableau NC)
                                     if (WITH_TDS_HAUTBAS) {
                                         t = iTeteSerieQhb(b, draw.nbOut);
-                                    } else {
+                                    }
+                                    else {
                                         t = iTeteSerieQ(b, draw.nbOut);
                                     }
                                     if (t <= nTeteSerie && !this.drawLib.FindTeteSerie(draw, t)) {
@@ -4764,16 +4427,14 @@ var jat;
                             iJoueur++;
                         }
                     }
-
                     if (iJoueur > players.length) {
                         break;
                     }
                 }
-
                 //	for( b=positionBottomCol(columnMin(draw.nbOut)); b<=positionMax(draw.nbColumn, draw.nbOut); b++)
                 //		draw.boxes[ b].setLockMatch( false);
                 //Mets les qualifiés sortants
-                if (draw.type !== 1 /* Final */) {
+                if (draw.type !== models.DrawType.Final) {
                     //Find the first unused qualif number
                     var group = this.drawLib.group(draw);
                     if (group) {
@@ -4782,10 +4443,10 @@ var jat;
                                 break;
                             }
                         }
-                    } else {
+                    }
+                    else {
                         i = 1;
                     }
-
                     bottom = positionBottomCol(colMin);
                     top = positionTopCol(colMin);
                     for (var b = top; b >= bottom && i <= MAX_QUALIF; b--, i++) {
@@ -4795,10 +4456,8 @@ var jat;
                         }
                     }
                 }
-
                 return draw;
             };
-
             Knockout.prototype.boxesOpponents = function (match) {
                 var pos1 = positionOpponent1(match.position), pos2 = positionOpponent2(match.position);
                 return {
@@ -4806,62 +4465,56 @@ var jat;
                     box2: this.find.by(match._draw.boxes, 'position', pos2)
                 };
             };
-
             Knockout.prototype.getSize = function (draw) {
                 if (!draw || !draw.nbColumn || !draw.nbOut) {
-                    return { width: 1, height: 1 };
+                    return { width: 1, height: 1 }; //{ width: dimensions.boxWidth, height: dimensions.boxHeight };
                 }
-
                 return {
                     width: draw.nbColumn,
                     height: countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut)
                 };
             };
-
             Knockout.prototype.computePositions = function (draw) {
                 if (!draw || !draw.nbColumn || !draw.nbOut || !draw.boxes || !draw.boxes.length) {
                     return;
                 }
-
                 var positions = [];
-
                 //var heights = <number[]> [];  //TODO variable height
                 var minPos = positionMin(draw.nbOut), maxPos = positionMax(draw.nbColumn, draw.nbOut), c0 = draw.nbColumn - 1 + columnMin(draw.nbOut);
                 for (var pos = maxPos; pos >= minPos; pos--) {
                     var col = column(pos), topPos = positionTopCol(col), c = c0 - col, g = positionTopCol(c - 1) + 2;
-
                     positions[pos] = {
                         x: c,
                         y: (topPos - pos) * g + g / 2 - 0.5
                     };
-
                     var box = this.find.by(draw.boxes, 'position', pos);
                     if (box) {
                         box._x = positions[pos].x;
                         box._y = positions[pos].y;
                     }
                 }
-
                 return positions;
             };
-
             Knockout.prototype.CalculeScore = function (draw) {
                 return true;
             };
-
             Knockout.prototype.isJoueurNouveau = function (box) {
                 if (!box) {
                     return false;
                 }
                 var boxIn = box;
                 var opponents = this.boxesOpponents(box);
-                return box.playerId && (!!boxIn.qualifIn || !((opponents.box1 && opponents.box1.playerId) || (opponents.box2 && opponents.box2.playerId)));
+                return box.playerId
+                    &&
+                        (!!boxIn.qualifIn
+                            ||
+                                !((opponents.box1 && opponents.box1.playerId)
+                                    ||
+                                        (opponents.box2 && opponents.box2.playerId)));
             };
-
             Knockout.prototype.SetQualifieEntrant = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
                 var draw = box._draw;
-
                 //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
                 if (inNumber) {
                     var prev = this.drawLib.previousGroup(draw);
@@ -4872,48 +4525,41 @@ var jat;
                             player = boxOut._player;
                         }
                     }
-
                     if (box.qualifIn) {
                         if (!this.SetQualifieEntrant(box)) {
                             ASSERT(false);
                         }
                     }
-
                     if (player) {
                         if (!this.drawLib.MetJoueur(box, player)) {
                             ASSERT(false);
                         }
                     }
-
                     //Qualifié entrant pas déjà pris
-                    if (inNumber === QEMPTY || !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
+                    if (inNumber === QEMPTY ||
+                        !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
                         box.qualifIn = inNumber;
-
                         //Cache les boites de gauche
                         this.iBoiteDeGauche(box.position, draw, true, function (box) {
                             box.hidden = true; //TODOjs delete the box from draw.boxes
                         });
                     }
-                } else {
+                }
+                else {
                     box.qualifIn = 0;
-
                     if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                         ASSERT(false);
                     }
-
                     //Réaffiche les boites de gauche
                     this.iBoiteDeGauche(box.position, draw, true, function (box) {
                         delete box.hidden;
                     });
                 }
-
                 return true;
             };
-
             Knockout.prototype.SetQualifieSortant = function (box, outNumber) {
                 // outNumber=0 => enlève qualifié
                 var next = this.drawLib.nextGroup(box._draw);
-
                 //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
                 if (outNumber) {
                     //Met à jour le tableau suivant
@@ -4926,22 +4572,20 @@ var jat;
                             }
                         }
                     }
-
                     //Enlève le précédent n° de qualifié sortant
                     if (box.qualifOut) {
                         if (!this.SetQualifieSortant(box)) {
                             ASSERT(false);
                         }
                     }
-
                     box.qualifOut = outNumber;
-
                     //Met à jour le tableau suivant
                     if (next && box.playerId && boxIn) {
                         if (!this.drawLib.MetJoueur(boxIn, box._player, true)) {
                         }
                     }
-                } else {
+                }
+                else {
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
                         var boxIn = this.drawLib.FindQualifieEntrant(next, box.qualifOut);
@@ -4952,20 +4596,15 @@ var jat;
                             }
                         }
                     }
-
                     delete box.qualifOut;
                 }
-
                 return true;
             };
-
             Knockout.prototype.FindQualifieEntrant = function (draw, iQualifie) {
                 ASSERT(0 <= iQualifie);
-
                 if (!draw.boxes) {
                     return;
                 }
-
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var boxIn = draw.boxes[i];
                     if (!boxIn) {
@@ -4977,17 +4616,13 @@ var jat;
                     }
                 }
             };
-
             Knockout.prototype.FindQualifieSortant = function (draw, iQualifie) {
                 ASSERT(0 < iQualifie);
-
                 if (iQualifie === QEMPTY || !draw.boxes) {
                     return;
                 }
-
                 return this.find.by(draw.boxes, "qualifOut", iQualifie);
             };
-
             //private box1(match: models.Match): models.Box {
             //    var pos = positionOpponent1(match.position);
             //    return <models.Box> this.find.by(match._draw.boxes, 'position', pos);
@@ -5014,20 +4649,18 @@ var jat;
             Knockout.prototype.iBoiteDeGauche = function (iBoite, draw, bToutesBoites, callback) {
                 var b;
                 var bOk = false;
-
-                for (var iBoiteCourante = iBoite; ;) {
+                //ASSERT_VALID(pTableau);
+                for (var iBoiteCourante = iBoite;;) {
                     var j = iBoiteCourante - iBoite * exp2(log2(iBoiteCourante + 1) - log2(iBoite + 1));
                     do {
                         j++;
                         b = j + iBoite * exp2(log2(j + 1));
-
                         var box = this.findBox(draw, b);
                         if (!box) {
                             return;
                         }
                         bOk = ((box.playerId) || bToutesBoites);
-                    } while(!bOk);
-
+                    } while (!bOk);
                     if (bOk) {
                         callback(box);
                     }
@@ -5037,69 +4670,66 @@ var jat;
             return Knockout;
         })();
         service.Knockout = Knockout;
-
         function ASSERT(b, message) {
             if (!b) {
                 debugger;
                 throw message || 'Assertion is false';
             }
         }
-
         function column(pos) {
             //TODO, use a table
             var col = -1;
-            for (pos++; pos; pos >>= 1, col++) {
-            }
+            for (pos++; pos; pos >>= 1, col++) { }
             return col;
         }
-
         function columnMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? nCol - 1 : column(nQ - 2) + nCol;
+            return !nQ || nQ === 1
+                ? nCol - 1
+                : column(nQ - 2) + nCol;
         }
-
         function columnMin(nQ) {
-            return !nQ || nQ === 1 ? 0 : column(nQ - 2) + 1;
+            return !nQ || nQ === 1
+                ? 0
+                : column(nQ - 2) + 1;
         }
-
         function positionTopCol(col) {
             return (1 << (col + 1)) - 2;
         }
-
         function positionBottomCol(col, nQ) {
-            return !nQ || nQ === 1 ? (1 << col) - 1 : (positionTopCol(col) - countInCol(col, nQ) + 1);
+            return !nQ || nQ === 1
+                ? (1 << col) - 1 //iBasCol
+                : (positionTopCol(col) - countInCol(col, nQ) + 1);
         }
-
         function countInCol(col, nQ) {
-            return !nQ || nQ === 1 ? (1 << col) : nQ * countInCol(col - columnMin(nQ), 1);
+            return !nQ || nQ === 1
+                ? (1 << col) //countInCol
+                : nQ * countInCol(col - columnMin(nQ), 1);
         }
-
         function positionMin(nQ) {
-            return !nQ || nQ === 1 ? 0 : positionBottomCol(columnMin(nQ), nQ);
+            return !nQ || nQ === 1
+                ? 0
+                : positionBottomCol(columnMin(nQ), nQ);
         }
-
         function positionMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? (1 << nCol) - 2 : positionTopCol(columnMax(nCol, nQ));
+            return !nQ || nQ === 1
+                ? (1 << nCol) - 2 //iHautCol
+                : positionTopCol(columnMax(nCol, nQ));
         }
-
         function positionMatch(pos) {
             return (pos - 1) >> 1;
         }
-
         function positionOpponent(pos) {
             return pos & 1 ? pos + 1 : pos - 1;
         }
-
         function positionOpponent1(pos) {
             return (pos << 1) + 2;
         }
         function positionOpponent2(pos) {
             return (pos << 1) + 1;
         }
-
         function positionPivotLeft(pos, pivot) {
             return pos + pivot * exp2(log2(pos + 1));
         }
-
         function log2(x) {
             ASSERT(x > 0);
             var sh = x;
@@ -5107,52 +4737,51 @@ var jat;
                 ;
             return i;
         }
-
         function exp2(col) {
             return 1 << col;
         }
-
         //Têtes de série de bas en haut (FFT)
         //Numéro du tête de série d'une boite (identique dans plusieurs boites)
         function iTeteSerieQ(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-
             if (column(i) === columnMin(nQualifie)) {
                 //Colonne de droite, numéroter 1 à n en partant du bas (OK!)
                 if (nQualifie === 1 << column(nQualifie - 1)) {
-                    return i === 0 ? 1 : iTeteSerieQ(i, 1);
-                } else {
+                    return i === 0 ? 1 : iTeteSerieQ(i, 1); // TODO à corriger
+                }
+                else {
                     return 1 + iPartieQ(i, nQualifie);
                 }
-            } else {
+            }
+            else {
                 //Tête de série précédente (de droite)
                 var t = iTeteSerieQ(positionMatch(i), nQualifie), v, d, c;
-
                 if (nQualifie == 1 << column(nQualifie - 1)) {
                     d = i;
-                } else {
+                }
+                else {
                     d = iDecaleGaucheQ(i, nQualifie);
                 }
-
                 v = !!(d & 1); //Ok pour demi-partie basse
-
-                if ((c = column(d)) > 1 && d > positionTopCol(c) - (countInCol(c, nQualifie) >> 1)) {
+                if ((c = column(d)) > 1
+                    && d > positionTopCol(c) - (countInCol(c, nQualifie) >> 1)) {
                     v = !v; //Inverse pour le demi-partie haute
                 }
-
-                return v ? t : 1 + countInCol(column(i), nQualifie) - t;
+                return v ?
+                    t :
+                    1 + countInCol(column(i), nQualifie) - t; //Nouvelle tête de série complémentaire
             }
         }
-
         //Ordre de remplissage des boites en partant de la droite
         //et en suivant les têtes de série
         function iOrdreQ(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-            return iTeteSerieQ(i, nQualifie) - 1 + countInCol(column(i), nQualifie) - nQualifie;
+            return iTeteSerieQ(i, nQualifie) - 1
+                + countInCol(column(i), nQualifie)
+                - nQualifie;
         }
-
         //Partie du tableau de i par rapport au qualifié sortant
         //retour: 0 à nQualifie-1, en partant du bas
         function iPartieQ(i, nQualifie) {
@@ -5164,87 +4793,89 @@ var jat;
             //TODOjs? pb division entière
         }
         service.iPartieQ = iPartieQ;
-
         //Numére de boite de la partie de tableau, ramenée à un seul qualifié
         function iDecaleGaucheQ(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-            return i - iPartieQ(i, nQualifie) * countInCol(c - columnMin(nQualifie)) - positionBottomCol(c, nQualifie) + positionBottomCol(c - columnMin(nQualifie));
+            return i
+                - iPartieQ(i, nQualifie) * countInCol(c - columnMin(nQualifie))
+                - positionBottomCol(c, nQualifie)
+                + positionBottomCol(c - columnMin(nQualifie));
         }
-
         //Têtes de série de haut en bas (non FFT)
         //Numéro du tête de série d'une boite (identique dans plusieurs boites)
         function iTeteSerieQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-
             if (column(i) === columnMin(nQualifie)) {
                 //Colonne de droite, numéroter 1 à n en partant du bas (OK!)
                 if (nQualifie === 1 << column(nQualifie - 1))
-                    return i == 0 ? 1 : iTeteSerieQhb(i, 1);
+                    return i == 0 ? 1 : iTeteSerieQhb(i, 1); // TODO à corriger
                 else
                     return 1 + iPartieQhb(i, nQualifie);
-            } else {
+            }
+            else {
                 //Tête de série précédente (de droite)
                 var t = iTeteSerieQhb(positionMatch(i), nQualifie), v, d, c;
-
                 if (nQualifie === 1 << column(nQualifie - 1)) {
                     d = i;
-                } else {
+                }
+                else {
                     d = iDecaleGaucheQhb(i, nQualifie);
                 }
                 v = !!(d & 1); //Ok pour demi-partie basse
-
-                if ((c = column(d)) > 1 && d <= positionTopCol(c) - (countInCol(c) >> 1)) {
+                if ((c = column(d)) > 1
+                    && d <= positionTopCol(c) - (countInCol(c) >> 1)) {
                     v = !v; //Inverse pour le demi-partie basse		//v1.11.0.1 (décommenté)
                 }
-                return !v ? t : 1 + countInCol(column(i), nQualifie) - t;
+                return !v ?
+                    t :
+                    1 + countInCol(column(i), nQualifie) - t; //Nouvelle tête de série complémentaire
             }
         }
-
         //Ordre de remplissage des boites en partant de la droite
         //et en suivant les têtes de série
         function iOrdreQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
-            return iTeteSerieQhb(i, nQualifie) - 1 + countInCol(column(i), nQualifie) - nQualifie;
+            return iTeteSerieQhb(i, nQualifie) - 1
+                + countInCol(column(i), nQualifie)
+                - nQualifie;
         }
-
         //Partie du tableau de i par rapport au qualifié sortant
         //retour: 0 à nQualifie-1, en partant du bas
         function iPartieQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-
-            //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );
+            //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );  
             return (nQualifie - 1) - Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
             // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
             //TODOjs? pb division entière
         }
-
         function iDecaleGaucheQhb(i, nQualifie) {
             //ASSERT(0 <= i && i < MAX_BOITE);
             ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
             var c = column(i);
-            return i - (nQualifie - 1 - iPartieQhb(i, nQualifie)) * countInCol(c - columnMin(nQualifie)) - positionBottomCol(c, nQualifie) + positionBottomCol(c - columnMin(nQualifie));
+            return i
+                - (nQualifie - 1 - iPartieQhb(i, nQualifie)) * countInCol(c - columnMin(nQualifie))
+                - positionBottomCol(c, nQualifie)
+                + positionBottomCol(c - columnMin(nQualifie));
         }
-
-        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('knockout', [
+        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
+            .factory('knockout', [
             'drawLib', 'tournamentLib', 'rank', 'find',
             function (drawLib, tournamentLib, rank, find) {
                 return new Knockout(drawLib, tournamentLib, rank, find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=knockout.js.map
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MAX_TETESERIE = 32, MAX_QUALIF = 32, QEMPTY = -1, MAX_MATCHJOUR = 16;
-
         var KnockoutValidation = (function () {
             function KnockoutValidation(validation, knockout, drawLib, tournamentLib, rank, category, score, find) {
                 this.validation = validation;
@@ -5260,17 +4891,14 @@ var jat;
             KnockoutValidation.prototype.validatePlayer = function (player) {
                 return true;
             };
-
             KnockoutValidation.prototype.validateGroup = function (draw) {
                 var bRes = true;
-
                 if (draw.suite) {
                     var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
                     if (iTableau === 0 || !draw._previous) {
                         this.validation.errorDraw('IDS_ERR_TAB_SUITE_PREMIER', draw);
                         bRes = false;
                     }
-
                     var group = this.drawLib.group(draw);
                     if (group) {
                         if (draw.type !== group[0].type) {
@@ -5287,29 +4915,27 @@ var jat;
                         }
                     }
                 }
-
                 var prevGroup = this.drawLib.previousGroup(draw);
                 if (prevGroup) {
-                    if (prevGroup[0].type !== 1 /* Final */ && draw.minRank && prevGroup[0].maxRank) {
+                    if (prevGroup[0].type !== models.DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
                         if (this.rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
                             this.validation.errorDraw('IDS_ERR_TAB_CLASSMAX_OVR', draw);
                             bRes = false;
                         }
                     }
                 }
-
                 var nextGroup = this.drawLib.nextGroup(draw);
                 if (nextGroup) {
-                    if (draw.type !== 1 /* Final */ && draw.maxRank && nextGroup[0].minRank) {
+                    if (draw.type !== models.DrawType.Final && draw.maxRank && nextGroup[0].minRank) {
                         if (this.rank.compare(nextGroup[0].minRank, draw.maxRank) < 0) {
                             this.validation.errorDraw('IDS_ERR_TAB_CLASSMAX_NEXT_OVR', draw);
                             bRes = false;
                         }
                     }
                 }
-
                 var e = MAX_QUALIF;
                 if (!draw.suite) {
+                    //Trouve le plus grand Qsortant
                     for (e = MAX_QUALIF; e >= 1; e--) {
                         if (this.drawLib.FindQualifieSortant(group, e)) {
                             break;
@@ -5322,23 +4948,18 @@ var jat;
                         }
                     }
                 }
-
                 return bRes;
             };
-
             KnockoutValidation.prototype.validateMatches = function (draw) {
                 var bRes = true;
-
                 return bRes;
             };
-
             KnockoutValidation.prototype.validateDraw = function (draw) {
                 var bRes = true;
                 var nqe = 0;
                 var nqs = 0;
                 var tournament = draw._event._tournament;
                 var isTypePoule = draw.type >= 2;
-
                 //Interdits:
                 // - De faire rencontrer 2 Qualifiés entre eux
                 // - D'avoir plus de Qualifiés que de joueurs admis directement
@@ -5354,87 +4975,79 @@ var jat;
                     this.validation.errorDraw('IDS_ERR_TAB_CLAST_INV', draw);
                     bRes = false;
                 }
-
                 //DONE 00/05/10: CTableau contrôle progression des classements
                 if (draw._event.maxRank && this.rank.compare(draw._event.maxRank, draw.maxRank) < 0) {
                     this.validation.errorDraw('IDS_ERR_TAB_CLASSLIM_OVR', draw);
                     bRes = false;
                 }
-
                 bRes = bRes && this.validateGroup(draw);
-
                 bRes = bRes && this.validateMatches(draw);
-
                 var colMax = columnMax(draw.nbColumn, draw.nbOut);
                 var pClastMaxCol = new Array(colMax + 1);
                 pClastMaxCol[colMax] = 'NC'; //pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();
-
+                //Match avec deux joueurs gagné par un des deux joueurs
                 for (var i = 0; i < draw.boxes.length; i++) {
                     var box = draw.boxes[i];
                     var boxIn = !isMatch(box) ? box : undefined;
                     var match = isMatch(box) ? box : undefined;
                     var b = box.position;
-
                     //ASSERT(-1 <= box.playerId && box.playerId < tournament.players.length);
                     //Joueur inscrit au tableau ?
                     var c = column(b);
                     if (b === positionTopCol(c)) {
                         if (c < colMax) {
                             pClastMaxCol[c] = pClastMaxCol[c + 1];
-                            //pClastMinCol[ c] = pClastMinCol[ c+1];
                         }
                     }
-
-                    if (boxIn && boxIn.order < 0 && !boxIn.qualifIn && !box.hidden) {
+                    if (boxIn
+                        && boxIn.order < 0
+                        && !boxIn.qualifIn
+                        && !box.hidden) {
                         this.validation.errorDraw('IDS_ERR_TAB_DUPLI', draw, boxIn);
                         bRes = false;
                     }
-
                     var player = box._player;
-
-                    //if( boxes[ i].order >= 0 && player)
+                    //if( boxes[ i].order >= 0 && player) 
                     if (player && boxIn && this.knockout.isJoueurNouveau(boxIn) && !boxIn.qualifIn) {
                         //DONE 00/03/07: Tableau, joueur sans classement
                         //DONE 00/03/04: Tableau, Classement des joueurs correspond au limites du tableau
                         if (!player.rank) {
                             this.validation.errorDraw('IDS_ERR_CLAST_NO', draw, boxIn);
                             bRes = false;
-                        } else {
+                        }
+                        else {
                             //Players rank within draw min and max ranks
                             if (!this.rank.within(player.rank, draw.minRank, draw.maxRank)) {
                                 this.validation.errorDraw('IDS_ERR_CLAST_MIS', draw, boxIn, player.rank);
                                 bRes = false;
                             }
-
                             //DONE: 01/07/15 (00/05/11): CTableau, isValide revoir tests progression des classements
                             //if (!isTypePoule) {
                             if (pClastMaxCol[c] < player.rank) {
                                 pClastMaxCol[c] = player.rank;
                             }
-
                             //if( player.rank < pClastMinCol[ c])
                             //	pClastMinCol[ c] = player.rank;
-                            if (c < colMax && pClastMaxCol[c + 1] && this.rank.compare(player.rank, pClastMaxCol[c + 1]) < 0) {
+                            if (c < colMax
+                                && pClastMaxCol[c + 1]
+                                && this.rank.compare(player.rank, pClastMaxCol[c + 1]) < 0) {
                                 this.validation.errorDraw('IDS_ERR_CLAST_PROGR', draw, boxIn, player.rank);
                                 bRes = false;
                             }
-                            //}
                         }
-
                         //Check inscriptions
                         if (!this.tournamentLib.isSexeCompatible(draw._event, player.sexe)) {
                             this.validation.errorDraw('IDS_ERR_EPR_SEXE', draw, boxIn);
-                        } else if (!this.tournamentLib.isRegistred(draw._event, player)) {
+                        }
+                        else if (!this.tournamentLib.isRegistred(draw._event, player)) {
                             this.validation.errorDraw('IDS_ERR_INSCR_NO', draw, boxIn);
                         }
-
                         //DONE 00/05/11: CTableau, check categorie
                         //Check Categorie
                         if (!this.category.isCompatible(draw._event.category, player.category)) {
                             this.validation.errorDraw('IDS_ERR_CATEG_MIS', draw, boxIn);
                         }
                     }
-
                     //if (!isMatch(box) && match.score) {
                     //    //DONE 01/07/13: CTableau, isValid score sans match
                     //    this.validation.errorDraw('IDS_ERR_SCORE_MATCH_NO', draw, box);
@@ -5445,149 +5058,148 @@ var jat;
                         //DONE 00/03/03: Test de club identique même si le club est vide
                         //TODO 00/07/27: Test de club identique avec des matches joués
                         ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
-
                         //TODO this.drawLib.boxesOpponents(match)
                         var opponent = this.knockout.boxesOpponents(match);
-
                         ASSERT(!!opponent.box1 && !!opponent.box2);
-
                         if (!match.score) {
                             if (match.playerId) {
                                 this.validation.errorDraw('IDS_ERR_VAINQ_SCORE_NO', draw, match, match._player.name);
                                 bRes = false;
                             }
-                        } else {
+                        }
+                        else {
                             ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
-
                             if (!match.playerId) {
                                 this.validation.errorDraw('IDS_ERR_SCORE_VAINQ_NO', draw, match);
                                 bRes = false;
                             }
-
                             if (!this.score.isValid(match.score)) {
                                 this.validation.errorDraw('IDS_ERR_SCORE_BAD', draw, match, match.score);
                                 bRes = false;
                             }
-
                             //ASSERT( boxes[ i].playerId==-1 || player.isInscrit( tournament.FindEpreuve( this)) );
                             ASSERT(column(b) < colMax);
                             if (!opponent.box1.playerId || !opponent.box2.playerId) {
                                 this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, match);
                                 bRes = false;
-                            } else if (opponent.box1.playerId != match.playerId && opponent.box2.playerId != match.playerId) {
+                            }
+                            else if (opponent.box1.playerId != match.playerId
+                                && opponent.box2.playerId != match.playerId) {
                                 this.validation.errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, match);
                                 bRes = false;
                             }
                         }
-
                         if (!this.isMatchJoue(match)) {
                             //match before opponent 2
                             var opponent1 = this.drawLib.boxesOpponents(opponent.box1);
                             var opponent2 = this.drawLib.boxesOpponents(opponent.box2);
-
                             if (opponent.box1.playerId) {
                                 if (opponent.box2.playerId) {
                                     if (!CompString(opponent.box1._player.club, opponent.box2._player.club)) {
                                         this.validation.errorDraw('IDS_ERR_MEME_CLUB1', draw, match, opponent.box1._player.club);
                                         bRes = false;
                                     }
-                                } else if (this.isMatchJouable(opponent.box2)) {
+                                }
+                                else if (this.isMatchJouable(opponent.box2)) {
                                     if (!CompString(opponent.box1._player.club, opponent2.box1._player.club)) {
                                         this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
                                         bRes = false;
-                                    } else if (!CompString(opponent.box1._player.club, opponent2.box2._player.club)) {
+                                    }
+                                    else if (!CompString(opponent.box1._player.club, opponent2.box2._player.club)) {
                                         this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
                                         bRes = false;
                                     }
                                 }
-                            } else if (isTypePoule) {
-                                //TODO Poule
-                            } else if (opponent.box2.playerId) {
+                            }
+                            else if (isTypePoule) {
+                            }
+                            else if (opponent.box2.playerId) {
                                 if (this.isMatchJouable(opponent.box1)) {
                                     if (!CompString(opponent.box2._player.club, opponent1.box1._player.club)) {
                                         this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
                                         bRes = false;
-                                    } else if (!CompString(opponent.box2._player.club, opponent1.box2._player.club)) {
+                                    }
+                                    else if (!CompString(opponent.box2._player.club, opponent1.box2._player.club)) {
                                         this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
                                         bRes = false;
                                     }
                                 }
-                            } else if (this.isMatchJouable(opponent.box1) && this.isMatchJouable(opponent.box2)) {
-                                if (!CompString(opponent1.box1._player.club, opponent2.box1._player.club) || !CompString(opponent1.box1._player.club, opponent2.box2._player.club)) {
+                            }
+                            else if (this.isMatchJouable(opponent.box1) && this.isMatchJouable(opponent.box2)) {
+                                if (!CompString(opponent1.box1._player.club, opponent2.box1._player.club)
+                                    || !CompString(opponent1.box1._player.club, opponent2.box2._player.club)) {
                                     this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box1._player.club);
                                     bRes = false;
                                 }
-                                if (!CompString(opponent1.box2._player.club, opponent2.box1._player.club) || !CompString(opponent1.box2._player.club, opponent2.box2._player.club)) {
+                                if (!CompString(opponent1.box2._player.club, opponent2.box1._player.club)
+                                    || !CompString(opponent1.box2._player.club, opponent2.box2._player.club)) {
                                     this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box2._player.club);
                                     bRes = false;
                                 }
                             }
                         }
-
                         //DONE 01/08/01 (00/07/27): Date d'un match entre dates de l'épreuve
                         if (match.date) {
-                            if (draw._event.start && match.date < draw._event.start) {
+                            if (draw._event.start
+                                && match.date < draw._event.start) {
                                 this.validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
                                 bRes = false;
                             }
-
-                            if (draw._event.end && draw._event.end < match.date) {
+                            if (draw._event.end
+                                && draw._event.end < match.date) {
                                 this.validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
                                 bRes = false;
                             }
-
                             tournament._dayCount = dateDiff(tournament.info.start, tournament.info.end, UnitDate.Day) + 1;
-
                             if (tournament._dayCount) {
                                 var iDay = dateDiff(match.date, tournament.info.start, UnitDate.Day);
                                 if (0 <= iDay && iDay < tournament._dayCount) {
                                     var dayMatches = tournament._day[iDay];
                                     ASSERT(dayMatches.length <= MAX_MATCHJOUR);
-
                                     for (var m = dayMatches.length - 1; m >= 0; m--) {
                                         var match2 = dayMatches[m];
-
-                                        if (match2.position != match.position && match2.place == match.place && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength) {
+                                        if (match2.position != match.position
+                                            && match2.place == match.place
+                                            && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength) {
                                             this.validation.errorDraw('IDS_ERR_PLN_OVERLAP', draw, match, match.date.toDateString());
                                             bRes = false;
                                         }
                                     }
-                                } else {
+                                }
+                                else {
                                     //Match en dehors du planning
                                     this.validation.errorDraw('IDS_ERR_DATE_MATCH_TOURNOI', draw, match, match.date.toDateString());
                                     bRes = false;
                                 }
                             }
-
                             //TODO 00/07/27: Date d'un match après les matches précédents (au moins 3 heures) ça test pas bien à tous les coups
                             //TODO 00/12/20: Dans tous les tableaux où le joueur est inscrit, date des matches différentes pour un même joueur
                             ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
-
                             //DONE 01/08/19 (00/12/20): Dans Poule, date des matches différentes pour un même joueur
                             //if (!isTypePoule) {
                             var match1 = opponent.box1;
                             var match2 = opponent.box2;
-
-                            if (isMatch(opponent.box1) && match1.date) {
+                            if (isMatch(opponent.box1)
+                                && match1.date) {
                                 if (match.date < match1.date) {
                                     this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                     bRes = false;
-                                } else if (match.date.getTime() < (match1.date.getTime() + (tournament.info.slotLength << 1))) {
+                                }
+                                else if (match.date.getTime() < (match1.date.getTime() + (tournament.info.slotLength << 1))) {
                                     this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                     bRes = false;
                                 }
                             }
-
                             if (isMatch(opponent.box2) && match2.date) {
                                 if (match.date < match2.date) {
                                     this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                     bRes = false;
-                                } else if (match.date.getTime() < (match2.date.getTime() + (tournament.info.slotLength << 1))) {
+                                }
+                                else if (match.date.getTime() < (match2.date.getTime() + (tournament.info.slotLength << 1))) {
                                     this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                                     bRes = false;
                                 }
                             }
-
                             //}
                             if (match.date) {
                                 if (!match.playerId && !match.place && tournament.places.length && tournament._dayCount) {
@@ -5596,24 +5208,17 @@ var jat;
                                 }
                             }
                         }
-                        //DONE 01/08/01 (00/05/28): CTableau, interdit d'avoir plus de Qualifiés que de joueurs admis directement
-                        //DONE 01/08/19 (00/05/28): CTableau, interdit de prévoir plus d'un tour d'écart entre deux joueurs de même classement
-                        //DONE 01/08/19 (00/05/28): CTableau, interdit de faire entrer un joueur plus loin qu'un joueur de classement supérieur au sien
                     }
-
                     if (boxIn) {
                         var e = boxIn.qualifIn;
                         if (e && e != QEMPTY) {
                             nqe++;
-
                             ASSERT(!isTypePoule || (b >= positionBottomCol(draw.nbColumn, draw.nbOut))); //Qe que dans colonne de gauche
-
                             var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
                             if (iTableau == 0) {
                                 this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_TAB1', draw, boxIn);
                                 bRes = false;
                             }
-
                             //ASSERT( iTableau != 0);
                             //DONE 00/03/07: CTableau, qualifié entrant en double
                             var j;
@@ -5621,7 +5226,6 @@ var jat;
                                 this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
                                 bRes = false;
                             }
-
                             var group = this.drawLib.previousGroup(draw);
                             if (group) {
                                 //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
@@ -5629,19 +5233,18 @@ var jat;
                                 if (!j) {
                                     this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                                     bRes = false;
-                                } else if (j.playerId != boxIn.playerId) {
+                                }
+                                else if (j.playerId != boxIn.playerId) {
                                     this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, boxIn);
                                     bRes = false;
                                 }
                             }
                         }
                     }
-
                     if (match) {
                         var e = match.qualifOut;
                         if (e) {
                             nqs++;
-
                             //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
                             //DONE 00/03/07: CTableau, qualifié sortant en double
                             j = this.drawLib.FindQualifieSortant(draw, e);
@@ -5649,24 +5252,13 @@ var jat;
                                 this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
                                 bRes = false;
                             }
-
-                            if (draw.type === 1 /* Final */) {
+                            if (draw.type === models.DrawType.Final) {
                                 this.validation.errorDraw('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
                                 bRes = false;
                             }
-                            /*
-                            pSuite = getSuivant();
-                            if( pSuite && (j = pSuite.FindQualifieEntrant( e, &pSuite)) != -1) {
-                            if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
-                            this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
-                            bRes=false;
-                            }
-                            }
-                            */
                         }
                     }
                 }
-
                 //Check Têtes de série
                 //	if( !isTypePoule)
                 if (!draw.suite) {
@@ -5677,12 +5269,10 @@ var jat;
                                 this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
                                 bRes = false;
                             }
-
                             if (isMatch(boxIn)) {
                                 this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_ENTRANT', boxIn._draw, boxIn, 'Seeded ' + e);
                                 bRes = false;
                             }
-
                             for (var i = 0; i < draw.boxes.length; i++) {
                                 var boxIn2 = draw.boxes[i];
                                 if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
@@ -5690,12 +5280,10 @@ var jat;
                                     bRes = false;
                                 }
                             }
-
                             e2 = e;
                         }
                     }
                 }
-
                 //Tous les qualifiés sortants du tableau précédent sont utilisés
                 if (!draw.suite) {
                     var pT = this.drawLib.previousGroup(draw);
@@ -5710,27 +5298,22 @@ var jat;
                         }
                     }
                 }
-
                 if (isTypePoule && nqs < draw.nbOut) {
                     this.validation.errorDraw('IDS_ERR_POULE_SORTANT_NO', draw);
                     bRes = false;
                 }
-
-                if (draw.type === 1 /* Final */) {
+                if (draw.type === models.DrawType.Final) {
                     if (draw.suite || group[group.length - 1].id !== draw.id) {
                         this.validation.errorDraw('IDS_ERR_TAB_SUITE_FINAL', draw);
                         bRes = false;
                     }
-
                     if (draw.nbOut != 1) {
                         this.validation.errorDraw('IDS_ERR_TAB_FINAL_NQUAL', draw);
                         bRes = false;
                     }
                 }
-
                 return bRes;
             };
-
             //private boxOpponent1(match: models.Match): models.Box {
             //    return this.find.by(match._draw.boxes, 'position', positionOpponent1(match.position));
             //}
@@ -5751,77 +5334,72 @@ var jat;
             return KnockoutValidation;
         })();
         service.KnockoutValidation = KnockoutValidation;
-
         function ASSERT(b, message) {
             if (!b) {
                 debugger;
                 throw message || 'Assertion is false';
             }
         }
-
         function isMatch(box) {
             return 'score' in box;
         }
-
         function column(pos) {
             //TODO, use a table
             var col = -1;
-            for (pos++; pos; pos >>= 1, col++) {
-            }
+            for (pos++; pos; pos >>= 1, col++) { }
             return col;
         }
-
         function columnMin(nQ) {
-            return !nQ || nQ === 1 ? 0 : column(nQ - 2) + 1;
+            return !nQ || nQ === 1
+                ? 0
+                : column(nQ - 2) + 1;
         }
-
         function columnMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? nCol - 1 : column(nQ - 2) + nCol;
+            return !nQ || nQ === 1
+                ? nCol - 1
+                : column(nQ - 2) + nCol;
         }
-
         function positionTopCol(col) {
             return (1 << (col + 1)) - 2;
         }
-
         function positionBottomCol(col, nQ) {
-            return !nQ || nQ === 1 ? (1 << col) - 1 : (positionTopCol(col) - countInCol(col, nQ) + 1);
+            return !nQ || nQ === 1
+                ? (1 << col) - 1 //iBasCol
+                : (positionTopCol(col) - countInCol(col, nQ) + 1);
         }
-
         function countInCol(col, nQ) {
-            return !nQ || nQ === 1 ? (1 << col) : nQ * countInCol(col - columnMin(nQ), 1);
+            return !nQ || nQ === 1
+                ? (1 << col) //countInCol
+                : nQ * countInCol(col - columnMin(nQ), 1);
         }
-
         function positionMax(nCol, nQ) {
-            return !nQ || nQ === 1 ? (1 << nCol) - 2 : positionTopCol(columnMax(nCol, nQ));
+            return !nQ || nQ === 1
+                ? (1 << nCol) - 2 //iHautCol
+                : positionTopCol(columnMax(nCol, nQ));
         }
-
         function positionOpponent1(pos) {
             return (pos << 1) + 2;
         }
         function positionOpponent2(pos) {
             return (pos << 1) + 1;
         }
-
         function CompString(a, b) {
             var u = (a || '').toUpperCase(), v = (b || '').toUpperCase();
             return u === v ? 0 : u < v ? -1 : 1;
         }
-
         var UnitDate;
         (function (UnitDate) {
-            UnitDate[UnitDate["Day"] = 1000 * 60 * 60 * 24] = "Day";
-            UnitDate[UnitDate["Hour"] = 1000 * 60 * 60] = "Hour";
+            UnitDate[UnitDate["Day"] = 86400000] = "Day";
+            UnitDate[UnitDate["Hour"] = 3600000] = "Hour";
         })(UnitDate || (UnitDate = {}));
-
         function dateDiff(first, second, unit) {
             // Copy date parts of the timestamps, discarding the time parts.
             var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
             var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
-
             return Math.floor((two.getTime() - one.getTime()) / unit);
         }
-
-        angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type']).factory('knockoutValidation', [
+        angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type'])
+            .factory('knockoutValidation', [
             'validation',
             'knockout',
             'drawLib',
@@ -5833,16 +5411,16 @@ var jat;
             function (validation, knockout, drawLib, tournamentLib, rank, category, score, find) {
                 return new KnockoutValidation(validation, knockout, drawLib, tournamentLib, rank, category, score, find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=knockoutValidation.js.map
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MainLib = (function () {
-            function MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, //private rank: ServiceRank,
-            undo, find, guid) {
+            function MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, 
+                //private rank: ServiceRank,
+                undo, find, guid) {
                 this.$log = $log;
                 this.$http = $http;
                 this.$q = $q;
@@ -5864,10 +5442,9 @@ var jat;
                     players: [],
                     events: []
                 };
-                this.selection.select(tournament, 1 /* Tournament */);
+                this.selection.select(tournament, models.ModelType.Tournament);
                 return tournament;
             };
-
             MainLib.prototype.loadTournament = function (file_url) {
                 var _this = this;
                 var deferred = this.$q.defer();
@@ -5876,30 +5453,36 @@ var jat;
                     if (data) {
                         var tournament = angular.fromJson(data);
                         this.tournamentLib.initTournament(tournament);
-                        this.selection.select(tournament, 1 /* Tournament */);
+                        this.selection.select(tournament, models.ModelType.Tournament);
                         deferred.resolve(tournament);
-                    } else {
+                    }
+                    else {
                         deferred.reject('nothing in storage');
                     }
-                } else if ('string' === typeof file_url) {
-                    this.$http.get(file_url).success(function (tournament, status) {
+                }
+                else if ('string' === typeof file_url) {
+                    this.$http.get(file_url)
+                        .success(function (tournament, status) {
                         tournament._url = file_url;
                         _this.tournamentLib.initTournament(tournament);
-                        _this.selection.select(tournament, 1 /* Tournament */);
+                        _this.selection.select(tournament, models.ModelType.Tournament);
                         deferred.resolve(tournament);
-                    }).error(function (data, status) {
+                    })
+                        .error(function (data, status) {
                         deferred.reject(data);
                     });
-                } else {
+                }
+                else {
                     var reader = new FileReader();
                     reader.addEventListener('loadend', function () {
-                        try  {
+                        try {
                             var tournament = angular.fromJson(reader.result);
                             tournament._url = file_url;
                             _this.tournamentLib.initTournament(tournament);
-                            _this.selection.select(tournament, 1 /* Tournament */);
+                            _this.selection.select(tournament, models.ModelType.Tournament);
                             deferred.resolve(tournament);
-                        } catch (ex) {
+                        }
+                        catch (ex) {
                             deferred.reject(ex.message);
                         }
                     });
@@ -5909,12 +5492,10 @@ var jat;
                     reader.addEventListener('onabort', function () {
                         return deferred.reject('aborted');
                     });
-
                     reader.readAsText(file_url);
                 }
                 return deferred.promise;
             };
-
             MainLib.prototype.saveTournament = function (tournament, url) {
                 var data = {};
                 tool.copy(tournament, data);
@@ -5923,95 +5504,86 @@ var jat;
                     this.$window.localStorage['tournament'] = angular.toJson(data);
                     return;
                 }
-                this.$http.post(url || tournament._url, data).success(function (data, status) {
+                this.$http.post(url || tournament._url, data)
+                    .success(function (data, status) {
                     //TODO
-                }).error(function (data, status) {
+                })
+                    .error(function (data, status) {
                     //TODO
                 });
             };
-
             //#region player
             MainLib.prototype.addPlayer = function (tournament, newPlayer) {
                 var c = tournament.players;
                 newPlayer.id = this.guid.create('p');
-
-                this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, 2 /* Player */); //c.push( newPlayer);
-                this.selection.select(newPlayer, 2 /* Player */);
+                this.undo.insert(c, -1, newPlayer, "Add " + newPlayer.name, models.ModelType.Player); //c.push( newPlayer);
+                this.selection.select(newPlayer, models.ModelType.Player);
             };
-
             MainLib.prototype.editPlayer = function (editedPlayer, player) {
                 var isSelected = this.selection.player === player;
                 var c = editedPlayer._tournament.players;
                 var i = this.find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
-                this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, 2 /* Player */); //c[i] = editedPlayer;
+                this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, models.ModelType.Player); //c[i] = editedPlayer;
                 if (isSelected) {
-                    this.selection.select(editedPlayer, 2 /* Player */);
+                    this.selection.select(editedPlayer, models.ModelType.Player);
                 }
             };
-
             MainLib.prototype.removePlayer = function (player) {
                 var c = player._tournament.players;
                 var i = this.find.indexOf(c, "id", player.id, "Player to remove not found");
-                this.undo.remove(c, i, "Delete " + player.name + " " + i, 2 /* Player */); //c.splice( i, 1);
+                this.undo.remove(c, i, "Delete " + player.name + " " + i, models.ModelType.Player); //c.splice( i, 1);
                 if (this.selection.player === player) {
-                    this.selection.select(c[i] || c[i - 1], 2 /* Player */); //select next or previous
+                    this.selection.select(c[i] || c[i - 1], models.ModelType.Player); //select next or previous
                 }
             };
-
             //#endregion player
             //#region event
             MainLib.prototype.addEvent = function (tournament, newEvent, afterEvent) {
                 var c = tournament.events;
                 var index = afterEvent ? this.find.indexOf(c, 'id', afterEvent.id) + 1 : c.length;
-
                 newEvent.id = this.guid.create('e');
-                this.undo.insert(c, index, newEvent, "Add " + newEvent.name, 3 /* Event */); //c.push( newEvent);
-                this.selection.select(newEvent, 3 /* Event */);
+                this.undo.insert(c, index, newEvent, "Add " + newEvent.name, models.ModelType.Event); //c.push( newEvent);
+                this.selection.select(newEvent, models.ModelType.Event);
             };
-
             MainLib.prototype.editEvent = function (editedEvent, event) {
                 var isSelected = this.selection.event === event;
                 var c = editedEvent._tournament.events;
                 var i = this.find.indexOf(c, "id", editedEvent.id, "Event to edit not found");
-                this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, 3 /* Event */); //c[i] = editedEvent;
+                this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, models.ModelType.Event); //c[i] = editedEvent;
                 if (isSelected) {
-                    this.selection.select(editedEvent, 3 /* Event */);
+                    this.selection.select(editedEvent, models.ModelType.Event);
                 }
             };
-
             MainLib.prototype.removeEvent = function (event) {
                 var c = event._tournament.events;
                 var i = this.find.indexOf(c, "id", event.id, "Event to remove not found");
-                this.undo.remove(c, i, "Delete " + c[i].name + " " + i, 3 /* Event */); //c.splice( i, 1);
+                this.undo.remove(c, i, "Delete " + c[i].name + " " + i, models.ModelType.Event); //c.splice( i, 1);
                 if (this.selection.event === event) {
-                    this.selection.select(c[i] || c[i - 1], 3 /* Event */);
+                    this.selection.select(c[i] || c[i - 1], models.ModelType.Event);
                 }
             };
-
             //#endregion event
             //#region draw
             MainLib.prototype.addDraw = function (draw, generate, afterDraw) {
                 var c = draw._event.draws;
                 var afterIndex = afterDraw ? this.find.indexOf(c, 'id', afterDraw.id) : c.length - 1;
-
                 if (generate) {
                     var draws = this.drawLib.generateDraw(draw, generate, afterIndex);
                     if (!draws || !draws.length) {
                         return;
                     }
-                    this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, 4 /* Draw */); //c.splice( i, 1, draws);
-
+                    this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, models.ModelType.Draw); //c.splice( i, 1, draws);
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
                     }
-                    this.selection.select(draws[0], 4 /* Draw */);
-                } else {
+                    this.selection.select(draws[0], models.ModelType.Draw);
+                }
+                else {
                     draw.id = this.guid.create('d');
-                    this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, 4 /* Draw */); //c.push( draw);
-                    this.selection.select(draw, 4 /* Draw */);
+                    this.undo.insert(c, afterIndex + 1, draw, "Add " + draw.name, models.ModelType.Draw); //c.push( draw);
+                    this.selection.select(draw, models.ModelType.Draw);
                 }
             };
-
             MainLib.prototype.updateDraw = function (draw, oldDraw, generate) {
                 var isSelected = this.selection.draw === oldDraw;
                 var group = this.drawLib.group(oldDraw || draw);
@@ -6020,28 +5592,28 @@ var jat;
                     if (!draws || !draws.length) {
                         return;
                     }
-                } else {
+                }
+                else {
                     this.drawLib.resize(draw, oldDraw);
                 }
                 var c = draw._event.draws;
                 if (generate && draws && group && draws.length) {
                     var i = this.find.indexOf(c, "id", group[0].id, "Draw to edit not found");
-                    this.undo.splice(c, i, group.length, draws, "Generate " + models.GenerateType[generate] + ' ' + draw.name, 4 /* Draw */);
-
+                    this.undo.splice(c, i, group.length, draws, "Generate " + models.GenerateType[generate] + ' ' + draw.name, models.ModelType.Draw);
                     for (var i = 0; i < draws.length; i++) {
                         this.drawLib.initDraw(draws[i], draw._event);
                     }
                     draw = draws[0];
-                } else {
+                }
+                else {
                     var i = this.find.indexOf(c, "id", draw.id, "Draw to edit not found");
-                    this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, 4 /* Draw */); //c[i] = draw;
+                    this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, models.ModelType.Draw); //c[i] = draw;
                 }
                 if (isSelected || generate) {
-                    this.selection.select(draw, 4 /* Draw */);
+                    this.selection.select(draw, models.ModelType.Draw);
                     this.drawLib.refresh(draw); //force angular refresh
                 }
             };
-
             MainLib.prototype.updateQualif = function (draw) {
                 var _this = this;
                 this.undo.newGroup('Update qualified', function () {
@@ -6049,16 +5621,14 @@ var jat;
                     return true;
                 }, draw);
             };
-
             MainLib.prototype.removeDraw = function (draw) {
                 var c = draw._event.draws;
                 var i = this.find.indexOf(c, "id", draw.id, "Draw to remove not found");
-                this.undo.remove(c, i, "Delete " + draw.name + " " + i, 4 /* Draw */); //c.splice( i, 1);
+                this.undo.remove(c, i, "Delete " + draw.name + " " + i, models.ModelType.Draw); //c.splice( i, 1);
                 if (this.selection.draw === draw) {
-                    this.selection.select(c[i] || c[i - 1], 4 /* Draw */); //select next or previous
+                    this.selection.select(c[i] || c[i - 1], models.ModelType.Draw); //select next or previous
                 }
             };
-
             MainLib.prototype.validateDraw = function (draw) {
                 this.validation.resetDraw(draw);
                 this.validation.validateDraw(draw);
@@ -6066,7 +5636,6 @@ var jat;
                     this.drawLib.refresh(draw); //force angular refresh
                 }
             };
-
             //#endregion draw
             //#region match
             MainLib.prototype.editMatch = function (editedMatch, match) {
@@ -6075,7 +5644,7 @@ var jat;
                 var c = match._draw.boxes;
                 var i = this.find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
                 this.undo.newGroup("Edit match", function () {
-                    _this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, 5 /* Match */); //c[i] = editedMatch;
+                    _this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, models.ModelType.Match); //c[i] = editedMatch;
                     if (editedMatch.qualifOut) {
                         //report qualified player to next draw
                         var nextGroup = _this.drawLib.nextGroup(editedMatch._draw);
@@ -6084,16 +5653,13 @@ var jat;
                             if (boxIn) {
                                 //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
                                 //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
-                                _this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player', function () {
-                                    return _this.drawLib.initBox(boxIn, boxIn._draw);
-                                }); //boxIn.playerId = editedMatch.playerId;
+                                _this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player', function () { return _this.drawLib.initBox(boxIn, boxIn._draw); }); //boxIn.playerId = editedMatch.playerId;
                             }
                         }
                     }
                     return true;
                 });
             };
-
             //erasePlayer(box: models.Box): void {
             //    //this.undo.newGroup("Erase player", () => {
             //    //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
@@ -6102,7 +5668,7 @@ var jat;
             //    //}, box);
             //    //this.undo.update(box, 'playerId', null, "Erase player",     //box.playerId = undefined;
             //    //    () => this.drawLib.initBox(box, box._draw)
-            //    //    );
+            //    //    );  
             //    var prev = box.playerId;
             //    this.undo.action((bUndo: boolean) => {
             //        box.playerId = bUndo ? prev : undefined;
@@ -6127,7 +5693,6 @@ var jat;
             return MainLib;
         })();
         service.MainLib = MainLib;
-
         angular.module('jat.services.mainLib', [
             'jat.services.selection',
             'jat.services.find',
@@ -6142,7 +5707,8 @@ var jat;
             'jat.services.validation.knockout',
             'jat.services.validation.roundrobin',
             'jat.services.validation.fft'
-        ]).factory('mainLib', [
+        ])
+            .factory('mainLib', [
             '$log',
             '$http',
             '$q',
@@ -6156,34 +5722,34 @@ var jat;
             'knockoutValidation',
             'roundrobinValidation',
             'fftValidation',
+            //'rank',
             'undo',
             'find',
             'guid',
-            function ($log, $http, $q, $window, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, //rank: ServiceRank,
-            undo, find, guid) {
+            function ($log, $http, $q, $window, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, 
+                //rank: ServiceRank,
+                undo, find, guid) {
                 return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=mainLib.js.map
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MIN_COL = 0, MAX_COL_POULE = 22, MAX_JOUEUR = 8191, MAX_TABLEAU = 63, QEMPTY = -1;
-
         /**
-        box positions example for nbColumn=3:
-        
-        |  11   |  10   |   9   |   row:
-        -------+-------+-------+-------+
-        11  |-- 8 --|   5   |   2   |     2
-        -------+-------+-------+-------+
-        10  |   7   |-- 4 --|   1   |     1
-        -------+-------+-------+-------+
-        9  |   6   |   3   |-- 0 --|     0
-        -------+-------+-------+-------+
-        
+          box positions example for nbColumn=3:
+    
+                |  11   |  10   |   9   |   row:
+         -------+-------+-------+-------+
+            11  |-- 8 --|   5   |   2   |     2
+         -------+-------+-------+-------+
+            10  |   7   |-- 4 --|   1   |     1
+         -------+-------+-------+-------+
+             9  |   6   |   3   |-- 0 --|     0
+         -------+-------+-------+-------+
+    
         col: 3      2       1       0
         */
         var Roundrobin = (function () {
@@ -6192,7 +5758,9 @@ var jat;
                 this.tournamentLib = tournamentLib;
                 this.ranking = ranking;
                 this.find = find;
-                drawLib._drawLibs[2 /* PouleSimple */] = drawLib._drawLibs[3 /* PouleAR */] = this;
+                drawLib._drawLibs[models.DrawType.PouleSimple]
+                    = drawLib._drawLibs[models.DrawType.PouleAR]
+                        = this;
             }
             Roundrobin.prototype.findBox = function (draw, position, create) {
                 var box = this.find.by(draw.boxes, 'position', position);
@@ -6201,11 +5769,9 @@ var jat;
                 }
                 return box;
             };
-
             Roundrobin.prototype.nbColumnForPlayers = function (draw, nJoueur) {
                 return nJoueur;
             };
-
             Roundrobin.prototype.boxesOpponents = function (match) {
                 var n = match._draw.nbColumn;
                 var pos1 = seedPositionOpponent1(match.position, n), pos2 = seedPositionOpponent2(match.position, n);
@@ -6214,56 +5780,48 @@ var jat;
                     box2: this.find.by(match._draw.boxes, 'position', pos2)
                 };
             };
-
             Roundrobin.prototype.getSize = function (draw) {
                 if (!draw.nbColumn) {
                     return { width: 1, height: 1 };
                 }
-
                 var n = draw.nbColumn;
                 return {
                     width: (n + 1),
-                    height: n
+                    height: n // * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
                 };
             };
-
             Roundrobin.prototype.computePositions = function (draw) {
                 //nothing to do for round robin
                 return;
             };
-
             Roundrobin.prototype.resize = function (draw, oldDraw, nJoueur) {
                 if (nJoueur) {
                     throw "Not implemnted";
                 }
-
                 if (oldDraw && draw.nbColumn !== oldDraw.nbColumn) {
                     var nOld = oldDraw.nbColumn, nCol = draw.nbColumn, maxPos = nCol * (nCol + 1) - 1;
-
+                    //Shift the boxes positions
                     for (var i = draw.boxes.length - 1; i >= 0; i--) {
                         var box = draw.boxes[i];
                         var b = positionResize(box.position, nOld, nCol);
-
                         var diag = iDiagonalePos(nCol, b);
-                        if (b < 0 || maxPos < b || b === diag || (b < diag && draw.type === 2 /* PouleSimple */)) {
+                        if (b < 0 || maxPos < b
+                            || b === diag || (b < diag && draw.type === models.DrawType.PouleSimple)) {
                             draw.boxes.splice(i, 1); //remove the exceeding box
                             continue;
                         }
-
                         box.position = b;
                     }
-
                     //Append new in players and matches
                     if (nCol > nOld) {
                         for (var i = nCol - nOld - 1; i >= 0; i--) {
                             var b = ADVERSAIRE1(draw, i);
                             var boxIn = this.drawLib.newBox(draw, undefined, b);
                             draw.boxes.push(boxIn);
-
                             //Append the matches
                             var diag = iDiagonalePos(nCol, b);
                             for (b -= nCol; b >= 0; b -= nCol) {
-                                if (b === diag || (b < diag && draw.type === 2 /* PouleSimple */)) {
+                                if (b === diag || (b < diag && draw.type === models.DrawType.PouleSimple)) {
                                     continue;
                                 }
                                 var match = this.drawLib.newBox(draw, undefined, b);
@@ -6274,14 +5832,11 @@ var jat;
                     }
                 }
             };
-
             Roundrobin.prototype.FindQualifieEntrant = function (draw, iQualifie) {
                 ASSERT(iQualifie >= 0);
-
                 if (!draw.boxes) {
                     return;
                 }
-
                 for (var i = draw.boxes.length - 1; i >= 0; i--) {
                     var boxIn = draw.boxes[i];
                     if (!boxIn) {
@@ -6293,14 +5848,11 @@ var jat;
                     }
                 }
             };
-
             Roundrobin.prototype.FindQualifieSortant = function (draw, iQualifie) {
                 ASSERT(0 < iQualifie);
-
                 if (iQualifie === QEMPTY || !draw.boxes) {
                     return;
                 }
-
                 for (var i = 0; i < draw.boxes.length; i++) {
                     var boxOut = draw.boxes[i];
                     if (boxOut && boxOut.qualifOut === iQualifie) {
@@ -6308,11 +5860,9 @@ var jat;
                     }
                 }
             };
-
             Roundrobin.prototype.SetQualifieEntrant = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
                 var draw = box._draw;
-
                 //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
                 if (inNumber) {
                     var prev = this.drawLib.previousGroup(draw);
@@ -6323,43 +5873,37 @@ var jat;
                             player = boxOut._player;
                         }
                     }
-
                     if (box.qualifIn) {
                         if (!this.SetQualifieEntrant(box)) {
                             ASSERT(false);
                         }
                     }
-
                     if (player) {
                         if (!this.drawLib.MetJoueur(box, player)) {
                             ASSERT(false);
                         }
                     }
-
                     //Qualifié entrant pas déjà pris
-                    if (inNumber == QEMPTY || !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
+                    if (inNumber == QEMPTY ||
+                        !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
                         this.SetQualifieEntrant(box, inNumber);
                     }
-                } else {
+                }
+                else {
                     box.qualifIn = 0;
-
                     if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
                         ASSERT(false);
                     }
                 }
-
                 return true;
             };
-
             Roundrobin.prototype.SetQualifieSortant = function (box, outNumber) {
                 // outNumber=0 => enlève qualifié
                 //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
                 var next = this.drawLib.nextGroup(box._draw);
-
                 //TODOjs findBox()
                 var diag = box._draw.boxes[iDiagonale(box)];
                 var box1 = box._draw.boxes[ADVERSAIRE1(box._draw, box.position)];
-
                 if (outNumber) {
                     //Met à jour le tableau suivant
                     if (next && box.playerId && box.qualifOut) {
@@ -6371,18 +5915,14 @@ var jat;
                             }
                         }
                     }
-
                     //Enlève le précédent n° de qualifié sortant
                     if (box.qualifOut)
                         if (!this.SetQualifieSortant(box)) {
                             ASSERT(false);
                         }
-
                     this.SetQualifieSortant(box, outNumber);
-
                     diag.playerId = box1.playerId;
                     this.drawLib.initBox(diag, box._draw);
-
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
                         var boxIn = this.drawLib.FindQualifieEntrant(next, outNumber);
@@ -6393,7 +5933,8 @@ var jat;
                             }
                         }
                     }
-                } else {
+                }
+                else {
                     var match = box;
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
@@ -6405,20 +5946,16 @@ var jat;
                             }
                         }
                     }
-
                     delete match.qualifOut;
-
                     diag.playerId = undefined;
                     this.drawLib.initBox(diag, box._draw);
                 }
-
                 //#ifdef WITH_POULE
                 //	if( isTypePoule())
                 //		CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd()).GetActiveDocument());
                 //#endif //WITH_POULE
                 return true;
             };
-
             Roundrobin.prototype.GetJoueursTableau = function (draw) {
                 //Récupère les joueurs du tableau
                 var ppJoueur = [];
@@ -6431,85 +5968,73 @@ var jat;
                         if (!boxIn) {
                             continue;
                         }
-
                         //Récupérer les joueurs et les Qualifiés entrants
                         if (boxIn.qualifIn) {
                             ppJoueur.push(boxIn.qualifIn); //no qualifie entrant
-                        } else if (boxIn.playerId) {
+                        }
+                        else if (boxIn.playerId) {
                             ppJoueur.push(boxIn._player); //a player
                         }
                     }
                 }
-
                 return ppJoueur;
             };
-
             Roundrobin.prototype.generateDraw = function (refDraw, generate, afterIndex) {
                 var oldDraws = this.drawLib.group(refDraw);
                 var iTableau = this.find.indexOf(refDraw._event.draws, 'id', oldDraws[0].id);
                 if (iTableau === -1) {
                     iTableau = refDraw._event.draws.length; //append the draws at the end of the event
                 }
-
                 var players = this.tournamentLib.GetJoueursInscrit(refDraw);
-
                 //Récupère les qualifiés sortants du tableau précédent
-                var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined;
+                var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(refDraw);
                 if (prev) {
                     players = players.concat(this.drawLib.FindAllQualifieSortant(prev, true));
                 }
-
                 //Tri et Mélange les joueurs de même classement
                 this.tournamentLib.TriJoueurs(players);
-
                 var event = refDraw._event;
-
                 var nDraw = Math.floor((players.length + (refDraw.nbColumn - 1)) / refDraw.nbColumn);
                 if (!nDraw) {
                     nDraw = 1;
                 }
-
                 if ((event.draws.length + nDraw) >= MAX_TABLEAU) {
-                    throw ('Maximum refDraw count is reached');
+                    throw ('Maximum refDraw count is reached'); //TODOjs
                     return;
                 }
-
                 var draws = [];
-
                 //Créé les poules
                 var name = refDraw.name;
                 for (var t = 0; t < nDraw; t++) {
                     if (t === 0) {
                         var draw = refDraw;
-                    } else {
+                    }
+                    else {
                         draw = this.drawLib.newDraw(event, refDraw);
                         draw.suite = true;
                     }
                     draw.boxes = [];
                     draw.name = name + (nDraw > 1 ? ' (' + (t + 1) + ')' : '');
-
                     for (var i = draw.nbColumn - 1; i >= 0 && players.length; i--) {
                         var b = ADVERSAIRE1(draw, i);
                         var j = t + (draw.nbColumn - i - 1) * nDraw;
-
                         var boxIn = this.drawLib.newBox(draw, undefined, b);
                         draw.boxes.push(boxIn);
-
                         if (j < players.length) {
                             var qualif = 'number' === typeof players[j] ? players[j] : 0;
                             if (qualif) {
                                 if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
                                     return;
                                 }
-                            } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
+                            }
+                            else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
                                 return;
                             }
                         }
-
                         //Append the matches
                         var diag = iDiagonalePos(draw.nbColumn, b);
                         for (b -= draw.nbColumn; b >= 0; b -= draw.nbColumn) {
-                            if (b === diag || (b < diag && draw.type === 2 /* PouleSimple */)) {
+                            if (b === diag || (b < diag && draw.type === models.DrawType.PouleSimple)) {
                                 continue;
                             }
                             var match = this.drawLib.newBox(draw, undefined, b);
@@ -6517,23 +6042,18 @@ var jat;
                             draw.boxes.push(match);
                         }
                     }
-
                     //Ajoute 1 tête de série
                     var boxT = this.findBox(draw, ADVERSAIRE1(draw, draw.nbColumn - 1));
                     boxT.seeded = t + 1;
-
                     draws.push(draw);
                 }
-
                 return draws;
             };
-
             //Calcul classement des poules
             Roundrobin.prototype.CalculeScore = function (draw) {
+                //TODO
                 throw "Not implemented";
-
-                var m_pOrdrePoule;
-
+                var m_pOrdrePoule; //classement de chaque joueur de la poule
                 //this.ranking.
                 //for (var b = 0; b < draw.nbColumn; b++) {
                 //    if (m_pOrdrePoule[b])
@@ -6578,46 +6098,37 @@ var jat;
             return Roundrobin;
         })();
         service.Roundrobin = Roundrobin;
-
         function ASSERT(b, message) {
             if (!b) {
                 debugger;
                 throw message || 'Assertion is false';
             }
         }
-
         function column(pos, nCol) {
             return Math.floor(pos / nCol);
         }
-
         function row(pos, nCol) {
             return pos % nCol;
         }
-
         function positionFirstIn(nCol) {
             return nCol * (nCol + 1);
         }
         function positionLastIn(nCol) {
             return nCol * nCol + 1;
         }
-
         function seedPositionOpponent1(pos, nCol) {
             return (pos % nCol) + (nCol * nCol);
         }
-
         function seedPositionOpponent2(pos, nCol) {
             return Math.floor(pos / nCol) + (nCol * nCol);
         }
-
         function positionMatchPoule(row, col, nCol) {
             return (col * nCol) + row;
         }
-
         function positionResize(pos, nColOld, nCol) {
             var r = row(pos, nColOld), col = column(pos, nColOld);
             return (nCol - nColOld + r) + nCol * (nCol - nColOld + col);
         }
-
         function iDiagonale(box) {
             var n = box._draw.nbColumn;
             return (box.position % n) * (n + 1);
@@ -6625,24 +6136,22 @@ var jat;
         function iDiagonalePos(nbColumn, pos) {
             return (pos % nbColumn) * (nbColumn + 1);
         }
-
         function ADVERSAIRE1(draw, pos) {
             var n = draw.nbColumn;
             return pos % n + n * n;
         }
         ;
-
-        angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find']).factory('roundrobin', [
+        angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
+            .factory('roundrobin', [
             'drawLib', 'tournamentLib', 'ranking', 'find',
             function (drawLib, tournamentLib, ranking, find) {
                 return new Roundrobin(drawLib, tournamentLib, ranking, find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=roundrobin.js.map
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var RoundrobinValidation = (function () {
             function RoundrobinValidation(validation) {
@@ -6652,20 +6161,14 @@ var jat;
             RoundrobinValidation.prototype.validatePlayer = function (player) {
                 return true;
             };
-
             RoundrobinValidation.prototype.validateDraw = function (draw) {
                 var bRes = true;
-
                 bRes = bRes && this.validatePoule(draw);
-
                 bRes = bRes && this.validateMatches(draw);
-
                 return bRes;
             };
-
             RoundrobinValidation.prototype.validatePoule = function (draw) {
                 var bRes = true;
-
                 //TODOjs
                 ////Compte le nombre de Qs de la poule (et pas dans suite)
                 //var e = 0;
@@ -6700,91 +6203,76 @@ var jat;
                 //TODO Poule, isValide
                 return bRes;
             };
-
             RoundrobinValidation.prototype.validateMatches = function (draw) {
                 var bRes = true;
-
+                //Match avec deux joueurs gagné par un des deux joueurs
                 for (var i = 0; i < draw.boxes.length; i++) {
                     var box = draw.boxes[i];
                     var boxIn = !isMatch(box) ? box : undefined;
                     var match = isMatch(box) ? box : undefined;
-
                     //ASSERT(-1 <= box.playerId && box.playerId < pDoc.m_nJoueur);
                     //Joueur inscrit au tableau ?
                     //Rien sur les croix (sauf les qualifiés sortants)
                     //ASSERT( !isTypePoule() || !boxes[ i].isCache() || boxes[ i].isVide() );
                     if (box.playerId) {
-                        //TODOjs
-                        //if (i >= iBasColQ(m_nColonne)) {	//Colonne joueurs
-                        //} else {
-                        //    var box1 = draw.boxes[ADVERSAIRE1(i)];
-                        //    var box2 = draw.boxes[ADVERSAIRE2(i)];
-                        //    if (!box1.playerId || !box2.playerId) {
-                        //        this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, box);
-                        //        bRes = false;
-                        //    } else {
-                        //        if (box.playerId != box1.playerId && box.playerId != box2.playerId) {
-                        //            this.validation.errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, box);
-                        //            bRes = false;
-                        //        }
-                        //    }
-                        //}
                     }
                 }
-
                 return bRes;
             };
             return RoundrobinValidation;
         })();
         service.RoundrobinValidation = RoundrobinValidation;
-
         function isMatch(box) {
             return 'score' in box;
         }
-
-        angular.module('jat.services.validation.roundrobin', ['jat.services.validation']).factory('roundrobinValidation', [
+        angular.module('jat.services.validation.roundrobin', ['jat.services.validation'])
+            .factory('roundrobinValidation', [
             'validation',
             function (validation) {
                 return new RoundrobinValidation(validation);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=roundrobinValidation.js.map
 'use strict';
+// Selection service
 var jat;
 (function (jat) {
-    // Selection service
+    var service;
     (function (service) {
         var Selection = (function () {
             function Selection() {
             }
             Selection.prototype.select = function (r, type) {
                 if (r) {
-                    if (type === 6 /* Box */ || ('_player' in r && r._draw)) {
+                    if (type === models.ModelType.Box || ('_player' in r && r._draw)) {
                         this.tournament = r._draw._event._tournament;
                         this.event = r._draw._event;
                         this.draw = r._draw;
                         this.box = r;
-                    } else if (type === 4 /* Draw */ || r._event) {
+                    }
+                    else if (type === models.ModelType.Draw || r._event) {
                         this.tournament = r._event._tournament;
                         this.event = r._event;
                         this.draw = r;
                         this.box = undefined;
-                    } else if (type === 3 /* Event */ || (r.draws && r._tournament)) {
+                    }
+                    else if (type === models.ModelType.Event || (r.draws && r._tournament)) {
                         this.tournament = r._tournament;
                         this.event = r;
                         this.draw = r.draws ? r.draws[0] : undefined;
                         this.box = undefined;
-                    } else if (type === 2 /* Player */ || (r.name && r._tournament)) {
+                    }
+                    else if (type === models.ModelType.Player || (r.name && r._tournament)) {
                         this.tournament = r._tournament;
                         this.player = r;
-                    } else if (type === 1 /* Tournament */ || (r.players && r.events)) {
+                    }
+                    else if (type === models.ModelType.Tournament || (r.players && r.events)) {
                         this.tournament = r;
                         if (this.tournament.events[0]) {
                             this.event = this.tournament.events[0];
                             this.draw = this.event && this.event.draws ? this.event.draws[this.event.draws.length - 1] : undefined;
-                        } else {
+                        }
+                        else {
                             this.event = undefined;
                             this.draw = undefined;
                         }
@@ -6793,19 +6281,20 @@ var jat;
                             this.player = undefined;
                         }
                     }
-                } else if (type) {
+                }
+                else if (type) {
                     switch (type) {
-                        case 1 /* Tournament */:
+                        case models.ModelType.Tournament:
                             this.tournament = undefined;
                             this.player = undefined;
-                        case 3 /* Event */:
+                        case models.ModelType.Event:
                             this.event = undefined;
-                        case 4 /* Draw */:
+                        case models.ModelType.Draw:
                             this.draw = undefined;
-                        case 6 /* Box */:
+                        case models.ModelType.Box:
                             this.box = undefined;
                             break;
-                        case 2 /* Player */:
+                        case models.ModelType.Player:
                             this.player = undefined;
                     }
                 }
@@ -6813,18 +6302,16 @@ var jat;
             return Selection;
         })();
         service.Selection = Selection;
-
-        angular.module('jat.services.selection', []).service('selection', Selection);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.selection', [])
+            .service('selection', Selection);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=selection.js.map
 'use strict';
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var MINUTES = 60000, DAYS = 24 * 60 * MINUTES;
-
         var TournamentLib = (function () {
             function TournamentLib(drawLib, rank, guid) {
                 this.drawLib = drawLib;
@@ -6839,7 +6326,6 @@ var jat;
                 this.initTournament(tournament);
                 return tournament;
             };
-
             TournamentLib.prototype.newInfo = function (source) {
                 var info = {};
                 if (angular.isObject(source)) {
@@ -6847,7 +6333,6 @@ var jat;
                 }
                 return info;
             };
-
             TournamentLib.prototype.initTournament = function (tournament) {
                 if (tournament.players) {
                     for (var i = tournament.players.length - 1; i >= 0; i--) {
@@ -6861,14 +6346,12 @@ var jat;
                         this.initEvent(tournament.events[i], tournament);
                     }
                 }
-
                 tournament.info = tournament.info || { name: '' };
                 tournament.info.slotLength = tournament.info.slotLength || 90 * MINUTES;
                 if (tournament.info.start && tournament.info.end) {
                     tournament._dayCount = Math.floor((tournament.info.end.getTime() - tournament.info.start.getTime()) / DAYS + 1);
                 }
             };
-
             TournamentLib.prototype.newPlayer = function (parent, source) {
                 var player = {};
                 if (angular.isObject(source)) {
@@ -6876,18 +6359,15 @@ var jat;
                 }
                 player.id = player.id || this.guid.create('p');
                 delete player.$$hashKey; //remove angular id
-
                 this.initPlayer(player, parent);
                 return player;
             };
-
             TournamentLib.prototype.initPlayer = function (player, parent) {
                 player._tournament = parent;
                 //player.toString = function () {
                 //    return this.name + ' ' + this.rank;
                 //};
             };
-
             TournamentLib.prototype.newEvent = function (parent, source) {
                 var event = {};
                 if (angular.isObject(source)) {
@@ -6895,31 +6375,25 @@ var jat;
                 }
                 event.id = event.id || this.guid.create('e');
                 delete event.$$hashKey; //remove angular id
-
                 this.initEvent(event, parent);
                 return event;
             };
-
             TournamentLib.prototype.initEvent = function (event, parent) {
                 event._tournament = parent;
-
                 var c = event.draws = event.draws || [];
                 if (c) {
                     for (var i = c.length - 1; i >= 0; i--) {
                         var draw = c[i];
                         this.drawLib.initDraw(draw, event);
-
                         //init draws linked list
                         draw._previous = c[i - 1];
                         draw._next = c[i + 1];
                     }
                 }
             };
-
             TournamentLib.prototype.isRegistred = function (event, player) {
                 return player.registration && player.registration.indexOf(event.id) !== -1;
             };
-
             TournamentLib.prototype.getRegistred = function (event) {
                 var a = [];
                 var c = event._tournament.players;
@@ -6931,7 +6405,6 @@ var jat;
                 }
                 return a;
             };
-
             TournamentLib.prototype.TriJoueurs = function (players) {
                 var _this = this;
                 //Tri les joueurs par classement
@@ -6950,58 +6423,53 @@ var jat;
                     return _this.rank.compare(p1.rank, p2.rank);
                 };
                 players.sort(comparePlayersByRank);
-
+                //Mélange les joueurs de même classement
                 for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
                     if (r1 === players.length || comparePlayersByRank(players[r0], players[r1])) {
                         //nouvelle plage de classement
                         //r0: premier joueur de l'intervalle
                         //r1: premier joueur de l'intervalle suivant
                         tool.shuffle(players, r0, r1);
-
                         r0 = r1;
                     }
                 }
             };
-
             TournamentLib.prototype.GetJoueursInscrit = function (draw) {
                 //Récupère les joueurs inscrits
                 var players = draw._event._tournament.players, ppJoueur = [], nPlayer = 0;
                 for (var i = 0; i < players.length; i++) {
                     var pJ = players[i];
                     if (this.isRegistred(draw._event, pJ)) {
-                        if (!pJ.rank || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
+                        if (!pJ.rank
+                            || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
                             ppJoueur.push(pJ); //no du joueur
                         }
                     }
                 }
-
                 return ppJoueur;
             };
-
             TournamentLib.prototype.isSexeCompatible = function (event, sexe) {
-                return event.sexe === sexe || (event.sexe === 'M' && !event.typeDouble);
+                return event.sexe === sexe //sexe épreuve = sexe joueur
+                    || (event.sexe === 'M' && !event.typeDouble); //ou simple mixte
             };
             return TournamentLib;
         })();
         service.TournamentLib = TournamentLib;
-
-        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid']).factory('tournamentLib', [
-            'drawLib', 'rank', 'guid',
+        angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
+            .factory('tournamentLib', ['drawLib', 'rank', 'guid',
             function (drawLib, rank, guid) {
                 return new TournamentLib(drawLib, rank, guid);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=tournamentLib.js.map
 'use strict';
-
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         /**
-        * Undo manager for typescript models.
-        */
+          * Undo manager for typescript models.
+          */
         var Undo = (function () {
             function Undo() {
                 this.stack = [];
@@ -7009,14 +6477,13 @@ var jat;
                 this.maxUndo = 20;
             }
             /**
-            * Reset the undo stacks
-            */
+              * Reset the undo stacks
+              */
             Undo.prototype.reset = function () {
                 this.stack = [];
                 this.head = -1;
                 this.group = null;
             };
-
             Undo.prototype.action = function (fnAction, message, meta) {
                 if ("function" !== typeof fnAction) {
                     throw "Undo action: invalid fnAction";
@@ -7031,7 +6498,6 @@ var jat;
                 this._pushAction(action);
                 return r;
             };
-
             Undo.prototype.update = function (obj, member, value, message, meta) {
                 if ("undefined" === typeof obj) {
                     throw "Undo update: invalid obj";
@@ -7058,7 +6524,6 @@ var jat;
                 obj[member] = value;
                 this._pushAction(action);
             };
-
             Undo.prototype.insert = function (obj, member, value, message, meta) {
                 if ("undefined" === typeof obj) {
                     throw "Undo insert: invalid obj";
@@ -7084,12 +6549,12 @@ var jat;
                 };
                 if (obj.splice) {
                     obj.splice(member, 0, value);
-                } else {
+                }
+                else {
                     obj[member] = value;
                 }
                 this._pushAction(action);
             };
-
             Undo.prototype.remove = function (obj, member, message, meta) {
                 if ("undefined" === typeof obj) {
                     throw "Undo remove: invalid obj";
@@ -7110,12 +6575,12 @@ var jat;
                         throw "Bad array position to remove";
                     }
                     obj.splice(member, 1);
-                } else {
+                }
+                else {
                     delete obj[member];
                 }
                 this._pushAction(action);
             };
-
             //public splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
             Undo.prototype.splice = function (obj, index, howmany, itemX, message, meta) {
                 if ("undefined" === typeof obj) {
@@ -7130,7 +6595,6 @@ var jat;
                 if (index < 0 || obj.length < index) {
                     throw "Undo splice: bad array position to remove";
                 }
-
                 //var isarray = angular.isArray(itemX);
                 var action = {
                     type: Undo.ActionType.SPLICE,
@@ -7143,25 +6607,22 @@ var jat;
                     values: undefined,
                     meta: meta
                 };
-
                 //var p = isarray ? itemX.slice(0, itemX.length) : Array.prototype.slice.call(arguments, 3, arguments.length - 1);
                 var p = itemX.slice(0, itemX.length);
                 p.unshift(index, howmany);
                 action.values = Array.prototype.splice.apply(obj, p);
-
                 this._pushAction(action);
             };
-
             Undo.prototype._pushAction = function (action) {
                 if (this.group) {
                     this.group.stack.push(action);
-                } else {
+                }
+                else {
                     this.head++;
                     this.stack.splice(this.head, this.stack.length, action);
                     this._maxUndoOverflow();
                 }
             };
-
             Undo.prototype.newGroup = function (message, fnGroup, meta) {
                 if (this.group) {
                     throw "Cannot imbricate group";
@@ -7175,7 +6636,8 @@ var jat;
                 if ("undefined" !== typeof fnGroup) {
                     if (fnGroup()) {
                         this.endGroup();
-                    } else {
+                    }
+                    else {
                         this.cancelGroup();
                     }
                 }
@@ -7197,7 +6659,6 @@ var jat;
                 this._do(this.group, true);
                 this.group = null;
             };
-
             Undo.prototype._do = function (action, bUndo) {
                 this.meta = action.meta;
                 if (action.type === Undo.ActionType.GROUP) {
@@ -7206,42 +6667,49 @@ var jat;
                         for (var i = action.stack.length - 1; i >= 0; i--) {
                             r = this._do(action.stack[i], true);
                         }
-                    } else {
+                    }
+                    else {
                         for (i = 0; i < action.stack.length; i++) {
                             r = this._do(action.stack[i], false);
                         }
                     }
                     this.meta = action.meta;
                     return r;
-                } else if (action.type === Undo.ActionType.ACTION) {
+                }
+                else if (action.type === Undo.ActionType.ACTION) {
                     return action.fnAction(bUndo);
-                } else if (action.type === Undo.ActionType.UPDATE) {
+                }
+                else if (action.type === Undo.ActionType.UPDATE) {
                     var temp = action.obj[action.member];
                     action.obj[action.member] = action.value;
                     action.value = temp;
                     return temp;
-                } else if (action.type === Undo.ActionType.SPLICE) {
-                    var p = action.values.slice(0, action.values.length);
+                }
+                else if (action.type === Undo.ActionType.SPLICE) {
+                    var p = action.values.slice(0, action.values.length); //copy array
                     p.unshift(action.index, action.howmany);
                     action.howmany = action.values.length;
                     action.values = Array.prototype.splice.apply(action.obj, p);
                     return p[2];
-                } else if (bUndo ? action.type === Undo.ActionType.INSERT : action.type === Undo.ActionType.REMOVE) {
+                }
+                else if (bUndo ? action.type === Undo.ActionType.INSERT : action.type === Undo.ActionType.REMOVE) {
                     action.value = action.obj[action.member];
                     if (action.obj.splice) {
                         action.obj.splice(action.member, 1);
-                    } else {
+                    }
+                    else {
                         delete action.obj[action.member];
                     }
-                } else if (action.obj.splice) {
+                }
+                else if (action.obj.splice) {
                     action.obj.splice(action.member, 0, action.value);
                     return action.value;
-                } else {
+                }
+                else {
                     action.obj[action.member] = action.value;
                     return action.value;
                 }
             };
-
             Undo.prototype.undo = function () {
                 if (!this.canUndo()) {
                     throw "Can't undo";
@@ -7250,7 +6718,6 @@ var jat;
                 this.head--;
                 return r;
             };
-
             Undo.prototype.redo = function () {
                 if (!this.canRedo()) {
                     throw "Can't redo";
@@ -7258,23 +6725,18 @@ var jat;
                 this.head++;
                 return this._do(this.stack[this.head], false);
             };
-
             Undo.prototype.canUndo = function () {
                 return 0 <= this.head && this.head < this.stack.length;
             };
-
             Undo.prototype.canRedo = function () {
                 return -1 <= this.head && this.head < this.stack.length - 1;
             };
-
             Undo.prototype.messageUndo = function () {
                 return this.canUndo() ? this.stack[this.head].message : "";
             };
-
             Undo.prototype.messageRedo = function () {
                 return this.canRedo() ? this.stack[this.head + 1].message : "";
             };
-
             Undo.prototype.setMaxUndo = function (v) {
                 if ("number" !== typeof v) {
                     throw "Invalid maxUndo value";
@@ -7282,7 +6744,6 @@ var jat;
                 this.maxUndo = v;
                 this._maxUndoOverflow();
             };
-
             Undo.prototype._maxUndoOverflow = function () {
                 if (this.stack.length > this.maxUndo) {
                     var nOverflow = this.stack.length - this.maxUndo;
@@ -7290,26 +6751,26 @@ var jat;
                     this.stack.splice(0, nOverflow);
                 }
             };
-
             Undo.prototype.getMeta = function () {
                 return this.meta;
             };
-
             Undo.prototype.toString = function () {
-                return (this.group ? "Grouping (" + this.group.message + "), " : "") + (this.canUndo() ? (this.head + 1) + " undo(" + this.messageUndo() + ")" : "No undo") + ", " + (this.canRedo() ? (this.stack.length - this.head) + " redo(" + this.messageRedo() + ")" : "No redo") + ", maxUndo=" + this.maxUndo;
+                return (this.group ? "Grouping (" + this.group.message + "), " : "")
+                    + (this.canUndo() ? (this.head + 1) + " undo(" + this.messageUndo() + ")" : "No undo")
+                    + ", " + (this.canRedo() ? (this.stack.length - this.head) + " redo(" + this.messageRedo() + ")" : "No redo")
+                    + ", maxUndo=" + this.maxUndo;
             };
             Undo.ActionType = { UPDATE: 1, INSERT: 2, REMOVE: 3, GROUP: 4, ACTION: 5, SPLICE: 6 };
             return Undo;
         })();
         service.Undo = Undo;
-
-        angular.module('jat.services.undo', []).service('undo', Undo);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+        angular.module('jat.services.undo', [])
+            .service('undo', Undo);
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=undo.js.map
 var jat;
 (function (jat) {
+    var service;
     (function (service) {
         var Validation = (function () {
             function Validation(find) {
@@ -7321,7 +6782,6 @@ var jat;
             Validation.prototype.addValidator = function (validator) {
                 this._validLibs.push(validator);
             };
-
             Validation.prototype.validatePlayer = function (player) {
                 var res = true;
                 for (var i = 0; i < this._validLibs.length; i++) {
@@ -7329,7 +6789,6 @@ var jat;
                 }
                 return res;
             };
-
             Validation.prototype.validateDraw = function (draw) {
                 var res = true;
                 for (var i = 0; i < this._validLibs.length; i++) {
@@ -7337,7 +6796,6 @@ var jat;
                 }
                 return res;
             };
-
             Validation.prototype.errorPlayer = function (message, player, detail) {
                 var a = [];
                 a.push('Validation error on', player.name);
@@ -7346,14 +6804,12 @@ var jat;
                 }
                 a.push(':', message);
                 console.warn(a.join(' '));
-
                 var c = this._errorsPlayer[player.id];
                 if (!c) {
                     c = this._errorsPlayer[player.id] = [];
                 }
                 c.push({ message: message, player: player, detail: detail });
             };
-
             Validation.prototype.errorDraw = function (message, draw, box, detail) {
                 var a = [];
                 a.push('Validation error on', draw.name);
@@ -7365,19 +6821,16 @@ var jat;
                 }
                 a.push(':', message);
                 console.warn(a.join(' '));
-
                 var c = this._errorsDraw[draw.id];
                 if (!c) {
                     c = this._errorsDraw[draw.id] = [];
                 }
                 c.push({ message: message, player: box ? box._player : undefined, position: box ? box.position : undefined, detail: detail });
             };
-
             Validation.prototype.hasErrorDraw = function (draw) {
                 var c = draw && this._errorsDraw[draw.id];
                 return c && c.length > 0;
             };
-
             Validation.prototype.hasErrorBox = function (box) {
                 var c = box && this._errorsDraw[box._draw.id];
                 if (c) {
@@ -7385,57 +6838,54 @@ var jat;
                 }
                 return !!e;
             };
-
             Validation.prototype.getErrorDraw = function (draw) {
                 return draw && this._errorsDraw[draw.id];
             };
-
             Validation.prototype.getErrorBox = function (box) {
                 var c = box && this._errorsDraw[box._draw.id];
                 if (c) {
                     return this.find.by(c, 'position', box.position);
                 }
             };
-
             Validation.prototype.resetPlayer = function (player) {
                 if (player) {
                     delete this._errorsPlayer[player.id];
-                } else {
+                }
+                else {
                     this._errorsPlayer = {};
                 }
             };
-
             Validation.prototype.resetDraw = function (draw) {
                 if (draw) {
                     delete this._errorsDraw[draw.id];
-                } else {
+                }
+                else {
                     this._errorsDraw = {};
                 }
             };
             return Validation;
         })();
         service.Validation = Validation;
-
-        angular.module('jat.services.validation', ['jat.services.find']).factory('validation', [
+        angular.module('jat.services.validation', ['jat.services.find'])
+            .factory('validation', [
             'find',
             function (find) {
                 return new Validation(find);
             }]);
-    })(jat.service || (jat.service = {}));
-    var service = jat.service;
+    })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=validation.js.map
 'use strict';
 /* Services */
 //*
 // Demonstrate how to register services
 // In this case it is a simple value service.
-angular.module('jat.services', []).value('version', '0.1');
-//*/
-//# sourceMappingURL=version.js.map
+angular.module('jat.services', []).
+    value('version', '0.1');
+//*/ 
 'use strict';
 var jat;
 (function (jat) {
+    var tournament;
     (function (tournament) {
         var dialogInfoCtrl = (function () {
             function dialogInfoCtrl(title, info) {
@@ -7448,15 +6898,14 @@ var jat;
             ];
             return dialogInfoCtrl;
         })();
-
-        angular.module('jat.tournament.dialog', []).controller('dialogInfoCtrl', dialogInfoCtrl);
-    })(jat.tournament || (jat.tournament = {}));
-    var tournament = jat.tournament;
+        angular.module('jat.tournament.dialog', [])
+            .controller('dialogInfoCtrl', dialogInfoCtrl);
+    })(tournament = jat.tournament || (jat.tournament = {}));
 })(jat || (jat = {}));
-//# sourceMappingURL=dialogInfo.js.map
 'use strict';
 var ec;
 (function (ec) {
+    var ui;
     (function (ui) {
         function ecInputFileDirective() {
             return {
@@ -7475,142 +6924,154 @@ var ec;
                 }
             };
         }
-
         function templateCache($templateCache) {
-            $templateCache.put("template/inputFile.html", "<input type='file' accept='application/json,text/plain'" + " style='position: relative; text-align: right; -moz-opacity:0; filter: alpha(opacity: 0); opacity: 0; z-index: 2; width: 80px;'>" + "<button style='position:absolute; left:0px; width:100%; z-index:1;' class='btn' ng-transclude></button>");
+            $templateCache.put("template/inputFile.html", 
+            //"<span style='position: relative;'>"
+            "<input type='file' accept='application/json,text/plain'"
+                + " style='position: relative; text-align: right; -webkit-opacity:0; -moz-opacity:0; filter: alpha(opacity: 0); opacity: 0; z-index: 2; width: 80px;'>"
+                + "<button style='position:absolute; left:0px; width:100%; z-index:1;' class='btn' ng-transclude></button>");
             /*
             <span class="fileinputs">
-            <input type="file" id="inputFile" accept="text/plain,application/json">
-            <button class="fakefile">Load</button>
+               <input type="file" id="inputFile" accept="text/plain,application/json">
+                <button class="fakefile">Load</button>
             </span>
             */
         }
-
-        angular.module('ec.inputFile', []).directive('ecInputFile', ecInputFileDirective).run(["$templateCache", templateCache]);
-    })(ec.ui || (ec.ui = {}));
-    var ui = ec.ui;
+        angular.module('ec.inputFile', [])
+            .directive('ecInputFile', ecInputFileDirective)
+            .run(["$templateCache", templateCache]);
+    })(ui = ec.ui || (ec.ui = {}));
 })(ec || (ec = {}));
 /*
 <!DOCTYPE html>
 <html>
-<head>
-<title>Test upload</title>
-<style>
-.dropable {
-background-color: lightgreen;
-cursor: move;
-}
-.fileinputs {
-position: relative;
-}
-.fakefile {
-position: absolute;
-left: 0px;
-width: 100%;
-z-index: 1;
-}
-input[type="file"] {
-position: relative;
-text-align: right;
--moz-opacity:0 ;
-filter:alpha(opacity: 0);
-opacity: 0;
-z-index: 2;
-width: 56px;
-}
-</style>
-</head>
-<body>
-.<span class="fileinputs"><input type="file" id="inputFile" accept="text/plain,application/json"><button class="fakefile">Load</button></span>.<br/>
-<textarea id="fileContent" rows="5" cols="60"></textarea><br/>
-<input id="filename" type="text" value="myfile.txt"><button id="btnSave">Save</button>
-<script>
-(function() {
-'use strict';
-var fi = document.getElementById('inputFile');
-var fc = document.getElementById('fileContent');
-fi.addEventListener('change', function(event) {
-loadFile(event.target.files[0]);
-});
-fi.addEventListener("dragenter", dragover, false);
-fi.addEventListener("dragover", dragover, false);
-document.addEventListener("dragleave", dragover, false);
-fi.addEventListener("drop", drop, false);
-fc.addEventListener("dragenter", dragover, false);
-fc.addEventListener("dragover", dragover, false);
-fc.addEventListener("drop", drop, false);
-function dragover(event) {
-event.stopPropagation();
-event.preventDefault();
-var target = event.target;
-target.className = /enter|over/.test(event.type) ? 'dropable' : '';
-}
-function drop(event) {
-dragover(event);
-loadFile(event.dataTransfer.files[0]);
-}
-function loadFile(file) {
-console && console.info(file);
-var reader = new FileReader();
-reader.addEventListener("loadend", function() {
-console && console.info(reader.result);
-fileContent.value = reader.result;
-});
-reader.readAsText(file);
-}
-var bSave = document.getElementById('btnSave');
-var filename = document.getElementById('filename');
-bSave.addEventListener('click', function(event) {
-var blob = new Blob([fc.value], {type: 'text/plain'});
-saveAs(blob, filename.value);
-});
-var saveAs = saveAs || function(blob, filename) {
-var a = document.createElement('a');
-a.download = filename;
-a.href = URL.createObjectURL(blob);
-a.textContent = filename;
-a.click();
-URL.revokeObjectURL(a.href);
-a = null;
-//document.body.appendChild(a);
-}
-})();
-</script>
-</body>
+    <head>
+        <title>Test upload</title>
+        <style>
+            .dropable {
+                background-color: lightgreen;
+                cursor: move;
+            }
+            .fileinputs {
+                position: relative;
+            }
+            .fakefile {
+                position: absolute;
+                left: 0px;
+                width: 100%;
+                z-index: 1;
+            }
+
+            input[type="file"] {
+                position: relative;
+                text-align: right;
+                -webkit-opacity:0 ;
+                -moz-opacity:0 ;
+                filter:alpha(opacity: 0);
+                opacity: 0;
+                z-index: 2;
+                
+                width: 56px;
+            }
+        </style>
+    </head>
+    <body>
+        .<span class="fileinputs"><input type="file" id="inputFile" accept="text/plain,application/json"><button class="fakefile">Load</button></span>.<br/>
+        <textarea id="fileContent" rows="5" cols="60"></textarea><br/>
+        <input id="filename" type="text" value="myfile.txt"><button id="btnSave">Save</button>
+        <script>
+            (function() {
+                'use strict';
+
+                var fi = document.getElementById('inputFile');
+                var fc = document.getElementById('fileContent');
+
+                fi.addEventListener('change', function(event) {
+                    loadFile(event.target.files[0]);
+                });
+                fi.addEventListener("dragenter", dragover, false);
+                fi.addEventListener("dragover", dragover, false);
+                document.addEventListener("dragleave", dragover, false);
+                fi.addEventListener("drop", drop, false);
+                fc.addEventListener("dragenter", dragover, false);
+                fc.addEventListener("dragover", dragover, false);
+                fc.addEventListener("drop", drop, false);
+
+                function dragover(event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    var target = event.target;
+                    target.className = /enter|over/.test(event.type) ? 'dropable' : '';
+                }
+                function drop(event) {
+                    dragover(event);
+                    loadFile(event.dataTransfer.files[0]);
+                }
+
+                function loadFile(file) {
+                    console && console.info(file);
+
+                    var reader = new FileReader();
+                    reader.addEventListener("loadend", function() {
+                        console && console.info(reader.result);
+                        fileContent.value = reader.result;
+                    });
+                    reader.readAsText(file);
+                }
+
+                var bSave = document.getElementById('btnSave');
+                var filename = document.getElementById('filename');
+                bSave.addEventListener('click', function(event) {
+                    var blob = new Blob([fc.value], {type: 'text/plain'});
+                    saveAs(blob, filename.value);
+                });
+
+                var saveAs = saveAs || function(blob, filename) {
+                    var a = document.createElement('a');
+                    a.download = filename;
+                    a.href = URL.createObjectURL(blob);
+                    a.textContent = filename;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                    a = null;
+                    //document.body.appendChild(a);
+                }
+
+            })();
+        </script>
+    </body>
 </html>
-*/
-//# sourceMappingURL=ec-inputfile.js.map
+*/ 
 'use strict';
 var ec;
 (function (ec) {
+    var ui;
     (function (ui) {
-        
-
         /**
-        * @ngdoc directive
-        * @name ec.panels.directive:panelset
-        * @restrict EA
-        *
-        * @description
-        * Panelset is the outer container for the panels directive
-        *
-        * @param {boolean=} vertical Whether or not to use vertical styling for the panels.
-        *
-        * @example
+         * @ngdoc directive
+         * @name ec.panels.directive:panelset
+         * @restrict EA
+         *
+         * @description
+         * Panelset is the outer container for the panels directive
+         *
+         * @param {boolean=} vertical Whether or not to use vertical styling for the panels.
+         *
+         * @example
         <example module="ec">
-        <file name="index.html">
-        <ec-panelset>
-        <ec-badge>A</ec-badge><panel heading="Vertical Panel 1"><b>First</b> Content!</panel>
-        <panel heading="Vertical Panel 2"><i>Second</i> Content!</panel>
-        </panelset>
-        <hr />
-        <panelset vertical="true">
-        <panel heading="Vertical Panel 1"><b>First</b> Vertical Content!</panel>
-        <panel heading="Vertical Panel 2"><i>Second</i> Vertical Content!</panel>
-        </panelset>
-        </file>
+          <file name="index.html">
+            <ec-panelset>
+              <ec-badge>A</ec-badge><panel heading="Vertical Panel 1"><b>First</b> Content!</panel>
+              <panel heading="Vertical Panel 2"><i>Second</i> Content!</panel>
+            </panelset>
+            <hr />
+            <panelset vertical="true">
+              <panel heading="Vertical Panel 1"><b>First</b> Vertical Content!</panel>
+              <panel heading="Vertical Panel 2"><i>Second</i> Vertical Content!</panel>
+            </panelset>
+          </file>
         </example>
-        */
+         */
         var PanelsetController = (function () {
             //static $inject = [];
             function PanelsetController() {
@@ -7639,13 +7100,13 @@ var ec;
                     if (this.panels[i].isOpen) {
                         this.selectCount++;
                         n = 0;
-                    } else {
+                    }
+                    else {
                         n--;
                     }
                     this.panels[i].marginLeft = n;
                 }
             };
-
             PanelsetController.prototype.addBadge = function (badge) {
                 var _this = this;
                 this.badges.push(badge);
@@ -7653,7 +7114,6 @@ var ec;
                     return _this.removeBadge(badge);
                 });
             };
-
             PanelsetController.prototype.addPanel = function (panel) {
                 var _this = this;
                 var badge = this.badges[this.panels.length];
@@ -7668,7 +7128,6 @@ var ec;
                     return _this.removePanel(panel);
                 });
             };
-
             PanelsetController.prototype.removePanel = function (panel) {
                 var index = this.panels.indexOf(panel);
                 if (panel.isOpen) {
@@ -7679,7 +7138,6 @@ var ec;
                 }
                 this.panels.splice(index, 1);
             };
-
             PanelsetController.prototype.removeBadge = function (badge) {
                 var index = this.badges.indexOf(badge);
                 if (badge.panel) {
@@ -7689,7 +7147,6 @@ var ec;
             };
             return PanelsetController;
         })();
-
         var PanelController = (function () {
             function PanelController($scope) {
                 this.scope = $scope;
@@ -7699,7 +7156,6 @@ var ec;
             ];
             return PanelController;
         })();
-
         function ecPanelsetDirective() {
             return {
                 restrict: 'EA',
@@ -7710,7 +7166,6 @@ var ec;
                 templateUrl: 'template/panels/panelset.html'
             };
         }
-
         //ecPanelDirective.$inject = ['$parse'];
         function ecPanelDirective() {
             return {
@@ -7728,24 +7183,20 @@ var ec;
                 link: function postLink(scope, elm, attrs, panelsetCtrl) {
                     //scope.isOpen = scope.isOpen == 'true';
                     panelsetCtrl.addPanel(scope);
-
                     scope.$watch('isOpen', function (value) {
                         return panelsetCtrl.select(scope, !!value);
                     });
-
                     scope.toggleOpen = function () {
                         if (!scope.isDisabled) {
                             scope.isOpen = !scope.isOpen;
                         }
                     };
-
                     scope.getWidth = function () {
                         return panelsetCtrl.selectCount ? (Math.floor(100 / panelsetCtrl.selectCount) + '%') : 'auto';
                     };
                 }
             };
         }
-
         function ecBadgeDirective() {
             return {
                 require: '^ecPanelset',
@@ -7756,40 +7207,51 @@ var ec;
                 scope: {},
                 link: function postLink(scope, elm, attrs, panelsetCtrl) {
                     scope.panel = null;
-
                     panelsetCtrl.addBadge(scope);
                 }
             };
         }
-
         function ecHeaderDirective() {
             return {
                 require: '^ecPanel',
                 restrict: 'EA',
                 replace: true,
                 templateUrl: 'template/panels/header.html',
-                transclude: true,
+                transclude: true //implies a new scope
+                ,
                 link: function postLink(scope, elm, attrs, panelCtrl) {
                     scope.panel = panelCtrl.scope;
                 }
             };
         }
-
         function templateCache($templateCache) {
-            $templateCache.put("template/panels/panelset.html", "<div class='panels'" + " ng-transclude>" + "</div>");
-
-            $templateCache.put("template/panels/badge.html", "<div class='panelbadge' ng-class='{active: panel.isOpen, disabled: panel.isDisabled}'" + " ng-style=\"{'margin-left': (panel.marginLeft) * 3 +'em'}\"" + " ng-click='panel.toggleOpen()' ng-dblclick='panel.toggleOpen(true)'" + " ng-transclude>" + "</div>");
-
-            $templateCache.put("template/panels/panel.html", "<div class='panel' ng-class='{active: isOpen, disabled: isDisabled}'" + " ng-style=\"{'width': isOpen ? getWidth() : 0}\"" + " ng-transclude>" + "</div>");
-
-            $templateCache.put("template/panels/header.html", "<div class='header'" + " ng-style=\"{'margin-left': (1 + panel.marginLeft) * 3 +'em'}\"" + " ng-transclude>" + "</div>");
+            $templateCache.put("template/panels/panelset.html", "<div class='panels'"
+                + " ng-transclude>"
+                + "</div>");
+            $templateCache.put("template/panels/badge.html", "<div class='panelbadge' ng-class='{active: panel.isOpen, disabled: panel.isDisabled}'"
+                + " ng-style=\"{'margin-left': (panel.marginLeft) * 3 +'em'}\""
+                + " ng-click='panel.toggleOpen()' ng-dblclick='panel.toggleOpen(true)'"
+                + " ng-transclude>"
+                + "</div>");
+            $templateCache.put("template/panels/panel.html", "<div class='panel' ng-class='{active: isOpen, disabled: isDisabled}'"
+                + " ng-style=\"{'width': isOpen ? getWidth() : 0}\""
+                + " ng-transclude>"
+                + "</div>");
+            $templateCache.put("template/panels/header.html", "<div class='header'"
+                + " ng-style=\"{'margin-left': (1 + panel.marginLeft) * 3 +'em'}\""
+                + " ng-transclude>"
+                + "</div>");
         }
-
-        angular.module('ec.panels', []).controller('PanelsetController', PanelsetController).controller('PanelController', PanelController).directive('ecPanelset', ecPanelsetDirective).directive('ecPanel', ecPanelDirective).directive('ecBadge', ecBadgeDirective).directive('ecHeader', ecHeaderDirective).run(["$templateCache", templateCache]);
-    })(ec.ui || (ec.ui = {}));
-    var ui = ec.ui;
+        angular.module('ec.panels', [])
+            .controller('PanelsetController', PanelsetController)
+            .controller('PanelController', PanelController)
+            .directive('ecPanelset', ecPanelsetDirective)
+            .directive('ecPanel', ecPanelDirective)
+            .directive('ecBadge', ecBadgeDirective)
+            .directive('ecHeader', ecHeaderDirective)
+            .run(["$templateCache", templateCache]);
+    })(ui = ec.ui || (ec.ui = {}));
 })(ec || (ec = {}));
-//# sourceMappingURL=ec-panels.js.map
 var polyfill;
 (function (polyfill) {
     //TODO autofocus directive
@@ -7801,50 +7263,40 @@ var polyfill;
             error: angular.noop
         };
     }
-
     if (!Array.prototype.indexOf) {
         Array.prototype.indexOf = function (searchElement, fromIndex) {
             var k;
-
             // 1. Let O be the result of calling ToObject passing
             //    the this value as the argument.
             if (this == null) {
                 throw new TypeError('"this" is null or not defined');
             }
-
             var O = Object(this);
-
             // 2. Let lenValue be the result of calling the Get
             //    internal method of O with the argument "length".
             // 3. Let len be ToUint32(lenValue).
             var len = O.length >>> 0;
-
             // 4. If len is 0, return -1.
             if (len === 0) {
                 return -1;
             }
-
             // 5. If argument fromIndex was passed let n be
             //    ToInteger(fromIndex); else let n be 0.
             var n = +fromIndex || 0;
-
             if (Math.abs(n) === Infinity) {
                 n = 0;
             }
-
             // 6. If n >= len, return -1.
             if (n >= len) {
                 return -1;
             }
-
             // 7. If n >= 0, then Let k be n.
             // 8. Else, n<0, Let k be len - abs(n).
             //    If k is less than 0, then let k be 0.
             k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
-
+            // 9. Repeat, while k < len
             while (k < len) {
                 var kValue;
-
                 // a. Let Pk be ToString(k).
                 //   This is implicit for LHS operands of the in operator
                 // b. Let kPresent be the result of calling the
@@ -7866,8 +7318,8 @@ var polyfill;
         };
     }
 })(polyfill || (polyfill = {}));
-//# sourceMappingURL=polyfill.js.map
-angular.module('jat.utils.checkList', []).directive('checkList', function () {
+angular.module('jat.utils.checkList', [])
+    .directive('checkList', function () {
     return {
         scope: {
             list: '=checkList',
@@ -7880,21 +7332,19 @@ angular.module('jat.utils.checkList', []).directive('checkList', function () {
                     elem.prop('checked', index != -1);
                 }
             }, true);
-
             function changeHandler() {
                 var checked = elem.prop('checked');
                 if (!scope.list) {
                     scope.list = [];
                 }
                 var index = scope.list.indexOf(scope.value);
-
                 if (checked && index == -1) {
                     scope.list.push(scope.value);
-                } else if (!checked && index != -1) {
+                }
+                else if (!checked && index != -1) {
                     scope.list.splice(index, 1);
                 }
             }
-
             elem.bind('change', function () {
                 scope.$apply(changeHandler);
             });
@@ -7903,40 +7353,43 @@ angular.module('jat.utils.checkList', []).directive('checkList', function () {
 });
 /*
 .directive('checkedArray', () => {
-return {
-restrict: 'A',
-require: '?ngModel', // get a hold of NgModelController
-scope: {
-array: '=checkedArray',
-value: '@'
-},
-link: (scope, element, attrs, ngModel) => {
-if (!ngModel) return; // do nothing if no ng-model
-// Specify how UI should be updated
-ngModel.$render = () => {
-//console.log("render:" + ngModel.$viewValue);
-var index = scope.array.indexOf( element.val());
-element.prop('checked', index !== -1);
-};
-// Listen for change events to enable binding
-element.bind('change', (event) => {
-console.log("change, event:" + event.target.checked);
-scope.$apply(read);
+    return {
+        restrict: 'A',
+        require: '?ngModel', // get a hold of NgModelController
+        scope: {
+            array: '=checkedArray',
+            value: '@'
+        },
+        link: (scope, element, attrs, ngModel) => {
+
+            if (!ngModel) return; // do nothing if no ng-model
+
+            // Specify how UI should be updated
+            ngModel.$render = () => {
+                //console.log("render:" + ngModel.$viewValue);
+                var index = scope.array.indexOf( element.val());
+                element.prop('checked', index !== -1);
+            };
+
+            // Listen for change events to enable binding
+            element.bind('change', (event) => {
+                console.log("change, event:" + event.target.checked);
+                scope.$apply(read);
+            });
+            read(); // initialize
+            //ngModel.$setViewValue(true);
+
+            // Write data to the model
+            function read() {
+                //console.log("read:");
+                //ngModel.$setViewValue(element.prop('checked'));
+                var index = scope.array.indexOf( element.val());
+                ngModel.$setViewValue( index !== -1);
+            }
+        }
+    };
 });
-read(); // initialize
-//ngModel.$setViewValue(true);
-// Write data to the model
-function read() {
-//console.log("read:");
-//ngModel.$setViewValue(element.prop('checked'));
-var index = scope.array.indexOf( element.val());
-ngModel.$setViewValue( index !== -1);
-}
-}
-};
-});
-//*/
-//# sourceMappingURL=checkList.js.map
+//*/ 
 var tool;
 (function (tool) {
     function copy(source, destination) {
@@ -7945,13 +7398,16 @@ var tool;
             if (source) {
                 if (angular.isArray(source)) {
                     destination = copy(source, []);
-                } else if (angular.isDate(source)) {
+                }
+                else if (angular.isDate(source)) {
                     destination = new Date(source.getTime());
-                } else if (angular.isObject(source)) {
+                }
+                else if (angular.isObject(source)) {
                     destination = copy(source, {});
                 }
             }
-        } else {
+        }
+        else {
             if (source === destination)
                 throw Error("Can't copy equivalent objects or arrays");
             if (angular.isArray(source)) {
@@ -7959,7 +7415,8 @@ var tool;
                 for (var i = 0; i < source.length; i++) {
                     destination.push(copy(source[i]));
                 }
-            } else {
+            }
+            else {
                 for (var key in source) {
                     if (source.hasOwnProperty(key) && "_$".indexOf(key.charAt(0)) == -1) {
                         destination[key] = copy(source[key]);
@@ -7970,20 +7427,19 @@ var tool;
         return destination;
     }
     tool.copy = copy;
-
     function shuffle(array, from, toExlusive) {
         from = from || 0;
         if (arguments.length < 3) {
             toExlusive = array.length;
         }
-
         var n = toExlusive - from;
         if (n == 2) {
             //if only two elements, swap them
             var tmp = array[0];
             array[0] = array[1];
             array[1] = tmp;
-        } else {
+        }
+        else {
             for (var i = toExlusive - 1; i > from; i--) {
                 var t = from + Math.floor(n * Math.random());
                 var tmp = array[t];
@@ -7994,7 +7450,6 @@ var tool;
         return array;
     }
     tool.shuffle = shuffle;
-
     function filledArray(size, value) {
         var a = new Array(size);
         for (var i = size - 1; i >= 0; i--) {
@@ -8003,7 +7458,6 @@ var tool;
         return a;
     }
     tool.filledArray = filledArray;
-
     function hashById(array) {
         if (!array) {
             return;
@@ -8019,4 +7473,3 @@ var tool;
     }
     tool.hashById = hashById;
 })(tool || (tool = {}));
-//# sourceMappingURL=tool.js.map

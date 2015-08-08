@@ -3,6 +3,39 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
+        tsconfig: {
+            make:{
+                options: {
+                    /* The main feature is to put files in your tsconfig.json file based on this filesGlob... */
+                    filesGlob: [
+                        "./app/**/*.ts",
+                        "./lib/**/*.d.ts",
+                        "!./app/JATennis.d.ts",
+                        "!./lib/**/*mock*.d.ts",
+                        "!./lib/**/angular*1.0*.d.ts",
+                        "!./lib/**/angular*scenario*.d.ts",
+                        "!./node_modules/**/*.ts"
+                    ],
+     
+                    /* if rootDir is provided, this will be the output-destination of the file, and the starting-point of the filesGlob */
+                    /* rootDir:'scripts/', */
+     
+                    /* Anything added to "additionalOptions" will also be put into the tsconfig.json file */
+                    additionalOptions: {
+                        compilerOptions:{
+                            "version":"1.5.0",
+                            "target": "es3",
+                            "module": "amd",
+                            "declaration": false,
+                            "noImplicitAny": false,
+                            "removeComments": false,
+                            "noLib": false
+                        }
+                    }
+                }
+            }
+        },
+
         clean: ["dist", '.tmp'],
 
         copy: {
