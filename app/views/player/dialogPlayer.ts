@@ -18,8 +18,8 @@ module jat.player {
             private title: string,
             private player: models.Player,
             private events: models.Event[],
-            rank: ServiceRank,
-            category: ServiceCategory
+            rank: Rank,
+            category: Category
             ) {
 
             this.ranks = rank.list();

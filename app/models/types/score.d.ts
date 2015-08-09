@@ -1,5 +1,5 @@
 interface ScoreString extends String { }
 
-interface ServiceScore {
+interface Score {
     isValid(score: ScoreString): boolean;
 }

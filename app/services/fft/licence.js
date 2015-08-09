@@ -2,25 +2,25 @@ var jat;
 (function (jat) {
     var fft;
     (function (fft) {
-        var Licence = (function () {
-            function Licence() {
+        var LicenceFFT = (function () {
+            function LicenceFFT() {
             }
-            Licence.prototype.isValid = function (licence) {
-                var a = Licence.reLicence.exec(licence + " ");
+            LicenceFFT.prototype.isValid = function (licence) {
+                var a = LicenceFFT.reLicence.exec(licence + " ");
                 if (a === null) {
                     return false;
                 }
                 //check licence key
                 var v = parseInt(a[1]);
-                var k = Licence.keys.charAt(v % 23);
+                var k = LicenceFFT.keys.charAt(v % 23);
                 return k == a[2];
             };
-            Licence.reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;
-            Licence.keys = "ABCDEFGHJKLMNPRSTUVWXYZ";
-            return Licence;
+            LicenceFFT.reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;
+            LicenceFFT.keys = "ABCDEFGHJKLMNPRSTUVWXYZ";
+            return LicenceFFT;
         })();
-        fft.Licence = Licence;
+        fft.LicenceFFT = LicenceFFT;
         angular.module('jat.services.fft.licence', [])
-            .service('licence', Licence);
+            .service('licence', LicenceFFT);
     })(fft = jat.fft || (jat.fft = {}));
 })(jat || (jat = {}));

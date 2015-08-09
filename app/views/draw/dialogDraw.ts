@@ -34,8 +34,8 @@ module jat.draw {
             private title: string,
             private draw: models.Draw,
             //private selection: jat.service.Selection,
-            private rank: ServiceRank,
-            category: ServiceCategory,
+            private rank: Rank,
+            category: Category,
             private drawLib: jat.service.DrawLib,
             private tournamentLib: jat.service.TournamentLib
             ,$scope: ng.IScope

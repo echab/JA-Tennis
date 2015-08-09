@@ -1,6 +1,6 @@
 namespace jat.fft {
 
-    export class Rank implements ServiceRank {
+    export class RankFFT implements Rank {
 
         private _group: { [groupName: string]: string } = {
             "4e série": "NC,40,30/5,30/4,30/3,30/2,30/1",
@@ -73,6 +73,6 @@ namespace jat.fft {
     }
 
     angular.module('jat.services.fft.rank', [])
-        .service('rank', Rank)
+        .service('rank', RankFFT)
     ;
 }

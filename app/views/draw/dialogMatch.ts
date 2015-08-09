@@ -4,7 +4,7 @@ module jat.match {
         player1: models.Player;
         player2: models.Player;
         places: string[];
-        matchFormats: any;  //TODO !any
+        matchFormats: { [code: string]: MatchFormat };
 
         static $inject = [
             'title',
@@ -19,7 +19,7 @@ module jat.match {
             private match: models.Match,
             find: jat.service.Find,
             drawLib: jat.service.DrawLib,
-            matchFormat: ServiceMatchFormat
+            matchFormat: MatchFormats
             ) {
 
             var tournament = match._draw._event._tournament;

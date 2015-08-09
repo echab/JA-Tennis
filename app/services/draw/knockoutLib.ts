@@ -1,9 +1,6 @@
-module jat.service {    //TODO noy a service but a  function library
+module jat.service {    //TODO not a service but a static function library
 
     export class KnockoutLib {
-
-        constructor() {
-        }
 
         column(pos: number): number {    //iCol
             //TODO, use a table
@@ -65,6 +62,13 @@ module jat.service {    //TODO noy a service but a  function library
         }
         positionOpponent2(pos: number): number { //ADVERSAIRE2
             return (pos << 1) + 1;
+        }
+
+        positionOpponents(pos: number): { pos1: number; pos2: number } { //ADVERSAIRE1, ADVERSAIRE2
+            return {
+                pos1: (pos << 1) + 2,
+                pos2: (pos << 1) + 1
+            };
         }
     }
 

@@ -31,7 +31,7 @@ module jat.service {
             private drawLib: jat.service.DrawLib,
             private knockoutLib: jat.service.KnockoutLib,
             private tournamentLib: jat.service.TournamentLib,
-            private rank: ServiceRank,
+            private rank: Rank,
             private find: Find
             ) {
             drawLib._drawLibs[models.DrawType.Normal]
@@ -91,12 +91,12 @@ module jat.service {
             if (generate === models.GenerateType.Create) {   //from registred players
                 var m_nMatchCol = tool.filledArray(MAX_COL, 0);
 
-                var players = this.tournamentLib.GetJoueursInscrit(draw);
+                var players : Array<models.Player|number> = this.tournamentLib.GetJoueursInscrit(draw);
 
                 //Récupère les qualifiés sortants du tableau précédent
                 var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = this.drawLib.previousGroup(draw);
                 if (prev) {
-                    players = players.concat(<any>this.drawLib.findAllPlayerOut(prev, true));
+                    players = players.concat(this.drawLib.findAllPlayerOut(prev, true));
                 }
 
                 this.drawLib.resetDraw(draw, players.length);
@@ -331,10 +331,10 @@ module jat.service {
             return false;
         }
 
-        private GetJoueursTableau(draw: models.Draw): models.Player[] {
+        private GetJoueursTableau(draw: models.Draw): Array<models.Player|number> {
 
             //Récupère les joueurs du tableau
-            var ppJoueur: models.Player[] = [];
+            var ppJoueur: Array<models.Player|number> = [];
             for (var i = 0; i < draw.boxes.length; i++) {
 
                 var boxIn = <models.PlayerIn>draw.boxes[i];
@@ -343,7 +343,7 @@ module jat.service {
                 }
                 //Récupérer les joueurs et les Qualifiés entrants
                 if (boxIn.qualifIn) {
-                    ppJoueur.push(<any>boxIn.qualifIn);	//no qualifie entrant
+                    ppJoueur.push(boxIn.qualifIn);	//no qualifie entrant
                 } else if (this.isJoueurNouveau(boxIn)) {
                     ppJoueur.push(boxIn._player);	//no du joueur
                 }
@@ -353,7 +353,7 @@ module jat.service {
         }
 
         //Place les matches dans l'ordre
-        private ConstruitMatch(oldDraw: models.Draw, m_nMatchCol: number[], players: models.Player[]): models.Draw {
+        private ConstruitMatch(oldDraw: models.Draw, m_nMatchCol: number[], players: Array<models.Player|number>): models.Draw {
 
             var k = this.knockoutLib;
             var draw = this.drawLib.newDraw(oldDraw._event, oldDraw);
@@ -440,7 +440,7 @@ module jat.service {
                 if (!pbMatch[b] && pbMatch[k.positionMatch(b)]) {
 
                     //Qualifiés entrants se rencontrent
-                    var qualif: number = 'number' === typeof players[iJoueur] ? <any>players[iJoueur] : 0;
+                    var qualif: number = 'number' === typeof players[iJoueur] ? <number>players[iJoueur] : 0;
                     if (qualif) {
                         var boxIn2 = <models.PlayerIn>this.findBox(draw, k.positionOpponent(b));
                         if (boxIn2 && boxIn2.qualifIn) {
@@ -449,7 +449,7 @@ module jat.service {
                                 if (angular.isObject(players[t])) {
                                     //switch
                                     var p = players[t];
-                                    players[t] = <any> qualif;
+                                    players[t] = qualif;
                                     players[iJoueur] = p;
                                     qualif = 0;
                                     break;
@@ -464,7 +464,7 @@ module jat.service {
                         if (qualif) {	//Qualifié entrant
                             this.drawLib.setPlayerIn(boxIn, qualif);
                         } else {	//Joueur
-                            this.drawLib.MetJoueur(boxIn, players[iJoueur]);
+                            this.drawLib.MetJoueur(boxIn, <models.Player>players[iJoueur]);
 
                             if ((!draw.minRank || !this.rank.isNC(draw.minRank))
                                 || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
@@ -792,7 +792,7 @@ module jat.service {
                     if (!box) {
                         return;
                     }
-                    bOk = (<any>(box.playerId) || bToutesBoites);
+                    bOk = (!!box.playerId || bToutesBoites);
                 } while (!bOk);
 
                 if (bOk) {
@@ -985,7 +985,7 @@ module jat.service {
             (drawLib: jat.service.DrawLib,
                 knockoutLib: jat.service.KnockoutLib,
                 tournamentLib: jat.service.TournamentLib,
-                rank: ServiceRank,
+                rank: Rank,
                 find: Find) => {
                 return new Knockout(drawLib, knockoutLib, tournamentLib, rank, find);
             }]);

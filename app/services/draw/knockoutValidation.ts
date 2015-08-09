@@ -13,9 +13,9 @@
             private drawLib: jat.service.DrawLib,
             private knockoutLib: jat.service.KnockoutLib,
             private tournamentLib: jat.service.TournamentLib,
-            private rank: ServiceRank,
-            private category: ServiceCategory,
-            private score: ServiceScore,
+            private rank: Rank,
+            private category: Category,
+            private score: Score,
             private find: jat.service.Find
             ) {
             validation.addValidator(this);
@@ -613,9 +613,9 @@
                 drawLib: jat.service.DrawLib,
                 knockoutLib: jat.service.KnockoutLib,
                 tournamentLib: jat.service.TournamentLib,
-                rank: ServiceRank,
-                category: ServiceCategory,
-                score: ServiceScore,
+                rank: Rank,
+                category: Category,
+                score: Score,
                 find: jat.service.Find) => {
                 return new KnockoutValidation(validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
             }]);

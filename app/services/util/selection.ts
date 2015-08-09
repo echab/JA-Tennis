@@ -1,7 +1,5 @@
 'use strict';
 
-// Selection service
-
 module jat.service {
 
     export class Selection {
@@ -11,32 +9,36 @@ module jat.service {
         public box: models.Box;
         public player: models.Player;
 
-        select(r: any, type?: models.ModelType): void {
+        select(r: models.Box | models.Draw | models.Event | models.Player | models.Tournament, type?: models.ModelType): void {
             if (r) {
-                if (type === models.ModelType.Box || ('_player' in r && r._draw)) { //box
-                    this.tournament = r._draw._event._tournament;
-                    this.event = r._draw._event;
-                    this.draw = r._draw;
-                    this.box = r;
+                if (type === models.ModelType.Box || ('_player' in r && (<models.Box>r)._draw)) { //box
+                    var b = <models.Box>r;
+                    this.tournament = b._draw._event._tournament;
+                    this.event = b._draw._event;
+                    this.draw = b._draw;
+                    this.box = b;
 
-                } else if (type === models.ModelType.Draw || r._event) { //draw
-                    this.tournament = r._event._tournament;
-                    this.event = r._event;
-                    this.draw = r;
+                } else if (type === models.ModelType.Draw || (<models.Draw>r)._event) { //draw
+                    var d = <models.Draw>r;
+                    this.tournament = d._event._tournament;
+                    this.event = d._event;
+                    this.draw = d;
                     this.box = undefined;
 
-                } else if (type === models.ModelType.Event || (r.draws && r._tournament)) { //event
-                    this.tournament = r._tournament;
-                    this.event = r;
-                    this.draw = r.draws ? r.draws[0] : undefined;
+                } else if (type === models.ModelType.Event || ((<models.Event>r).draws && (<models.Event>r)._tournament)) { //event
+                    var e = <models.Event>r;
+                    this.tournament = e._tournament;
+                    this.event = e;
+                    this.draw = e.draws ? e.draws[0] : undefined;
                     this.box = undefined;
 
-                } else if (type === models.ModelType.Player || (r.name && r._tournament)) {   //player
-                    this.tournament = r._tournament;
-                    this.player = r;
+                } else if (type === models.ModelType.Player || ((<models.Player>r).name && (<models.Player>r)._tournament)) {   //player
+                    var p = <models.Player>r;
+                    this.tournament = p._tournament;
+                    this.player = p;
 
-                } else if (type === models.ModelType.Tournament || (r.players && r.events)) { //tournament
-                    this.tournament = r;
+                } else if (type === models.ModelType.Tournament || ((<models.Tournament>r).players && (<models.Tournament>r).events)) { //tournament
+                    this.tournament = <models.Tournament>r;
                     if (this.tournament.events[0]) {
                         this.event = this.tournament.events[0];
                         this.draw = this.event && this.event.draws ? this.event.draws[this.event.draws.length - 1] : undefined;

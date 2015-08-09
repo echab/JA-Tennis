@@ -21,8 +21,8 @@ module jat.event {
             private title: string,
             private event: models.Event,
             private tournamentLib: jat.service.TournamentLib,
-            rank: ServiceRank,
-            category: ServiceCategory
+            rank: Rank,
+            category: Category
             ) {
 
             this.ranks = rank.list();

@@ -29,7 +29,7 @@
 
 <!-- Begin Templates -->
 <script type="text/ng-template" id="views/draw/dialogDraw.html">
-<form name="drawForm" ng-submit="$close('Ok')" zzzng-controller="dialogDrawCtrl as dlg" class="modal-form form-horizontal">
+<form name="drawForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
         <h3>{{dlg.title}} <!--<small>Id: {{dlg.draw.id}}</small>--> {{dlg.draw.name}}</h3>
@@ -273,7 +273,7 @@
 </script>
 
 <script type="text/ng-template" id="views/event/dialogEvent.html">
-<form name="eventForm" ng-submit="$close('Ok')" zzzng-controller="dialogEventCtrl as dlg" class="modal-form form-horizontal">
+<form name="eventForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
@@ -514,7 +514,7 @@
 </script>
 
 <script type="text/ng-template" id="views/player/dialogPlayer.html">
-<form name="playerForm" ng-submit="$close('Ok')" zzzng-controller="dialogPlayerCtrl as dlg" class="modal-form form-horizontal">
+<form name="playerForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>

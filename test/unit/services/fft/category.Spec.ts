@@ -5,14 +5,14 @@
 'use strict';
 
 describe('services.fft.category', function () {
-    var category: jat.fft.Category;
+    var category: jat.fft.CategoryFFT;
     var now = new Date();
     //var march = new Date(2014, 2, 14);
     //var november = new Date(2014, 10, 14);
 
     it('should inject category', function () {
         module('jat.services.type');
-        inject(function (_category_: jat.fft.Category) {
+        inject(function (_category_: jat.fft.CategoryFFT) {
             category = _category_;
         });
     });

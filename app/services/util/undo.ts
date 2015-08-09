@@ -293,7 +293,7 @@ module jat.service {
             return r;
         }
 
-        public redo(): void {
+        public redo(): any {
             if (!this.canRedo()) {
                 throw "Can't redo";
             }

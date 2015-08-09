@@ -2,11 +2,11 @@ var jat;
 (function (jat) {
     var fft;
     (function (fft) {
-        var Score = (function () {
-            function Score() {
+        var ScoreFFT = (function () {
+            function ScoreFFT() {
             }
-            Score.prototype.isValid = function (score) {
-                var a = Score.reScore.exec(score + " ");
+            ScoreFFT.prototype.isValid = function (score) {
+                var a = ScoreFFT.reScore.exec(score + " ");
                 if (a === null) {
                     return false;
                 }
@@ -32,24 +32,24 @@ var jat;
                 }
                 return true;
             };
-            Score.reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
-            return Score;
+            ScoreFFT.reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
+            return ScoreFFT;
         })();
-        fft.Score = Score;
+        fft.ScoreFFT = ScoreFFT;
         var MAX_SET = 5;
-        var ScoreFFT = (function () {
-            function ScoreFFT(score, fm) {
+        var ScoreDeltaFFT = (function () {
+            function ScoreDeltaFFT(score, fm) {
                 //TODO parse
                 return;
             }
-            ScoreFFT.prototype.getnSet = function () {
+            ScoreDeltaFFT.prototype.getnSet = function () {
                 var i = 0;
                 while (i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2)) {
                     i++;
                 }
                 return i - 1;
             };
-            ScoreFFT.prototype.deltaSet = function (bVainqueur /*, BOOL bEquipe */) {
+            ScoreDeltaFFT.prototype.deltaSet = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
@@ -118,7 +118,7 @@ var jat;
                 //        }
                 return dSet;
             };
-            ScoreFFT.prototype.deltaJeu = function (bVainqueur /*, BOOL bEquipe */) {
+            ScoreDeltaFFT.prototype.deltaJeu = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
@@ -187,7 +187,7 @@ var jat;
                 //    }
                 return dJeu;
             };
-            ScoreFFT.prototype.deltaPoint = function (bVainqueur /*, BOOL bEquipe */) {
+            ScoreDeltaFFT.prototype.deltaPoint = function (bVainqueur /*, BOOL bEquipe */) {
                 throw "Not implemented";
                 var n = 0;
                 for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
@@ -209,10 +209,10 @@ var jat;
                 //        }
                 return n;
             };
-            return ScoreFFT;
+            return ScoreDeltaFFT;
         })();
-        fft.ScoreFFT = ScoreFFT;
+        fft.ScoreDeltaFFT = ScoreDeltaFFT;
         angular.module('jat.services.fft.score', [])
-            .service('score', Score);
+            .service('score', ScoreFFT);
     })(fft = jat.fft || (jat.fft = {}));
 })(jat || (jat = {}));

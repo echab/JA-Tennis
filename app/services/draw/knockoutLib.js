@@ -56,6 +56,12 @@ var jat;
             KnockoutLib.prototype.positionOpponent2 = function (pos) {
                 return (pos << 1) + 1;
             };
+            KnockoutLib.prototype.positionOpponents = function (pos) {
+                return {
+                    pos1: (pos << 1) + 2,
+                    pos2: (pos << 1) + 1
+                };
+            };
             return KnockoutLib;
         })();
         service.KnockoutLib = KnockoutLib;

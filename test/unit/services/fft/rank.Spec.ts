@@ -3,11 +3,11 @@
 ///<reference path="../../../../app/models/types/rank.d.ts"/>
 
 describe('services.fft.rank', function () {
-    var rank: jat.fft.Rank;
+    var rank: jat.fft.RankFFT;
 
     it('should inject rank', function () {
         module('jat.services.type');
-        inject(function (_rank_: jat.fft.Rank) {
+        inject(function (_rank_: jat.fft.RankFFT) {
             rank = _rank_;
         });
     });

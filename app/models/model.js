@@ -1,5 +1,6 @@
 var models;
 (function (models) {
+    //model.ts and not model.d.ts because enum are exported nd generate sme js
     (function (DrawType) {
         DrawType[DrawType["Normal"] = 0] = "Normal";
         DrawType[DrawType["Final"] = 1] = "Final";

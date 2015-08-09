@@ -4,7 +4,7 @@ var jat;
     (function (service) {
         var MainLib = (function () {
             function MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, 
-                //private rank: ServiceRank,
+                //private rank: Rank,
                 undo, find, guid) {
                 this.$log = $log;
                 this.$http = $http;
@@ -30,6 +30,7 @@ var jat;
                 this.selection.select(tournament, models.ModelType.Tournament);
                 return tournament;
             };
+            /** This function load tournament data from an url. */
             MainLib.prototype.loadTournament = function (file_url) {
                 var _this = this;
                 var deferred = this.$q.defer();
@@ -45,7 +46,7 @@ var jat;
                         deferred.reject('nothing in storage');
                     }
                 }
-                else if ('string' === typeof file_url) {
+                else if (typeof file_url === 'string') {
                     this.$http.get(file_url)
                         .success(function (tournament, status) {
                         tournament._url = file_url;
@@ -62,7 +63,7 @@ var jat;
                     reader.addEventListener('loadend', function () {
                         try {
                             var tournament = angular.fromJson(reader.result);
-                            tournament._url = file_url;
+                            tournament._url = file_url.name; //TODO missing path
                             _this.tournamentLib.initTournament(tournament);
                             _this.selection.select(tournament, models.ModelType.Tournament);
                             deferred.resolve(tournament);
@@ -312,7 +313,7 @@ var jat;
             'find',
             'guid',
             function ($log, $http, $q, $window, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, 
-                //rank: ServiceRank,
+                //rank: Rank,
                 undo, find, guid) {
                 return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
             }]);

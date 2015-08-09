@@ -25,7 +25,7 @@ module jat.service {
         constructor(
             private drawLib: jat.service.DrawLib,
             private tournamentLib: jat.service.TournamentLib,
-            private ranking: ServiceRanking,
+            private ranking: Ranking,
             private find: Find
             ) {
             drawLib._drawLibs[models.DrawType.PouleSimple]
@@ -286,10 +286,10 @@ module jat.service {
             return true;
         }
 
-        private GetJoueursTableau(draw: models.Draw): models.Player[] {
+        private GetJoueursTableau(draw: models.Draw): Array<models.Player|number> {
 
             //Récupère les joueurs du tableau
-            var ppJoueur: models.Player[] = [];
+            var ppJoueur: Array<models.Player|number> = [];
             var draws = this.drawLib.group(draw);
             for (var j = 0; j < draws.length; j++) {
                 var d = draws[j];
@@ -302,7 +302,7 @@ module jat.service {
                     }
                     //Récupérer les joueurs et les Qualifiés entrants
                     if (boxIn.qualifIn) {
-                        ppJoueur.push(<any>boxIn.qualifIn);	//no qualifie entrant
+                        ppJoueur.push(boxIn.qualifIn);	//no qualifie entrant
                     } else if (boxIn.playerId) {
                         ppJoueur.push(boxIn._player);	//a player
                     }
@@ -321,12 +321,12 @@ module jat.service {
                 iTableau = refDraw._event.draws.length;  //append the draws at the end of the event
             }
 
-            var players = this.tournamentLib.GetJoueursInscrit(refDraw);
+            var players : Array<models.Player|number> = this.tournamentLib.GetJoueursInscrit(refDraw);
 
             //Récupère les qualifiés sortants du tableau précédent
             var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(refDraw);
             if (prev) {
-                players = players.concat(<any>this.drawLib.findAllPlayerOut(prev, true));
+                players = players.concat(this.drawLib.findAllPlayerOut(prev, true));
             }
 
             //Tri et Mélange les joueurs de même classement
@@ -368,12 +368,12 @@ module jat.service {
                     draw.boxes.push(boxIn);
 
                     if (j < players.length) {
-                        var qualif: number = 'number' === typeof players[j] ? <any>players[j] : 0;
+                        var qualif = 'number' === typeof players[j] ? <number>players[j] : 0;
                         if (qualif) {	//Qualifié entrant
                             if (!this.drawLib.setPlayerIn(boxIn, qualif)) {
                                 return;
                             }
-                        } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
+                        } else if (!this.drawLib.MetJoueur(boxIn, <models.Player>players[j])) {
                             return;
                         }
                     }
@@ -407,7 +407,7 @@ module jat.service {
             //TODO
             throw "Not implemented";
 
-            var m_pOrdrePoule: ServiceRanking[];    //classement de chaque joueur de la poule
+            var m_pOrdrePoule: Ranking[];    //classement de chaque joueur de la poule
 
             //this.ranking.
 
@@ -526,7 +526,7 @@ module jat.service {
     angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
         .factory('roundrobin', [
             'drawLib', 'tournamentLib', 'ranking', 'find',
-            (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: ServiceRanking, find: Find) => {
+            (drawLib: jat.service.DrawLib, tournamentLib: jat.service.TournamentLib, ranking: Ranking, find: Find) => {
             return new Roundrobin(drawLib, tournamentLib, ranking, find);
         }]);
 }

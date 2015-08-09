@@ -39,7 +39,7 @@ module jat.service {
 
         constructor(
             private find: jat.service.Find,
-            private rank: ServiceRank,
+            private rank: Rank,
             private guid: jat.service.Guid
             ) {
         }
@@ -246,7 +246,7 @@ module jat.service {
         //}
 
         public isCreneau(box: models.Match): boolean {
-            return box && ('score' in box) && (<any>(box.place) || box.date);
+            return box && ('score' in box) && (!!box.place || !!box.date);
         }
 
         public findSeeded(origin: models.Draw | models.Draw[], iTeteSerie: number): models.PlayerIn {    //FindTeteSerie
@@ -789,7 +789,7 @@ module jat.service {
     angular.module('jat.services.drawLib', ['jat.services.find', 'jat.services.type', 'jat.services.guid'])
         .factory('drawLib', [
             'find', 'rank', 'guid',
-            (find: jat.service.Find, rank: ServiceRank, guid: jat.service.Guid) => {
+            (find: jat.service.Find, rank: Rank, guid: jat.service.Guid) => {
             return new DrawLib(find, rank, guid);
         }]);
 }

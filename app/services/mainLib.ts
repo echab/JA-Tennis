@@ -11,7 +11,7 @@
             private tournamentLib: jat.service.TournamentLib,
             private drawLib: jat.service.DrawLib,
             private validation: jat.service.Validation,
-            //private rank: ServiceRank,
+            //private rank: Rank,
             private undo: jat.service.Undo,
             private find: jat.service.Find,
             private guid: jat.service.Guid
@@ -32,9 +32,7 @@
         }
 
         /** This function load tournament data from an url. */
-        loadTournament(file?: File): ng.IPromise<models.Tournament>;
-        loadTournament(url?: string): ng.IPromise<models.Tournament>;
-        loadTournament(file_url?: any): ng.IPromise<models.Tournament> {
+        loadTournament(file_url?: File|string): ng.IPromise<models.Tournament> {
             var deferred = this.$q.defer();
             if (!file_url) {
                 var data = this.$window.localStorage['tournament'];
@@ -46,7 +44,7 @@
                 } else {
                     deferred.reject('nothing in storage');
                 }
-            } else if ('string' === typeof file_url) {
+            } else if (typeof file_url === 'string') {
                 this.$http.get(file_url)
                     .success((tournament: models.Tournament, status: number) => {
                         tournament._url = file_url;
@@ -62,7 +60,7 @@
                 reader.addEventListener('loadend', () => {
                     try {
                         var tournament: models.Tournament = angular.fromJson(reader.result);
-                        tournament._url = file_url;
+                        tournament._url = file_url.name;    //TODO missing path
                         this.tournamentLib.initTournament(tournament);
                         this.selection.select(tournament, models.ModelType.Tournament);
                         deferred.resolve(tournament);
@@ -345,7 +343,7 @@
                 knockoutValidation: jat.service.KnockoutValidation,
                 roundrobinValidation: jat.service.RoundrobinValidation,
                 fftValidation: jat.service.FFTValidation,
-                //rank: ServiceRank,
+                //rank: Rank,
                 undo: jat.service.Undo,
                 find: jat.service.Find,
                 guid: jat.service.Guid) => {

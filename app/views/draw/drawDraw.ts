@@ -254,7 +254,7 @@ module jat.draw {
         //document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
 
         //emulate canvas context using VML
-        vmlContext = function (element: JQuery, width: number, height: number) {
+        vmlContext = function(element: JQuery, width: number, height: number) {
             this._width = width;
             this._height = height;
             this.beginPath();
@@ -266,25 +266,25 @@ module jat.draw {
         };
         vmlContext.prototype = {
             _path: [], _tx: 0, _ty: 0,
-            translate: function (tx: number, ty: number): void {
+            translate: function(tx: number, ty: number): void {
                 //this._tx = tx;
                 //this._ty = ty;
             },
-            beginPath: function (): void {
+            beginPath: function(): void {
                 this._path.length = 0;
                 this.lineWidth = 1;
                 this.strokeStyle = 'black';
             },
-            moveTo: function (x: number, y: number): void {
+            moveTo: function(x: number, y: number): void {
                 this._path.push('m', (this._tx + x), ',', (this._ty + y));
             },
-            lineTo: function (x: number, y: number): void {
+            lineTo: function(x: number, y: number): void {
                 this._path.push('l', (this._tx + x), ',', (this._ty + y));
             },
-            stroke: function (): void {
+            stroke: function(): void {
                 //this._path.push('e');
             },
-            done: function (): void {
+            done: function(): void {
                 var shape = angular.element('<v:shape'
                     + ' coordsize="' + this._width + ' ' + this._height + '"'
                     + ' style="position:absolute; left:0px; top:0px; width:' + this._width + 'px; height:' + this._height + 'px;"'

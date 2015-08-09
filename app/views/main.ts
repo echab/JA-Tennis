@@ -101,7 +101,7 @@ module jat.main {
         }
         //#endregion tournament
 
-        select(item: any, type?: models.ModelType): void {
+        select(item: models.Box | models.Draw | models.Event | models.Player | models.Tournament, type?: models.ModelType): void {
             if (item && type) {
                 //first unselect any item to close the actions dropdown
                 this.selection.select(undefined, type);

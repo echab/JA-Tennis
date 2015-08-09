@@ -1,12 +1,12 @@
 namespace jat.fft {
 
-    export class Ranking implements ServiceRanking {
+    export class RankingFFT implements Ranking {
 
-        private _serviceScore: Score;
+        private _serviceScore: ScoreFFT;
 
         constructor(
-            score: ServiceScore) {
-            this._serviceScore = <Score> score;
+            score: Score) {
+            this._serviceScore = <ScoreFFT> score;
         }
 
         private _champs = [
@@ -52,7 +52,7 @@ namespace jat.fft {
         public AddResultat(bVictoire: number, score: string, fm: string): boolean {	//-1=défaite, 0=nul, 1=victoire
             //bVictoire: -1=défaite, 0=nul, 1=victoire
 
-            var sc = new ScoreFFT(score, fm);
+            var sc = new ScoreDeltaFFT(score, fm);
 
             //Compte la différence de Set
             this.dPoint += sc.deltaPoint(bVictoire > 0);	//TODO bEquipe ???
@@ -68,6 +68,6 @@ namespace jat.fft {
     }
 
    angular.module('jat.services.fft.ranking', [])
-        .service('ranking', ['score', Ranking])
+        .service('ranking', ['score', RankingFFT])
     ;
 }

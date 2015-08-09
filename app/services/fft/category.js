@@ -2,8 +2,8 @@ var jat;
 (function (jat) {
     var fft;
     (function (fft) {
-        var Category = (function () {
-            function Category() {
+        var CategoryFFT = (function () {
+            function CategoryFFT() {
                 // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf
                 this._category = {
                     "-8ans": { ageMax: 8 },
@@ -40,22 +40,22 @@ var jat;
                     this._index[this._categories[i]] = i;
                 }
             }
-            Category.prototype.list = function () {
+            CategoryFFT.prototype.list = function () {
                 return this._categories;
             };
-            Category.prototype.isValid = function (category) {
+            CategoryFFT.prototype.isValid = function (category) {
                 return this._index[category] >= 0;
             };
-            Category.prototype.compare = function (category1, category2) {
+            CategoryFFT.prototype.compare = function (category1, category2) {
                 var i = this._index[category1], j = this._index[category2];
                 return i - j;
             };
-            Category.prototype.getAge = function (date) {
+            CategoryFFT.prototype.getAge = function (date) {
                 //var age = (new Date(refDate - date)).getFullYear() - _beginOfTime.getFullYear() -1;
                 var age = this.currentYear - date.getFullYear();
                 return age;
             };
-            Category.prototype.ofDate = function (date) {
+            CategoryFFT.prototype.ofDate = function (date) {
                 var age = this.getAge(date), i, prev;
                 for (i in this._category) {
                     var categ = this._category[i];
@@ -74,7 +74,7 @@ var jat;
                     return i;
                 }
             };
-            Category.prototype.isCompatible = function (eventCategory, playerCategory) {
+            CategoryFFT.prototype.isCompatible = function (eventCategory, playerCategory) {
                 if (playerCategory || !eventCategory) {
                     return true;
                 }
@@ -105,10 +105,10 @@ var jat;
                 //		(playerCategory.AgeMin() <= AgeMax() 
                 //		&& AgeMin() <= playerCategory.AgeMax() );
             };
-            return Category;
+            return CategoryFFT;
         })();
-        fft.Category = Category;
+        fft.CategoryFFT = CategoryFFT;
         angular.module('jat.services.fft.category', [])
-            .service('category', Category);
+            .service('category', CategoryFFT);
     })(fft = jat.fft || (jat.fft = {}));
 })(jat || (jat = {}));

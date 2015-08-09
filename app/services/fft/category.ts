@@ -1,6 +1,6 @@
 namespace jat.fft {
 
-    export class Category implements ServiceCategory {
+    export class CategoryFFT implements Category {
 
         // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf
 
@@ -132,6 +132,6 @@ namespace jat.fft {
     }
     
     angular.module('jat.services.fft.category', [])
-        .service('category', Category)
+        .service('category', CategoryFFT)
     ;
 }

@@ -9,7 +9,7 @@ module jat.service {
 
         constructor(
             private drawLib: jat.service.DrawLib,
-            private rank: ServiceRank,
+            private rank: Rank,
             private guid: jat.service.Guid
             ) { }
 
@@ -116,10 +116,10 @@ module jat.service {
             return a;
         }
 
-        public TriJoueurs(players: models.Player[]): void {
+        public TriJoueurs(players: Array<models.Player|number>): void {
 
             //Tri les joueurs par classement
-            var comparePlayersByRank = (p1: models.Player, p2: models.Player): number => {
+            var comparePlayersByRank = (p1: models.Player|number, p2: models.Player|number): number => {
                 //if numbers, p1 or p2 are PlayerIn
                 var isNumber1 = 'number' === typeof p1,
                     isNumber2 = 'number' === typeof p2;
@@ -132,7 +132,7 @@ module jat.service {
                 if (isNumber2) {
                     return 1;
                 }
-                return this.rank.compare(p1.rank, p2.rank);
+                return this.rank.compare((<models.Player>p1).rank, (<models.Player>p2).rank);
             };
             players.sort(comparePlayersByRank);
 
@@ -178,7 +178,7 @@ module jat.service {
     angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
         .factory('tournamentLib',
             ['drawLib', 'rank', 'guid',
-            (drawLib: jat.service.DrawLib, rank: ServiceRank, guid: jat.service.Guid) => {
+            (drawLib: jat.service.DrawLib, rank: Rank, guid: jat.service.Guid) => {
             return new TournamentLib(drawLib, rank, guid);
         }]);
 }

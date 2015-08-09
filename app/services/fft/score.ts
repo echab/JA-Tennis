@@ -1,12 +1,12 @@
 namespace jat.fft {
 
-    export class Score implements ServiceScore {
+    export class ScoreFFT implements Score {
 
         private static reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
 
         isValid(score: string): boolean {
 
-            var a = Score.reScore.exec(score + " ");
+            var a = ScoreFFT.reScore.exec(score + " ");
 
             if (a === null) {
                 return false;
@@ -45,7 +45,7 @@ namespace jat.fft {
 
     var MAX_SET = 5;
 
-    export class ScoreFFT {
+    export class ScoreDeltaFFT {
         m_Jeu: { j1: number; j2: number; }[];
 
         constructor(score: string, fm: string) {
@@ -263,6 +263,6 @@ namespace jat.fft {
     }
 	
     angular.module('jat.services.fft.score', [])
-        .service('score', Score)
+        .service('score', ScoreFFT)
     ;
 }    

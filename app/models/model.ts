@@ -1,4 +1,6 @@
 namespace models {
+    
+    //model.ts and not model.d.ts because enum are exported nd generate sme js
  
     export enum DrawType { Normal, Final, PouleSimple, PouleAR }
 

@@ -18,7 +18,7 @@ angular.module('jat', [
         };
     }]);
 /*
-.config([<any>'$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {
+.config(['$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {
     //routes
     $routeProvider.when('/players', {
         templateUrl: 'views/player/players.html',

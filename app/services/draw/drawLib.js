@@ -182,7 +182,7 @@ var jat;
             //    m_iType = iType;
             //}
             DrawLib.prototype.isCreneau = function (box) {
-                return box && ('score' in box) && ((box.place) || box.date);
+                return box && ('score' in box) && (!!box.place || !!box.date);
             };
             DrawLib.prototype.findSeeded = function (origin, iTeteSerie) {
                 ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);

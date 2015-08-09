@@ -1,5 +1,4 @@
 'use strict';
-// Selection service
 var jat;
 (function (jat) {
     var service;
@@ -10,26 +9,30 @@ var jat;
             Selection.prototype.select = function (r, type) {
                 if (r) {
                     if (type === models.ModelType.Box || ('_player' in r && r._draw)) {
-                        this.tournament = r._draw._event._tournament;
-                        this.event = r._draw._event;
-                        this.draw = r._draw;
-                        this.box = r;
+                        var b = r;
+                        this.tournament = b._draw._event._tournament;
+                        this.event = b._draw._event;
+                        this.draw = b._draw;
+                        this.box = b;
                     }
                     else if (type === models.ModelType.Draw || r._event) {
-                        this.tournament = r._event._tournament;
-                        this.event = r._event;
-                        this.draw = r;
+                        var d = r;
+                        this.tournament = d._event._tournament;
+                        this.event = d._event;
+                        this.draw = d;
                         this.box = undefined;
                     }
                     else if (type === models.ModelType.Event || (r.draws && r._tournament)) {
-                        this.tournament = r._tournament;
-                        this.event = r;
-                        this.draw = r.draws ? r.draws[0] : undefined;
+                        var e = r;
+                        this.tournament = e._tournament;
+                        this.event = e;
+                        this.draw = e.draws ? e.draws[0] : undefined;
                         this.box = undefined;
                     }
                     else if (type === models.ModelType.Player || (r.name && r._tournament)) {
-                        this.tournament = r._tournament;
-                        this.player = r;
+                        var p = r;
+                        this.tournament = p._tournament;
+                        this.player = p;
                     }
                     else if (type === models.ModelType.Tournament || (r.players && r.events)) {
                         this.tournament = r;

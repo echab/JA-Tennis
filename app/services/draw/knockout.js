@@ -646,7 +646,7 @@ var jat;
                         if (!box) {
                             return;
                         }
-                        bOk = ((box.playerId) || bToutesBoites);
+                        bOk = (!!box.playerId || bToutesBoites);
                     } while (!bOk);
                     if (bOk) {
                         callback(box);

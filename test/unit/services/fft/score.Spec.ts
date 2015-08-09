@@ -3,11 +3,11 @@
 ///<reference path="../../../../app/models/types/score.d.ts"/>
 
 describe('services.fft.score', function () {
-    var score: jat.fft.Score;
+    var score: jat.fft.ScoreFFT;
 
     it('should inject score', function () {
         module('jat.services.type');
-        inject(function (_score_: jat.fft.Score) {
+        inject(function (_score_: jat.fft.ScoreFFT) {
             score = _score_;
         });
     });

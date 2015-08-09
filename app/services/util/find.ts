@@ -11,13 +11,13 @@ module jat.service {
 
     export class Find {
 
-        private static _reindex<T>(array: any, member: string): void {
+        private static _reindex<T>(array: T[], member: string): void {
 
             var idx: IIndex = {
                 _length: array.length
             };
             for (var i = 0; i < array.length; i++) {
-                var a: any = array[i], j = a[member];
+                var a = array[i], j = a[member];
                 if (j !== undefined) {
                     idx[j] = i;
                 }
@@ -30,30 +30,30 @@ module jat.service {
           */
         public indexOf<T>(array: T[], member: string, value: any, error?: string): number {
 
-            var i: number, a: any;
+            var i: number, a: T;
 
             if (null == value) {
                 return null;
             }
 
-            var idxName: string = "_FindBy" + member;
-            if (!(idxName in <any>array)) {
+            var idxName = "_FindBy" + member;
+            if (!(idxName in array)) {
                 Find._reindex(array, member);
             }
 
-            var idx: any = array[<any>idxName];
+            var idx = array[idxName];
 
             if (!(value in idx) || idx._length !== array.length) {
                 Find._reindex(array, member);
-                a = array[<any>idxName];
+                a = array[idxName];
                 i = a[value];
             } else {
                 i = idx[value];
                 a = array[i];
-                if (a[<any>member] !== value) {
+                if (a[member] !== value) {
                     Find._reindex(array, member);
-                    a = array[<any>idxName];
-                    i = a[<any>value];
+                    a = array[idxName];
+                    i = a[value];
                 }
             }
 
