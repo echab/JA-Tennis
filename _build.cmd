@@ -1,5 +1,7 @@
 @echo off
 
+title Build TS
+
 @echo Build from typescript
 call tsc.cmd
 

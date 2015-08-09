@@ -1,5 +1,7 @@
 @echo off
 
+title Backup
+
 pushd %~dp0
 cd
 

@@ -1,5 +1,7 @@
 @echo off
 
+title Build w/ grunt
+
 pushd %~dp0
 cd
 

@@ -1,8 +1,16 @@
-'use strict';
 var jat;
 (function (jat) {
     var main;
     (function (main) {
+        function mainDirective() {
+            var dir = {
+                templateUrl: 'views/main.html',
+                controller: 'mainCtrl',
+                controllerAs: 'main',
+                restrict: 'EA'
+            };
+            return dir;
+        }
         /** Main controller for the application */
         var mainCtrl = (function () {
             function mainCtrl($modal, selection, mainLib, tournamentLib, drawLib, validation, undo, $window, $timeout) {
@@ -286,6 +294,7 @@ var jat;
             'ec.inputFile',
             //'polyfill',
             'ui.bootstrap'])
+            .directive('main', mainDirective)
             .controller('mainCtrl', mainCtrl);
     })(main = jat.main || (jat.main = {}));
 })(jat || (jat = {}));

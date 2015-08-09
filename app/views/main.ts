@@ -1,6 +1,14 @@
-'use strict';
-
 module jat.main {
+
+    function mainDirective(): ng.IDirective {
+        var dir = {
+            templateUrl: 'views/main.html',
+            controller: 'mainCtrl',
+            controllerAs: 'main',
+            restrict: 'EA'
+        };
+        return dir;
+    }
 
     /** Main controller for the application */
     export class mainCtrl {
@@ -313,5 +321,6 @@ module jat.main {
     //'polyfill',
         'ui.bootstrap'])
 
+        .directive('main', mainDirective)
         .controller('mainCtrl', mainCtrl);
 }

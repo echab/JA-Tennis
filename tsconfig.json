@@ -23,7 +23,6 @@
   },
   "files": [
     "./app/app.ts",
-    "./app/main.ts",
     "./app/models/box.d.ts",
     "./app/models/draw.d.ts",
     "./app/models/event.d.ts",
@@ -72,6 +71,7 @@
     "./app/views/event/dialogEvent.ts",
     "./app/views/event/listEvents.d.ts",
     "./app/views/event/listEvents.ts",
+    "./app/views/main.ts",
     "./app/views/player/dialogPlayer.d.ts",
     "./app/views/player/dialogPlayer.ts",
     "./app/views/player/listPlayers.d.ts",

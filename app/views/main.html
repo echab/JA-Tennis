@@ -1,0 +1,100 @@
+<div ec-panelset="" class="ng-cloak" ng-init="tournamentOpened=true; drawsOpened=true; planningOpen=false;">
+    <div ec-panel="" is-open="tournamentOpened" class="tournament">
+        <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
+        <div ec-header="">
+            <i class="icon2-info" ng-click="main.editTournament(main.selection.tournament)"></i>
+            {{main.selection.tournament.info.name}}
+        </div>
+        <div class="content">
+            <div list-events="main.selection.tournament.events" class="inline"></div>
+
+            <div app-version></div>
+        </div>
+        <div class="footer">
+            <div class="btn-group">
+                <button ng-click="main.newTournament()" class="btn"><i class="icon-file"></i> New</button>
+                <!--<button ng-click="main.loadTournament()" class="btn"><i class="icon2-open"></i> Open</button>-->
+                <span ec-input-file onloaded="main.loadTournament(file)"><i class="icon2-open"></i> Open</span>
+                <button ng-click="main.saveTournament()" class="btn"><i class="icon2-save"></i> Save</button>
+            </div>
+            <div class="btn-group">
+                <button ng-disabled="!main.undo.canUndo()" ng-click="main.doUndo()" class="btn"><i class="icon2-undo" title="Undo {{main.undo.messageUndo()}}"></i></button>
+                <button ng-disabled="!main.undo.canRedo()" ng-click="main.doRedo()" class="btn"><i class="icon2-redo" title="Redo {{main.undo.messageRedo()}}"></i></button>
+            </div>
+            <button ng-click="main.addEvent(main.selection.event)" class="btn"><i class="icon-plus"></i> Add event</button>
+        </div>
+    </div><div ec-panel="" is-open="playersOpened" class="players">
+        <div ec-badge="" class="players"><i class="icon2-player"></i></div>
+        <div ec-header="">
+            Players
+        </div>
+        <div class="content">
+            <div list-players="main.selection.tournament.players"></div>
+        </div>
+        <div class="footer">
+            <form class="form-horizontal">
+                <button ng-click="main.addPlayer()" class="btn"><i class="icon-plus"></i> Add player</button>
+            </form>
+        </div>
+    </div><div ec-panel="" is-open="drawsOpened" class="draws">
+        <div ec-badge="" class="draws"><i class="icon2-draw"></i></div>
+        <div ec-header="">
+            <form class="form-horizontal">
+                <label>
+                    <select ng-model="main.selection.event" ng-change="main.select(main.selection.event)" ng-options="event.name for event in main.selection.tournament.events" class="span2"></select>
+                </label>
+                <label>
+                    <i class="icon2-info" ng-click="main.editDraw(main.selection.draw)" ng-disabled="!main.selection.draw"></i>
+                    <select ng-model="main.selection.draw" ng-change="main.select(main.selection.draw)" ng-options="draw.name for draw in main.selection.event.draws" class="span2"></select>
+                    <!--<i class="icon2-locker" ng-click="main.lockDraw(main.selection.draw, !main.selection.draw.locked)" ng-disabled="!main.selection.draw" title="Lock/unlock the draw modifications"></i>-->
+                    <div class="btn-group" title="Lock/unlock the draw modifications">
+                        <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Build" ng-disabled="!main.selection.draw" title="Switch to draw build mode"><i class="icon2-draw"></i></button>
+                        <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Plan" ng-disabled="!main.selection.draw" title="Switch to planning mode"><i class="icon2-planning"></i></button>
+                        <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Play" ng-disabled="!main.selection.draw" title="Switch to match mode"><i class="icon2-match"></i></button>
+                        <button class="btn" ng-model="main.selection.draw.mode" btn-radio="main.Mode.Lock" ng-disabled="!main.selection.draw" title="Lock the draw"><i class="icon2-locker" ng-click="main.lockDraw(main.selection.draw, !main.selection.draw.locked)"></i></button>
+                    </div>
+                </label>
+            </form>
+        </div>
+        <div class="content">
+            <div draw="main.selection.draw" class="inline" style="position:relative;"></div>
+
+            <div class="inline">
+                Validation errors:
+                <ul>
+                    <li ng-repeat="error in main.validation.getErrorDraw(main.selection.draw)">{{error.message + ' '+ error.detail}}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">
+            <form class="form-horizontal">
+                <label ng-switch="main.selection.draw.mode">
+                    <button ng-click="main.addDraw(main.selection.draw)" class="btn" ng-disabled="!main.selection.event"><i class="icon-plus"></i> Add draw</button>
+                    <button type="button" class="btn" ng-switch-when="0"
+                            ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Create)" ng-disabled="!main.selection.draw">
+                        <i class="icon2-draw-generate"></i> Generate
+                    </button>
+                    <div class="btn-group" ng-switch-when="0">
+                        <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEchelonne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw more"><i class="icon2-draw-left"></i></button>
+                        <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.PlusEnLigne)" ng-disabled="!main.selection.draw || main.selection.draw.type >= 2" class="btn" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
+                        <button type="button" ng-click="main.generateDraw(main.selection.draw, main.GenerateType.Mix)" ng-disabled="!main.selection.draw" class="btn" title="Mix the players"><i class="icon2-random"></i></button>
+                    </div>
+                    <div class="btn-group" ng-switch-when="0">
+                        <button type="button" ng-click="main.updateQualif(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" ng-click="main.validateDraw(main.selection.draw)" ng-disabled="!main.selection.draw" class="btn" title="Check the draw"><i class="icon2-checkmark"></i> Check</button>
+                    </div>
+                </label>
+            </form>
+        </div>
+    </div><div ec-panel="" is-open="planningOpened" class="planning">
+        <div ec-badge="" class="planning"><i class="icon2-planning"></i></div>
+        <div ec-header="">Planning</div>
+        <div class="content">
+            Not implemented.
+        </div>
+        <div class="footer">
+        </div>
+    </div>
+</div>

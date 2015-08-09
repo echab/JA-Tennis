@@ -1,5 +1,7 @@
 @echo off
 
+title Publish
+
 pushd %~dp0
 cd
 
