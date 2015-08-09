@@ -17,10 +17,13 @@
         validateDraw(draw: models.Draw): boolean {
             var bRes = true;
 
-            bRes = bRes && this.validatePoule(draw);
+            if (draw.type === models.DrawType.PouleSimple
+                || draw.type === models.DrawType.PouleAR) {
+                    
+                bRes = bRes && this.validatePoule(draw);
 
-            bRes = bRes && this.validateMatches(draw);
-
+                bRes = bRes && this.validateMatches(draw);
+            }
 
 
             return bRes;
@@ -45,7 +48,7 @@
             //        if (boxes[j].m_iClassement
             //            && boxes[iDiagonale(j)].isQualifieSortant()) {
 
-			//		if(boxes[j].m_iClassement > (char)e) {
+            //		if(boxes[j].m_iClassement > (char)e) {
             //                this.validation.errorDraw('IDS_ERR_POU_QSORTANT', draw, j);
             //                bRes = false;
             //            }
@@ -124,6 +127,6 @@
         .factory('roundrobinValidation', [
             'validation',
             (validation: jat.service.Validation) => {
-            return new RoundrobinValidation(validation);
-        }]);
+                return new RoundrobinValidation(validation);
+            }]);
 }  

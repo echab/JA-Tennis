@@ -14,8 +14,11 @@ var jat;
             //Override
             RoundrobinValidation.prototype.validateDraw = function (draw) {
                 var bRes = true;
-                bRes = bRes && this.validatePoule(draw);
-                bRes = bRes && this.validateMatches(draw);
+                if (draw.type === models.DrawType.PouleSimple
+                    || draw.type === models.DrawType.PouleAR) {
+                    bRes = bRes && this.validatePoule(draw);
+                    bRes = bRes && this.validateMatches(draw);
+                }
                 return bRes;
             };
             RoundrobinValidation.prototype.validatePoule = function (draw) {

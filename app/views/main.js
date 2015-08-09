@@ -84,7 +84,7 @@ var jat;
                 var _this = this;
                 if (item && type) {
                     //first unselect any item to close the actions dropdown
-                    this.selection.select(undefined, type);
+                    this.selection.unselect(type);
                     //then select the new box
                     this.$timeout(function () { return _this.selection.select(item, type); }, 0);
                     return;

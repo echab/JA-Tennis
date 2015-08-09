@@ -1,6 +1,6 @@
 ﻿<div ng-class="{match: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.isPlayed(), hidden: ctrlBox.box.hidden, selected: ctrlBox.box === main.selection.box, error: ctrlBox.error}"
      title="{{ctrlBox.error ? ctrlBox.error.message +' '+ ctrlBox.error.detail : ''}}"
-     ng-click="main.select(ctrlBox.box, main.ModelType.Box); $event.stopPropagation();"
+     ng-click="main.select(ctrlBox.box, main.ModelType.Box)"
      ng-switch="ctrlBox.isMatch">
     <span ng-if="ctrlBox.box.qualifIn" class="qualifIn">{{ctrlBox.box.qualifIn === -1 ? 'Q?' : 'Q' + ctrlBox.box.qualifIn}}</span>
     <span ng-if="ctrlBox.box.seeded" class="seeded">{{ctrlBox.box.seeded}}</span>

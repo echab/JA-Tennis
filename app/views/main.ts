@@ -7,6 +7,7 @@ module jat.main {
             controller: 'mainCtrl',
             controllerAs: 'main',
             restrict: 'EA'
+            //,scope: true
         };
         return dir;
     }
@@ -105,7 +106,7 @@ module jat.main {
         select(item: models.Box | models.Draw | models.Event | models.Player | models.Tournament, type?: models.ModelType): void {
             if (item && type) {
                 //first unselect any item to close the actions dropdown
-                this.selection.select(undefined, type);
+                this.selection.unselect(type);
                 //then select the new box
                 this.$timeout(() => this.selection.select(item, type), 0);
                 return;

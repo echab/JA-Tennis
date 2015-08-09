@@ -116,8 +116,8 @@ module.exports = function (grunt) {
                 options: {
                     base: 'app', // (Optional) ID of the <script> tag will be relative to this folder. Default is project dir.
                     //prefix: '/',            // (Optional) Prefix path to the ID. Default is empty string.
-                    //selector: 'body',       // (Optional) CSS selector of the element to use to insert the templates. Default is `body`.
-                    //method: 'prepend',       // (Optional) DOM insert method. Default is `prepend`.
+                    selector: 'head',       // (Optional) CSS selector of the element to use to insert the templates. Default is `body`.
+                    method: 'append',       // (Optional) DOM insert method. Default is `prepend`.
                     unescape: {             // (Optional) List of escaped characters to unescape
                         '&lt;': '<',
                         '&gt;': '>',

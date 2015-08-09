@@ -108,6 +108,11 @@
             var isTypePoule = draw.type >= 2;
             var k = this.knockoutLib;
 
+            if (draw.type !== models.DrawType.Normal
+                && draw.type !== models.DrawType.Final) {
+                return true;
+            }
+
             //Interdits:
             // - De faire rencontrer 2 Qualifiés entre eux
             // - D'avoir plus de Qualifiés que de joueurs admis directement
@@ -579,8 +584,16 @@
     }
 
     function CompString(a: string, b: string): number {
-        var u = (a || '').toUpperCase(), v = (b || '').toUpperCase();
-        return u === v ? 0 : u < v ? -1 : 1;
+        //sort empty/null vale at the end
+        if (!a) {
+            return 1;
+        }
+        if (!b) {
+            return -1;
+        }
+        //upper case comparison
+        var u = a.toUpperCase(), v = b.toUpperCase();
+        return u == v ? 0 : u < v ? -1 : 1;
     }
 
     enum UnitDate {
