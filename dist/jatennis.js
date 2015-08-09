@@ -5592,6 +5592,7 @@ var jat;
             .controller('listEventsCtrl', listEventsCtrl);
     })(event = jat.event || (jat.event = {}));
 })(jat || (jat = {}));
+'use strict';
 var jat;
 (function (jat) {
     var main;

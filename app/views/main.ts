@@ -1,3 +1,4 @@
+'use strict';
 module jat.main {
 
     function mainDirective(): ng.IDirective {
