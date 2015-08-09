@@ -8,10 +8,12 @@
             validation.addValidator(this);
         }
 
+        //Override
         validatePlayer(player: models.Player): boolean {
             return true;
         }
 
+        //Override
         validateDraw(draw: models.Draw): boolean {
             var bRes = true;
 
@@ -38,7 +40,7 @@
             //for (i = draw.nbColumn - 1; i >= 0; i--) {
             //    j = ADVERSAIRE1(i);
 
-            //    //comparer les Qs avec le classement de CalculeScore
+            //    //comparer les Qs avec le classement de computeScore
             //    if (e) {
             //        if (boxes[j].m_iClassement
             //            && boxes[iDiagonale(j)].isQualifieSortant()) {

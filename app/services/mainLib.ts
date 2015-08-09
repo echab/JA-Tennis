@@ -247,7 +247,7 @@
                     //report qualified player to next draw
                     var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
                     if (nextGroup) {
-                        var boxIn = this.drawLib.FindQualifieEntrant(nextGroup, editedMatch.qualifOut);
+                        var boxIn = this.drawLib.findPlayerIn(nextGroup, editedMatch.qualifOut);
                         if (boxIn) {
                             //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
                             //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;

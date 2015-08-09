@@ -41,10 +41,12 @@ module jat.service {
             return box;
         }
 
+        //Override
         public nbColumnForPlayers(draw: models.Draw, nJoueur: number): number {
             return nJoueur;
         }
 
+        //Override
         public boxesOpponents(match: models.Match): { box1: models.Box; box2: models.Box } {
             var n = match._draw.nbColumn;
             var pos1 = seedPositionOpponent1(match.position, n),
@@ -55,6 +57,7 @@ module jat.service {
             }
         }
 
+        //Override
         public getSize(draw: models.Draw): ISize {
 
             if (!draw.nbColumn) {
@@ -68,11 +71,13 @@ module jat.service {
             };
         }
 
+        //Override
         public computePositions(draw: models.Draw): IPoint[] {
             //nothing to do for round robin
             return;
         }
 
+        //Override
         public resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void {
 
             if (nJoueur) {
@@ -122,7 +127,8 @@ module jat.service {
             }
         }
 
-        public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn {
+        //Override
+        public findPlayerIn(draw: models.Draw, iQualifie: number): models.PlayerIn {
 
             ASSERT(iQualifie >= 0);
 
@@ -143,7 +149,8 @@ module jat.service {
             }
         }
 
-        public FindQualifieSortant(draw: models.Draw, iQualifie: number): models.Match {
+        //Override
+        public findPlayerOut(draw: models.Draw, iQualifie: number): models.Match {
 
             ASSERT(0 < iQualifie);
 
@@ -159,24 +166,25 @@ module jat.service {
             }
         }
 
-        public SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean { //setPlayerIn
+        //Override
+        public setPlayerIn(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean { //setPlayerIn
             // inNumber=0 => enlève qualifié
 
             var draw = box._draw;
-            //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
+            //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
             if (inNumber) {	//Ajoute un qualifié entrant
                 var prev = this.drawLib.previousGroup(draw);
                 if (!player && prev && inNumber != QEMPTY) {
                     //Va chercher le joueur dans le tableau précédent
-                    var boxOut = this.drawLib.FindQualifieSortant(prev, inNumber);
+                    var boxOut = this.drawLib.findPlayerOut(prev, inNumber);
                     if (angular.isObject(boxOut)) {	//V0997
                         player = boxOut._player;
                     }
                 }
 
                 if (box.qualifIn) {
-                    if (!this.SetQualifieEntrant(box)) {	//Enlève le précédent qualifié
+                    if (!this.setPlayerIn(box)) {	//Enlève le précédent qualifié
                         ASSERT(false);
                     }
                 }
@@ -189,9 +197,9 @@ module jat.service {
 
                 //Qualifié entrant pas déjà pris
                 if (inNumber == QEMPTY ||
-                    !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
+                    !this.drawLib.findPlayerIn(draw, inNumber)) {
 
-                    this.SetQualifieEntrant(box, inNumber);
+                    this.setPlayerIn(box, inNumber);
                 }
             } else {	// Enlève un qualifié entrant
 
@@ -205,10 +213,11 @@ module jat.service {
             return true;
         }
 
-        public SetQualifieSortant(box: models.Match, outNumber?: number): boolean { //setPlayerOut
+        //Override
+        public setPlayerOut(box: models.Match, outNumber?: number): boolean { //setPlayerOut
             // outNumber=0 => enlève qualifié
 
-            //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
+            //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
             var next = this.drawLib.nextGroup(box._draw);
 
@@ -219,7 +228,7 @@ module jat.service {
             if (outNumber) {	//Ajoute un qualifié sortant
                 //Met à jour le tableau suivant
                 if (next && box.playerId && box.qualifOut) {
-                    var boxIn = this.drawLib.FindQualifieEntrant(box._draw, outNumber);
+                    var boxIn = this.drawLib.findPlayerIn(box._draw, outNumber);
                     if (boxIn) {
                         ASSERT(boxIn.playerId === box.playerId);
                         if (!this.drawLib.EnleveJoueur(boxIn)) {
@@ -230,18 +239,18 @@ module jat.service {
 
                 //Enlève le précédent n° de qualifié sortant
                 if (box.qualifOut)
-                    if (!this.SetQualifieSortant(box)) {	//Enlève le qualifié
+                    if (!this.setPlayerOut(box)) {	//Enlève le qualifié
                         ASSERT(false);
                     }
 
-                this.SetQualifieSortant(box, outNumber);
+                this.setPlayerOut(box, outNumber);
 
                 diag.playerId = box1.playerId;
                 this.drawLib.initBox(diag, box._draw);
 
                 if (next && box.playerId) {
                     //Met à jour le tableau suivant
-                    var boxIn = this.drawLib.FindQualifieEntrant(next, outNumber);
+                    var boxIn = this.drawLib.findPlayerIn(next, outNumber);
                     if (boxIn) {
                         ASSERT(!boxIn.playerId);
                         if (!this.drawLib.MetJoueur(boxIn, box._player, true)) {
@@ -254,7 +263,7 @@ module jat.service {
                 var match = <models.Match>box;
                 if (next && box.playerId) {
                     //Met à jour le tableau suivant
-                    var boxIn = this.drawLib.FindQualifieEntrant(next, match.qualifOut);
+                    var boxIn = this.drawLib.findPlayerIn(next, match.qualifOut);
                     if (boxIn) {
                         ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
                         if (!this.drawLib.EnleveJoueur(boxIn, true)) {
@@ -271,7 +280,7 @@ module jat.service {
 
             //#ifdef WITH_POULE
             //	if( isTypePoule())
-            //		CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd()).GetActiveDocument());
+            //		computeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd()).GetActiveDocument());
             //#endif //WITH_POULE
 
             return true;
@@ -303,6 +312,7 @@ module jat.service {
             return ppJoueur;
         }
 
+        //Override
         public generateDraw(refDraw: models.Draw, generate?: models.GenerateType, afterIndex?: number): models.Draw[] {
 
             var oldDraws = this.drawLib.group(refDraw);
@@ -316,7 +326,7 @@ module jat.service {
             //Récupère les qualifiés sortants du tableau précédent
             var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(refDraw);
             if (prev) {
-                players = players.concat(<any>this.drawLib.FindAllQualifieSortant(prev, true));
+                players = players.concat(<any>this.drawLib.findAllPlayerOut(prev, true));
             }
 
             //Tri et Mélange les joueurs de même classement
@@ -360,7 +370,7 @@ module jat.service {
                     if (j < players.length) {
                         var qualif: number = 'number' === typeof players[j] ? <any>players[j] : 0;
                         if (qualif) {	//Qualifié entrant
-                            if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
+                            if (!this.drawLib.setPlayerIn(boxIn, qualif)) {
                                 return;
                             }
                         } else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
@@ -391,7 +401,8 @@ module jat.service {
         }
 
         //Calcul classement des poules
-        public CalculeScore(draw: models.Draw): boolean {
+        //Override
+        public computeScore(draw: models.Draw): boolean {
 
             //TODO
             throw "Not implemented";

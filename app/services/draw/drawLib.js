@@ -58,7 +58,7 @@ var jat;
                             for (var b = 0; b < boxes.length; b++) {
                                 var box = boxes[b];
                                 if (box && box.qualifOut) {
-                                    this.SetQualifieSortant(box);
+                                    this.setPlayerOut(box);
                                 }
                             }
                         }
@@ -118,11 +118,11 @@ var jat;
                 tool.shuffle(qualifs);
                 //remove old qualif numbers
                 for (i = qualifs.length - 1; i >= 0; i--) {
-                    this.SetQualifieEntrant(qualifs[i], 0);
+                    this.setPlayerIn(qualifs[i], 0);
                 }
                 //assign new qualif number
                 for (i = qualifs.length - 1; i >= 0; i--) {
-                    this.SetQualifieEntrant(qualifs[i], i + 1);
+                    this.setPlayerIn(qualifs[i], i + 1);
                 }
             };
             DrawLib.prototype.getPlayer = function (box) {
@@ -184,7 +184,7 @@ var jat;
             DrawLib.prototype.isCreneau = function (box) {
                 return box && ('score' in box) && ((box.place) || box.date);
             };
-            DrawLib.prototype.FindTeteSerie = function (origin, iTeteSerie) {
+            DrawLib.prototype.findSeeded = function (origin, iTeteSerie) {
                 ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 for (var i = 0; i < group.length; i++) {
@@ -198,23 +198,23 @@ var jat;
                 }
                 return null;
             };
-            DrawLib.prototype.FindQualifieEntrant = function (origin, iQualifie) {
+            DrawLib.prototype.findPlayerIn = function (origin, iQualifie) {
                 ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 for (var i = 0; i < group.length; i++) {
                     var d = group[i];
-                    var playerIn = this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
+                    var playerIn = this._drawLibs[d.type].findPlayerIn(d, iQualifie);
                     if (playerIn) {
                         return playerIn;
                     }
                 }
             };
-            DrawLib.prototype.FindQualifieSortant = function (origin, iQualifie) {
+            DrawLib.prototype.findPlayerOut = function (origin, iQualifie) {
                 ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 for (var i = 0; i < group.length; i++) {
                     var d = group[i];
-                    var boxOut = this._drawLibs[d.type].FindQualifieSortant(d, iQualifie);
+                    var boxOut = this._drawLibs[d.type].findPlayerOut(d, iQualifie);
                     if (boxOut) {
                         return boxOut;
                     }
@@ -232,26 +232,26 @@ var jat;
                 }
                 return null;
             };
-            DrawLib.prototype.FindAllQualifieSortant = function (origin, hideNumbers) {
+            DrawLib.prototype.findAllPlayerOut = function (origin, hideNumbers) {
                 //Récupère les qualifiés sortants du tableau
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 if (group) {
                     var a = [];
                     for (var i = 1; i <= MAX_QUALIF; i++) {
-                        if (this.FindQualifieSortant(group, i)) {
+                        if (this.findPlayerOut(group, i)) {
                             a.push(hideNumbers ? QEMPTY : i);
                         }
                     }
                     return a;
                 }
             };
-            DrawLib.prototype.FindAllQualifieSortantBox = function (origin) {
+            DrawLib.prototype.findAllPlayerOutBox = function (origin) {
                 //Récupère les qualifiés sortants du tableau
                 var group = angular.isArray(origin) ? origin : this.group(origin);
                 if (group) {
                     var a = [], m;
                     for (var i = 1; i <= MAX_QUALIF; i++) {
-                        if (m = this.FindQualifieSortant(group, i)) {
+                        if (m = this.findPlayerOut(group, i)) {
                             a.push(m);
                         }
                     }
@@ -266,16 +266,16 @@ var jat;
               * @param inNumber (optional)
               * @param player   (optional)
               */
-            DrawLib.prototype.SetQualifieEntrant = function (box, inNumber, player) {
+            DrawLib.prototype.setPlayerIn = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
-                return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);
+                return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
             };
-            DrawLib.prototype.SetQualifieSortant = function (box, outNumber) {
+            DrawLib.prototype.setPlayerOut = function (box, outNumber) {
                 // iQualifie=0 => enlève qualifié
-                return this._drawLibs[box._draw.type].SetQualifieSortant(box, outNumber);
+                return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
             };
-            DrawLib.prototype.CalculeScore = function (draw) {
-                return this._drawLibs[draw.type].CalculeScore(draw);
+            DrawLib.prototype.computeScore = function (draw) {
+                return this._drawLibs[draw.type].computeScore(draw);
             };
             //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
             DrawLib.prototype.MetJoueur = function (box, player, bForce) {
@@ -301,7 +301,7 @@ var jat;
                 if (boxOut.qualifOut) {
                     var next = this.nextGroup(box._draw);
                     if (next) {
-                        var boxIn = this.FindQualifieEntrant(next, boxOut.qualifOut);
+                        var boxIn = this.findPlayerIn(next, boxOut.qualifOut);
                         if (boxIn) {
                             if (!boxIn.playerId
                                 && !this.MetJoueur(boxIn, player, true)) {
@@ -336,7 +336,7 @@ var jat;
                 //            }
                 //        }
                 //    }
-                //    CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
+                //    computeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
                 //    //TODO Poule, Lock
                 //} else
                 //if( iBoiteMin() <= IAUTRE( box) 
@@ -369,7 +369,7 @@ var jat;
                     throw 'Error';
                 }
                 box.score = boite.score;
-                this.CalculeScore(box._draw);
+                this.computeScore(box._draw);
                 return true;
             };
             //Planification d'un match : met le court, la date et l'heure
@@ -406,7 +406,7 @@ var jat;
                 var boxOut = box;
                 var i;
                 if ((i = boxOut.qualifOut) && next) {
-                    var boxIn = this.FindQualifieEntrant(next, i);
+                    var boxIn = this.findPlayerIn(next, i);
                     if (boxIn) {
                         if (!this.EnleveJoueur(boxIn, true)) {
                             throw 'Error';
@@ -475,7 +475,7 @@ var jat;
                 
                         }
     
-                        this.CalculeScore(box._draw);
+                        this.computeScore(box._draw);
                         //TODO Poule, Unlock
                     } else
                     if(  ADVERSAIRE1(box) <= iBoiteMax()) {
@@ -500,7 +500,7 @@ var jat;
                 if (prev) {
                     var boxIn = box;
                     if (boxIn.qualifIn) {
-                        var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
+                        var boxOut = this.findPlayerOut(prev, boxIn.qualifIn);
                         if (boxOut) {
                             boxOut.locked = true;
                         }
@@ -518,7 +518,7 @@ var jat;
                 if (prev) {
                     var boxIn = box;
                     if (boxIn.qualifIn) {
-                        var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
+                        var boxOut = this.findPlayerOut(prev, boxIn.qualifIn);
                         if (boxOut) {
                             delete boxOut.locked;
                         }
@@ -535,7 +535,7 @@ var jat;
                 var boiteMatch = isMatch(boite) ? boite : undefined;
                 if (boxIn.qualifIn
                     && boxIn.qualifIn != boiteIn.qualifIn) {
-                    if (!this.SetQualifieEntrant(box)) {
+                    if (!this.setPlayerIn(box)) {
                         throw 'Error';
                     }
                 }
@@ -555,7 +555,7 @@ var jat;
                 }
                 //Rempli avec les nouvelles valeurs
                 if (boiteIn.qualifIn) {
-                    if (!this.SetQualifieEntrant(box, boiteIn.qualifIn, boite._player)) {
+                    if (!this.setPlayerIn(box, boiteIn.qualifIn, boite._player)) {
                         throw 'Error';
                     }
                 }
@@ -573,7 +573,7 @@ var jat;
                     }
                     if (match) {
                         if (boiteMatch.qualifOut) {
-                            if (!this.SetQualifieSortant(match, boiteMatch.qualifOut)) {
+                            if (!this.setPlayerOut(match, boiteMatch.qualifOut)) {
                                 throw 'Error';
                             }
                         }
@@ -593,7 +593,7 @@ var jat;
                         match.note = match.note;
                     }
                 }
-                this.CalculeScore(box._draw);
+                this.computeScore(box._draw);
                 return true;
             };
             DrawLib.prototype.DeplaceJoueur = function (box, boiteSrc, pBoite) {

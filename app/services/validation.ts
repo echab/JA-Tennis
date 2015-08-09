@@ -27,6 +27,7 @@ module jat.service {
             this._validLibs.push(validator);
         }
 
+        //Override
         validatePlayer(player: models.Player): boolean {
             var res = true;
             for (var i = 0; i < this._validLibs.length; i++) {
@@ -35,6 +36,7 @@ module jat.service {
             return res;
         }
 
+        //Override
         validateDraw(draw: models.Draw): boolean {
             var res = true;
             for (var i = 0; i < this._validLibs.length; i++) {

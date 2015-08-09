@@ -4,11 +4,11 @@
     resize(draw: models.Draw, oldDraw?: models.Draw, nJoueur?: number): void;
     nbColumnForPlayers(draw: models.Draw, nJoueur: number): number;
     generateDraw(draw: models.Draw, generate: models.GenerateType, afterIndex: number): models.Draw[];
-    SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean;    //setPlayerIn
-    SetQualifieSortant(box: models.Match, outNumber?: number): boolean;    //setPlayerOut
-    FindQualifieEntrant(draw: models.Draw, inNumber: number): models.PlayerIn;  //findPlayerIn
-    FindQualifieSortant(draw: models.Draw, outNumber: number): models.Match;    //findPlayerOut
-    CalculeScore(draw: models.Draw): boolean;
+    setPlayerIn(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean;    //SetQualifieEntrant
+    setPlayerOut(box: models.Match, outNumber?: number): boolean;    //SetQualifieSortant
+    findPlayerIn(draw: models.Draw, inNumber: number): models.PlayerIn;  //FindQualifieEntrant
+    findPlayerOut(draw: models.Draw, outNumber: number): models.Match;    //FindQualifieSortant
+    computeScore(draw: models.Draw): boolean;   //CalculeScore
     boxesOpponents(match: models.Match): { box1: models.Box; box2: models.Box };
 }
 
@@ -98,7 +98,7 @@ module jat.service {
                         for (var b = 0; b < boxes.length; b++) {
                             var box = <models.Match> boxes[b];
                             if (box && box.qualifOut) {
-                                this.SetQualifieSortant(box);
+                                this.setPlayerOut(box);
                             }
                         }
                     }
@@ -171,12 +171,12 @@ module jat.service {
 
             //remove old qualif numbers
             for (i = qualifs.length - 1; i >= 0; i--) {
-                this.SetQualifieEntrant(qualifs[i], 0);
+                this.setPlayerIn(qualifs[i], 0);
             }
 
             //assign new qualif number
             for (i = qualifs.length - 1; i >= 0; i--) {
-                this.SetQualifieEntrant(qualifs[i], i + 1);
+                this.setPlayerIn(qualifs[i], i + 1);
             }
         }
 
@@ -249,11 +249,9 @@ module jat.service {
             return box && ('score' in box) && (<any>(box.place) || box.date);
         }
 
-        public FindTeteSerie(group: models.Draw[], iTeteSerie: number): models.PlayerIn;
-        public FindTeteSerie(draw: models.Draw, iTeteSerie: number): models.PlayerIn;
-        public FindTeteSerie(origin: any, iTeteSerie: number): models.PlayerIn {
+        public findSeeded(origin: models.Draw | models.Draw[], iTeteSerie: number): models.PlayerIn {    //FindTeteSerie
             ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-            var group = angular.isArray(origin) ? origin : this.group(origin);
+            var group = angular.isArray(origin) ? <models.Draw[]>origin : this.group(<models.Draw>origin);
             for (var i = 0; i < group.length; i++) {
                 var boxes = group[i].boxes;
                 for (var j = 0; j < boxes.length; j++) {
@@ -266,28 +264,24 @@ module jat.service {
             return null;
         }
 
-        public FindQualifieEntrant(group: models.Draw[], iQualifie: number): models.PlayerIn;
-        public FindQualifieEntrant(draw: models.Draw, iQualifie: number): models.PlayerIn;
-        public FindQualifieEntrant(origin: any, iQualifie: number): models.PlayerIn {
+        public findPlayerIn(origin: models.Draw | models.Draw[], iQualifie: number): models.PlayerIn {
             ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
-            var group: models.Draw[] = angular.isArray(origin) ? origin : this.group(origin);
+            var group = angular.isArray(origin) ? <models.Draw[]>origin : this.group(<models.Draw>origin);
             for (var i = 0; i < group.length; i++) {
                 var d = group[i];
-                var playerIn = this._drawLibs[d.type].FindQualifieEntrant(d, iQualifie);
+                var playerIn = this._drawLibs[d.type].findPlayerIn(d, iQualifie);
                 if (playerIn) {
                     return playerIn;
                 }
             }
         }
 
-        public FindQualifieSortant(group: models.Draw[], iQualifie: number): models.Match;
-        public FindQualifieSortant(draw: models.Draw, iQualifie: number): models.Match;
-        public FindQualifieSortant(origin: any, iQualifie: number): models.Match {
+        public findPlayerOut(origin: models.Draw | models.Draw[], iQualifie: number): models.Match {
             ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
-            var group = angular.isArray(origin) ? origin : this.group(origin);
+            var group = angular.isArray(origin) ? <models.Draw[]>origin : this.group(<models.Draw>origin);
             for (var i = 0; i < group.length; i++) {
                 var d = group[i];
-                var boxOut = this._drawLibs[d.type].FindQualifieSortant(d, iQualifie);
+                var boxOut = this._drawLibs[d.type].findPlayerOut(d, iQualifie);
                 if (boxOut) {
                     return boxOut;
                 }
@@ -307,15 +301,13 @@ module jat.service {
             return null;
         }
 
-        public FindAllQualifieSortant(group: models.Draw[], hideNumbers?: boolean): number[];
-        public FindAllQualifieSortant(draw: models.Draw, hideNumbers?: boolean): number[];
-        public FindAllQualifieSortant(origin: any, hideNumbers?: boolean): number[] {
+        public findAllPlayerOut(origin: models.Draw | models.Draw[], hideNumbers?: boolean): number[] {   //FindAllQualifieSortant
             //Récupère les qualifiés sortants du tableau
-            var group = angular.isArray(origin) ? origin : this.group(origin);
+            var group = angular.isArray(origin) ? <models.Draw[]>origin : this.group(<models.Draw>origin);
             if (group) {
                 var a: number[] = [];
                 for (var i = 1; i <= MAX_QUALIF; i++) {
-                    if (this.FindQualifieSortant(group, i)) {
+                    if (this.findPlayerOut(group, i)) {
                         a.push(hideNumbers ? QEMPTY : i);
                     }
                 }
@@ -323,15 +315,13 @@ module jat.service {
             }
         }
 
-        public FindAllQualifieSortantBox(group: models.Draw[]): models.Match[];
-        public FindAllQualifieSortantBox(draw: models.Draw): models.Match[];
-        public FindAllQualifieSortantBox(origin: any): models.Match[] {
+        public findAllPlayerOutBox(origin: models.Draw | models.Draw[]): models.Match[] { //FindAllQualifieSortantBox
             //Récupère les qualifiés sortants du tableau
-            var group = angular.isArray(origin) ? origin : this.group(origin);
+            var group = angular.isArray(origin) ? <models.Draw[]>origin : this.group(<models.Draw>origin);
             if (group) {
                 var a: models.Match[] = [], m:models.Match;
                 for (var i = 1; i <= MAX_QUALIF; i++) {
-                    if (m = this.FindQualifieSortant(group, i)) {
+                    if (m = this.findPlayerOut(group, i)) {
                         a.push(m);
                     }
                 }
@@ -347,18 +337,18 @@ module jat.service {
           * @param inNumber (optional)
           * @param player   (optional)
           */
-        public SetQualifieEntrant(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean {
+        public setPlayerIn(box: models.PlayerIn, inNumber?: number, player?: models.Player): boolean {
             // inNumber=0 => enlève qualifié
-            return this._drawLibs[box._draw.type].SetQualifieEntrant(box, inNumber, player);
+            return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
         }
 
-        public SetQualifieSortant(box: models.Match, outNumber?: number): boolean { //setPlayerOut
+        public setPlayerOut(box: models.Match, outNumber?: number): boolean { //setPlayerOut
             // iQualifie=0 => enlève qualifié
-            return this._drawLibs[box._draw.type].SetQualifieSortant(box, outNumber);
+            return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
         }
 
-        public CalculeScore(draw: models.Draw): boolean {
-            return this._drawLibs[draw.type].CalculeScore(draw);
+        public computeScore(draw: models.Draw): boolean {
+            return this._drawLibs[draw.type].computeScore(draw);
         }
 
         //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
@@ -390,7 +380,7 @@ module jat.service {
             if (boxOut.qualifOut) {
                 var next = this.nextGroup(box._draw);
                 if (next) {
-                    var boxIn = this.FindQualifieEntrant(next, boxOut.qualifOut);
+                    var boxIn = this.findPlayerIn(next, boxOut.qualifOut);
                     if (boxIn) {
                         if (!boxIn.playerId
                             && !this.MetJoueur(boxIn, player, true)) {
@@ -427,7 +417,7 @@ module jat.service {
             //            }
             //        }
             //    }
-            //    CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
+            //    computeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
             //    //TODO Poule, Lock
             //} else
             //if( iBoiteMin() <= IAUTRE( box) 
@@ -465,7 +455,7 @@ module jat.service {
 
             box.score = boite.score;
 
-            this.CalculeScore(box._draw);
+            this.computeScore(box._draw);
 
             return true;
         }
@@ -516,7 +506,7 @@ module jat.service {
             var boxOut = <models.Match> box;
             var i: number;
             if ((i = boxOut.qualifOut) && next) {
-                var boxIn = this.FindQualifieEntrant(next, i);
+                var boxIn = this.findPlayerIn(next, i);
                 if (boxIn) {
                     if (!this.EnleveJoueur(boxIn, true)) {
                         throw 'Error';
@@ -587,7 +577,7 @@ module jat.service {
 			
                     }
 
-                    this.CalculeScore(box._draw);
+                    this.computeScore(box._draw);
                     //TODO Poule, Unlock
                 } else
                 if(  ADVERSAIRE1(box) <= iBoiteMax()) {
@@ -619,7 +609,7 @@ module jat.service {
             if (prev) {
                 var boxIn = <models.PlayerIn>box;
                 if (boxIn.qualifIn) {
-                    var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
+                    var boxOut = this.findPlayerOut(prev, boxIn.qualifIn);
                     if (boxOut) {
                         boxOut.locked = true;
                     }
@@ -642,7 +632,7 @@ module jat.service {
             if (prev) {
                 var boxIn = <models.PlayerIn>box;
                 if (boxIn.qualifIn) {
-                    var boxOut = this.FindQualifieSortant(prev, boxIn.qualifIn);
+                    var boxOut = this.findPlayerOut(prev, boxIn.qualifIn);
                     if (boxOut) {
                         delete boxOut.locked;
                     }
@@ -664,7 +654,7 @@ module jat.service {
             if (boxIn.qualifIn
                 && boxIn.qualifIn != boiteIn.qualifIn) {
 
-                if (!this.SetQualifieEntrant(box)) {	//Enlève
+                if (!this.setPlayerIn(box)) {	//Enlève
                     throw 'Error';
                 }
             } else {
@@ -686,7 +676,7 @@ module jat.service {
 
             //Rempli avec les nouvelles valeurs
             if (boiteIn.qualifIn) {
-                if (!this.SetQualifieEntrant(box, boiteIn.qualifIn, boite._player)) {
+                if (!this.setPlayerIn(box, boiteIn.qualifIn, boite._player)) {
                     throw 'Error';
                 }
             } else {
@@ -705,7 +695,7 @@ module jat.service {
 
                 if (match) {
                     if (boiteMatch.qualifOut) {
-                        if (!this.SetQualifieSortant(match, boiteMatch.qualifOut)) {
+                        if (!this.setPlayerOut(match, boiteMatch.qualifOut)) {
                             throw 'Error';
                         }
                     }
@@ -730,7 +720,7 @@ module jat.service {
                 }
             }
 
-            this.CalculeScore(box._draw);
+            this.computeScore(box._draw);
 
             return true;
         }

@@ -39,6 +39,7 @@
     "./app/models/types/score.d.ts",
     "./app/services/draw/drawLib.ts",
     "./app/services/draw/knockout.ts",
+    "./app/services/draw/knockoutLib.ts",
     "./app/services/draw/knockoutValidation.ts",
     "./app/services/draw/roundrobin.ts",
     "./app/services/draw/roundrobinValidation.ts",

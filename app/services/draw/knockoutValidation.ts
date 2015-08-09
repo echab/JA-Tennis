@@ -11,6 +11,7 @@
             private validation: jat.service.Validation,
             private knockout: jat.service.Knockout,
             private drawLib: jat.service.DrawLib,
+            private knockoutLib: jat.service.KnockoutLib,
             private tournamentLib: jat.service.TournamentLib,
             private rank: ServiceRank,
             private category: ServiceCategory,
@@ -20,6 +21,7 @@
             validation.addValidator(this);
         }
 
+        //Override
         validatePlayer(player: models.Player): boolean {
             return true;
         }
@@ -75,12 +77,12 @@
             if (!draw.suite) {
                 //Trouve le plus grand Qsortant
                 for (e = MAX_QUALIF; e >= 1; e--) {
-                    if (this.drawLib.FindQualifieSortant(group, e)) {
+                    if (this.drawLib.findPlayerOut(group, e)) {
                         break;
                     }
                 }
                 for (var e2 = 1; e2 <= e; e2++) {
-                    if (!this.drawLib.FindQualifieSortant(group, e2)) {
+                    if (!this.drawLib.findPlayerOut(group, e2)) {
                         this.validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
                         bRes = false;
                     }
@@ -97,12 +99,14 @@
             return bRes;
         }
 
+        //Override
         validateDraw(draw: models.Draw): boolean {
             var bRes = true;
             var nqe = 0;
             var nqs = 0;
             var tournament = draw._event._tournament;
             var isTypePoule = draw.type >= 2;
+            var k = this.knockoutLib;
 
             //Interdits:
             // - De faire rencontrer 2 Qualifiés entre eux
@@ -132,7 +136,7 @@
 
             bRes = bRes && this.validateMatches(draw);
 
-            var colMax = columnMax(draw.nbColumn, draw.nbOut);
+            var colMax = k.columnMax(draw.nbColumn, draw.nbOut);
             var pClastMaxCol: RankString[] = new Array(colMax + 1);
             pClastMaxCol[colMax] = 'NC';    //pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();
 
@@ -146,8 +150,8 @@
                 //ASSERT(-1 <= box.playerId && box.playerId < tournament.players.length);
                 //Joueur inscrit au tableau ?
 
-                var c = column(b);
-                if (b === positionTopCol(c)) {
+                var c = k.column(b);
+                if (b === k.positionTopCol(c)) {
                     if (c < colMax) {
                         pClastMaxCol[c] = pClastMaxCol[c + 1];
                         //pClastMinCol[ c] = pClastMinCol[ c+1];
@@ -230,7 +234,7 @@
 
 
 
-                    ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
+                    ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
 
                     //TODO this.drawLib.boxesOpponents(match)
                     var opponent = this.knockout.boxesOpponents(match);
@@ -245,7 +249,7 @@
                         }
 
                     } else {
-                        ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
+                        ASSERT(b < k.positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
 
                         if (!match.playerId) {
                             this.validation.errorDraw('IDS_ERR_SCORE_VAINQ_NO', draw, match);
@@ -258,7 +262,7 @@
                         }
 
                         //ASSERT( boxes[ i].playerId==-1 || player.isInscrit( tournament.FindEpreuve( this)) );
-                        ASSERT(column(b) < colMax);
+                        ASSERT(k.column(b) < colMax);
                         if (!opponent.box1.playerId || !opponent.box2.playerId) {
                             this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, match);
                             bRes = false;
@@ -361,7 +365,7 @@
 
                         //TODO 00/07/27: Date d'un match après les matches précédents (au moins 3 heures) ça test pas bien à tous les coups
                         //TODO 00/12/20: Dans tous les tableaux où le joueur est inscrit, date des matches différentes pour un même joueur
-                        ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
+                        ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
 
                         //DONE 01/08/19 (00/12/20): Dans Poule, date des matches différentes pour un même joueur
 
@@ -414,7 +418,7 @@
                     if (e && e != QEMPTY) {
                         nqe++;
 
-                        ASSERT(!isTypePoule || (b >= positionBottomCol(draw.nbColumn, draw.nbOut)));	//Qe que dans colonne de gauche
+                        ASSERT(!isTypePoule || (b >= k.positionBottomCol(draw.nbColumn, draw.nbOut)));	//Qe que dans colonne de gauche
 
                         var iTableau = this.find.indexOf(draw._event.draws, 'id', draw.id);
                         if (iTableau == 0) {
@@ -425,7 +429,7 @@
 
                         //DONE 00/03/07: CTableau, qualifié entrant en double
                         var j: models.Box;
-                        if (!draw.suite && (j = this.drawLib.FindQualifieEntrant(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
+                        if (!draw.suite && (j = this.drawLib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
                             this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
                             bRes = false;
                         }
@@ -433,7 +437,7 @@
                         var group = this.drawLib.previousGroup(draw);
                         if (group) {
                             //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                            j = this.drawLib.FindQualifieSortant(group, e);
+                            j = this.drawLib.findPlayerOut(group, e);
                             if (!j) {
                                 this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                                 bRes = false;
@@ -453,9 +457,9 @@
                         //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
 
                         //DONE 00/03/07: CTableau, qualifié sortant en double
-                        j = this.drawLib.FindQualifieSortant(draw, e);
+                        j = this.drawLib.findPlayerOut(draw, e);
                         if (j && (j.position != b || j._draw.id != draw.id)) {
-                        this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
+                            this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
                             bRes = false;
                         }
 
@@ -465,7 +469,7 @@
                         }
                         /*			
                         pSuite = getSuivant();
-                        if( pSuite && (j = pSuite.FindQualifieEntrant( e, &pSuite)) != -1) {
+                        if( pSuite && (j = pSuite.findPlayerIn( e, &pSuite)) != -1) {
                             if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
                                 this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
                                 bRes=false;
@@ -481,7 +485,7 @@
             //	if( !isTypePoule)
             if (!draw.suite) {
                 for (var e2 = 0, e = 1; e <= MAX_TETESERIE; e++) {
-                    boxIn = this.drawLib.FindTeteSerie(draw, e);
+                    boxIn = this.drawLib.findSeeded(draw, e);
                     if (boxIn) {
                         if (e > e2 + 1) {
                             this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
@@ -511,8 +515,8 @@
                 var pT = this.drawLib.previousGroup(draw);
                 if (pT && pT.length) {
                     for (var e = 1; e <= MAX_QUALIF; e++) {
-                        var boxOut = this.drawLib.FindQualifieSortant(pT, e);
-                        boxIn = this.drawLib.FindQualifieEntrant(draw, e);
+                        var boxOut = this.drawLib.findPlayerOut(pT, e);
+                        boxIn = this.drawLib.findPlayerIn(draw, e);
                         if (boxOut && !boxIn) {
                             this.validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);
                             bRes = false;
@@ -574,54 +578,6 @@
         return 'score' in box;
     }
 
-    function column(pos: number): number {    //iCol
-        //TODO, use a table
-        var col = -1;
-        for (pos++; pos; pos >>= 1, col++) { }
-        return col;
-    }
-
-    function columnMin(nQ?: number): number {   //iColMinQ
-        return !nQ || nQ === 1
-            ? 0
-            : column(nQ - 2) + 1;
-    }
-
-    function columnMax(nCol: number, nQ?: number): number { //iColMaxQ
-        return !nQ || nQ === 1
-            ? nCol - 1
-            : column(nQ - 2) + nCol;
-    }
-
-    function positionTopCol(col: number): number { // iHautCol
-        return (1 << (col + 1)) - 2;
-    }
-
-    function positionBottomCol(col: number, nQ?: number): number {  //iBasColQ
-        return !nQ || nQ === 1
-            ? (1 << col) - 1    //iBasCol
-            : (positionTopCol(col) - countInCol(col, nQ) + 1);
-    }
-
-    function countInCol(col: number, nQ?: number): number { //nInColQ
-        return !nQ || nQ === 1
-            ? (1 << col)    //countInCol
-            : nQ * countInCol(col - columnMin(nQ), 1);
-    }
-
-    function positionMax(nCol: number, nQ?: number): number {   //iBoiteMaxQ
-        return !nQ || nQ === 1
-            ? (1 << nCol) - 2  //iHautCol
-            : positionTopCol(columnMax(nCol, nQ));
-    }
-
-    function positionOpponent1(pos: number): number { //ADVERSAIRE1
-        return (pos << 1) + 2;
-    }
-    function positionOpponent2(pos: number): number { //ADVERSAIRE2
-        return (pos << 1) + 1;
-    }
-
     function CompString(a: string, b: string): number {
         var u = (a || '').toUpperCase(), v = (b || '').toUpperCase();
         return u === v ? 0 : u < v ? -1 : 1;
@@ -641,11 +597,12 @@
         return Math.floor((two.getTime() - one.getTime()) / unit);
     }
 
-    angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type'])
+    angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type', 'jat.services.knockoutLib'])
         .factory('knockoutValidation', [
             'validation',
             'knockout',
             'drawLib',
+            'knockoutLib',
             'tournamentLib',
             'rank',
             'category',
@@ -654,11 +611,12 @@
             (validation: jat.service.Validation,
                 knockout: jat.service.Knockout,
                 drawLib: jat.service.DrawLib,
+                knockoutLib: jat.service.KnockoutLib,
                 tournamentLib: jat.service.TournamentLib,
                 rank: ServiceRank,
                 category: ServiceCategory,
                 score: ServiceScore,
                 find: jat.service.Find) => {
-            return new KnockoutValidation(validation, knockout, drawLib, tournamentLib, rank, category, score, find);
-        }]);
+                return new KnockoutValidation(validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
+            }]);
 } 

@@ -57,7 +57,7 @@ module jat.draw {
 
             //qualifs in
             var prev = this.drawLib.previousGroup(this.draw);
-            this.qualifsIn = prev ? this.drawLib.FindAllQualifieSortantBox(prev) : undefined;
+            this.qualifsIn = prev ? this.drawLib.findAllPlayerOutBox(prev) : undefined;
 
             //qualifs out
             this.qualifsOut = [];
@@ -172,7 +172,7 @@ module jat.draw {
             var prevQualif = box.qualifIn;
             this.undo.action((bUndo: boolean) => {
                 if (prevQualif || qualifIn) {
-                    this.drawLib.SetQualifieEntrant(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
+                    this.drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
                 } else {
                     box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
                     this.drawLib.initBox(box, box._draw);

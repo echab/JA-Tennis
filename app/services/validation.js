@@ -12,6 +12,7 @@ var jat;
             Validation.prototype.addValidator = function (validator) {
                 this._validLibs.push(validator);
             };
+            //Override
             Validation.prototype.validatePlayer = function (player) {
                 var res = true;
                 for (var i = 0; i < this._validLibs.length; i++) {
@@ -19,6 +20,7 @@ var jat;
                 }
                 return res;
             };
+            //Override
             Validation.prototype.validateDraw = function (draw) {
                 var res = true;
                 for (var i = 0; i < this._validLibs.length; i++) {

@@ -26,7 +26,7 @@ var jat;
                 this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
                 //qualifs in
                 var prev = this.drawLib.previousGroup(this.draw);
-                this.qualifsIn = prev ? this.drawLib.FindAllQualifieSortantBox(prev) : undefined;
+                this.qualifsIn = prev ? this.drawLib.findAllPlayerOutBox(prev) : undefined;
                 //qualifs out
                 this.qualifsOut = [];
                 for (var i = 1; i <= this.draw.nbOut; i++) {
@@ -131,7 +131,7 @@ var jat;
                 var prevQualif = box.qualifIn;
                 this.undo.action(function (bUndo) {
                     if (prevQualif || qualifIn) {
-                        _this.drawLib.SetQualifieEntrant(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
+                        _this.drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
                     }
                     else {
                         box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);

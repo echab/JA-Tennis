@@ -34,9 +34,11 @@ var jat;
                 }
                 return box;
             };
+            //Override
             Roundrobin.prototype.nbColumnForPlayers = function (draw, nJoueur) {
                 return nJoueur;
             };
+            //Override
             Roundrobin.prototype.boxesOpponents = function (match) {
                 var n = match._draw.nbColumn;
                 var pos1 = seedPositionOpponent1(match.position, n), pos2 = seedPositionOpponent2(match.position, n);
@@ -45,6 +47,7 @@ var jat;
                     box2: this.find.by(match._draw.boxes, 'position', pos2)
                 };
             };
+            //Override
             Roundrobin.prototype.getSize = function (draw) {
                 if (!draw.nbColumn) {
                     return { width: 1, height: 1 };
@@ -55,10 +58,12 @@ var jat;
                     height: n // * (dimensions.boxHeight + dimensions.interBoxHeight) - dimensions.interBoxHeight
                 };
             };
+            //Override
             Roundrobin.prototype.computePositions = function (draw) {
                 //nothing to do for round robin
                 return;
             };
+            //Override
             Roundrobin.prototype.resize = function (draw, oldDraw, nJoueur) {
                 if (nJoueur) {
                     throw "Not implemnted";
@@ -97,7 +102,8 @@ var jat;
                     }
                 }
             };
-            Roundrobin.prototype.FindQualifieEntrant = function (draw, iQualifie) {
+            //Override
+            Roundrobin.prototype.findPlayerIn = function (draw, iQualifie) {
                 ASSERT(iQualifie >= 0);
                 if (!draw.boxes) {
                     return;
@@ -113,7 +119,8 @@ var jat;
                     }
                 }
             };
-            Roundrobin.prototype.FindQualifieSortant = function (draw, iQualifie) {
+            //Override
+            Roundrobin.prototype.findPlayerOut = function (draw, iQualifie) {
                 ASSERT(0 < iQualifie);
                 if (iQualifie === QEMPTY || !draw.boxes) {
                     return;
@@ -125,21 +132,22 @@ var jat;
                     }
                 }
             };
-            Roundrobin.prototype.SetQualifieEntrant = function (box, inNumber, player) {
+            //Override
+            Roundrobin.prototype.setPlayerIn = function (box, inNumber, player) {
                 // inNumber=0 => enlève qualifié
                 var draw = box._draw;
-                //ASSERT(SetQualifieEntrantOk(iBoite, inNumber, iJoueur));
+                //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
                 if (inNumber) {
                     var prev = this.drawLib.previousGroup(draw);
                     if (!player && prev && inNumber != QEMPTY) {
                         //Va chercher le joueur dans le tableau précédent
-                        var boxOut = this.drawLib.FindQualifieSortant(prev, inNumber);
+                        var boxOut = this.drawLib.findPlayerOut(prev, inNumber);
                         if (angular.isObject(boxOut)) {
                             player = boxOut._player;
                         }
                     }
                     if (box.qualifIn) {
-                        if (!this.SetQualifieEntrant(box)) {
+                        if (!this.setPlayerIn(box)) {
                             ASSERT(false);
                         }
                     }
@@ -150,8 +158,8 @@ var jat;
                     }
                     //Qualifié entrant pas déjà pris
                     if (inNumber == QEMPTY ||
-                        !this.drawLib.FindQualifieEntrant(draw, inNumber)) {
-                        this.SetQualifieEntrant(box, inNumber);
+                        !this.drawLib.findPlayerIn(draw, inNumber)) {
+                        this.setPlayerIn(box, inNumber);
                     }
                 }
                 else {
@@ -162,9 +170,10 @@ var jat;
                 }
                 return true;
             };
-            Roundrobin.prototype.SetQualifieSortant = function (box, outNumber) {
+            //Override
+            Roundrobin.prototype.setPlayerOut = function (box, outNumber) {
                 // outNumber=0 => enlève qualifié
-                //ASSERT(SetQualifieSortantOk(iBoite, outNumber));
+                //ASSERT(setPlayerOutOk(iBoite, outNumber));
                 var next = this.drawLib.nextGroup(box._draw);
                 //TODOjs findBox()
                 var diag = box._draw.boxes[iDiagonale(box)];
@@ -172,7 +181,7 @@ var jat;
                 if (outNumber) {
                     //Met à jour le tableau suivant
                     if (next && box.playerId && box.qualifOut) {
-                        var boxIn = this.drawLib.FindQualifieEntrant(box._draw, outNumber);
+                        var boxIn = this.drawLib.findPlayerIn(box._draw, outNumber);
                         if (boxIn) {
                             ASSERT(boxIn.playerId === box.playerId);
                             if (!this.drawLib.EnleveJoueur(boxIn)) {
@@ -182,15 +191,15 @@ var jat;
                     }
                     //Enlève le précédent n° de qualifié sortant
                     if (box.qualifOut)
-                        if (!this.SetQualifieSortant(box)) {
+                        if (!this.setPlayerOut(box)) {
                             ASSERT(false);
                         }
-                    this.SetQualifieSortant(box, outNumber);
+                    this.setPlayerOut(box, outNumber);
                     diag.playerId = box1.playerId;
                     this.drawLib.initBox(diag, box._draw);
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
-                        var boxIn = this.drawLib.FindQualifieEntrant(next, outNumber);
+                        var boxIn = this.drawLib.findPlayerIn(next, outNumber);
                         if (boxIn) {
                             ASSERT(!boxIn.playerId);
                             if (!this.drawLib.MetJoueur(boxIn, box._player, true)) {
@@ -203,7 +212,7 @@ var jat;
                     var match = box;
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
-                        var boxIn = this.drawLib.FindQualifieEntrant(next, match.qualifOut);
+                        var boxIn = this.drawLib.findPlayerIn(next, match.qualifOut);
                         if (boxIn) {
                             ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
                             if (!this.drawLib.EnleveJoueur(boxIn, true)) {
@@ -217,7 +226,7 @@ var jat;
                 }
                 //#ifdef WITH_POULE
                 //	if( isTypePoule())
-                //		CalculeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd()).GetActiveDocument());
+                //		computeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd()).GetActiveDocument());
                 //#endif //WITH_POULE
                 return true;
             };
@@ -244,6 +253,7 @@ var jat;
                 }
                 return ppJoueur;
             };
+            //Override
             Roundrobin.prototype.generateDraw = function (refDraw, generate, afterIndex) {
                 var oldDraws = this.drawLib.group(refDraw);
                 var iTableau = this.find.indexOf(refDraw._event.draws, 'id', oldDraws[0].id);
@@ -254,7 +264,7 @@ var jat;
                 //Récupère les qualifiés sortants du tableau précédent
                 var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(refDraw);
                 if (prev) {
-                    players = players.concat(this.drawLib.FindAllQualifieSortant(prev, true));
+                    players = players.concat(this.drawLib.findAllPlayerOut(prev, true));
                 }
                 //Tri et Mélange les joueurs de même classement
                 this.tournamentLib.TriJoueurs(players);
@@ -288,7 +298,7 @@ var jat;
                         if (j < players.length) {
                             var qualif = 'number' === typeof players[j] ? players[j] : 0;
                             if (qualif) {
-                                if (!this.drawLib.SetQualifieEntrant(boxIn, qualif)) {
+                                if (!this.drawLib.setPlayerIn(boxIn, qualif)) {
                                     return;
                                 }
                             }
@@ -315,7 +325,8 @@ var jat;
                 return draws;
             };
             //Calcul classement des poules
-            Roundrobin.prototype.CalculeScore = function (draw) {
+            //Override
+            Roundrobin.prototype.computeScore = function (draw) {
                 //TODO
                 throw "Not implemented";
                 var m_pOrdrePoule; //classement de chaque joueur de la poule

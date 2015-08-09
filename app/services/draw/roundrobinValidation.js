@@ -7,9 +7,11 @@ var jat;
                 this.validation = validation;
                 validation.addValidator(this);
             }
+            //Override
             RoundrobinValidation.prototype.validatePlayer = function (player) {
                 return true;
             };
+            //Override
             RoundrobinValidation.prototype.validateDraw = function (draw) {
                 var bRes = true;
                 bRes = bRes && this.validatePoule(draw);
@@ -27,7 +29,7 @@ var jat;
                 //}
                 //for (i = draw.nbColumn - 1; i >= 0; i--) {
                 //    j = ADVERSAIRE1(i);
-                //    //comparer les Qs avec le classement de CalculeScore
+                //    //comparer les Qs avec le classement de computeScore
                 //    if (e) {
                 //        if (boxes[j].m_iClassement
                 //            && boxes[iDiagonale(j)].isQualifieSortant()) {
