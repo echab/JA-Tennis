@@ -207,7 +207,7 @@ module jat.draw {
         return {
             restrict: 'EA',
             scope: true,
-            templateUrl: 'draw/drawDraw.html',
+            templateUrl: 'views/draw/drawDraw.html',
             controller: drawCtrl,   //controller: ['drawLib', 'knockout', 'roundrobin', 'tournamentLib', 'find', drawCtrl],
             controllerAs: 'ctrlDraw',
             link: (scope: ng.IScope, element: JQuery, attrs: DrawAttributes, ctrlDraw: drawCtrl) => {

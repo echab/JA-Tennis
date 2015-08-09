@@ -7,6 +7,8 @@ cd
 call npm install
 @if errorlevel 1 goto :theend
 
+call _build.cmd
+
 @echo Build with Grunt
 call grunt %*
 

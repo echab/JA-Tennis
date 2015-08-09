@@ -3,7 +3,7 @@ module jat.player {
 
     function listPlayersDirective(): ng.IDirective {
         var dir = {
-            templateUrl: 'player/listPlayers.html',
+            templateUrl: 'views/player/listPlayers.html',
             controller: 'listPlayersCtrl',
             controllerAs: 'list',
             restrict: 'EA',

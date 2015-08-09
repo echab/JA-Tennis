@@ -173,7 +173,7 @@ var jat;
             return {
                 restrict: 'EA',
                 scope: true,
-                templateUrl: 'draw/drawDraw.html',
+                templateUrl: 'views/draw/drawDraw.html',
                 controller: drawCtrl,
                 controllerAs: 'ctrlDraw',
                 link: function (scope, element, attrs, ctrlDraw) {

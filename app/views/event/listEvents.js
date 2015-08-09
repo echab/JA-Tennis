@@ -5,7 +5,7 @@ var jat;
     (function (event) {
         function listEventsDirective() {
             var dir = {
-                templateUrl: 'event/listEvents.html',
+                templateUrl: 'views/event/listEvents.html',
                 controller: 'listEventsCtrl',
                 controllerAs: 'list',
                 restrict: 'EA',

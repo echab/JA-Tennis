@@ -3,7 +3,7 @@ module jat.event {
 
     function listEventsDirective(): ng.IDirective {
         var dir = {
-            templateUrl: 'event/listEvents.html',
+            templateUrl: 'views/event/listEvents.html',
             controller: 'listEventsCtrl',
             controllerAs: 'list',
             restrict: 'EA',

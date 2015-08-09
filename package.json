@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "description": "Tennis tournament management system. Offline web application, fully customisable.",
     "author": "Eloi Chabaud",
+    "private": true,
 
     "homepage": "http://jatennis.free.fr/",
 

@@ -56,7 +56,7 @@ var jat;
                 var _this = this;
                 var editedInfo = this.tournamentLib.newInfo(this.selection.tournament.info);
                 this.$modal.open({
-                    templateUrl: 'tournament/dialogInfo.html',
+                    templateUrl: 'views/tournament/dialogInfo.html',
                     controller: 'dialogInfoCtrl as dlg',
                     resolve: {
                         title: function () { return "Edit info"; },
@@ -87,7 +87,7 @@ var jat;
                 var _this = this;
                 var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament);
                 this.$modal.open({
-                    templateUrl: 'player/dialogPlayer.html',
+                    templateUrl: 'views/player/dialogPlayer.html',
                     controller: 'dialogPlayerCtrl as dlg',
                     resolve: {
                         title: function () { return "New player"; },
@@ -104,7 +104,7 @@ var jat;
                 var _this = this;
                 var editedPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);
                 this.$modal.open({
-                    templateUrl: 'player/dialogPlayer.html',
+                    templateUrl: 'views/player/dialogPlayer.html',
                     controller: 'dialogPlayerCtrl as dlg',
                     resolve: {
                         title: function () { return "Edit player"; },
@@ -129,7 +129,7 @@ var jat;
                 var _this = this;
                 var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
                 this.$modal.open({
-                    templateUrl: 'event/dialogEvent.html',
+                    templateUrl: 'views/event/dialogEvent.html',
                     controller: 'dialogEventCtrl as dlg',
                     resolve: {
                         title: function () { return "New event"; },
@@ -145,7 +145,7 @@ var jat;
                 var _this = this;
                 var editedEvent = this.tournamentLib.newEvent(this.selection.tournament, event);
                 this.$modal.open({
-                    templateUrl: 'event/dialogEvent.html',
+                    templateUrl: 'views/event/dialogEvent.html',
                     controller: 'dialogEventCtrl as dlg',
                     resolve: {
                         title: function () { return "Edit event"; },
@@ -169,7 +169,7 @@ var jat;
                 var _this = this;
                 var newDraw = this.drawLib.newDraw(this.selection.event, undefined, after);
                 this.$modal.open({
-                    templateUrl: 'draw/dialogDraw.html',
+                    templateUrl: 'views/draw/dialogDraw.html',
                     controller: 'dialogDrawCtrl as dlg',
                     resolve: {
                         title: function () { return "New draw"; },
@@ -189,7 +189,7 @@ var jat;
                 var _this = this;
                 var editedDraw = this.drawLib.newDraw(draw._event, draw);
                 this.$modal.open({
-                    templateUrl: 'draw/dialogDraw.html',
+                    templateUrl: 'views/draw/dialogDraw.html',
                     controller: 'dialogDrawCtrl as dlg',
                     resolve: {
                         title: function () { return "Edit draw"; },
@@ -228,7 +228,7 @@ var jat;
                 var _this = this;
                 var editedMatch = this.drawLib.newBox(match._draw, match);
                 this.$modal.open({
-                    templateUrl: 'draw/dialogMatch.html',
+                    templateUrl: 'views/draw/dialogMatch.html',
                     controller: 'dialogMatchCtrl as dlg',
                     resolve: {
                         title: function () { return "Edit match"; },

@@ -24,11 +24,11 @@ angular.module('jat', [
 .config([<any>'$routeProvider', ( $routeProvider: ng.IRouteProviderProvider) => {
     //routes
     $routeProvider.when('/players', {
-        templateUrl: 'players.html',         
+        templateUrl: 'views/player/players.html',         
         controller: controllers.Players
     });
     $routeProvider.when('/player/:id', {
-        templateUrl: 'player.html',
+        templateUrl: 'views/player/player.html',
         controller: controllers.Player
     });
     $routeProvider.otherwise({

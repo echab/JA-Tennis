@@ -15,7 +15,7 @@ var jat;
             return {
                 restrict: 'EA',
                 scope: true,
-                templateUrl: 'draw/drawBox.html',
+                templateUrl: 'views/draw/drawBox.html',
                 controller: boxCtrl,
                 controllerAs: 'ctrlBox',
                 link: function (scope, element, attrs, ctrlBox) {

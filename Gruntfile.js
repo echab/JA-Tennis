@@ -126,7 +126,7 @@ module.exports = function (grunt) {
                     }
                 },
                 files: {
-                    'dist/index.html': ['app/*/*.html', '!**/_*.html']
+                    'dist/index.html': ['app/**/*.html', '!app/index*.html', '!**/_*.html']
                 }
             }
         },

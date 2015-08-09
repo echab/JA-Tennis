@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 
-
-<html lang="en" ng-app="jat" id="ng-app" manifest="jatennis.appcache" xmlns:v="urn:schemas-microsoft-com:vml">
-
+<html lang="en" ng-app="jat" id="ng-app" manifest="jatennis.appcache">
 <head>
     <meta charset="utf-8">
     <title>JA-Tennis</title>
@@ -10,37 +8,27 @@
     <meta name="application-name" content="JA-Tennis">
     <meta name="msapplication-TileColor" content="#ffaaaa">
     <style type="text/css">
-        .ng-cloak {
-            display: none;
-        }
+        .ng-cloak { display: none;}
     </style>
-    <![if lte IE 8]>
-    <style type="text/css">
-        v\:shape {
-            behavior:url(#default#VML);
-            display:inline-block;
-        }
-    </style>
-    <![endif]-->
     
-    
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
-    
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
     <link rel="stylesheet" href="style/app.min.css"/>
 
     <link rel="icon" href="style/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <![if lte IE 8]>
+    <!--[if lte IE 8]>
     <script type="text/javascript">
         document.createElement('canvas');
+        document.namespaces.add('v', 'urn:schemas-microsoft-com:vml');
+        document.createStyleSheet().cssText = 'v\\:shape { behavior:url(#default#VML); display: inline-block; }';
     </script>
     <![endif]-->
 </head>
 <body ng-controller="mainCtrl as main">
 
 <!-- Begin Templates -->
-<script type="text/ng-template" id="draw/dialogDraw.html">
+<script type="text/ng-template" id="views/draw/dialogDraw.html">
 <form name="drawForm" ng-submit="$close('Ok')" zzzng-controller="dialogDrawCtrl as dlg" class="modal-form form-horizontal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
@@ -110,7 +98,7 @@
 
 </script>
 
-<script type="text/ng-template" id="draw/dialogMatch.html">
+<script type="text/ng-template" id="views/draw/dialogMatch.html">
 <form name="matchForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
@@ -175,7 +163,7 @@
 
 </script>
 
-<script type="text/ng-template" id="draw/drawBox.html">
+<script type="text/ng-template" id="views/draw/drawBox.html">
 <div ng-class="{match: ctrlBox.isMatch, inPlayer: !ctrlBox.isMatch, played:ctrlBox.isPlayed(), hidden: ctrlBox.box.hidden, selected: ctrlBox.box === main.selection.box, error: ctrlBox.error}"
      title="{{ctrlBox.error ? ctrlBox.error.message +' '+ ctrlBox.error.detail : ''}}"
      ng-click="main.select(ctrlBox.box, main.ModelType.Box); $event.stopPropagation();"
@@ -196,7 +184,7 @@
 </div>
 </script>
 
-<script type="text/ng-template" id="draw/drawDraw.html">
+<script type="text/ng-template" id="views/draw/drawDraw.html">
 <div ng-if="ctrlDraw.isKnockout" class="draw knockout" ng-style="{width: ctrlDraw.width +'px', height: ctrlDraw.height +'px'}"
      ng-click="main.select(null,main.ModelType.Box)">
     <canvas draw-lines="ctrlDraw._refresh"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
@@ -284,7 +272,7 @@
 
 </script>
 
-<script type="text/ng-template" id="event/dialogEvent.html">
+<script type="text/ng-template" id="views/event/dialogEvent.html">
 <form name="eventForm" ng-submit="$close('Ok')" zzzng-controller="dialogEventCtrl as dlg" class="modal-form form-horizontal">
 
     <div class="modal-header">
@@ -369,7 +357,7 @@
 
 </script>
 
-<script type="text/ng-template" id="event/event.html">
+<script type="text/ng-template" id="views/event/event.html">
 <div ng-show="!!show">
     <div class="modal-backdrop" ng-click="show = !show"></div>
     <div class="modal">
@@ -434,7 +422,7 @@
 
 </script>
 
-<script type="text/ng-template" id="event/listEvents.html">
+<script type="text/ng-template" id="views/event/listEvents.html">
 <table class="table table-hover table-condensed" style="width:auto;">
     <!--<caption>Events</caption>-->
     <thead>
@@ -486,7 +474,7 @@
 
 </script>
 
-<script type="text/ng-template" id="player/dialogPlayer.html">
+<script type="text/ng-template" id="views/player/dialogPlayer.html">
 <form name="playerForm" ng-submit="$close('Ok')" zzzng-controller="dialogPlayerCtrl as dlg" class="modal-form form-horizontal">
 
     <div class="modal-header">
@@ -603,7 +591,7 @@
 
 </script>
 
-<script type="text/ng-template" id="player/listPlayers.html">
+<script type="text/ng-template" id="views/player/listPlayers.html">
 <!-- <span class="input-append text-right" style="text-align:right;">
     <input placeholder="Search player list" type="search" class="span2"/>
     <button type="submit" class="btn">Search</button>
@@ -636,7 +624,7 @@
 
 </script>
 
-<script type="text/ng-template" id="tournament/dialogInfo.html">
+<script type="text/ng-template" id="views/tournament/dialogInfo.html">
 <form name="infoForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
 
     <div class="modal-header">

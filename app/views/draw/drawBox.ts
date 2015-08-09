@@ -23,7 +23,7 @@ module jat.draw {
         return {
             restrict: 'EA',
             scope: true,
-            templateUrl: 'draw/drawBox.html',
+            templateUrl: 'views/draw/drawBox.html',
             controller: boxCtrl,
             controllerAs: 'ctrlBox',
             link: (scope: ng.IScope, element: JQuery, attrs: BoxAttributes, ctrlBox: boxCtrl) => {

@@ -77,7 +77,7 @@ module jat.main {
             var editedInfo = this.tournamentLib.newInfo(this.selection.tournament.info);
 
             this.$modal.open({
-                templateUrl: 'tournament/dialogInfo.html',
+                templateUrl: 'views/tournament/dialogInfo.html',
                 controller: 'dialogInfoCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "Edit info",
@@ -110,7 +110,7 @@ module jat.main {
             var newPlayer = this.tournamentLib.newPlayer(this.selection.tournament);
 
             this.$modal.open({
-                templateUrl: 'player/dialogPlayer.html',
+                templateUrl: 'views/player/dialogPlayer.html',
                 controller: 'dialogPlayerCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "New player",
@@ -129,7 +129,7 @@ module jat.main {
             var editedPlayer = this.tournamentLib.newPlayer(this.selection.tournament, player);
 
             this.$modal.open({
-                templateUrl: 'player/dialogPlayer.html',
+                templateUrl: 'views/player/dialogPlayer.html',
                 controller: 'dialogPlayerCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "Edit player",
@@ -155,7 +155,7 @@ module jat.main {
             var newEvent = this.tournamentLib.newEvent(this.selection.tournament);
 
             this.$modal.open({
-                templateUrl: 'event/dialogEvent.html',
+                templateUrl: 'views/event/dialogEvent.html',
                 controller: 'dialogEventCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "New event",
@@ -173,7 +173,7 @@ module jat.main {
             var editedEvent = this.tournamentLib.newEvent(this.selection.tournament, event);
 
             this.$modal.open({
-                templateUrl: 'event/dialogEvent.html',
+                templateUrl: 'views/event/dialogEvent.html',
                 controller: 'dialogEventCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "Edit event",
@@ -199,7 +199,7 @@ module jat.main {
             var newDraw = this.drawLib.newDraw(this.selection.event, undefined, after);
 
             this.$modal.open({
-                templateUrl: 'draw/dialogDraw.html',
+                templateUrl: 'views/draw/dialogDraw.html',
                 controller: 'dialogDrawCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "New draw",
@@ -220,7 +220,7 @@ module jat.main {
             var editedDraw = this.drawLib.newDraw(draw._event, draw);
 
             this.$modal.open({
-                templateUrl: 'draw/dialogDraw.html',
+                templateUrl: 'views/draw/dialogDraw.html',
                 controller: 'dialogDrawCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "Edit draw",
@@ -263,7 +263,7 @@ module jat.main {
             var editedMatch = <models.Match> this.drawLib.newBox(match._draw, match);
 
             this.$modal.open({
-                templateUrl: 'draw/dialogMatch.html',
+                templateUrl: 'views/draw/dialogMatch.html',
                 controller: 'dialogMatchCtrl as dlg',    //required for resolve
                 resolve: {
                     title: () => "Edit match",

@@ -1,4 +1,4 @@
-﻿module tool {
+﻿namespace tool {
 
     export function copy(source: any, destination?: any) {
         if (!destination) {

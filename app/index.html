@@ -1,10 +1,6 @@
 ﻿<!DOCTYPE html>
-<!--(if target dev)><!-->
-<html lang="en" ng-app="jat" id="ng-app" xmlns:v="urn:schemas-microsoft-com:vml">
-<!--<!(endif)-->
-<!--(if target dist)>
-<html lang="en" ng-app="jat" id="ng-app" manifest="jatennis.appcache" xmlns:v="urn:schemas-microsoft-com:vml">
-<!(endif)-->
+<!--(if target dist)><html lang="en" ng-app="jat" id="ng-app" manifest="jatennis.appcache"><!(endif)-->
+<!--(if target dev)><!--><html lang="en" ng-app="jat" id="ng-app"><!--<!(endif)-->
 <head>
     <meta charset="utf-8">
     <title>JA-Tennis</title>
@@ -12,24 +8,10 @@
     <meta name="application-name" content="JA-Tennis" />
     <meta name="msapplication-TileColor" content="#ffaaaa" />
     <style type="text/css">
-        .ng-cloak {
-            display: none;
-        }
+        .ng-cloak { display: none;}
     </style>
-    <![if lte IE 8]>
-    <style type="text/css">
-        v\:shape {
-            behavior:url(#default#VML);
-            display:inline-block;
-        }
-    </style>
-    <![endif]-->
-    <!--(if target dev)><!-->
-    <link rel="stylesheet" href="../lib/ui-bootstrap/assets/bootstrap.css" />
-    <!--<!(endif)-->
-    <!--(if target dist)>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
-    <!(endif)-->
+    <!--(if target dist)><link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"><!(endif)-->
+    <!--(if target dev)><!--><link rel="stylesheet" href="../lib/ui-bootstrap/assets/bootstrap.css" /><!--<!(endif)-->
     <!-- build:css style/app.min.css -->
     <link rel="stylesheet" href="style/app.css" />
     <link rel="stylesheet" href="style/icons.css" />
@@ -40,9 +22,11 @@
     <link rel="icon" href="style/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="style/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <![if lte IE 8]>
+    <!--[if lte IE 8]>
     <script type="text/javascript">
         document.createElement('canvas');
+        document.namespaces.add('v', 'urn:schemas-microsoft-com:vml');
+        document.createStyleSheet().cssText = 'v\\:shape { behavior:url(#default#VML); display: inline-block; }';
     </script>
     <![endif]-->
 </head>
@@ -153,7 +137,6 @@
             <div class="footer">
             </div>
         </div>
-        -->
     </div>
 
     <!--(if target dev)><!-->
@@ -165,26 +148,27 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.8.0/ui-bootstrap-tpls.min.js"></script>
     <!(endif)-->
     <!-- build:js jatennis.min.js -->
-    <script src="ui/polyfill.js"></script>
+    <script src="utils/polyfill.js"></script>
+    <script src="utils/tool.js"></script>
+
     <script src="app.js"></script>
 
-    <script src="utils/tool.js"></script>
-    <script src="utils/checkList.js"></script>
-
-    <script src="services/version.js"></script>
-    <script src="services/undo.js"></script>
-    <script src="services/find.js"></script>
-    <script src="services/guid.js"></script>
-    <script src="services/selection.js"></script>
     <script src="services/mainLib.js"></script>
     <script src="services/tournamentLib.js"></script>
-    <script src="services/drawLib.js"></script>
-    <script src="services/knockout.js"></script>
-    <script src="services/roundrobin.js"></script>
+    
+    <script src="services/util/version.js"></script>
+    <script src="services/util/undo.js"></script>
+    <script src="services/util/find.js"></script>
+    <script src="services/util/guid.js"></script>
+    <script src="services/util/selection.js"></script>
+    
+    <script src="services/draw/drawLib.js"></script>
+    <script src="services/draw/knockout.js"></script>
+    <script src="services/draw/roundrobin.js"></script>
 
     <script src="services/validation.js"></script>
-    <script src="services/knockoutValidation.js"></script>
-    <script src="services/roundrobinValidation.js"></script>
+    <script src="services/draw/knockoutValidation.js"></script>
+    <script src="services/draw/roundrobinValidation.js"></script>
 
     <script src="services/fft/score.js"></script>
     <script src="services/fft/category.js"></script>
@@ -193,28 +177,28 @@
     <script src="services/fft/matchFormat.js"></script>
     <script src="services/fft/rank.js"></script>
     <script src="services/fft/ranking.js"></script>    
-    <script src="services/fftValidation.js"></script>
+    <script src="services/fft/fftValidation.js"></script>
 
     <script src="models/model.js"></script>
 
     <script src="main.js"></script>
 
-    <script src="tournament/dialogInfo.js"></script>
+    <script src="views/tournament/dialogInfo.js"></script>
 
-    <script src="player/listPlayers.js"></script>
-    <script src="player/dialogPlayer.js"></script>
+    <script src="views/player/listPlayers.js"></script>
+    <script src="views/player/dialogPlayer.js"></script>
 
-    <script src="event/listEvents.js"></script>
-    <script src="event/dialogEvent.js"></script>
+    <script src="views/event/listEvents.js"></script>
+    <script src="views/event/dialogEvent.js"></script>
 
-    <script src="draw/drawDraw.js"></script>
-    <script src="draw/drawBox.js"></script>
-    <script src="draw/dialogDraw.js"></script>
-    <script src="draw/dialogMatch.js"></script>
+    <script src="views/draw/drawDraw.js"></script>
+    <script src="views/draw/drawBox.js"></script>
+    <script src="views/draw/dialogDraw.js"></script>
+    <script src="views/draw/dialogMatch.js"></script>
 
-    <script src="ui/ec-panels.js"></script>
-    <script src="ui/ec-inputfile.js"></script>
-
+    <script src="views/controls/ec-panels.js"></script>
+    <script src="views/controls/ec-inputfile.js"></script>
+    <script src="views/controls/checkList.js"></script>
     <!-- endbuild -->
 </body>
 </html>
