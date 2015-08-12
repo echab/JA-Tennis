@@ -4,6 +4,6 @@
 		"**/*.js": { "when": "$(basename).ts"},
 		"**/*.js.map": true,
 		"**/*.lnk": true,
-		".*": true
+		".*": true 
 	}
 }

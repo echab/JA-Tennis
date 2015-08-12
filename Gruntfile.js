@@ -211,7 +211,6 @@ module.exports = function (grunt) {
                             '**/{math-mock,ui-bootstrap-mocks}.js',
                             'package.json',
                             '.htaccess',
-                            '.ftppass',
                             '*file.js',
                             '!node_modules/**', '!lib/angular/**', '!lib/ui-bootstrap/**', '!lib/typings/**', '!dist/**', '!bin/**'],
                         dest: '/'

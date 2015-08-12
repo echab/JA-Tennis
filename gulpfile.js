@@ -18,7 +18,7 @@ var pkg = require('./package.json'),
     zip = require('gulp-zip'),
     ftp = require('gulp-ftp'),
     fs = require('fs'),
-    ftppass = JSON.parse(fs.readFileSync('.ftppass', 'utf8')),
+    ftppass = JSON.parse(fs.readFileSync('../.ftppass', 'utf8')),
     del = require('del')
 ;
 
