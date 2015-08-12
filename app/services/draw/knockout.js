@@ -1,3 +1,9 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var jat;
 (function (jat) {
     var service;
@@ -21,17 +27,18 @@ var jat;
                 >-- 3---'
         --- 7---
         */
-        var Knockout = (function () {
-            function Knockout(drawLib, knockoutLib, tournamentLib, rank, find) {
-                this.drawLib = drawLib;
+        var Knockout = (function (_super) {
+            __extends(Knockout, _super);
+            function Knockout(services, drawLib, knockoutLib, tournamentLib, rank, find, guid) {
+                _super.call(this, services, drawLib, find, rank, guid);
                 this.knockoutLib = knockoutLib;
                 this.tournamentLib = tournamentLib;
-                this.rank = rank;
-                this.find = find;
-                drawLib._drawLibs[models.DrawType.Normal]
-                    = drawLib._drawLibs[models.DrawType.Final]
-                        = this;
+                services.registerDrawlib(this);
             }
+            //Override
+            Knockout.prototype.manage = function (draw) {
+                return draw.type === models.DrawType.Normal || draw.type === models.DrawType.Final;
+            };
             Knockout.prototype.findBox = function (draw, position, create) {
                 var box = this.find.by(draw.boxes, 'position', position);
                 if (!box && create) {
@@ -76,9 +83,9 @@ var jat;
                     //Récupère les qualifiés sortants du tableau précédent
                     var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = this.drawLib.previousGroup(draw);
                     if (prev) {
-                        players = players.concat(this.drawLib.findAllPlayerOut(prev, true));
+                        players = players.concat(this.drawLib.groupFindAllPlayerOut(prev, true));
                     }
-                    this.drawLib.resetDraw(draw, players.length);
+                    this.resetDraw(draw, players.length);
                     this.RempliMatchs(draw, m_nMatchCol, players.length - draw.nbOut);
                 }
                 else {
@@ -382,10 +389,10 @@ var jat;
                         if (boxIn) {
                             delete boxIn.score; //not a match
                             if (qualif) {
-                                this.drawLib.setPlayerIn(boxIn, qualif);
+                                this.setPlayerIn(boxIn, qualif);
                             }
                             else {
-                                this.drawLib.MetJoueur(boxIn, players[iJoueur]);
+                                this.MetJoueur(boxIn, players[iJoueur]);
                                 if ((!draw.minRank || !this.rank.isNC(draw.minRank))
                                     || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
                                     //Mets les têtes de série (sauf tableau NC)
@@ -395,7 +402,7 @@ var jat;
                                     else {
                                         t = this.iTeteSerieQ(b, draw.nbOut);
                                     }
-                                    if (t <= nTeteSerie && !this.drawLib.findSeeded(draw, t)) {
+                                    if (t <= nTeteSerie && !this.findSeeded(draw, t)) {
                                         boxIn.seeded = t;
                                     }
                                 }
@@ -415,7 +422,7 @@ var jat;
                     var group = this.drawLib.group(draw);
                     if (group) {
                         for (i = 1; i <= MAX_QUALIF; i++) {
-                            if (!this.drawLib.findPlayerOut(group, i)) {
+                            if (!this.drawLib.groupFindPlayerOut(group, i)) {
                                 break;
                             }
                         }
@@ -428,7 +435,7 @@ var jat;
                     for (var b = top; b >= bottom && i <= MAX_QUALIF; b--, i++) {
                         var boxOut = this.findBox(draw, b);
                         if (boxOut) {
-                            this.drawLib.setPlayerOut(boxOut, i);
+                            this.setPlayerOut(boxOut, i);
                         }
                     }
                 }
@@ -504,7 +511,7 @@ var jat;
                     var prev = this.drawLib.previousGroup(draw);
                     if (!player && prev && prev.length && inNumber !== QEMPTY) {
                         //Va chercher le joueur dans le tableau précédent
-                        var boxOut = this.drawLib.findPlayerOut(prev, inNumber);
+                        var boxOut = this.drawLib.groupFindPlayerOut(prev, inNumber);
                         if (angular.isObject(boxOut)) {
                             player = boxOut._player;
                         }
@@ -515,13 +522,13 @@ var jat;
                         }
                     }
                     if (player) {
-                        if (!this.drawLib.MetJoueur(box, player)) {
+                        if (!this.MetJoueur(box, player)) {
                             ASSERT(false);
                         }
                     }
                     //Qualifié entrant pas déjà pris
                     if (inNumber === QEMPTY ||
-                        !this.drawLib.findPlayerIn(draw, inNumber)) {
+                        !this.findPlayerIn(draw, inNumber)) {
                         box.qualifIn = inNumber;
                         //Cache les boites de gauche
                         this.iBoiteDeGauche(box.position, draw, true, function (box) {
@@ -531,7 +538,7 @@ var jat;
                 }
                 else {
                     box.qualifIn = 0;
-                    if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
+                    if (this.drawLib.previousGroup(draw) && !this.EnleveJoueur(box)) {
                         ASSERT(false);
                     }
                     //Réaffiche les boites de gauche
@@ -549,10 +556,10 @@ var jat;
                 if (outNumber) {
                     //Met à jour le tableau suivant
                     if (next && box.playerId && box.qualifOut) {
-                        var boxIn = this.drawLib.findPlayerIn(next, outNumber);
+                        var boxIn = this.drawLib.groupFindPlayerIn(next, outNumber);
                         if (boxIn) {
                             ASSERT(boxIn.playerId === box.playerId);
-                            if (!this.drawLib.EnleveJoueur(boxIn)) {
+                            if (!this.EnleveJoueur(boxIn)) {
                                 throw "Can not remove player";
                             }
                         }
@@ -566,17 +573,17 @@ var jat;
                     box.qualifOut = outNumber;
                     //Met à jour le tableau suivant
                     if (next && box.playerId && boxIn) {
-                        if (!this.drawLib.MetJoueur(boxIn, box._player, true)) {
+                        if (!this.MetJoueur(boxIn, box._player, true)) {
                         }
                     }
                 }
                 else {
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
-                        var boxIn = this.drawLib.findPlayerIn(next, box.qualifOut);
+                        var boxIn = this.drawLib.groupFindPlayerIn(next, box.qualifOut);
                         if (boxIn) {
                             ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
-                            if (!this.drawLib.EnleveJoueur(boxIn, true)) {
+                            if (!this.EnleveJoueur(boxIn, true)) {
                                 throw "Can not remove player";
                             }
                         }
@@ -788,7 +795,7 @@ var jat;
                     + k.positionBottomCol(c - k.columnMin(nQualifie));
             };
             return Knockout;
-        })();
+        })(service.DrawLibBase);
         service.Knockout = Knockout;
         function ASSERT(b, message) {
             if (!b) {
@@ -806,15 +813,17 @@ var jat;
         function exp2(col) {
             return 1 << col;
         }
-        angular.module('jat.services.knockout', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find', 'jat.services.knockoutLib'])
+        angular.module('jat.services.knockout', ['jat.services.services', 'jat.services.tournamentLib', 'jat.services.drawLib', 'jat.services.type', 'jat.services.find', 'jat.services.knockoutLib'])
             .factory('knockout', [
+            'services',
             'drawLib',
             'knockoutLib',
             'tournamentLib',
             'rank',
             'find',
-            function (drawLib, knockoutLib, tournamentLib, rank, find) {
-                return new Knockout(drawLib, knockoutLib, tournamentLib, rank, find);
+            'guid',
+            function (services, drawLib, knockoutLib, tournamentLib, rank, find, guid) {
+                return new Knockout(services, drawLib, knockoutLib, tournamentLib, rank, find, guid);
             }]);
     })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));

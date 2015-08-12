@@ -29,7 +29,10 @@ module jat.draw {
         interBoxHeight: number = 10;
         simple: boolean = false;
 
+        _drawLib: IDrawLib;
+
         static $inject = [
+            'services',
             'drawLib',
         //'knockout',
         //'roundrobin',
@@ -38,6 +41,7 @@ module jat.draw {
             'undo',
             'selection'];
         constructor(
+            private services: jat.service.Services,
             private drawLib: jat.service.DrawLib,
             //private knockout: jat.service.Knockout, //for dependencies
             //private roundrobin: jat.service.Roundrobin, //for dependencies
@@ -52,6 +56,7 @@ module jat.draw {
             if (!this.draw || this.simple) {
                 return;
             }
+            this._drawLib = this.services.drawLibFor(this.draw);
 
             this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
 
@@ -66,16 +71,20 @@ module jat.draw {
             }
         }
 
+        //TODO to be moved into knockout and roundrobin drawLib
         computeCoordinates(): void {
             if (!this.draw) {
                 return;
             }
             var draw = this.draw;
-            var size = this.drawLib.getSize(draw);
+            if (!this._drawLib) {
+                this._drawLib = this.services.drawLibFor(draw);
+            }
+            var size = this._drawLib.getSize(draw);
             this.width = size.width * this.boxWidth - this.interBoxWidth;
             this.height = size.height * this.boxHeight;
 
-            draw._points = this.drawLib.computePositions(draw);    //TODO to be moved into drawLib when draw changes
+            draw._points = this._drawLib.computePositions(draw);    //TODO to be moved into drawLib when draw changes
             this._refresh = new Date(); //to refresh lines
 
             if (!this.isKnockout) {
@@ -172,7 +181,7 @@ module jat.draw {
             var prevQualif = box.qualifIn;
             this.undo.action((bUndo: boolean) => {
                 if (prevQualif || qualifIn) {
-                    this.drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
+                    this._drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
                 } else {
                     box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
                     this.drawLib.initBox(box, box._draw);
@@ -249,10 +258,6 @@ module jat.draw {
             return;
         }
 
-        // create xmlns and stylesheet
-        //document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
-        //document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
-
         //emulate canvas context using VML
         vmlContext = function(element: JQuery, width: number, height: number) {
             this._width = width;
@@ -316,8 +321,8 @@ module jat.draw {
 
     angular.module('jat.draw.list', [
         'jat.services.drawLib',
-        'jat.services.knockout',
-        'jat.services.roundrobin',
+        //'jat.services.knockout',
+        //'jat.services.roundrobin',
         'jat.services.tournamentLib',
         'jat.services.find',
         'jat.services.undo',

@@ -8,6 +8,7 @@
     export class KnockoutValidation implements IValidation {
 
         constructor(
+            private services: jat.service.Services,
             private validation: jat.service.Validation,
             private knockout: jat.service.Knockout,
             private drawLib: jat.service.DrawLib,
@@ -76,13 +77,14 @@
             var e = MAX_QUALIF;
             if (!draw.suite) {
                 //Trouve le plus grand Qsortant
+                group =  group || this.drawLib.group(draw);
                 for (e = MAX_QUALIF; e >= 1; e--) {
-                    if (this.drawLib.findPlayerOut(group, e)) {
+                    if (this.drawLib.groupFindPlayerOut(group, e)) {
                         break;
                     }
                 }
                 for (var e2 = 1; e2 <= e; e2++) {
-                    if (!this.drawLib.findPlayerOut(group, e2)) {
+                    if (!this.drawLib.groupFindPlayerOut(group, e2)) {
                         this.validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
                         bRes = false;
                     }
@@ -107,6 +109,7 @@
             var tournament = draw._event._tournament;
             var isTypePoule = draw.type >= 2;
             var k = this.knockoutLib;
+            var drawLib = this.services.drawLibFor(draw);
 
             if (draw.type !== models.DrawType.Normal
                 && draw.type !== models.DrawType.Final) {
@@ -282,8 +285,8 @@
                     if (!this.isMatchJoue(match)) {
 
                         //match before opponent 2
-                        var opponent1 = this.drawLib.boxesOpponents(<models.Match>opponent.box1);
-                        var opponent2 = this.drawLib.boxesOpponents(<models.Match>opponent.box2);
+                        var opponent1 = drawLib.boxesOpponents(<models.Match>opponent.box1);
+                        var opponent2 = drawLib.boxesOpponents(<models.Match>opponent.box2);
 
                         if (opponent.box1.playerId) {
                             if (opponent.box2.playerId) {
@@ -434,7 +437,7 @@
 
                         //DONE 00/03/07: CTableau, qualifié entrant en double
                         var j: models.Box;
-                        if (!draw.suite && (j = this.drawLib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
+                        if (!draw.suite && (j = drawLib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
                             this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
                             bRes = false;
                         }
@@ -442,7 +445,7 @@
                         var group = this.drawLib.previousGroup(draw);
                         if (group) {
                             //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                            j = this.drawLib.findPlayerOut(group, e);
+                            j = this.drawLib.groupFindPlayerOut(group, e);
                             if (!j) {
                                 this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                                 bRes = false;
@@ -462,7 +465,7 @@
                         //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
 
                         //DONE 00/03/07: CTableau, qualifié sortant en double
-                        j = this.drawLib.findPlayerOut(draw, e);
+                        j = drawLib.findPlayerOut(draw, e);
                         if (j && (j.position != b || j._draw.id != draw.id)) {
                             this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
                             bRes = false;
@@ -520,8 +523,8 @@
                 var pT = this.drawLib.previousGroup(draw);
                 if (pT && pT.length) {
                     for (var e = 1; e <= MAX_QUALIF; e++) {
-                        var boxOut = this.drawLib.findPlayerOut(pT, e);
-                        boxIn = this.drawLib.findPlayerIn(draw, e);
+                        var boxOut = this.drawLib.groupFindPlayerOut(pT, e);
+                        boxIn = drawLib.findPlayerIn(draw, e);
                         if (boxOut && !boxIn) {
                             this.validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);
                             bRes = false;
@@ -559,14 +562,14 @@
         //}
 
         private isMatchJoue(match: models.Match): boolean {
-            var opponent = this.drawLib.boxesOpponents(match);
+            var opponent = this.knockout.boxesOpponents(match);
             return !!match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
         }
         private isMatchJouable(match: models.Box): boolean {
             if (!isMatch(match)) {
                 return false;
             }
-            var opponent = this.drawLib.boxesOpponents(<models.Match> match);
+            var opponent = this.knockout.boxesOpponents(<models.Match> match);
             return !match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
         }
 
@@ -610,8 +613,9 @@
         return Math.floor((two.getTime() - one.getTime()) / unit);
     }
 
-    angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type', 'jat.services.knockoutLib'])
+    angular.module('jat.services.validation.knockout', ['jat.services.services', 'jat.services.validation', 'jat.services.type', 'jat.services.knockoutLib'])
         .factory('knockoutValidation', [
+            'services',
             'validation',
             'knockout',
             'drawLib',
@@ -621,7 +625,8 @@
             'category',
             'score',
             'find',
-            (validation: jat.service.Validation,
+            (services:jat.service.Services,
+                validation: jat.service.Validation,
                 knockout: jat.service.Knockout,
                 drawLib: jat.service.DrawLib,
                 knockoutLib: jat.service.KnockoutLib,
@@ -630,6 +635,6 @@
                 category: Category,
                 score: Score,
                 find: jat.service.Find) => {
-                return new KnockoutValidation(validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
+                return new KnockoutValidation(services, validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
             }]);
 } 

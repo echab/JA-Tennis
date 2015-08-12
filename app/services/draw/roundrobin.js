@@ -1,3 +1,9 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var jat;
 (function (jat) {
     var service;
@@ -17,16 +23,18 @@ var jat;
     
         col: 3      2       1       0
         */
-        var Roundrobin = (function () {
-            function Roundrobin(drawLib, tournamentLib, ranking, find) {
-                this.drawLib = drawLib;
+        var Roundrobin = (function (_super) {
+            __extends(Roundrobin, _super);
+            function Roundrobin(services, drawLib, tournamentLib, ranking, rank, find, guid) {
+                _super.call(this, services, drawLib, find, rank, guid);
                 this.tournamentLib = tournamentLib;
                 this.ranking = ranking;
-                this.find = find;
-                drawLib._drawLibs[models.DrawType.PouleSimple]
-                    = drawLib._drawLibs[models.DrawType.PouleAR]
-                        = this;
+                services.registerDrawlib(this);
             }
+            //Override
+            Roundrobin.prototype.manage = function (draw) {
+                return draw.type === models.DrawType.PouleSimple || draw.type === models.DrawType.PouleAR;
+            };
             Roundrobin.prototype.findBox = function (draw, position, create) {
                 var box = this.find.by(draw.boxes, 'position', position);
                 if (!box && create) {
@@ -141,7 +149,7 @@ var jat;
                     var prev = this.drawLib.previousGroup(draw);
                     if (!player && prev && inNumber != QEMPTY) {
                         //Va chercher le joueur dans le tableau précédent
-                        var boxOut = this.drawLib.findPlayerOut(prev, inNumber);
+                        var boxOut = this.drawLib.groupFindPlayerOut(prev, inNumber);
                         if (angular.isObject(boxOut)) {
                             player = boxOut._player;
                         }
@@ -152,19 +160,19 @@ var jat;
                         }
                     }
                     if (player) {
-                        if (!this.drawLib.MetJoueur(box, player)) {
+                        if (!this.MetJoueur(box, player)) {
                             ASSERT(false);
                         }
                     }
                     //Qualifié entrant pas déjà pris
                     if (inNumber == QEMPTY ||
-                        !this.drawLib.findPlayerIn(draw, inNumber)) {
+                        !this.findPlayerIn(draw, inNumber)) {
                         this.setPlayerIn(box, inNumber);
                     }
                 }
                 else {
                     box.qualifIn = 0;
-                    if (this.drawLib.previousGroup(draw) && !this.drawLib.EnleveJoueur(box)) {
+                    if (this.drawLib.previousGroup(draw) && !this.EnleveJoueur(box)) {
                         ASSERT(false);
                     }
                 }
@@ -181,10 +189,10 @@ var jat;
                 if (outNumber) {
                     //Met à jour le tableau suivant
                     if (next && box.playerId && box.qualifOut) {
-                        var boxIn = this.drawLib.findPlayerIn(box._draw, outNumber);
+                        var boxIn = this.findPlayerIn(box._draw, outNumber);
                         if (boxIn) {
                             ASSERT(boxIn.playerId === box.playerId);
-                            if (!this.drawLib.EnleveJoueur(boxIn)) {
+                            if (!this.EnleveJoueur(boxIn)) {
                                 ASSERT(false);
                             }
                         }
@@ -199,10 +207,10 @@ var jat;
                     this.drawLib.initBox(diag, box._draw);
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
-                        var boxIn = this.drawLib.findPlayerIn(next, outNumber);
+                        var boxIn = this.drawLib.groupFindPlayerIn(next, outNumber);
                         if (boxIn) {
                             ASSERT(!boxIn.playerId);
-                            if (!this.drawLib.MetJoueur(boxIn, box._player, true)) {
+                            if (!this.MetJoueur(boxIn, box._player, true)) {
                                 ASSERT(false);
                             }
                         }
@@ -212,10 +220,10 @@ var jat;
                     var match = box;
                     if (next && box.playerId) {
                         //Met à jour le tableau suivant
-                        var boxIn = this.drawLib.findPlayerIn(next, match.qualifOut);
+                        var boxIn = this.drawLib.groupFindPlayerIn(next, match.qualifOut);
                         if (boxIn) {
                             ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
-                            if (!this.drawLib.EnleveJoueur(boxIn, true)) {
+                            if (!this.EnleveJoueur(boxIn, true)) {
                                 ASSERT(false);
                             }
                         }
@@ -264,7 +272,7 @@ var jat;
                 //Récupère les qualifiés sortants du tableau précédent
                 var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : undefined; // = this.drawLib.previousGroup(refDraw);
                 if (prev) {
-                    players = players.concat(this.drawLib.findAllPlayerOut(prev, true));
+                    players = players.concat(this.drawLib.groupFindAllPlayerOut(prev, true));
                 }
                 //Tri et Mélange les joueurs de même classement
                 this.tournamentLib.TriJoueurs(players);
@@ -298,11 +306,11 @@ var jat;
                         if (j < players.length) {
                             var qualif = 'number' === typeof players[j] ? players[j] : 0;
                             if (qualif) {
-                                if (!this.drawLib.setPlayerIn(boxIn, qualif)) {
+                                if (!this.setPlayerIn(boxIn, qualif)) {
                                     return;
                                 }
                             }
-                            else if (!this.drawLib.MetJoueur(boxIn, players[j])) {
+                            else if (!this.MetJoueur(boxIn, players[j])) {
                                 return;
                             }
                         }
@@ -372,7 +380,7 @@ var jat;
                 return true;
             };
             return Roundrobin;
-        })();
+        })(service.DrawLibBase);
         service.Roundrobin = Roundrobin;
         function ASSERT(b, message) {
             if (!b) {
@@ -417,11 +425,17 @@ var jat;
             return pos % n + n * n;
         }
         ;
-        angular.module('jat.services.roundrobin', ['jat.services.drawLib', 'jat.services.tournamentLib', 'jat.services.type', 'jat.services.find'])
+        angular.module('jat.services.roundrobin', ['jat.services.services', 'jat.services.tournamentLib', 'jat.services.drawLib', 'jat.services.type', 'jat.services.find'])
             .factory('roundrobin', [
-            'drawLib', 'tournamentLib', 'ranking', 'find',
-            function (drawLib, tournamentLib, ranking, find) {
-                return new Roundrobin(drawLib, tournamentLib, ranking, find);
+            'services',
+            'drawLib',
+            'tournamentLib',
+            'ranking',
+            'rank',
+            'find',
+            'guid',
+            function (services, drawLib, tournamentLib, ranking, rank, find, guid) {
+                return new Roundrobin(services, drawLib, tournamentLib, ranking, rank, find, guid);
             }]);
     })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));

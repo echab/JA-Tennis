@@ -9,6 +9,7 @@
             private $window: ng.IWindowService,
             private selection: jat.service.Selection,
             private tournamentLib: jat.service.TournamentLib,
+            private services: jat.service.Services,
             private drawLib: jat.service.DrawLib,
             private validation: jat.service.Validation,
             //private rank: Rank,
@@ -161,13 +162,15 @@
             var afterIndex = afterDraw ? this.find.indexOf(c, 'id', afterDraw.id) : c.length - 1;
 
             if (generate) {
-                var draws = this.drawLib.generateDraw(draw, generate, afterIndex);
+                var drawLib = this.services.drawLibFor(draw);
+                var draws = drawLib.generateDraw(draw, generate, afterIndex);
                 if (!draws || !draws.length) {
                     return;
                 }
                 this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, models.ModelType.Draw); //c.splice( i, 1, draws);
 
                 for (var i = 0; i < draws.length; i++) {
+                    var drawLib = this.services.drawLibFor(draws[i]);
                     this.drawLib.initDraw(draws[i], draw._event);
                 }
                 this.selection.select(draws[0], models.ModelType.Draw);
@@ -181,14 +184,15 @@
 
         updateDraw(draw: models.Draw, oldDraw?: models.Draw, generate?: models.GenerateType): void {
             var isSelected = this.selection.draw === oldDraw;
+            var drawLib = this.services.drawLibFor(draw);
             var group = this.drawLib.group(oldDraw || draw);
             if (generate) {
-                var draws = this.drawLib.generateDraw(draw, generate, -1);
+                var draws = drawLib.generateDraw(draw, generate, -1);
                 if (!draws || !draws.length) {
                     return;
                 }
             } else {
-                this.drawLib.resize(draw, oldDraw);
+                drawLib.resize(draw, oldDraw);
             }
             var c = draw._event.draws;
             if (generate && draws && group && draws.length) {
@@ -245,7 +249,7 @@
                     //report qualified player to next draw
                     var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
                     if (nextGroup) {
-                        var boxIn = this.drawLib.findPlayerIn(nextGroup, editedMatch.qualifOut);
+                        var boxIn = this.drawLib.groupFindPlayerIn(nextGroup, editedMatch.qualifOut);
                         if (boxIn) {
                             //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
                             //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
@@ -302,6 +306,7 @@
         'jat.services.guid',
         'jat.services.type',
         'jat.services.tournamentLib',
+        'jat.services.services',
         'jat.services.drawLib',
         'jat.services.knockout',
         'jat.services.roundrobin',
@@ -318,6 +323,7 @@
             '$window',
             'selection',
             'tournamentLib',
+            'services',
             'drawLib',
             'knockout',
             'roundrobin',
@@ -336,6 +342,7 @@
                 $window: ng.IWindowService,
                 selection: jat.service.Selection,
                 tournamentLib: jat.service.TournamentLib,
+                services: jat.service.Services,
                 drawLib: jat.service.DrawLib,
                 knockout: jat.service.Knockout,
                 roundrobin: jat.service.Roundrobin,
@@ -347,6 +354,6 @@
                 undo: jat.service.Undo,
                 find: jat.service.Find,
                 guid: jat.service.Guid) => {
-                return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
+                return new MainLib($log, $http, $q, $window, selection, tournamentLib, services, drawLib, validation, undo, find, guid);
             }]);
 }

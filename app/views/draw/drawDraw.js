@@ -4,10 +4,11 @@ var jat;
     var draw;
     (function (draw_1) {
         var drawCtrl = (function () {
-            function drawCtrl(drawLib, 
+            function drawCtrl(services, drawLib, 
                 //private knockout: jat.service.Knockout, //for dependencies
                 //private roundrobin: jat.service.Roundrobin, //for dependencies
                 tournamentLib, find, undo, selection) {
+                this.services = services;
                 this.drawLib = drawLib;
                 this.tournamentLib = tournamentLib;
                 this.find = find;
@@ -23,6 +24,7 @@ var jat;
                 if (!this.draw || this.simple) {
                     return;
                 }
+                this._drawLib = this.services.drawLibFor(this.draw);
                 this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
                 //qualifs in
                 var prev = this.drawLib.previousGroup(this.draw);
@@ -33,15 +35,19 @@ var jat;
                     this.qualifsOut.push(i);
                 }
             };
+            //TODO to be moved into knockout and roundrobin drawLib
             drawCtrl.prototype.computeCoordinates = function () {
                 if (!this.draw) {
                     return;
                 }
                 var draw = this.draw;
-                var size = this.drawLib.getSize(draw);
+                if (!this._drawLib) {
+                    this._drawLib = this.services.drawLibFor(draw);
+                }
+                var size = this._drawLib.getSize(draw);
                 this.width = size.width * this.boxWidth - this.interBoxWidth;
                 this.height = size.height * this.boxHeight;
-                draw._points = this.drawLib.computePositions(draw); //TODO to be moved into drawLib when draw changes
+                draw._points = this._drawLib.computePositions(draw); //TODO to be moved into drawLib when draw changes
                 this._refresh = new Date(); //to refresh lines
                 if (!this.isKnockout) {
                     //for roundrobin, fill the list of rows/columns for the view
@@ -131,7 +137,7 @@ var jat;
                 var prevQualif = box.qualifIn;
                 this.undo.action(function (bUndo) {
                     if (prevQualif || qualifIn) {
-                        _this.drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
+                        _this._drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
                     }
                     else {
                         box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
@@ -154,6 +160,7 @@ var jat;
                 return box && ('score' in box);
             };
             drawCtrl.$inject = [
+                'services',
                 'drawLib',
                 //'knockout',
                 //'roundrobin',
@@ -208,9 +215,6 @@ var jat;
             if (!useVML) {
                 return;
             }
-            // create xmlns and stylesheet
-            //document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
-            //document.createStyleSheet().cssText = 'v\\:shape{behavior:url(#default#VML)}';
             //emulate canvas context using VML
             vmlContext = function (element, width, height) {
                 this._width = width;
@@ -272,8 +276,8 @@ var jat;
         }
         angular.module('jat.draw.list', [
             'jat.services.drawLib',
-            'jat.services.knockout',
-            'jat.services.roundrobin',
+            //'jat.services.knockout',
+            //'jat.services.roundrobin',
             'jat.services.tournamentLib',
             'jat.services.find',
             'jat.services.undo',

@@ -3,7 +3,7 @@ var jat;
     var service;
     (function (service) {
         var MainLib = (function () {
-            function MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, 
+            function MainLib($log, $http, $q, $window, selection, tournamentLib, services, drawLib, validation, 
                 //private rank: Rank,
                 undo, find, guid) {
                 this.$log = $log;
@@ -12,6 +12,7 @@ var jat;
                 this.$window = $window;
                 this.selection = selection;
                 this.tournamentLib = tournamentLib;
+                this.services = services;
                 this.drawLib = drawLib;
                 this.validation = validation;
                 this.undo = undo;
@@ -154,12 +155,14 @@ var jat;
                 var c = draw._event.draws;
                 var afterIndex = afterDraw ? this.find.indexOf(c, 'id', afterDraw.id) : c.length - 1;
                 if (generate) {
-                    var draws = this.drawLib.generateDraw(draw, generate, afterIndex);
+                    var drawLib = this.services.drawLibFor(draw);
+                    var draws = drawLib.generateDraw(draw, generate, afterIndex);
                     if (!draws || !draws.length) {
                         return;
                     }
                     this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, models.ModelType.Draw); //c.splice( i, 1, draws);
                     for (var i = 0; i < draws.length; i++) {
+                        var drawLib = this.services.drawLibFor(draws[i]);
                         this.drawLib.initDraw(draws[i], draw._event);
                     }
                     this.selection.select(draws[0], models.ModelType.Draw);
@@ -172,15 +175,16 @@ var jat;
             };
             MainLib.prototype.updateDraw = function (draw, oldDraw, generate) {
                 var isSelected = this.selection.draw === oldDraw;
+                var drawLib = this.services.drawLibFor(draw);
                 var group = this.drawLib.group(oldDraw || draw);
                 if (generate) {
-                    var draws = this.drawLib.generateDraw(draw, generate, -1);
+                    var draws = drawLib.generateDraw(draw, generate, -1);
                     if (!draws || !draws.length) {
                         return;
                     }
                 }
                 else {
-                    this.drawLib.resize(draw, oldDraw);
+                    drawLib.resize(draw, oldDraw);
                 }
                 var c = draw._event.draws;
                 if (generate && draws && group && draws.length) {
@@ -235,7 +239,7 @@ var jat;
                         //report qualified player to next draw
                         var nextGroup = _this.drawLib.nextGroup(editedMatch._draw);
                         if (nextGroup) {
-                            var boxIn = _this.drawLib.findPlayerIn(nextGroup, editedMatch.qualifOut);
+                            var boxIn = _this.drawLib.groupFindPlayerIn(nextGroup, editedMatch.qualifOut);
                             if (boxIn) {
                                 //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
                                 //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
@@ -286,6 +290,7 @@ var jat;
             'jat.services.guid',
             'jat.services.type',
             'jat.services.tournamentLib',
+            'jat.services.services',
             'jat.services.drawLib',
             'jat.services.knockout',
             'jat.services.roundrobin',
@@ -301,6 +306,7 @@ var jat;
             '$window',
             'selection',
             'tournamentLib',
+            'services',
             'drawLib',
             'knockout',
             'roundrobin',
@@ -312,10 +318,10 @@ var jat;
             'undo',
             'find',
             'guid',
-            function ($log, $http, $q, $window, selection, tournamentLib, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, 
+            function ($log, $http, $q, $window, selection, tournamentLib, services, drawLib, knockout, roundrobin, validation, knockoutValidation, roundrobinValidation, fftValidation, 
                 //rank: Rank,
                 undo, find, guid) {
-                return new MainLib($log, $http, $q, $window, selection, tournamentLib, drawLib, validation, undo, find, guid);
+                return new MainLib($log, $http, $q, $window, selection, tournamentLib, services, drawLib, validation, undo, find, guid);
             }]);
     })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));

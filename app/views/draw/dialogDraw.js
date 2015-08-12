@@ -35,7 +35,7 @@ var jat;
                 var n = this.tournamentLib.GetJoueursInscrit(this.draw).length;
                 var previous = this.drawLib.previousGroup(this.draw);
                 if (previous) {
-                    var qualifs = this.drawLib.findAllPlayerOut(previous);
+                    var qualifs = this.drawLib.groupFindAllPlayerOut(previous);
                     if (qualifs) {
                         n += qualifs.length;
                     }

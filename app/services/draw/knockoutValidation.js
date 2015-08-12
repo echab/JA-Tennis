@@ -4,7 +4,8 @@ var jat;
     (function (service) {
         var MAX_TETESERIE = 32, MAX_QUALIF = 32, QEMPTY = -1, MAX_MATCHJOUR = 16;
         var KnockoutValidation = (function () {
-            function KnockoutValidation(validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find) {
+            function KnockoutValidation(services, validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find) {
+                this.services = services;
                 this.validation = validation;
                 this.knockout = knockout;
                 this.drawLib = drawLib;
@@ -65,13 +66,14 @@ var jat;
                 var e = MAX_QUALIF;
                 if (!draw.suite) {
                     //Trouve le plus grand Qsortant
+                    group = group || this.drawLib.group(draw);
                     for (e = MAX_QUALIF; e >= 1; e--) {
-                        if (this.drawLib.findPlayerOut(group, e)) {
+                        if (this.drawLib.groupFindPlayerOut(group, e)) {
                             break;
                         }
                     }
                     for (var e2 = 1; e2 <= e; e2++) {
-                        if (!this.drawLib.findPlayerOut(group, e2)) {
+                        if (!this.drawLib.groupFindPlayerOut(group, e2)) {
                             this.validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
                             bRes = false;
                         }
@@ -91,6 +93,7 @@ var jat;
                 var tournament = draw._event._tournament;
                 var isTypePoule = draw.type >= 2;
                 var k = this.knockoutLib;
+                var drawLib = this.services.drawLibFor(draw);
                 if (draw.type !== models.DrawType.Normal
                     && draw.type !== models.DrawType.Final) {
                     return true;
@@ -226,8 +229,8 @@ var jat;
                         }
                         if (!this.isMatchJoue(match)) {
                             //match before opponent 2
-                            var opponent1 = this.drawLib.boxesOpponents(opponent.box1);
-                            var opponent2 = this.drawLib.boxesOpponents(opponent.box2);
+                            var opponent1 = drawLib.boxesOpponents(opponent.box1);
+                            var opponent2 = drawLib.boxesOpponents(opponent.box2);
                             if (opponent.box1.playerId) {
                                 if (opponent.box2.playerId) {
                                     if (!CompString(opponent.box1._player.club, opponent.box2._player.club)) {
@@ -357,14 +360,14 @@ var jat;
                             //ASSERT( iTableau != 0);
                             //DONE 00/03/07: CTableau, qualifié entrant en double
                             var j;
-                            if (!draw.suite && (j = this.drawLib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
+                            if (!draw.suite && (j = drawLib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
                                 this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
                                 bRes = false;
                             }
                             var group = this.drawLib.previousGroup(draw);
                             if (group) {
                                 //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                                j = this.drawLib.findPlayerOut(group, e);
+                                j = this.drawLib.groupFindPlayerOut(group, e);
                                 if (!j) {
                                     this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                                     bRes = false;
@@ -382,7 +385,7 @@ var jat;
                             nqs++;
                             //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
                             //DONE 00/03/07: CTableau, qualifié sortant en double
-                            j = this.drawLib.findPlayerOut(draw, e);
+                            j = drawLib.findPlayerOut(draw, e);
                             if (j && (j.position != b || j._draw.id != draw.id)) {
                                 this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
                                 bRes = false;
@@ -424,8 +427,8 @@ var jat;
                     var pT = this.drawLib.previousGroup(draw);
                     if (pT && pT.length) {
                         for (var e = 1; e <= MAX_QUALIF; e++) {
-                            var boxOut = this.drawLib.findPlayerOut(pT, e);
-                            boxIn = this.drawLib.findPlayerIn(draw, e);
+                            var boxOut = this.drawLib.groupFindPlayerOut(pT, e);
+                            boxIn = drawLib.findPlayerIn(draw, e);
                             if (boxOut && !boxIn) {
                                 this.validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);
                                 bRes = false;
@@ -456,14 +459,14 @@ var jat;
             //    return this.find.by(match._draw.boxes, 'position', positionOpponent2(match.position));
             //}
             KnockoutValidation.prototype.isMatchJoue = function (match) {
-                var opponent = this.drawLib.boxesOpponents(match);
+                var opponent = this.knockout.boxesOpponents(match);
                 return !!match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
             };
             KnockoutValidation.prototype.isMatchJouable = function (match) {
                 if (!isMatch(match)) {
                     return false;
                 }
-                var opponent = this.drawLib.boxesOpponents(match);
+                var opponent = this.knockout.boxesOpponents(match);
                 return !match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
             };
             return KnockoutValidation;
@@ -501,8 +504,9 @@ var jat;
             var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
             return Math.floor((two.getTime() - one.getTime()) / unit);
         }
-        angular.module('jat.services.validation.knockout', ['jat.services.validation', 'jat.services.type', 'jat.services.knockoutLib'])
+        angular.module('jat.services.validation.knockout', ['jat.services.services', 'jat.services.validation', 'jat.services.type', 'jat.services.knockoutLib'])
             .factory('knockoutValidation', [
+            'services',
             'validation',
             'knockout',
             'drawLib',
@@ -512,8 +516,8 @@ var jat;
             'category',
             'score',
             'find',
-            function (validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find) {
-                return new KnockoutValidation(validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
+            function (services, validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find) {
+                return new KnockoutValidation(services, validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
             }]);
     })(service = jat.service || (jat.service = {}));
 })(jat || (jat = {}));
