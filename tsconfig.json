@@ -19,7 +19,22 @@
       "removeComments": false,
       "noLib": false,
       "sourceMap": true
-    }
+    },
+    "exclude": [
+      "app/JATennis.d.ts",
+      "lib/typings/angularjs/angular-mocks.d.ts",
+      "lib/typings/angularjs/angular-scenario-1.0.d.ts",
+      "lib/typings/angularjs/angular-1.0.d.ts",
+      "lib/typings/angularjs/angular-cookies-1.0.d.ts",
+      "lib/typings/angularjs/angular-mocks-1.0.d.ts",
+      "lib/typings/angularjs/angular-resource-1.0.d.ts",
+      "lib/typings/angularjs/angular-sanitize-1.0.d.ts",
+      "lib/typings/angularjs/angular-scenario-1.0.d.ts",
+      "lib/typings/angularjs/angular-scenario.d.ts",
+      "lib/typings/mocks/math-mock.d.ts",
+      "lib/typings/ui-bootstrap/ui-bootstrap-mocks.d.ts",
+      "node_modules"
+    ]
   },
   "files": [
     "./app/app.ts",
