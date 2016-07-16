@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch index.html with sourcemaps",
+            "type": "chrome",
+            "request": "launch",
+            "file": "${workspaceRoot}/index.html",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}",
+            "runtimeExecutable":"C:\\Users\\chabaud\\Documents\\Tools\\chromium\\chrome.exe",
+            "runtimeArgs": ["--profile-directory=Default", "--remote-debugging-port=9222"]
+        },
+        {
+            "name": "Launch localhost with sourcemaps",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}",
+            "runtimeExecutable":"C:\\Users\\chabaud\\Documents\\Tools\\chromium\\chrome.exe",
+            "runtimeArgs": ["--profile-directory=Default", "--remote-debugging-port=9222"]
+        },
+        {
+            "name": "Attach with sourcemaps",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}"
+        }
+    ]
+}
