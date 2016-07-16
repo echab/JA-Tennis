@@ -4,8 +4,8 @@ import 'fetch';
 
 @autoinject
 export class Users {
-  heading: string = 'Github Users';
-  users: any[] = [];
+  heading = 'Github Users';
+  users = [];
 
   constructor(private http: HttpClient) {
     http.configure(config => {
