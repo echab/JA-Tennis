@@ -1,0 +1,134 @@
+﻿.panels {
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    /*display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;*/
+}
+
+.panel {
+    background-color: #bbb;
+    -webkit-transition: width .5s;
+    transition: width .5s;
+    display: inline-block;
+    height: 100%;
+    overflow: hidden;
+    /*
+    vertical-align: top;
+    */
+    /*-webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+
+    bottom: 0px;*/
+}
+
+    .panel .header {
+        display: block;
+        position: absolute;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        padding-left: .5em;
+        padding-right: .5em;
+        line-height: 3em;
+        background-color: #f8f8f8;
+        border-color: #e7e7e7;
+        -webkit-transition: margin-left .5s;
+        transition: margin-left .5s;
+        Zbox-shadow: rgba(200,200,200,5) -2px -2px inset;
+        border-bottom: 1px solid #DDD;
+        z-index: 2;
+    }
+
+        .panel .header form {
+            margin-bottom: 0px;
+        }
+
+.panelbadge {
+    position: absolute;
+    display: block;
+    width: 3em;
+    line-height: 3em;
+    color: #555;
+    background-color: #bbb;
+    text-align: center;
+    z-index: 2;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: all .5s;
+    transition: all .5s;
+}
+
+.panel:not(.active) form, .panel:not(.active) button, .panel:not(.active) .header, .panel:not(.active) .footer {
+    display: none;
+}
+
+/*.panel:not(.active) .panelbadge {
+    background-color: lightsteelblue;
+    color: black;
+}*/
+
+.panel .content {
+    overflow: auto;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: .5em;
+    border-top: 3em solid transparent;
+}
+
+.panel .footer {
+    line-height: 3em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: -3em;
+    padding-left: .5em;
+    border-top: 1px solid #DDD;
+}
+
+.panel .content {
+    border-bottom: 3em solid transparent;
+}
+
+
+.panel.tournament, .panel.tournament .header, .panel.tournament .footer {
+    background-color: #fcc;
+}
+
+.panelbadge.tournament {
+    background-color: #faa;
+}
+
+.panel.players, .panel.players .header, .panel.players .footer {
+    background-color: #aaf;
+}
+
+.panelbadge.players {
+    background-color: #88f;
+}
+
+.panel.draws, .panel.draws .header, .panel.draws .footer {
+    background-color: #eee;
+}
+
+.panelbadge.draws {
+    background-color: #ccc;
+}
+
+.panel.planning, .panel.planning .header, .panel.planning .footer {
+    background-color: #8f8;
+}
+
+.panelbadge.planning {
+    background-color: #8d8;
+}

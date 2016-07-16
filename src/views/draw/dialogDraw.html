@@ -1,0 +1,66 @@
+﻿<form name="drawForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.draw.id}}</small>--> {{dlg.draw.name}}</h3>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <label class="span4">
+                Name:
+                <input type="text" name="name" ng-model="dlg.draw.name" required class="span3" autofocus />
+            </label>
+            <!--<span class="error" ng-show="drawForm.name.$error.required">Required!</span>-->
+        </div>
+
+        <div class="row">
+            <label class="span3">
+                Type:
+                <select name="type" ng-model="dlg.draw.type" ng-options="type.value as type.label for type in dlg.drawTypes" required class="span2"></select>
+            </label>
+            <!--<span class="error" ng-show="drawForm.name.$error.required">Required!</span>-->
+        </div>
+
+        <div class="row">
+            <label class="span3">
+                Rank, from:
+                <select name="minRank" ng-model="dlg.draw.minRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+            <label class="span3">
+                to:
+                <select name="maxRank" ng-model="dlg.draw.maxRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+        </div>
+
+        <div class="row">
+            <div class="offset1">
+                <label>{{dlg.getRegisteredCount()}} registered</label>
+            </div>
+        </div>
+
+        <fieldset>
+            <legend>Dimensions:</legend>
+            <!--<div class="row">
+                <label class="span2">
+                    Entries:
+                    <input type="number" readonly ng-model="dlg.getNbEntry()" class="span1"/>
+                </label>
+            </div>-->
+            <div class="row">
+                <label class="span2">
+                    Columns:
+                    <input type="number" name="nbColumn" ng-model="dlg.draw.nbColumn" min="2" max="9" required class="span1" />
+                </label>
+                <label class="span2">
+                    Outputs:
+                    <input type="number" name="nbOut" ng-model="dlg.draw.nbOut" min="1" max="16" required class="span1" />
+                </label>
+            </div>
+        </fieldset>
+    </div>
+    <div class="modal-footer">
+        <button type="button" ng-click="$close('Generate')" ng-disabled="!!drawForm.$error.required" ng-class="{'disabled': !!drawForm.$error.required}" class="btn btn-success"><i class="icon2-draw-generate"></i> Generate</button>
+        <button type="submit" ng-disabled="!!drawForm.$error.required" ng-class="{'disabled': !!drawForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i> OK</button>
+        <a href="#" ng-click="$close('Del')"><i class="icon-trash"></i></a>
+    </div>
+</form>

@@ -1,0 +1,45 @@
+/* app css stylesheet */
+
+html, body {
+    width:100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+
+.debug {
+    border: 1px dashed gray;
+}
+
+input.ng-invalid {
+    background-color: #FFF2F2;
+}
+
+input.ng-invalid-required:after {
+    content: 'Required !';
+    color: lightcoral;
+}
+
+label {
+    display: inline-block;
+    text-align: right;
+}
+label.checkbox {
+    text-align: left;
+}
+span.spacer {
+    display: inline-block;
+    width: 12px;
+}
+
+tr.error, div.error, span.error {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAXSURBVBhXY/jHwPAPBsAsCJ8BLgxmAAAh+RvJXdMJlQAAAABJRU5ErkJggg==);
+    background-repeat: repeat-x;
+    background-position-y: bottom;
+}
+
+
+.table .selected {
+    background-color: #96d3f2 !important;
+}

@@ -1,0 +1,81 @@
+﻿<form name="eventForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="$dismiss()">&times;</button>
+        <h3>{{dlg.title}} <!--<small>Id: {{dlg.event.id}}</small>--> {{dlg.event.name}}</h3>
+    </div>
+    <div class="modal-body">
+
+        <!--<div class="control-group">
+                <label for="name" class="control-label">Name:</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" ng-model="event.name" required />*
+                </div>
+            </div>-->
+
+        <div class="row">
+            <label class="span4">
+                Name:
+                <input type="text" name="name" ng-model="dlg.event.name" required class="span3" autofocus />
+            </label>
+            <!--<span class="error" ng-show="eventForm.name.$error.required">Required!</span>-->
+        </div>
+        <div class="row">
+            <label class="span3">
+                Category:
+                <select type="text" name="category" ng-model="dlg.event.category" ng-options="value for value in dlg.categories" class="span2"></select>
+            </label>
+            <label class="span3">
+                Max Rank:
+                <select type="text" name="maxRank" ng-model="dlg.event.maxRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+            </label>
+        </div>
+        <div class="row">
+            <label class="span3">
+                Date start:
+                <input type="date" name="start" ng-model="dlg.event.start" class="span2" />
+            </label>
+            <label class="span3">
+                end:
+                <input type="date" name="end" ng-model="dlg.event.end" class="span2" />
+            </label>
+        </div>
+        <!--<div class="row">
+            <label class="span2">Registrations:</label>
+            <div class="offset2">
+                <ul class="span3 unstyled">
+                    <li ng-repeat="player in dlg.registred">
+                        <label><input type="checkbox" check-list="player.registration" value="{{event.id}}" /> {{player.name}}</label>
+                    </li>
+                </ul>
+            </div>
+        </div>-->
+        <hr/>
+        <div class="row">
+            <span class="span1">Draws:</span>
+            <div class="offset1">
+                <ul class="unstyled">
+                    <li ng-repeat="draw in dlg.event.draws">
+                        <span><i class="icon2-draw"></i> {{draw.name}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" ng-disabled="!!eventForm.$error.required" ng-class="{'disabled': !!eventForm.$error.required}" class="btn btn-primary btn-success"><i class="icon-ok-sign icon-white"></i>OK</button>
+        <a href="#" ng-click="$close('Del')"><i class="icon-trash"></i></a>
+    </div>
+    <!--<fieldset>
+            <legend>Coordinate</legend>
+            <div>
+            </div>
+
+            <div>
+                <label>
+                    Rank:
+            <select type="text" name="rank" ng-model="dlg.event.rank" ng-options="value for value in dlg.ranks"></select></label>
+            </div>
+        </fieldset>-->
+    <!--{{ eventForm.$error }}-->
+</form>
