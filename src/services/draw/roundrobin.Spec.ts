@@ -1,7 +1,7 @@
-﻿///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
+﻿// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
+// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
 
-'use strict';
+import {Container} from 'aurelia-dependency-injection';
 
 describe('services.roundrobin', () => {
     var roundrobin: jat.service.Roundrobin;

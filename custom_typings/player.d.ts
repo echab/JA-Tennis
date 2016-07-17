@@ -1,7 +1,5 @@
-﻿import {Tournament} from './tournament'; 
-import {Box} from './draw';
-
-export interface Player {
+﻿
+interface Player {
 
     id: string;
 
@@ -41,7 +39,7 @@ export interface Player {
     _tournament ?: Tournament;
 }
 
-export interface PlayerIn extends Box {
+interface PlayerIn extends Box {
 
     seeded ?: number;
 

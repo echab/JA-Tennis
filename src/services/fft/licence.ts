@@ -1,5 +1,3 @@
-import { Licence} from '../../models/types';
-
 export class LicenceFFT implements Licence {
 
     private static reLicence = /^([0-9]{7})([A-HJ-NPR-Z])$/;

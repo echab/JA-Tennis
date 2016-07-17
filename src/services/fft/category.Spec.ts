@@ -1,19 +1,19 @@
-///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
+// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
+// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
 
-import { Category,CategoryString} from '../../models/types';
+import {Container} from 'aurelia-dependency-injection';
+import { CategoryFFT } from './category';
 
 describe('services.fft.category', function () {
-    var category: jat.fft.CategoryFFT;
+    let container: Container;
+    var category: CategoryFFT;
     var now = new Date();
     //var march = new Date(2014, 2, 14);
     //var november = new Date(2014, 10, 14);
 
-    it('should inject category', function () {
-        module('jat.services.type');
-        inject(function (_category_: jat.fft.CategoryFFT) {
-            category = _category_;
-        });
+    beforeEach(() => {    //inject before each "it
+        container = new Container();
+        category = container.get(CategoryFFT);
     });
 
     describe('list category', function () {

@@ -1,11 +1,14 @@
 ﻿// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
 // ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
 
+import {Container} from 'aurelia-dependency-injection';
+import { Knockout } from './knockout';
+
 describe('services.knockout', () => {
     var knockout: Knockout;
 
-    beforeEach(module('jat.services.knockout'));
-    beforeEach(module('jat.services.type'));
+    // beforeEach(module('jat.services.knockout'));
+    // beforeEach(module('jat.services.type'));
     beforeEach(inject((_knockout_: jat.service.Knockout) => {    //inject before each "it
         knockout = _knockout_;
     }));

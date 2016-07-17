@@ -1,9 +1,9 @@
-import {DrawType,Mode} from './enums'
-import {Player} from './player';
-import { RankString,ScoreString } from './types';
-import {TEvent} from './tournament';
 
-export interface Draw {
+declare enum DrawType { Normal, Final, PouleSimple, PouleAR }
+
+declare enum Mode { Build, Plan, Play, Lock }
+
+interface Draw {
     id: string; //new draw has no id
 
     name: string;
@@ -36,24 +36,24 @@ export interface Draw {
     _refresh?: Date; //force angular refresh //TODO?
 }
 
-//export interface IDrawDimensions {
+//interface IDrawDimensions {
 //    boxWidth: number;
 //    boxHeight: number;
 //    interBoxWidth: number;
 //    interBoxHeight: number;
 //}
 
-export interface IPoint {
+interface IPoint {
     x: number;
     y: number
 }
 
-export interface ISize {
+interface ISize {
     width: number;
     height: number;
 }
 
-export interface Match extends Box {
+interface Match extends Box {
 
     //winner: number; //1 or 2 (or undefined)
     score: ScoreString;  //a match is a box with a score member
@@ -75,7 +75,7 @@ export interface Match extends Box {
     _player2: Player;
 }
 
-export interface Box {
+interface Box {
     id: string;
     position: number;
 

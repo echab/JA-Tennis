@@ -1,32 +1,13 @@
-﻿import { DrawLibBase,IDrawLib } from './draw/drawLibBase';
+﻿import { DrawLibBase } from './draw/drawLibBase';
 import { DrawLib } from './draw/drawLib';
 import { KnockoutLib } from './draw/knockoutLib';
 import { TournamentLib } from './tournamentLib';
 import {Find} from './util/Find';
 import {Guid} from './util/Guid';
-import { TEvent } from '../models/tournament';
-import { Draw,Match,Box,ISize,IPoint } from '../models/draw';
-import { Player,PlayerIn } from '../models/player';
-import { DrawType } from '../models/enums';
-import { Rank } from '../models/types';
-import { GenerateType } from '../models/enums';
 import { isObject,isArray,extend } from './util/object'
 import { shuffle } from '../utils/tool';
 import { Services } from './services';
 import { filledArray } from '../utils/tool'
-
-export interface IValidation {
-    validatePlayer(player: Player): boolean;
-    validateDraw(draw: Draw): boolean;
-    //validateDay(): boolean;   //VerifieJour
-}
-
-export interface IError {
-    message: string;
-    player?: Player;
-    position?: number;
-    detail?: string;
-}
 
 export class Validation implements IValidation {
 

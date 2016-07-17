@@ -1,4 +1,3 @@
-import { Ranking,Score} from '../../models/types';
 import { ScoreFFT,ScoreDeltaFFT} from './score';
 
 export class RankingFFT implements Ranking {

@@ -1,5 +1,3 @@
-import { Rank,RankString} from '../../models/types';
-
 export class RankFFT implements Rank {
 
     private _group: { [groupName: string]: string } = {

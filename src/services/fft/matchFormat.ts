@@ -1,5 +1,3 @@
-import { MatchFormats} from '../../models/types';
-
 export class MatchFormatFFT implements MatchFormats {
 
     private _matchFormats: { [code: string]: MatchFormat } = {

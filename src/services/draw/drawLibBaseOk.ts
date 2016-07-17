@@ -1,10 +1,12 @@
+import { DrawLib } from './drawLib';
+import { Find } from '../util/find';
+import { Validation,IValidation } from '../validation';
+
 export class DrawLibBaseOk {
 
     constructor(
-        protected services: Services,
         private validation: Validation,
-        protected drawLib: DrawLib,
-        protected find: Find
+        protected drawLib: DrawLib
         ) {
     }
     

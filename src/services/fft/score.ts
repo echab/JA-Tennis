@@ -1,5 +1,3 @@
-import { Score} from '../../models/types';
-
 export class ScoreFFT implements Score {
 
     private static reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;

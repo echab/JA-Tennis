@@ -1,6 +1,6 @@
-export interface CategoryString extends String { }
+interface CategoryString extends String { }
 
-export interface Category {
+interface Category {
     //currentYear: number;    //public for Spec
     list(): CategoryString[];
     isValid(category: CategoryString): boolean;
@@ -10,17 +10,17 @@ export interface Category {
     compare(category1: CategoryString, category2: CategoryString): number;
 }
 
-export interface Licence {
+interface Licence {
     isValid(licence: string): boolean;
 }
 
-export interface RankString extends String {
+interface RankString extends String {
 }
 
-export interface RankGroupString extends String {    
+interface RankGroupString extends String {    
 }
 
-export interface Rank {
+interface Rank {
     list(): RankString[];
     isValid(rank: RankString): boolean;
     next(rank: RankString): RankString;
@@ -32,7 +32,7 @@ export interface Rank {
     isNC(rank: RankString): boolean;
 }
 
-export interface Ranking {
+interface Ranking {
     //TODO factory
     AddResultat(bVictoire: number, score: string, fm: string): boolean;	//-1=défaite, 0=nul, 1=victoire
     Empty(): void;
@@ -42,18 +42,18 @@ export interface Ranking {
     isVide(): boolean;
 }
 
-export interface MatchFormat {
+interface MatchFormat {
     code: string;
     name: string;
     duration?: number;
 }
 
-export interface MatchFormats {
+interface MatchFormats {
     list(): { [code: string]: MatchFormat };
 }
 
-export interface ScoreString extends String { }
+interface ScoreString extends String { }
 
-export interface Score {
+interface Score {
     isValid(score: ScoreString): boolean;
 }

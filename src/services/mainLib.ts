@@ -1,15 +1,11 @@
-﻿import { Services } from './services';
+﻿import { TournamentLib } from './tournamentLib';
+import { DrawLib } from './draw/drawLib';
+import { Validation } from './validation';
+import { Services } from './services';
+import { Selection } from './util/selection';
 import { Find } from './util/find';
 import { Guid } from './util/guid';
 import { Undo } from './util/undo';
-import { TournamentLib } from './tournamentLib';
-import { Tournament,TEvent } from '../models/tournament';
-import { DrawLib } from './draw/drawLib';
-import { Validation } from './validation';
-import { ModelType,GenerateType } from '../models/enums';
-import { Player } from '../models/player';
-import { Draw,Match } from '../models/draw';
-import { Selection } from './util/selection';
 import { copy } from '../utils/tool';
 
 export class MainLib {

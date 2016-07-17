@@ -1,5 +1,3 @@
-import { Category,CategoryString} from '../../models/types';
-
 export class CategoryFFT implements Category {
 
     // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf

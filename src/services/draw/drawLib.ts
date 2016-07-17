@@ -1,10 +1,6 @@
 import {Find} from '../util/Find';
 import {Guid} from '../util/Guid';
-import { TEvent } from '../../models/tournament';
-import { Draw,Match,Box } from '../../models/draw';
-import { Player,PlayerIn } from '../../models/player';
-import { DrawType } from '../../models/enums';
-import { Rank } from '../../models/types';
+//import { DrawType } from '../../models/enums';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle } from '../../utils/tool';
 import { Services } from '../services';

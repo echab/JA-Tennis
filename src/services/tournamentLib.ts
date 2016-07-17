@@ -1,4 +1,7 @@
+import { DrawLib } from './draw/drawLib';
+import { Guid } from './util/guid';
 import { isObject,extend } from './util/object'
+import { shuffle } from '../utils/tool';
 
 var MINUTES = 60000,
     DAYS = 24 * 60 * MINUTES;
@@ -7,8 +10,7 @@ export class TournamentLib {
 
     constructor(
         private drawLib: DrawLib,
-        private rank: Rank,
-        private guid: Guid
+        private rank: Rank
         ) { }
 
     public newTournament(source?: Tournament): Tournament {
@@ -141,7 +143,7 @@ export class TournamentLib {
 
                 //r0: premier joueur de l'intervalle
                 //r1: premier joueur de l'intervalle suivant
-                tool.shuffle(players, r0, r1);
+                shuffle(players, r0, r1);
 
                 r0 = r1;
             }
@@ -173,9 +175,9 @@ export class TournamentLib {
     }
 }
 
-angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
-    .factory('tournamentLib',
-        ['drawLib', 'rank', 'guid',
-        (drawLib: DrawLib, rank: Rank, guid: Guid) => {
-        return new TournamentLib(drawLib, rank, guid);
-    }]);
+// angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
+//     .factory('tournamentLib',
+//         ['drawLib', 'rank', 'guid',
+//         (drawLib: DrawLib, rank: Rank, guid: Guid) => {
+//         return new TournamentLib(drawLib, rank, guid);
+//     }]);

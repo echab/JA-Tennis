@@ -1,8 +1,5 @@
-import {Player} from './player'
-import {Draw, Match} from './draw';
-import { CategoryString,RankString } from './types';
 
-export interface Tournament {
+interface Tournament {
 
     id: string;
 
@@ -20,7 +17,7 @@ export interface Tournament {
     _day?: Match[][]; //list of matches by day
 }
 
-export interface TournamentInfo {
+interface TournamentInfo {
     name: string;
 
     start?: Date;
@@ -29,7 +26,7 @@ export interface TournamentInfo {
     slotLength?: number;
 }
 
-export interface TEvent {
+interface TEvent {
 
     id: string;
 

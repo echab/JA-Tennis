@@ -1,20 +1,19 @@
 ﻿// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
 // ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
 
+import {Container} from 'aurelia-dependency-injection';
 import { DrawLib } from './drawLib';
-import { Tournament,TEvent } from '../../models/tournament';
-import { Draw,Box } from '../../models/draw';
-import { DrawType } from '../../models/enums';
-import { Player } from '../../models/player';
 
 describe('services.drawLib', () => {
-    var drawLib: DrawLib;
+    let container: Container;
+    let drawLib: DrawLib;
 
-    beforeEach(module('jat.services.drawLib'));
-    beforeEach(module('jat.services.type'));
-    beforeEach(inject((_drawLib_: DrawLib) => {    //inject before each "it
-        drawLib = _drawLib_;
-    }));
+    beforeEach(() => {    //inject before each "it
+        container = new Container();
+        //let rank = container.get(Rank);
+        //drawLib = new DrawLib(rank);
+        drawLib = container.get(DrawLib);
+    });
 
     var player1: Player = {
         id: 'p1',

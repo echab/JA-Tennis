@@ -1,34 +1,30 @@
-﻿/// <reference path="../../lib/typings/mocks/math-mock.d.ts" />
+﻿// /// <reference path="../../lib/typings/mocks/math-mock.d.ts" />
 
-'use strict';
+import {Container} from 'aurelia-dependency-injection';
+
+import { MainLib } from './mainLib';
+import { DrawLib } from './draw/drawLib';
+import { Guid } from './util/guid';
+import { Undo } from './util/undo';
+import { Find } from './util/Find';
 
 describe('services.mainLib', () => {
-
-    var main: MainLib,
+    let container = new Container();
+    let main: MainLib,
         drawLib: DrawLib,
         undo: Undo,
-        find: Find,
-        guid: Guid,
         math: mock.Math;
 
-    beforeEach(module('jat.services.mainLib'));
-    beforeEach(module('jat.services.guid.mock'));
-    beforeEach(module('math.mock'));
+    // beforeEach(module('jat.services.mainLib'));
+    // beforeEach(module('jat.services.guid.mock'));
+    // beforeEach(module('math.mock'));
 
-    beforeEach(inject((
-        _mainLib_: MainLib,
-        _drawLib_: DrawLib,
-        _undo_: Undo,
-        _find_: Find,
-        _guid_: Guid,
-        _math_: mock.Math) => {
-        main = _mainLib_;
-        drawLib = _drawLib_;
-        undo = _undo_;
-        find = _find_;
-        guid = _guid_;
-        math = _math_;
-    }));
+    beforeEach(()=> {
+        main = container.get(MainLib);
+        drawLib = container.get(DrawLib);
+        undo = container.get(Undo);
+        math = container.get(Math);
+    });
 
     describe('Load/save', () => {
 
@@ -132,19 +128,19 @@ describe('services.mainLib', () => {
                 expect(draw1.boxes).toBeDefined();
                 expect(draw1.boxes.length).toBe(7);
 
-                var boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 6);
+                var boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 6);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 5);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 3);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Albert');
 
-                var boxOut = <Match>find.by(draw1.boxes, 'position', 0);
+                var boxOut = <Match>Find.by(draw1.boxes, 'position', 0);
                 expect(boxOut.qualifOut).toBe(1);
             });
 
@@ -158,22 +154,22 @@ describe('services.mainLib', () => {
                 expect(draw1.boxes).toBeDefined();
                 expect(draw1.boxes.length).toBe(6);
 
-                var boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 6);
+                var boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 6);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 5);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 3);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Albert');
 
-                var boxOut = <Match>find.by(draw1.boxes, 'position', 2);
+                var boxOut = <Match>Find.by(draw1.boxes, 'position', 2);
                 expect(boxOut.qualifOut).toBe(1);
 
-                boxOut = <Match>find.by(draw1.boxes, 'position', 1);
+                boxOut = <Match>Find.by(draw1.boxes, 'position', 1);
                 expect(boxOut.qualifOut).toBe(2);
             });
 
@@ -188,17 +184,17 @@ describe('services.mainLib', () => {
                 expect(draw1.boxes).toBeDefined();
                 expect(draw1.boxes.length).toBe(10);
 
-                var boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 19);
+                var boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 19);
                 expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 18);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 18);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 17);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 17);
                 expect(boxIn._player.name).toBe('Albert');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 16);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 16);
                 expect(boxIn._player.name).toBe('Claude');
             });
 
@@ -214,11 +210,11 @@ describe('services.mainLib', () => {
                 expect(draw1.boxes).toBeDefined();
                 expect(draw1.boxes.length).toBe(3);
 
-                var boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 5);
+                var boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Albert');
 
                 var draw2 = event1.draws[1];
@@ -227,11 +223,11 @@ describe('services.mainLib', () => {
                 expect(draw2.boxes).toBeDefined();
                 expect(draw2.boxes.length).toBe(3);
 
-                boxIn = <PlayerIn>find.by(draw2.boxes, 'position', 5);
+                boxIn = <PlayerIn>Find.by(draw2.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Daniel');
                 expect(boxIn.seeded).toBe(2);
 
-                boxIn = <PlayerIn>find.by(draw2.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw2.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Claude');
             });
 
@@ -248,19 +244,19 @@ describe('services.mainLib', () => {
                 expect(draw.boxes).toBeDefined();
                 expect(draw.boxes.length).toBe(5);
 
-                var boxIn = <PlayerIn> find.by(draw.boxes, 'position', 3);
+                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Frank');
                 expect(boxIn._player.rank).toBe('30/5');
 
-                boxIn = find.by(draw.boxes, 'position', 4);
+                boxIn = Find.by(draw.boxes, 'position', 4);
                 expect(boxIn.qualifIn).toBe(-1);
 
-                boxIn = find.by(draw.boxes, 'position', 2);
+                boxIn = Find.by(draw.boxes, 'position', 2);
                 expect(boxIn._player.name).toBe('Eloi');
                 expect(boxIn._player.rank).toBe('30/3');
                 expect(boxIn.seeded).toBe(1);
 
-                var boxOut = <Match>find.by(draw.boxes, 'position', 0);
+                var boxOut = <Match>Find.by(draw.boxes, 'position', 0);
                 expect(boxOut.qualifOut).toBe(1);
             });
 
@@ -276,17 +272,17 @@ describe('services.mainLib', () => {
                 expect(draw.boxes).toBeDefined();
                 expect(draw.boxes.length).toBe(5);
 
-                var boxIn = <PlayerIn> find.by(draw.boxes, 'position', 3);
+                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.rank).toBe('30/5');
 
-                boxIn = find.by(draw.boxes, 'position', 4);
+                boxIn = Find.by(draw.boxes, 'position', 4);
                 expect(boxIn.qualifIn).toBe(-1);
 
-                boxIn = find.by(draw.boxes, 'position', 2);
+                boxIn = Find.by(draw.boxes, 'position', 2);
                 expect(boxIn._player.rank).toBe('30/3');
                 expect(boxIn.seeded).toBe(1);
 
-                var boxOut = <Match>find.by(draw.boxes, 'position', 0);
+                var boxOut = <Match>Find.by(draw.boxes, 'position', 0);
                 expect(boxOut.qualifOut).toBe(1);
 
                 var r = undo.undo();
@@ -308,31 +304,31 @@ describe('services.mainLib', () => {
                 var draw = event1.draws[0];
                 expect(draw.boxes.length).toBe(9);
 
-                var boxIn = find.by(draw.boxes, 'position', 14);
+                var boxIn = Find.by(draw.boxes, 'position', 14);
                 expect(boxIn._player.name).toBe('Gérard');
 
-                boxIn = find.by(draw.boxes, 'position', 13);
+                boxIn = Find.by(draw.boxes, 'position', 13);
                 expect(boxIn._player.name).toBe('Henri');
 
-                boxIn = find.by(draw.boxes, 'position', 12);
+                boxIn = Find.by(draw.boxes, 'position', 12);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = find.by(draw.boxes, 'position', 11);
+                boxIn = Find.by(draw.boxes, 'position', 11);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = find.by(draw.boxes, 'position', 10);
+                boxIn = Find.by(draw.boxes, 'position', 10);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = find.by(draw.boxes, 'position', 9);
+                boxIn = Find.by(draw.boxes, 'position', 9);
                 expect(boxIn._player.name).toBe('Albert');
 
-                var boxOut = <Match>find.by(draw.boxes, 'position', 6);
+                var boxOut = <Match>Find.by(draw.boxes, 'position', 6);
                 expect(boxOut.qualifOut).toBe(1);
 
-                boxOut = <Match>find.by(draw.boxes, 'position', 5);
+                boxOut = <Match>Find.by(draw.boxes, 'position', 5);
                 expect(boxOut.qualifOut).toBe(2);
 
-                boxOut = <Match>find.by(draw.boxes, 'position', 4);
+                boxOut = <Match>Find.by(draw.boxes, 'position', 4);
                 expect(boxOut.qualifOut).toBe(3);
 
                 tournament1.players.splice(6, 2);   //remove two additional players
@@ -358,16 +354,16 @@ describe('services.mainLib', () => {
 
                 expect(draw.boxes.length).toBe(7);
 
-                var boxIn = <PlayerIn> find.by(draw.boxes, 'position', 6);
+                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 6);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 5);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 4);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 3);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Albert');
             });
 
@@ -382,16 +378,16 @@ describe('services.mainLib', () => {
 
                 expect(draw.boxes.length).toBe(10);
 
-                var boxIn = <PlayerIn> find.by(draw.boxes, 'position', 19);
+                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 19);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 18);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 18);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 17);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 17);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 16);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 16);
                 expect(boxIn._player.name).toBe('Albert');
             });
         });
@@ -417,23 +413,23 @@ describe('services.mainLib', () => {
                 expect(draw.boxes.length).toBe(7);
 
                 it('should move the qualif out', () => {
-                    var boxOut = <Match>find.by(draw.boxes, 'position', 2);
+                    var boxOut = <Match>Find.by(draw.boxes, 'position', 2);
                     expect(boxOut.qualifOut).toBe(1);
 
-                    boxOut = <Match>find.by(draw.boxes, 'position', 1);
+                    boxOut = <Match>Find.by(draw.boxes, 'position', 1);
                     expect(boxOut.qualifOut).toBe(2);
                 });
 
-                var boxIn = <PlayerIn> find.by(draw.boxes, 'position', 6);
+                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 6);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 5);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 4);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn> find.by(draw.boxes, 'position', 3);
+                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Albert');
             });
 
@@ -450,14 +446,14 @@ describe('services.mainLib', () => {
 
                 expect(draw.boxes.length).toBe(6);
 
-                var boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 11);
+                var boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 11);
                 expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 10);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 10);
                 expect(boxIn._player.name).toBe('Albert');
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 9);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 9);
                 expect(boxIn._player).toBeUndefined();
             });
 
@@ -474,11 +470,11 @@ describe('services.mainLib', () => {
 
                 expect(draw.boxes.length).toBe(3);
 
-                var boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 5);
+                var boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
                 expect(boxIn.seeded).toBe(1);
 
-                boxIn = <PlayerIn>find.by(draw1.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw1.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Albert');
             });
         });

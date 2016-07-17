@@ -1,7 +1,7 @@
-///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
+// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
+// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
 
-import { Category,CategoryString} from '../../models/types';
+import {Container} from 'aurelia-dependency-injection';
 
 describe('services.fft.score', function () {
     var score: ScoreFFT;
