@@ -1,20 +1,14 @@
-// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
-import { Undo } from './undo';
+import { Undo } from '../../../../src/services/util/undo';
 
 describe('services.undo', () => {
-    let container = new Container();
-    let undo: Undo;
+    let undo: Undo = new Undo();
 
-    //beforeEach(module('jat.services.undo'));
     //beforeEach(inject((_undo_:Undo) => {undo = _undo_;}));    //inject before each "it
     //beforeEach(undo.reset);
 
-    it('should inject undo', () => {
-        undo = container.get(Undo);
-    });
+    // it('should inject undo', () => {
+    //     undo = new Undo();
+    // });
 
     function initTest() {
         expect(undo).not.toBe(undefined);

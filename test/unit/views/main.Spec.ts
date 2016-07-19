@@ -1,20 +1,14 @@
-﻿///<reference path="../../lib/typings/jasmine/jasmine.d.ts"/>
-///<reference path="../../lib/typings/angularjs/angular-mocks.d.ts"/>
-///<reference path="../../lib/typings/ui-bootstrap/ui-bootstrap-mocks.d.ts"/>
-
-'use strict';
-
+﻿
 describe('main controller', () => {
 
-    var main: jat.main.mainCtrl, $modal: uib.mock.IModalService<string>;
+    // var main: jat.main.mainCtrl, $modal: uib.mock.IModalService<string>;
 
-    beforeEach(module('jat.main'));
-    beforeEach(module('ui.bootstrap.mock'));    //for $modal mock
+    // beforeEach(module('ui.bootstrap.mock'));    //for $modal mock
 
-    beforeEach(inject(($controller: ng.IControllerService, _$modal_: uib.mock.IModalService<string>) => {
-        main = $controller('mainCtrl');
-        $modal = _$modal_;
-    }));
+    // beforeEach(inject(($controller: ng.IControllerService, _$modal_: uib.mock.IModalService<string>) => {
+    //     main = $controller('mainCtrl');
+    //     $modal = _$modal_;
+    // }));
 
     describe('Players management', () => {
 

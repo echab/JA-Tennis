@@ -1,16 +1,10 @@
-// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
+import { RankFFT } from '../../../../src/services/fft/rank'
 
 describe('services.fft.rank', function () {
-    var rank: jat.fft.RankFFT;
+    var rank: RankFFT;
 
     it('should inject rank', function () {
-        module('jat.services.type');
-        inject(function (_rank_: jat.fft.RankFFT) {
-            rank = _rank_;
-        });
+        rank = new RankFFT();
     });
 
     describe('list rank', function () {

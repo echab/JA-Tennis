@@ -2,7 +2,7 @@
 import { DrawLib } from './draw/drawLib';
 import { Validation } from './validation';
 import { Services } from './services';
-import { Selection } from './util/selection';
+import { Selection,ModelType } from './util/selection';
 import { Find } from './util/find';
 import { Guid } from './util/guid';
 import { Undo } from './util/undo';

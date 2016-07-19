@@ -1,5 +1,7 @@
 import {Find} from './find'; 
 
+export enum ModelType { None, Tournament, Player, TEvent, Draw, Match, Box }
+
 export class Selection {
     public tournament: Tournament;
     public event: TEvent;
@@ -7,7 +9,7 @@ export class Selection {
     public box: Box;
     public player: Player;
 
-    constructor(private find: Find) {
+    constructor() {
     }
 
     select(r: Box | Draw | TEvent | Player | Tournament, type?: ModelType): void {

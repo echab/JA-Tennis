@@ -1,16 +1,10 @@
-// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
+import { ScoreFFT } from '../../../../src/services/fft/score'
 
 describe('services.fft.score', function () {
     var score: ScoreFFT;
 
     it('should inject score', function () {
-        module('jat.services.type');
-        inject(function (_score_: ScoreFFT) {
-            score = _score_;
-        });
+        score = new ScoreFFT();
     });
 
     describe('isValid score', function () {

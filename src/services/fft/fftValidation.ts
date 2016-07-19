@@ -1,14 +1,16 @@
 ﻿// FFT validation services
 
-import {Find} from '../util/find'
+import { Validation } from '../validation';
+import { DrawLib } from '../draw/drawLib';
+import { Knockout } from '../draw/knockout';
+import {Find} from '../util/find';
 
 export class FFTValidation implements IValidation {
 
     constructor(
-        private validation: jat.service.Validation,
-        private drawLib: jat.service.DrawLib,
-        private knockout: jat.service.Knockout,
-        private find: Find
+        private validation: Validation,
+        private drawLib: DrawLib,
+        private knockout: Knockout
         ) {
         validation.addValidator(this);
     }
@@ -407,15 +409,15 @@ function positionMax(nCol: number, nQ?: number): number {   //iBoiteMaxQ
         : positionTopCol(columnMax(nCol, nQ));
 }
 
-angular.module('jat.services.validation.fft', ['jat.services.validation'])
-    .factory('fftValidation', [
-        'validation',
-        'drawLib',
-        'knockout',
-        'find',
-        (validation: jat.service.Validation,
-            drawLib: jat.service.DrawLib,
-            knockout: jat.service.Knockout,
-            find: jat.service.Find) => {
-        return new FFTValidation(validation, drawLib, knockout, find);
-    }]);
+// angular.module('jat.services.validation.fft', ['jat.services.validation'])
+//     .factory('fftValidation', [
+//         'validation',
+//         'drawLib',
+//         'knockout',
+//         'find',
+//         (validation: Validation,
+//             drawLib: DrawLib,
+//             knockout: Knockout,
+//             find: Find) => {
+//         return new FFTValidation(validation, drawLib, knockout, find);
+//     }]);

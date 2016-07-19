@@ -1,15 +1,9 @@
-import { DrawLibBase,IDrawLib } from './drawLibBase';
+import { DrawLibBase } from './drawLibBase';
 import { DrawLib } from './drawLib';
 import { KnockoutLib } from './knockoutLib';
 import { TournamentLib } from '../tournamentLib';
 import {Find} from '../util/Find';
 import {Guid} from '../util/Guid';
-import { TEvent } from '../../models/tournament';
-import { Draw,Match,Box,ISize,IPoint } from '../../models/draw';
-import { Player,PlayerIn } from '../../models/player';
-import { DrawType } from '../../models/enums';
-import { Rank,Ranking } from '../../models/types';
-import { GenerateType } from '../../models/enums';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle } from '../../utils/tool';
 import { Services } from '../services';
@@ -41,9 +35,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         drawLib: DrawLib,
         private tournamentLib: TournamentLib,
         private ranking: Ranking,
-        rank: Rank,
-        find: Find,
-        guid: Guid
+        rank: Rank
         ) {
         super(drawLib, rank);
         Services.registerDrawlib(this, DrawType.PouleSimple);

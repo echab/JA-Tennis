@@ -1,17 +1,18 @@
-﻿// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
-import { Knockout } from './knockout';
+﻿import { Knockout } from '../../../../src/services/draw/knockout';
+import { KnockoutLib as knockoutLib } from '../../../../src/services/draw/knockoutLib';
+import { DrawLib } from '../../../../src/services/draw/drawLib';
+import { RankFFT } from '../../../../src/services/fft/rank'
+import { TournamentLib } from '../../../../src/services/tournamentLib';
 
 describe('services.knockout', () => {
     var knockout: Knockout;
+    let rank = new RankFFT;
+    let drawLib = new DrawLib(rank);
+    let tournamentLib = new TournamentLib(drawLib, rank);
 
-    // beforeEach(module('jat.services.knockout'));
-    // beforeEach(module('jat.services.type'));
-    beforeEach(inject((_knockout_: jat.service.Knockout) => {    //inject before each "it
-        knockout = _knockout_;
-    }));
+    beforeEach(() => {    //inject before each "it
+        knockout = new Knockout(drawLib, tournamentLib, rank);
+    });
 
     var draw1: Draw = {
         id: 'd1', name: 'draw1',

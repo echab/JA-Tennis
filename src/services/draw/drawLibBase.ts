@@ -1,4 +1,4 @@
-﻿import { DrawLib } from './drawLib';
+﻿import { DrawLib as drawLib } from './drawLib';
 import { Find } from '../util/find';
 import { Guid } from '../util/guid';
 import { isArray } from '../util/object';
@@ -11,8 +11,8 @@ var MAX_TETESERIE = 32,
 export class DrawLibBase {
 
     constructor(
-        protected drawLib: DrawLib,
-        protected rank: Rank
+        protected drawLib: DrawLib
+        //,protected rank: Rank
         ) {
     }
 

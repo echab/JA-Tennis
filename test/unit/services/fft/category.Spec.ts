@@ -1,19 +1,13 @@
-// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
-import { CategoryFFT } from './category';
+import { CategoryFFT } from '../../../../src/services/fft/category';
 
 describe('services.fft.category', function () {
-    let container: Container;
     var category: CategoryFFT;
     var now = new Date();
     //var march = new Date(2014, 2, 14);
     //var november = new Date(2014, 10, 14);
 
     beforeEach(() => {    //inject before each "it
-        container = new Container();
-        category = container.get(CategoryFFT);
+        category = new CategoryFFT();
     });
 
     describe('list category', function () {

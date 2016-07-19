@@ -1,18 +1,12 @@
-﻿// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
-import { DrawLib } from './drawLib';
+﻿import { DrawLib } from '../../../../src/services/draw/drawLib';
+import { RankFFT } from '../../../../src/services/fft/rank';
 
 describe('services.drawLib', () => {
-    let container: Container;
+    let rank = new RankFFT();
     let drawLib: DrawLib;
 
     beforeEach(() => {    //inject before each "it
-        container = new Container();
-        //let rank = container.get(Rank);
-        //drawLib = new DrawLib(rank);
-        drawLib = container.get(DrawLib);
+        drawLib = new DrawLib(rank);
     });
 
     var player1: Player = {

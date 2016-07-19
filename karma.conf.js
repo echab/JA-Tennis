@@ -35,7 +35,8 @@ module.exports = function(config) {
     },
     files: [
       'test/unit/setup.ts',
-      'test/unit/*.ts'
+      //'test/unit/*.ts'
+      'test/unit/**/*.Spec.ts'
     ],
     exclude: [],
     preprocessors: { },
@@ -44,7 +45,17 @@ module.exports = function(config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    //browsers: ['Chrome'],
+    browsers: ['ChromeCanary'],
+    //browsers: ['Chromium'],
+    // you can define custom flags
+    customLaunchers: {
+      Chromium: {
+        base: 'ChromeCanary',
+        flags: ['--profile-directory=Default']
+        //,flags: ['--disable-web-security']
+      }
+    },
     singleRun: false
   });
 };

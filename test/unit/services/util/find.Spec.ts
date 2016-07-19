@@ -1,11 +1,8 @@
-// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
+import { Find } from '../../../../src/services/util/find';
 
-import { Find } from './find';
+describe('services.find', () => {
 
-describe('services.find', function () {
-
-    describe('find byIndex', function () {
+    describe('find byIndex', () => {
 
         var a = [
             { id: "j1", name: "name1" },
@@ -13,22 +10,22 @@ describe('services.find', function () {
             { id: "j3", name: "name3" }
         ];
 
-        it('should find indexOf', function () {
+        it('should find indexOf', () => {
             var i = Find.indexOf(a, "id", "j2");
             expect(i).toBe(1);
         });
 
-        it('should not find indexOf zz', function () {
+        it('should not find indexOf zz', () => {
             var i = Find.indexOf(a, "id", "zz");
             expect(i).toBe(-1);
         });
 
-        it('should not find indexOf idZ', function () {
+        it('should not find indexOf idZ', () => {
             expect(() => Find.indexOf(a, "idZ", "zz", 'bad field idZ')).toThrow('bad field idZ');
         });
     });
 
-    describe('find by', function () {
+    describe('find by', () => {
 
         var a = [
             { id: "j1", name: "name1" },
@@ -36,17 +33,17 @@ describe('services.find', function () {
             { id: "j3", name: "name3" }
         ];
 
-        it('should find by', function () {
+        it('should find by', () => {
             var o = Find.by(a, "id", "j2");
             expect(o).toEqual({ id: "j2", name: "name2" });
         });
 
-        it('should not find indexOf zz', function () {
+        it('should not find indexOf zz', () => {
             var o = Find.by(a, "id", "zz");
             expect(o).toBeUndefined();
         });
 
-        it('should not find indexOf idZ', function () {
+        it('should not find indexOf idZ', () => {
             var o = Find.by(a, "idZ", "zz");
             expect(o).toBeUndefined();
         });

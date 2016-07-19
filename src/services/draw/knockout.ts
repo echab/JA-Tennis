@@ -1,6 +1,6 @@
 import { DrawLibBase } from './drawLibBase';
 import { DrawLib } from './drawLib';
-import { KnockoutLib } from './knockoutLib';
+import { KnockoutLib as k } from './knockoutLib';
 import { TournamentLib } from '../tournamentLib';
 import {Find} from '../util/Find';
 import {Guid} from '../util/Guid';
@@ -37,7 +37,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     constructor(
         drawLib: DrawLib,
-        private knockoutLib: KnockoutLib,
         private tournamentLib: TournamentLib,
         rank: Rank
         ) {
@@ -57,7 +56,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Override
     public nbColumnForPlayers(draw: Draw, nJoueur: number): number {
 
-        var k = this.knockoutLib;
+        
         var colMin = k.columnMin(draw.nbOut);
 
         for (var c = colMin + 1; k.countInCol(c, draw.nbOut) < nJoueur && c < MAX_COL; c++) {
@@ -75,7 +74,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
         //ASSERT( SetDimensionOk( draw, oldDraw, nPlayer));
 
-        var k = this.knockoutLib;
+        
 
         if (nPlayer) {    //AgranditTableau to fit all players
             draw.nbColumn = this.nbColumnForPlayers(draw, nPlayer);
@@ -133,7 +132,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     private RempliMatchs(draw: Draw, m_nMatchCol: number[], nMatchRestant: number, colGauche?: number): void {
 
-        var k = this.knockoutLib;
+        
         var colMin = k.columnMin(draw.nbOut);
 
         colGauche = colGauche || colMin;
@@ -157,7 +156,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Init m_nMatchCol à partir du tableau existant
     private CompteMatchs(draw: Draw): number[] {
 
-        var k = this.knockoutLib;
+        
         var b: number, c2: number, n: number, bColSansMatch: boolean;
 
         var m_nMatchCol: number[] = new Array(MAX_COL);
@@ -283,7 +282,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     private TirageEchelonne(draw: Draw, m_nMatchCol: number[]): boolean {		//Suivant
 
-        var k = this.knockoutLib;
+        
         var colMin = k.columnMin(draw.nbOut);
         var colMax = k.columnMax(draw.nbColumn, draw.nbOut);
 
@@ -312,7 +311,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     private TirageEnLigne(draw: Draw, m_nMatchCol: number[]): boolean {	//Precedent
 
-        var k = this.knockoutLib;
+        
         var colMin = k.columnMin(draw.nbOut);
 
         //Cherche où est-ce qu'on peut ajouter un match en partant de la gauche
@@ -364,7 +363,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Place les matches dans l'ordre
     private ConstruitMatch(oldDraw: Draw, m_nMatchCol: number[], players: Array<Player|number>): Draw {
 
-        var k = this.knockoutLib;
+        
         var draw = this.drawLib.newDraw(oldDraw._event, oldDraw);
         draw.boxes = [];
 
@@ -530,7 +529,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //Override
     public boxesOpponents(match: Match): { box1: Box; box2: Box } {
-        var k = this.knockoutLib;
+        
         var pos1 = k.positionOpponent1(match.position),
             pos2 = k.positionOpponent2(match.position);
         return {
@@ -542,7 +541,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Override
     public getSize(draw: Draw): ISize {
 
-        var k = this.knockoutLib;
+        
 
         if (!draw || !draw.nbColumn || !draw.nbOut) {
             return { width: 1, height: 1 }; //{ width: dimensions.boxWidth, height: dimensions.boxHeight };
@@ -557,7 +556,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Override
     public computePositions(draw: Draw): IPoint[] {
 
-        var k = this.knockoutLib;
+        
 
         if (!draw || !draw.nbColumn || !draw.nbOut || !draw.boxes || !draw.boxes.length) {
             return;
@@ -819,7 +818,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //Numéro du tête de série d'une boite (identique dans plusieurs boites)
     private iTeteSerieQ(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
 
@@ -859,7 +858,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Ordre de remplissage des boites en partant de la droite
     //et en suivant les têtes de série
     private iOrdreQ(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
         return this.iTeteSerieQ(i, nQualifie) - 1
@@ -870,7 +869,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Partie du tableau de i par rapport au qualifié sortant
     //retour: 0 à nQualifie-1, en partant du bas
     iPartieQ(i: number, nQualifie: number): number {   //not private for Sped?
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
         var c = k.column(i);
@@ -881,7 +880,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //Numére de boite de la partie de tableau, ramenée à un seul qualifié
     private iDecaleGaucheQ(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
         var c: number = k.column(i);
@@ -896,7 +895,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //Numéro du tête de série d'une boite (identique dans plusieurs boites)
     private iTeteSerieQhb(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
 
@@ -933,7 +932,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Ordre de remplissage des boites en partant de la droite
     //et en suivant les têtes de série
     private iOrdreQhb(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
         return this.iTeteSerieQhb(i, nQualifie) - 1
@@ -944,7 +943,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Partie du tableau de i par rapport au qualifié sortant
     //retour: 0 à nQualifie-1, en partant du bas
     private iPartieQhb(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
         var c: number = k.column(i);
@@ -955,7 +954,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     private iDecaleGaucheQhb(i: number, nQualifie: number): number {
-        var k = this.knockoutLib;
+        
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
         var c: number = k.column(i);

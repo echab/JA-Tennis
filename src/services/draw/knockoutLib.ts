@@ -1,5 +1,3 @@
-//TODO not a service but a static function library
-
 export class KnockoutLib {
 
     static column(pos: number): number {    //iCol

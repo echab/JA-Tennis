@@ -5,21 +5,15 @@ import { isObject,isArray,extend } from '../util/object'
 import { shuffle } from '../../utils/tool';
 import { Services } from '../services';
 
-import {autoinject} from 'aurelia-dependency-injection';
+import { rank } from '../types';
 
 var MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1;
 
-@autoinject
 export class DrawLib {
 
-    constructor(
-        private rank: Rank
-        ) {
-    }
-
-    public newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
+    public static newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
         var draw: Draw = <any>{};
         if (isObject(source)) {
             extend(draw, source);
@@ -36,9 +30,9 @@ export class DrawLib {
             //TODO? after._next = draw;
         }
         if (!draw.minRank) {
-            draw.minRank = after && after.maxRank ? this.rank.next(after.maxRank) : 'NC';
+            draw.minRank = after && after.maxRank ? rank.next(after.maxRank) : 'NC';
         }
-        if (draw.maxRank && this.rank.compare(draw.minRank, draw.maxRank) > 0) {
+        if (draw.maxRank && rank.compare(draw.minRank, draw.maxRank) > 0) {
             draw.maxRank = draw.minRank;
         }
 
@@ -46,7 +40,7 @@ export class DrawLib {
         return draw;
     }
 
-    public initDraw(draw: Draw, parent: TEvent): void {
+    public static initDraw(draw: Draw, parent: TEvent): void {
         draw._event = parent;
 
         draw.type = draw.type || 0;
@@ -65,7 +59,7 @@ export class DrawLib {
 
     //public newBox(parent: Draw, matchFormat?: string, position?: number): Box
     //public newBox(parent: Draw, source?: Box, position?: number): Box
-    public newBox(parent: Draw, source?: string|Box, position?: number): Box {
+    public static newBox(parent: Draw, source?: string|Box, position?: number): Box {
         var box: Box = <any>{};
         if (isObject(source)) {
             extend(box, source);
@@ -83,7 +77,7 @@ export class DrawLib {
         return box;
     }
 
-    public initBox(box: Box, parent: Draw): void {
+    public static initBox(box: Box, parent: Draw): void {
         box._draw = parent;
         box._player = this.getPlayer(box);
     }
@@ -109,7 +103,7 @@ export class DrawLib {
         draw._refresh = new Date(); //force angular refresh
     }
 
-    public updateQualif(draw: Draw): void {
+    public static updateQualif(draw: Draw): void {
 
         var drawLib = Services.drawLibFor(draw);
 
@@ -135,11 +129,11 @@ export class DrawLib {
         }
     }
 
-    public getPlayer(box: Box): Player {
+    public static getPlayer(box: Box): Player {
         return Find.byId(box._draw._event._tournament.players, box.playerId);
     }
 
-    private groupBegin(draw: Draw): Draw {   //getDebut
+    private static groupBegin(draw: Draw): Draw {   //getDebut
         //return the first Draw of the suite
         var p = draw;
         while (p && p.suite) {
@@ -150,7 +144,7 @@ export class DrawLib {
         return p;
     }
 
-    private groupEnd(draw: Draw): Draw { //getFin
+    private static groupEnd(draw: Draw): Draw { //getFin
         //return the last Draw of the suite
         var p = this.groupBegin(draw);
         while (p && p._next && p._next.suite)
@@ -159,7 +153,7 @@ export class DrawLib {
     }
 
     //** return the group of draw of the given draw (mainly for group of round robin). */
-    public group(draw: Draw): Draw[] {
+    public static group(draw: Draw): Draw[] {
         var draws: Draw[] = [];
         var d = this.groupBegin(draw);
         while (d) {
@@ -173,13 +167,13 @@ export class DrawLib {
     }
 
     //** return the draws of the previous group. */
-    public previousGroup(draw: Draw): Draw[] {	//getPrecedent
+    public static previousGroup(draw: Draw): Draw[] {	//getPrecedent
         var p = this.groupBegin(draw);
         return p && p._previous ? this.group(p._previous) : null;
     }
 
     //** return the draws of the next group. */
-    public nextGroup(draw: Draw): Draw[] {	    //getSuivant
+    public static nextGroup(draw: Draw): Draw[] {	    //getSuivant
         var p = this.groupEnd(draw);
         return p && p._next ? this.group(p._next) : null;
     }
@@ -200,11 +194,11 @@ export class DrawLib {
     //    m_iType = iType;
     //}
 
-    public isSlot(box: Match): boolean {  //isCreneau
+    public static isSlot(box: Match): boolean {  //isCreneau
         return box && ('score' in box) && (!!box.place || !!box.date);
     }
 
-    public findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
+    public static findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
         var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
@@ -219,7 +213,7 @@ export class DrawLib {
         return null;
     }
 
-    public groupFindPlayerIn(group: Draw[], iQualifie: number): PlayerIn {
+    public static groupFindPlayerIn(group: Draw[], iQualifie: number): PlayerIn {
         ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
         //var group = isArray(group) ? <Draw[]>group : this.group(<Draw>group);
         for (var i = 0; i < group.length; i++) {
@@ -232,7 +226,7 @@ export class DrawLib {
         }
     }
 
-    public groupFindPlayerOut(group: Draw[], iQualifie: number): Match {
+    public static groupFindPlayerOut(group: Draw[], iQualifie: number): Match {
         ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
         //var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
@@ -258,7 +252,7 @@ export class DrawLib {
         return null;
     }
 
-    public groupFindAllPlayerOut(origin: Draw | Draw[], hideNumbers?: boolean): number[] {   //FindAllQualifieSortant
+    public static groupFindAllPlayerOut(origin: Draw | Draw[], hideNumbers?: boolean): number[] {   //FindAllQualifieSortant
         //Récupère les qualifiés sortants du tableau
         var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         if (group) {
@@ -272,7 +266,7 @@ export class DrawLib {
         }
     }
 
-    public findAllPlayerOutBox(origin: Draw | Draw[]): Match[] { //FindAllQualifieSortantBox
+    public static findAllPlayerOutBox(origin: Draw | Draw[]): Match[] { //FindAllQualifieSortantBox
         //Récupère les qualifiés sortants du tableau
         var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         if (group) {
@@ -294,21 +288,21 @@ export class DrawLib {
         * @param inNumber (optional)
         * @param player   (optional)
         */
-    //         public setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
+    //         public static setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
     //             // inNumber=0 => enlève qualifié
     //             return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
     //         }
     // 
-    //         public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
+    //         public static setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
     //             // iQualifie=0 => enlève qualifié
     //             return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
     //         }
     // 
-    //         public computeScore(draw: Draw): boolean {
+    //         public static computeScore(draw: Draw): boolean {
     //             return this._drawLibs[draw.type].computeScore(draw);
     //         }
 
-    // public boxesOpponents(match: Match): { box1: Box; box2: Box } {
+    // public static boxesOpponents(match: Match): { box1: Box; box2: Box } {
     //     return this._drawLibs[match._draw.type].boxesOpponents(match);
     // }
 }

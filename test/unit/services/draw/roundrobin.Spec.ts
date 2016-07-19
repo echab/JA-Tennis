@@ -1,16 +1,21 @@
-﻿// ///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-// ///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-import {Container} from 'aurelia-dependency-injection';
+﻿import { Roundrobin } from '../../../../src/services/draw/roundrobin';
+import { DrawLib } from '../../../../src/services/draw/drawLib';
+import { RankFFT } from '../../../../src/services/fft/rank'
+import { RankingFFT } from '../../../../src/services/fft/ranking'
+import { ScoreFFT } from '../../../../src/services/fft/score'
+import { TournamentLib } from '../../../../src/services/tournamentLib';
 
 describe('services.roundrobin', () => {
-    var roundrobin: jat.service.Roundrobin;
+    var roundrobin: Roundrobin;
+    let rank = new RankFFT;
+    let score = new ScoreFFT();
+    let ranking = new RankingFFT(score);
+    let drawLib = new DrawLib(rank);
+    let tournamentLib = new TournamentLib(drawLib, rank);
 
-    beforeEach(module('jat.services.roundrobin'));
-    beforeEach(module('jat.services.type'));
-    beforeEach(inject((_roundrobin_: jat.service.Roundrobin) => {    //inject before each "it
-        roundrobin = _roundrobin_;
-    }));
+    beforeEach( () => {    //inject before each "it
+        roundrobin = new Roundrobin( drawLib, tournamentLib, ranking, rank);
+    });
 
     var draw1: Draw = {
         id: 'd1', name: 'draw1',

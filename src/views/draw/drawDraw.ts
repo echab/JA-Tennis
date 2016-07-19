@@ -1,4 +1,9 @@
-'use strict';
+import { Selection,ModelType} from '../../services/util/selection';
+import { Services } from '../../services/services';
+import { DrawLib } from '../../services/draw/drawLib';
+import { TournamentLib } from '../../services/tournamentLib';
+import { Find } from '../../services/util/find';
+import { Undo } from '../../services/util/undo';
 
 interface DrawAttributes extends ng.IAttributes {
     draw: string;
@@ -41,14 +46,14 @@ module jat.draw {
             'undo',
             'selection'];
         constructor(
-            private services: jat.service.Services,
-            private drawLib: jat.service.DrawLib,
-            //private knockout: jat.service.Knockout, //for dependencies
-            //private roundrobin: jat.service.Roundrobin, //for dependencies
-            private tournamentLib: jat.service.TournamentLib,
-            private find: jat.service.Find,
-            private undo: jat.service.Undo,
-            private selection: jat.service.Selection
+            private services: Services,
+            private drawLib: DrawLib,
+            //private knockout: Knockout, //for dependencies
+            //private roundrobin: Roundrobin, //for dependencies
+            private tournamentLib: TournamentLib,
+            private find: Find,
+            private undo: Undo,
+            private selection: Selection
             ) {
         }
 

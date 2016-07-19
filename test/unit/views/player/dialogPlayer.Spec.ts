@@ -1,8 +1,4 @@
-﻿///<reference path="../../../lib/typings/jasmine/jasmine.d.ts"/>
-///<reference path="../../../lib/typings/angularjs/angular-mocks.d.ts"/>
-
-'use strict';
-
+﻿
 describe('Player dialog', () => {
 
     //var dlg: jat.player.dialogPlayerCtrl, scope:ng.IScope, $modal: uib.IModalService<string>;

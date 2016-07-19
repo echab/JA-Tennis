@@ -1,29 +1,31 @@
 ﻿// /// <reference path="../../lib/typings/mocks/math-mock.d.ts" />
 
-import {Container} from 'aurelia-dependency-injection';
-
-import { MainLib } from './mainLib';
-import { DrawLib } from './draw/drawLib';
-import { Guid } from './util/guid';
-import { Undo } from './util/undo';
-import { Find } from './util/Find';
+//import {Container} from 'aurelia-dependency-injection';
+import { MainLib } from '../../../src/services//mainLib';
+import { DrawLib } from '../../../src/services//draw/drawLib';
+import { TournamentLib } from '../../../src/services/tournamentLib';
+import { Guid } from '../../../src/services/util/guid';
+import { Undo } from '../../../src/services//util/undo';
+import { Find } from '../../../src/services//util/Find';
+import { RankFFT } from '../../../src/services/fft/rank';
+import { Selection } from '../../../src/services/util/selection';
+import { Validation } from '../../../src/services/validation';
 
 describe('services.mainLib', () => {
-    let container = new Container();
     let main: MainLib,
-        drawLib: DrawLib,
-        undo: Undo,
-        math: mock.Math;
+        rank = new RankFFT,
+        drawLib = new DrawLib(rank),
+        undo = new Undo();
+    let tournamentLib = new TournamentLib(drawLib, rank);
+    let selection = new Selection();
+    let validation = new Validation();
+    let math: mock.Math;
 
-    // beforeEach(module('jat.services.mainLib'));
     // beforeEach(module('jat.services.guid.mock'));
     // beforeEach(module('math.mock'));
 
     beforeEach(()=> {
-        main = container.get(MainLib);
-        drawLib = container.get(DrawLib);
-        undo = container.get(Undo);
-        math = container.get(Math);
+        main = new MainLib( selection, tournamentLib, drawLib, validation, undo);
     });
 
     describe('Load/save', () => {

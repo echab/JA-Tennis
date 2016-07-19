@@ -1,4 +1,5 @@
-'use strict';
+import { Selection,ModelType } from '../services/util/selection';
+
 module jat.main {
 
     function mainDirective(): ng.IDirective {

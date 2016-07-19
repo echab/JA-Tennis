@@ -1,4 +1,4 @@
-export class MatchFormatFFT implements MatchFormats {
+export class MatchFormatsFFT implements MatchFormats {
 
     private _matchFormats: { [code: string]: MatchFormat } = {
         "A": { code:'A', name: "A: traditionnel (3 sets à 6 jeux)" },
