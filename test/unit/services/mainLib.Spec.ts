@@ -2,30 +2,19 @@
 
 //import {Container} from 'aurelia-dependency-injection';
 import { MainLib } from '../../../src/services//mainLib';
-import { DrawLib } from '../../../src/services//draw/drawLib';
-import { TournamentLib } from '../../../src/services/tournamentLib';
+import { DrawLib as drawLib } from '../../../src/services//draw/drawLib';
 import { Guid } from '../../../src/services/util/guid';
-import { Undo } from '../../../src/services//util/undo';
 import { Find } from '../../../src/services//util/Find';
-import { RankFFT } from '../../../src/services/fft/rank';
-import { Selection } from '../../../src/services/util/selection';
-import { Validation } from '../../../src/services/validation';
 
 describe('services.mainLib', () => {
-    let main: MainLib,
-        rank = new RankFFT,
-        drawLib = new DrawLib(rank),
-        undo = new Undo();
-    let tournamentLib = new TournamentLib(drawLib, rank);
-    let selection = new Selection();
-    let validation = new Validation();
+    let main: MainLib;
     let math: mock.Math;
 
     // beforeEach(module('jat.services.guid.mock'));
     // beforeEach(module('math.mock'));
 
     beforeEach(()=> {
-        main = new MainLib( selection, tournamentLib, drawLib, validation, undo);
+        main = new MainLib();
     });
 
     describe('Load/save', () => {
@@ -287,7 +276,7 @@ describe('services.mainLib', () => {
                 var boxOut = <Match>Find.by(draw.boxes, 'position', 0);
                 expect(boxOut.qualifOut).toBe(1);
 
-                var r = undo.undo();
+                var r = main.undo.undo();
                 expect(event1.draws.length).toBe(1);
                 expect(event1.draws[0]).toBe(draw1);
                 expect(r).toBeUndefined();

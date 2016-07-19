@@ -1,20 +1,13 @@
 ﻿import { Roundrobin } from '../../../../src/services/draw/roundrobin';
-import { DrawLib } from '../../../../src/services/draw/drawLib';
-import { RankFFT } from '../../../../src/services/fft/rank'
-import { RankingFFT } from '../../../../src/services/fft/ranking'
-import { ScoreFFT } from '../../../../src/services/fft/score'
-import { TournamentLib } from '../../../../src/services/tournamentLib';
+import { DrawLib as drawLib } from '../../../../src/services/draw/drawLib';
+import { ranking } from '../../../../src/services/types'
+import { TournamentLib as tournamentLib } from '../../../../src/services/tournamentLib';
 
 describe('services.roundrobin', () => {
     var roundrobin: Roundrobin;
-    let rank = new RankFFT;
-    let score = new ScoreFFT();
-    let ranking = new RankingFFT(score);
-    let drawLib = new DrawLib(rank);
-    let tournamentLib = new TournamentLib(drawLib, rank);
 
     beforeEach( () => {    //inject before each "it
-        roundrobin = new Roundrobin( drawLib, tournamentLib, ranking, rank);
+        roundrobin = new Roundrobin();
     });
 
     var draw1: Draw = {

@@ -1,17 +1,14 @@
 ﻿import { Knockout } from '../../../../src/services/draw/knockout';
 import { KnockoutLib as knockoutLib } from '../../../../src/services/draw/knockoutLib';
-import { DrawLib } from '../../../../src/services/draw/drawLib';
-import { RankFFT } from '../../../../src/services/fft/rank'
-import { TournamentLib } from '../../../../src/services/tournamentLib';
+import { DrawLib as drawLib } from '../../../../src/services/draw/drawLib';
+import { TournamentLib as tournamentLib } from '../../../../src/services/tournamentLib';
+import { rank } from '../../../../src/services/types'
 
 describe('services.knockout', () => {
     var knockout: Knockout;
-    let rank = new RankFFT;
-    let drawLib = new DrawLib(rank);
-    let tournamentLib = new TournamentLib(drawLib, rank);
 
     beforeEach(() => {    //inject before each "it
-        knockout = new Knockout(drawLib, tournamentLib, rank);
+        knockout = new Knockout();
     });
 
     var draw1: Draw = {

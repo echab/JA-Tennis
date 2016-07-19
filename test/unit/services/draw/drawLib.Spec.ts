@@ -1,13 +1,7 @@
-﻿import { DrawLib } from '../../../../src/services/draw/drawLib';
+﻿import { DrawLib as drawLib } from '../../../../src/services/draw/drawLib';
 import { RankFFT } from '../../../../src/services/fft/rank';
 
 describe('services.drawLib', () => {
-    let rank = new RankFFT();
-    let drawLib: DrawLib;
-
-    beforeEach(() => {    //inject before each "it
-        drawLib = new DrawLib(rank);
-    });
 
     var player1: Player = {
         id: 'p1',

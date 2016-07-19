@@ -11,8 +11,8 @@ import {HttpClient} from 'aurelia-http-client';
 
 export class MainLib {
 
-    private selection = new Selection();
-    private undo = new Undo();
+    public selection = new Selection();
+    public undo = new Undo();
 
     constructor() {
     }
