@@ -1,3 +1,5 @@
+//TODO implement as a configurable feature
+
 import  { CategoryFFT } from './fft/category';
 import  { LicenceFFT } from './fft/licence';
 import  { MatchFormatsFFT } from './fft/matchFormat';

@@ -99,7 +99,7 @@ export class DrawLib {
     //             return this._drawLibs[draw.type].generateDraw(draw, generate, afterIndex);
     //         }
 
-    refresh(draw: Draw): void {
+    public static refresh(draw: Draw): void {
         draw._refresh = new Date(); //force angular refresh
     }
 

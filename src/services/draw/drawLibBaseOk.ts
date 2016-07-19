@@ -1,15 +1,10 @@
-import { DrawLib } from './drawLib';
+import { DrawLib as drawLib } from './drawLib';
 import { Find } from '../util/find';
-import { Validation,IValidation } from '../validation';
+import { Validation } from '../validation';
+import { validation } from '../types';
 
 export class DrawLibBaseOk {
 
-    constructor(
-        private validation: Validation,
-        protected drawLib: DrawLib
-        ) {
-    }
-    
     //TODO DrawLibBaseOk, dispatch into knockout and roundrobin
     
 // 		public SetDimensionOk( draw: Draw, oldDraw?: Draw, nJoueur?: number) :boolean {
@@ -49,18 +44,18 @@ export class DrawLibBaseOk {
 // 			//		}
 // 
 // 			if (box.locked && box.playerId !== player.id) {
-// 				this.validation.errorDraw('IDS_ERR_PROGAM_LOC', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_PROGAM_LOC', box._draw, box);
 // 				return false;
 // 			}
 // 
 // 			var boxIn = <PlayerIn>box;
 // 			if (boxIn.qualifIn && !bForce) {
-// 				this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_LOC', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_TAB_ENTRANT_LOC', box._draw, box);
 // 				return false;
 // 			}
 // 
 // 			if (box.hidden) {
-// 				this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DEVANT', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_TAB_ENTRANT_DEVANT', box._draw, box);
 // 				return false;
 // 			}
 // 
@@ -81,7 +76,7 @@ export class DrawLibBaseOk {
 // 
 // 			//Check changement de vainqueur ou enlève vainqueur et box lockée (match suivant déjà joué)
 // 			if ((box.playerId !== box.playerId || box.playerId === -1) && box.locked) {
-// 				this.validation.errorDraw('IDS_ERR_VAINQUEUR_LOC', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_VAINQUEUR_LOC', box._draw, box);
 // 				return false;
 // 			}
 // 
@@ -172,21 +167,21 @@ export class DrawLibBaseOk {
 // 			//		}
 // 		
 // 			if (box.locked) {
-// 				this.validation.errorDraw('IDS_ERR_DEPROGRAM_LOC', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_DEPROGRAM_LOC', box._draw, box);
 // 				return false;
 // 			}
 // 
 // 			var boxIn = <PlayerIn>box;
 // 			if (boxIn.qualifIn && !bForce) {
-// 				this.validation.errorDraw('IDS_ERR_DEENTRANT_LOC', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_DEENTRANT_LOC', box._draw, box);
 // 				return false;
 // 			}
 // 
-// 			var next = this.drawLib.nextGroup(box._draw);
+// 			var next = drawLib.nextGroup(box._draw);
 // 			var boxOut = <Match> box;
 // 			var i: number;
 // 			if ((i = boxOut.qualifOut) && next) {
-// 				var boxIn = this.drawLib.groupFindPlayerIn(next, i);
+// 				var boxIn = drawLib.groupFindPlayerIn(next, i);
 // 				if (boxIn) {
 // 					if (next.locked || !next.EnleveJoueurOk(i, true))
 // 						return false;
@@ -202,7 +197,7 @@ export class DrawLibBaseOk {
 // 			ASSERT(0 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
 // 
 // 			if (box.hidden) {
-// 				this.validation.errorDraw('IDS_ERR_TETESERIE_BAD', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_TETESERIE_BAD', box._draw, box);
 // 				return false;
 // 			}
 // 
@@ -236,7 +231,7 @@ export class DrawLibBaseOk {
 // 			ASSERT(inNumber >= 0);
 // 
 // 			if (box.hidden) {
-// 				this.validation.errorDraw('IDS_ERR_ENTRANT_BAD', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_ENTRANT_BAD', box._draw, box);
 // 				return false;
 // 			}
 // 
@@ -256,16 +251,16 @@ export class DrawLibBaseOk {
 // 
 // 				var boxOut = <Match> box;
 // 				if (box.isTeteSerie() || boxOut.qualifOut) {
-// 					this.validation.errorDraw('IDS_ERR_ENTRANT_TDS_S', box._draw, box);
+// 					validation.errorDraw('IDS_ERR_ENTRANT_TDS_S', box._draw, box);
 // 					return false;
 // 				}
 // 
-// 				var prev = this.drawLib.previousGroup(draw);
+// 				var prev = drawLib.previousGroup(draw);
 // 				if (!player && prev && prev.length && inNumber !== QEMPTY) {
 // 					//Va chercher le joueur dans le tableau précédent
-// 					var boxOut = this.drawLib.groupFindPlayerOut(prev, inNumber);
+// 					var boxOut = drawLib.groupFindPlayerOut(prev, inNumber);
 // 					if (!isObject(boxOut)) {
-// 						this.validation.errorDraw('IDS_ERR_ENTRANT_MIS', box._draw, box);
+// 						validation.errorDraw('IDS_ERR_ENTRANT_MIS', box._draw, box);
 // 						return false;
 // 					}
 // 					player = boxOut._player;
@@ -299,7 +294,7 @@ export class DrawLibBaseOk {
 // 		
 // 				ASSERT(boxIn.qualifIn);
 // 
-// 				if (box._draw.locked || (this.drawLib.previousGroup(draw) && !this.EnleveJoueurOk(box, true))) {
+// 				if (box._draw.locked || (drawLib.previousGroup(draw) && !this.EnleveJoueurOk(box, true))) {
 // 					return false;
 // 				}
 // 			}
@@ -313,7 +308,7 @@ export class DrawLibBaseOk {
 // 			ASSERT(outNumber >= 0);
 // 
 // 			if (box.hidden && !isTypePoule()) {
-// 				this.validation.errorDraw('IDS_ERR_SORTANT_HIDE', box._draw, box);
+// 				validation.errorDraw('IDS_ERR_SORTANT_HIDE', box._draw, box);
 // 				return false;
 // 			}
 // 
@@ -328,12 +323,12 @@ export class DrawLibBaseOk {
 // 					ASSERT(iCol(box) !== iColMax());
 // 
 // 					if (box.isTeteSerie() || boxIn.qualifIn) {
-// 						this.validation.errorDraw('IDS_ERR_SORTANT_TDS_E', box._draw, box);
+// 						validation.errorDraw('IDS_ERR_SORTANT_TDS_E', box._draw, box);
 // 						return false;
 // 					}
 // 			
 // 					//Qualifié sortant pas déjà pris
-// 					var group = this.drawLib.group(draw);
+// 					var group = drawLib.group(draw);
 // 					ASSERT((i = getDebut().FindQualifieSortant(outNumber, &pSuite)) < 0 || (i === box && pSuite === this));
 // 					//		if( FindQualifieSortant( outNumber) < 0)
 // 					//			{
@@ -342,7 +337,7 @@ export class DrawLibBaseOk {
 // 					//			}
 // 			
 // 					//Met à jour le tableau suivant
-// 					var next = this.drawLib.nextGroup(box._draw);
+// 					var next = drawLib.nextGroup(box._draw);
 // 					if (next) {
 // 						var boxOut = <Match> box;
 // 						if (box.isJoueur() && boxOut.qualifOut) {
@@ -385,12 +380,12 @@ export class DrawLibBaseOk {
 // 
 // 					pSuite = getSuivant();
 // 					if (pSuite && pSuite.locked) {
-// 						this.validation.errorDraw('IDS_ERR_DESORTANT_SUIV_LOC', box._draw, box);
+// 						validation.errorDraw('IDS_ERR_DESORTANT_SUIV_LOC', box._draw, box);
 // 						return false;
 // 					}
 // 
 // 					if (box.locked) {
-// 						this.validation.errorDraw('IDS_ERR_DESORTANT_LOC', box._draw, box);
+// 						validation.errorDraw('IDS_ERR_DESORTANT_LOC', box._draw, box);
 // 						return false;
 // 					}
 // 

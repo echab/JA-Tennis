@@ -7,8 +7,9 @@ export class Services {
 		this._drawLibs[type] = drawLib;
 	}
 
-	static drawLibFor(draw: Draw): IDrawLib {
-		return this._drawLibs[ draw.type];
+	static drawLibFor(draw: Draw | DrawType): IDrawLib {
+		//TODO remove cast?
+		return this._drawLibs[ <number> ( (<Draw>draw).type ? (<Draw>draw).type : draw)];
 	}
 
 }

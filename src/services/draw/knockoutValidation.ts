@@ -1,15 +1,13 @@
-﻿import { Validation,IValidation } from '../validation';
-import { DrawLibBase } from './drawLibBase';
-import { DrawLib } from './drawLib';
-import { Knockout } from './knockout';
-import { KnockoutLib } from './knockoutLib';
-import { TournamentLib } from '../tournamentLib';
-import {Find} from '../util/Find';
-import {Guid} from '../util/Guid';
+﻿import { Knockout } from './knockout';
+import { KnockoutLib as k } from './knockoutLib';
+import { DrawLib as drawLib } from './drawLib';
+import { TournamentLib as tournamentLib } from '../tournamentLib';
+import { Find } from '../util/Find';
+import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object';
-import { shuffle } from '../../utils/tool';
+import { shuffle,filledArray } from '../../utils/tool';
 import { Services } from '../services';
-import { filledArray } from '../../utils/tool';
+import { category, rank, score, validation } from '../types';
 
 var MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
@@ -18,16 +16,10 @@ var MAX_TETESERIE = 32,
 
 export class KnockoutValidation implements IValidation {
 
-    constructor(
-        private validation: Validation,
-        private knockout: Knockout,
-        private drawLib: DrawLib,
-        private knockoutLib: KnockoutLib,
-        private tournamentLib: TournamentLib,
-        private rank: Rank,
-        private category: Category,
-        private score: Score
-        ) {
+    private knockout: Knockout;
+
+    constructor() {
+        this.knockout = <Knockout>Services.drawLibFor(DrawType.Normal);
         validation.addValidator(this);
     }
 
@@ -42,42 +34,42 @@ export class KnockoutValidation implements IValidation {
         if (draw.suite) {
             var iTableau = Find.indexOf(draw._event.draws, 'id', draw.id);
             if (iTableau === 0 || !draw._previous) {
-                this.validation.errorDraw('IDS_ERR_TAB_SUITE_PREMIER', draw);
+                validation.errorDraw('IDS_ERR_TAB_SUITE_PREMIER', draw);
                 bRes = false;
             }
 
-            var group = this.drawLib.group(draw);
+            var group = drawLib.group(draw);
             if (group) {
                 if (draw.type !== group[0].type) {
-                    this.validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
+                    validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
                     bRes = false;
                 }
                 if (draw.minRank != group[0].minRank) {
-                    this.validation.errorDraw('IDS_ERR_TAB_SUITE_MIN', draw);
+                    validation.errorDraw('IDS_ERR_TAB_SUITE_MIN', draw);
                     bRes = false;
                 }
                 if (draw.maxRank != group[0].maxRank) {
-                    this.validation.errorDraw('IDS_ERR_TAB_SUITE_MAX', draw);
+                    validation.errorDraw('IDS_ERR_TAB_SUITE_MAX', draw);
                     bRes = false;
                 }
             }
         }
 
-        var prevGroup = this.drawLib.previousGroup(draw);
+        var prevGroup = drawLib.previousGroup(draw);
         if (prevGroup) {
             if (prevGroup[0].type !== DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
-                if (this.rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
-                    this.validation.errorDraw('IDS_ERR_TAB_CLASSMAX_OVR', draw);
+                if (rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
+                    validation.errorDraw('IDS_ERR_TAB_CLASSMAX_OVR', draw);
                     bRes = false;
                 }
             }
         }
 
-        var nextGroup = this.drawLib.nextGroup(draw);
+        var nextGroup = drawLib.nextGroup(draw);
         if (nextGroup) {
             if (draw.type !== DrawType.Final && draw.maxRank && nextGroup[0].minRank) {
-                if (this.rank.compare(nextGroup[0].minRank, draw.maxRank) < 0) {
-                    this.validation.errorDraw('IDS_ERR_TAB_CLASSMAX_NEXT_OVR', draw);
+                if (rank.compare(nextGroup[0].minRank, draw.maxRank) < 0) {
+                    validation.errorDraw('IDS_ERR_TAB_CLASSMAX_NEXT_OVR', draw);
                     bRes = false;
                 }
             }
@@ -86,15 +78,15 @@ export class KnockoutValidation implements IValidation {
         var e = MAX_QUALIF;
         if (!draw.suite) {
             //Trouve le plus grand Qsortant
-            group =  group || this.drawLib.group(draw);
+            group =  group || drawLib.group(draw);
             for (e = MAX_QUALIF; e >= 1; e--) {
-                if (this.drawLib.groupFindPlayerOut(group, e)) {
+                if (drawLib.groupFindPlayerOut(group, e)) {
                     break;
                 }
             }
             for (var e2 = 1; e2 <= e; e2++) {
-                if (!this.drawLib.groupFindPlayerOut(group, e2)) {
-                    this.validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
+                if (!drawLib.groupFindPlayerOut(group, e2)) {
+                    validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
                     bRes = false;
                 }
             }
@@ -117,8 +109,7 @@ export class KnockoutValidation implements IValidation {
         var nqs = 0;
         var tournament = draw._event._tournament;
         var isTypePoule = draw.type >= 2;
-        var k = this.knockoutLib;
-        var drawLib = Services.drawLibFor(draw);
+        var lib = Services.drawLibFor(draw);
 
         if (draw.type !== DrawType.Normal
             && draw.type !== DrawType.Final) {
@@ -138,14 +129,14 @@ export class KnockoutValidation implements IValidation {
         // - Ensuite à un classement supérieur au sien
         // - Ecart maximal souhaité DEUX échelons
 
-        if (draw.minRank && draw.maxRank && this.rank.compare(draw.maxRank, draw.minRank) < 0) {
-            this.validation.errorDraw('IDS_ERR_TAB_CLAST_INV', draw);
+        if (draw.minRank && draw.maxRank && rank.compare(draw.maxRank, draw.minRank) < 0) {
+            validation.errorDraw('IDS_ERR_TAB_CLAST_INV', draw);
             bRes = false;
         }
 
         //DONE 00/05/10: CTableau contrôle progression des classements
-        if (draw._event.maxRank && this.rank.compare(draw._event.maxRank, draw.maxRank) < 0) {
-            this.validation.errorDraw('IDS_ERR_TAB_CLASSLIM_OVR', draw);
+        if (draw._event.maxRank && rank.compare(draw._event.maxRank, draw.maxRank) < 0) {
+            validation.errorDraw('IDS_ERR_TAB_CLASSLIM_OVR', draw);
             bRes = false;
         }
 
@@ -180,7 +171,7 @@ export class KnockoutValidation implements IValidation {
                 && !boxIn.qualifIn
                 && !box.hidden
                 ) {
-                this.validation.errorDraw('IDS_ERR_TAB_DUPLI', draw, boxIn);
+                validation.errorDraw('IDS_ERR_TAB_DUPLI', draw, boxIn);
                 bRes = false;
             }
 
@@ -192,13 +183,13 @@ export class KnockoutValidation implements IValidation {
                 //DONE 00/03/07: Tableau, joueur sans classement
                 //DONE 00/03/04: Tableau, Classement des joueurs correspond au limites du tableau
                 if (!player.rank) {
-                    this.validation.errorDraw('IDS_ERR_CLAST_NO', draw, boxIn);
+                    validation.errorDraw('IDS_ERR_CLAST_NO', draw, boxIn);
                     bRes = false;
                 } else {
 
                     //Players rank within draw min and max ranks
-                    if (!this.rank.within(player.rank, draw.minRank, draw.maxRank)) {
-                        this.validation.errorDraw('IDS_ERR_CLAST_MIS', draw, boxIn, player.rank);
+                    if (!rank.within(player.rank, draw.minRank, draw.maxRank)) {
+                        validation.errorDraw('IDS_ERR_CLAST_MIS', draw, boxIn, player.rank);
                         bRes = false;
                     }
 
@@ -213,8 +204,8 @@ export class KnockoutValidation implements IValidation {
 
                     if (c < colMax
                         && pClastMaxCol[c + 1]
-                        && this.rank.compare(player.rank, pClastMaxCol[c + 1]) < 0) {
-                        this.validation.errorDraw('IDS_ERR_CLAST_PROGR', draw, boxIn, player.rank);
+                        && rank.compare(player.rank, pClastMaxCol[c + 1]) < 0) {
+                        validation.errorDraw('IDS_ERR_CLAST_PROGR', draw, boxIn, player.rank);
                         bRes = false;
                     }
                     //}
@@ -222,24 +213,24 @@ export class KnockoutValidation implements IValidation {
                 }
 
                 //Check inscriptions
-                if (!this.tournamentLib.isSexeCompatible(draw._event, player.sexe)) {
-                    this.validation.errorDraw('IDS_ERR_EPR_SEXE', draw, boxIn);
+                if (!tournamentLib.isSexeCompatible(draw._event, player.sexe)) {
+                    validation.errorDraw('IDS_ERR_EPR_SEXE', draw, boxIn);
 
-                } else if (!this.tournamentLib.isRegistred(draw._event, player)) {
-                    this.validation.errorDraw('IDS_ERR_INSCR_NO', draw, boxIn);
+                } else if (!tournamentLib.isRegistred(draw._event, player)) {
+                    validation.errorDraw('IDS_ERR_INSCR_NO', draw, boxIn);
                 }
 
                 //DONE 00/05/11: CTableau, check categorie
                 //Check Categorie
-                if (!this.category.isCompatible(draw._event.category, player.category)) {
-                    this.validation.errorDraw('IDS_ERR_CATEG_MIS', draw, boxIn);
+                if (!category.isCompatible(draw._event.category, player.category)) {
+                    validation.errorDraw('IDS_ERR_CATEG_MIS', draw, boxIn);
                 }
             }
 
             //if (!isMatch(box) && match.score) {
 
             //    //DONE 01/07/13: CTableau, isValid score sans match
-            //    this.validation.errorDraw('IDS_ERR_SCORE_MATCH_NO', draw, box);
+            //    validation.errorDraw('IDS_ERR_SCORE_MATCH_NO', draw, box);
             //    bRes = false;
             //}
 
@@ -253,7 +244,7 @@ export class KnockoutValidation implements IValidation {
 
                 ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
 
-                //TODO this.drawLib.boxesOpponents(match)
+                //TODO drawLib.boxesOpponents(match)
                 var opponent = this.knockout.boxesOpponents(match);
 
                 ASSERT(!!opponent.box1 && !!opponent.box2);
@@ -261,7 +252,7 @@ export class KnockoutValidation implements IValidation {
                 if (!match.score) {
 
                     if (match.playerId) {
-                        this.validation.errorDraw('IDS_ERR_VAINQ_SCORE_NO', draw, match, match._player.name);
+                        validation.errorDraw('IDS_ERR_VAINQ_SCORE_NO', draw, match, match._player.name);
                         bRes = false;
                     }
 
@@ -269,24 +260,24 @@ export class KnockoutValidation implements IValidation {
                     ASSERT(b < k.positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
 
                     if (!match.playerId) {
-                        this.validation.errorDraw('IDS_ERR_SCORE_VAINQ_NO', draw, match);
+                        validation.errorDraw('IDS_ERR_SCORE_VAINQ_NO', draw, match);
                         bRes = false;
                     }
 
-                    if (!this.score.isValid(match.score)) {
-                        this.validation.errorDraw('IDS_ERR_SCORE_BAD', draw, match, <string>match.score);
+                    if (!score.isValid(match.score)) {
+                        validation.errorDraw('IDS_ERR_SCORE_BAD', draw, match, <string>match.score);
                         bRes = false;
                     }
 
                     //ASSERT( boxes[ i].playerId==-1 || player.isInscrit( tournament.FindEpreuve( this)) );
                     ASSERT(k.column(b) < colMax);
                     if (!opponent.box1.playerId || !opponent.box2.playerId) {
-                        this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, match);
+                        validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, match);
                         bRes = false;
 
                     } else if (opponent.box1.playerId != match.playerId
                         && opponent.box2.playerId != match.playerId) {
-                        this.validation.errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, match);
+                        validation.errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, match);
                         bRes = false;
                     }
                 }
@@ -294,22 +285,22 @@ export class KnockoutValidation implements IValidation {
                 if (!this.isMatchJoue(match)) {
 
                     //match before opponent 2
-                    var opponent1 = drawLib.boxesOpponents(<Match>opponent.box1);
-                    var opponent2 = drawLib.boxesOpponents(<Match>opponent.box2);
+                    var opponent1 = lib.boxesOpponents(<Match>opponent.box1);
+                    var opponent2 = lib.boxesOpponents(<Match>opponent.box2);
 
                     if (opponent.box1.playerId) {
                         if (opponent.box2.playerId) {
                             if (!CompString(opponent.box1._player.club, opponent.box2._player.club)) {
-                                this.validation.errorDraw('IDS_ERR_MEME_CLUB1', draw, match, opponent.box1._player.club);
+                                validation.errorDraw('IDS_ERR_MEME_CLUB1', draw, match, opponent.box1._player.club);
                                 bRes = false;
                             }
                         } else if (this.isMatchJouable(opponent.box2)) { //!isTypePoule &&
 
                             if (!CompString(opponent.box1._player.club, opponent2.box1._player.club)) {
-                                this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
+                                validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
                                 bRes = false;
                             } else if (!CompString(opponent.box1._player.club, opponent2.box2._player.club)) {
-                                this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
+                                validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box1._player.club);
                                 bRes = false;
                             }
                         }
@@ -318,10 +309,10 @@ export class KnockoutValidation implements IValidation {
                     } else if (opponent.box2.playerId) {
                         if (this.isMatchJouable(opponent.box1)) {
                             if (!CompString(opponent.box2._player.club, opponent1.box1._player.club)) {
-                                this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
+                                validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
                                 bRes = false;
                             } else if (!CompString(opponent.box2._player.club, opponent1.box2._player.club)) {
-                                this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
+                                validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent.box2._player.club);
                                 bRes = false;
                             }
                         }
@@ -329,12 +320,12 @@ export class KnockoutValidation implements IValidation {
 
                         if (!CompString(opponent1.box1._player.club, opponent2.box1._player.club)
                             || !CompString(opponent1.box1._player.club, opponent2.box2._player.club)) {
-                            this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box1._player.club);
+                            validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box1._player.club);
                             bRes = false;
                         }
                         if (!CompString(opponent1.box2._player.club, opponent2.box1._player.club)
                             || !CompString(opponent1.box2._player.club, opponent2.box2._player.club)) {
-                            this.validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box2._player.club);
+                            validation.errorDraw('IDS_ERR_MEME_CLUB2', draw, match, opponent1.box2._player.club);
                             bRes = false;
                         }
                     }
@@ -344,13 +335,13 @@ export class KnockoutValidation implements IValidation {
                 if (match.date) {
                     if (draw._event.start
                         && match.date < draw._event.start) {
-                        this.validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
+                        validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
                         bRes = false;
                     }
 
                     if (draw._event.end
                         && draw._event.end < match.date) {
-                        this.validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
+                        validation.errorDraw('IDS_ERR_DATE_MATCH_EPREUVE', draw, match, match.date.toDateString());
                         bRes = false;
                     }
 
@@ -369,13 +360,13 @@ export class KnockoutValidation implements IValidation {
                                 if (match2.position != match.position
                                     && match2.place == match.place
                                     && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength) {
-                                    this.validation.errorDraw('IDS_ERR_PLN_OVERLAP', draw, match, match.date.toDateString());
+                                    validation.errorDraw('IDS_ERR_PLN_OVERLAP', draw, match, match.date.toDateString());
                                     bRes = false;
                                 }
                             }
                         } else {
                             //Match en dehors du planning
-                            this.validation.errorDraw('IDS_ERR_DATE_MATCH_TOURNOI', draw, match, match.date.toDateString());
+                            validation.errorDraw('IDS_ERR_DATE_MATCH_TOURNOI', draw, match, match.date.toDateString());
                             bRes = false;
                         }
                     }
@@ -393,20 +384,20 @@ export class KnockoutValidation implements IValidation {
                     if (isMatch(opponent.box1)
                         && match1.date) {
                         if (match.date < match1.date) {
-                            this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
+                            validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                             bRes = false;
                         } else if (match.date.getTime() < (match1.date.getTime() + (tournament.info.slotLength << 1))) {
-                            this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
+                            validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                             bRes = false;
                         }
                     }
 
                     if (isMatch(opponent.box2) && match2.date) {
                         if (match.date < match2.date) {
-                            this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
+                            validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                             bRes = false;
                         } else if (match.date.getTime() < (match2.date.getTime() + (tournament.info.slotLength << 1))) {
-                            this.validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
+                            validation.errorDraw('IDS_ERR_DATE_MATCHS', draw, match, match.date.toDateString());
                             bRes = false;
                         }
                     }
@@ -414,7 +405,7 @@ export class KnockoutValidation implements IValidation {
 
                     if (match.date) {
                         if (!match.playerId && !match.place && tournament.places.length && tournament._dayCount) {
-                            this.validation.errorDraw('IDS_ERR_PLN_COURT_NO', draw, match);
+                            validation.errorDraw('IDS_ERR_PLN_COURT_NO', draw, match);
                             bRes = false;
                         }
                     }
@@ -439,27 +430,27 @@ export class KnockoutValidation implements IValidation {
 
                     var iTableau = Find.indexOf(draw._event.draws, 'id', draw.id);
                     if (iTableau == 0) {
-                        this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_TAB1', draw, boxIn);
+                        validation.errorDraw('IDS_ERR_TAB_ENTRANT_TAB1', draw, boxIn);
                         bRes = false;
                     }
                     //ASSERT( iTableau != 0);
 
                     //DONE 00/03/07: CTableau, qualifié entrant en double
                     var j: Box;
-                    if (!draw.suite && (j = drawLib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
-                        this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
+                    if (!draw.suite && (j = lib.findPlayerIn(draw, e)) && (j.position != b || j._draw.id != draw.id)) {
+                        validation.errorDraw('IDS_ERR_TAB_ENTRANT_DUP', draw, boxIn);
                         bRes = false;
                     }
 
-                    var group = this.drawLib.previousGroup(draw);
+                    var group = drawLib.previousGroup(draw);
                     if (group) {
                         //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                        j = this.drawLib.groupFindPlayerOut(group, e);
+                        j = drawLib.groupFindPlayerOut(group, e);
                         if (!j) {
-                            this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
+                            validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                             bRes = false;
                         } else if (j.playerId != boxIn.playerId) {
-                            this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, boxIn);
+                            validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', draw, boxIn);
                             bRes = false;
                         }
                     }
@@ -474,21 +465,21 @@ export class KnockoutValidation implements IValidation {
                     //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
 
                     //DONE 00/03/07: CTableau, qualifié sortant en double
-                    j = drawLib.findPlayerOut(draw, e);
+                    j = lib.findPlayerOut(draw, e);
                     if (j && (j.position != b || j._draw.id != draw.id)) {
-                        this.validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
+                        validation.errorDraw('IDS_ERR_TAB_SORTANT_DUP', draw, match);
                         bRes = false;
                     }
 
                     if (draw.type === DrawType.Final) {
-                        this.validation.errorDraw('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
+                        validation.errorDraw('IDS_ERR_TAB_SORTANT_FINAL', draw, box);
                         bRes = false;
                     }
                     /*			
                     pSuite = getSuivant();
                     if( pSuite && (j = pSuite.findPlayerIn( e, &pSuite)) != -1) {
                         if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
-                            this.validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
+                            validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite), j);
                             bRes=false;
                         }
                     }
@@ -502,22 +493,22 @@ export class KnockoutValidation implements IValidation {
         //	if( !isTypePoule)
         if (!draw.suite) {
             for (var e2 = 0, e = 1; e <= MAX_TETESERIE; e++) {
-                boxIn = this.drawLib.findSeeded(draw, e);
+                boxIn = drawLib.findSeeded(draw, e);
                 if (boxIn) {
                     if (e > e2 + 1) {
-                        this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
+                        validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
                         bRes = false;
                     }
 
                     if (isMatch(boxIn)) {
-                        this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_ENTRANT', boxIn._draw, boxIn, 'Seeded ' + e);
+                        validation.errorDraw('IDS_ERR_TAB_TETESERIE_ENTRANT', boxIn._draw, boxIn, 'Seeded ' + e);
                         bRes = false;
                     }
 
                     for (var i = 0; i < draw.boxes.length; i++) {
                         var boxIn2 = <PlayerIn>draw.boxes[i];
                         if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
-                            this.validation.errorDraw('IDS_ERR_TAB_TETESERIE_DUP', boxIn._draw, boxIn, 'Seeded ' + e);
+                            validation.errorDraw('IDS_ERR_TAB_TETESERIE_DUP', boxIn._draw, boxIn, 'Seeded ' + e);
                             bRes = false;
                         }
                     }
@@ -529,13 +520,13 @@ export class KnockoutValidation implements IValidation {
 
         //Tous les qualifiés sortants du tableau précédent sont utilisés
         if (!draw.suite) {
-            var pT = this.drawLib.previousGroup(draw);
+            var pT = drawLib.previousGroup(draw);
             if (pT && pT.length) {
                 for (var e = 1; e <= MAX_QUALIF; e++) {
-                    var boxOut = this.drawLib.groupFindPlayerOut(pT, e);
-                    boxIn = drawLib.findPlayerIn(draw, e);
+                    var boxOut = drawLib.groupFindPlayerOut(pT, e);
+                    boxIn = lib.findPlayerIn(draw, e);
                     if (boxOut && !boxIn) {
-                        this.validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);
+                        validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);
                         bRes = false;
                     }
                 }
@@ -543,19 +534,19 @@ export class KnockoutValidation implements IValidation {
         }
 
         if (isTypePoule && nqs < draw.nbOut) {
-            this.validation.errorDraw('IDS_ERR_POULE_SORTANT_NO', draw);
+            validation.errorDraw('IDS_ERR_POULE_SORTANT_NO', draw);
             bRes = false;
         }
 
         if (draw.type === DrawType.Final) {
 
             if (draw.suite || group[group.length - 1].id !== draw.id) {
-                this.validation.errorDraw('IDS_ERR_TAB_SUITE_FINAL', draw);
+                validation.errorDraw('IDS_ERR_TAB_SUITE_FINAL', draw);
                 bRes = false;
             }
 
             if (draw.nbOut != 1) {
-                this.validation.errorDraw('IDS_ERR_TAB_FINAL_NQUAL', draw);
+                validation.errorDraw('IDS_ERR_TAB_FINAL_NQUAL', draw);
                 bRes = false;
             }
         }
@@ -621,28 +612,3 @@ function dateDiff(first: Date, second: Date, unit: UnitDate) {
 
     return Math.floor((two.getTime() - one.getTime()) / unit);
 }
-
-// angular.module('jat.services.validation.knockout', ['jat.services.services', 'jat.services.validation', 'jat.services.type', 'jat.services.knockoutLib'])
-//     .factory('knockoutValidation', [
-//         'services',
-//         'validation',
-//         'knockout',
-//         'drawLib',
-//         'knockoutLib',
-//         'tournamentLib',
-//         'rank',
-//         'category',
-//         'score',
-//         'find',
-//         (services:Services,
-//             validation: Validation,
-//             knockout: Knockout,
-//             drawLib: DrawLib,
-//             knockoutLib: KnockoutLib,
-//             tournamentLib: TournamentLib,
-//             rank: Rank,
-//             category: Category,
-//             score: Score,
-//             find: Find) => {
-//             return new KnockoutValidation(services, validation, knockout, drawLib, knockoutLib, tournamentLib, rank, category, score, find);
-//         }]);

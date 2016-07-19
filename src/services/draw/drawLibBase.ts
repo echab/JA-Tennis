@@ -10,15 +10,9 @@ var MAX_TETESERIE = 32,
 
 export class DrawLibBase {
 
-    constructor(
-        protected drawLib: DrawLib
-        //,protected rank: Rank
-        ) {
-    }
-
     public resetDraw(draw: Draw, nPlayer: number): void {
         //remove qualif out
-        var next = this.drawLib.nextGroup(draw);
+        var next = drawLib.nextGroup(draw);
         if (next && draw.boxes) {
             for (var i = 0; i < next.length; i++) {
                 var boxes = next[i].boxes;
@@ -35,9 +29,9 @@ export class DrawLibBase {
         }
 
         //reset boxes
-        var drawLib = Services.drawLibFor( draw);
+        var lib = Services.drawLibFor( draw);
         draw.boxes = [];
-        draw.nbColumn = drawLib.nbColumnForPlayers(draw, nPlayer);
+        draw.nbColumn = lib.nbColumnForPlayers(draw, nPlayer);
     }
 
     public getPlayer(box: Box): Player {
@@ -66,7 +60,7 @@ export class DrawLibBase {
 
     public findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-        var group = isArray(origin) ? <Draw[]>origin : this.drawLib.group(<Draw>origin);
+        var group = isArray(origin) ? <Draw[]>origin : drawLib.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
             var boxes = group[i].boxes;
             for (var j = 0; j < boxes.length; j++) {
@@ -128,9 +122,9 @@ export class DrawLibBase {
 
         var boxOut = <Match>box;
         if (boxOut.qualifOut) {
-            var next = this.drawLib.nextGroup(box._draw);
+            var next = drawLib.nextGroup(box._draw);
             if (next) {
-                var boxIn = this.drawLib.groupFindPlayerIn(next, boxOut.qualifOut);
+                var boxIn = drawLib.groupFindPlayerIn(next, boxOut.qualifOut);
                 if (boxIn) {
                     if (!boxIn.playerId
                         && !this.putPlayer(boxIn, player, true)) {
@@ -205,8 +199,8 @@ export class DrawLibBase {
 
         box.score = boite.score;
 
-        var drawLib = Services.drawLibFor(box._draw);  
-        drawLib.computeScore(box._draw);
+        var lib = Services.drawLibFor(box._draw);  
+        lib.computeScore(box._draw);
 
         return true;
     }
@@ -253,11 +247,11 @@ export class DrawLibBase {
 
         //ASSERT(EnleveJoueurOk(box, bForce));
 
-        var next = this.drawLib.nextGroup(box._draw);
+        var next = drawLib.nextGroup(box._draw);
         var boxOut = <Match> box;
         var i: number;
         if ((i = boxOut.qualifOut) && next) {
-            var boxIn = this.drawLib.groupFindPlayerIn(next, i);
+            var boxIn = drawLib.groupFindPlayerIn(next, i);
             if (boxIn) {
                 if (!this.removePlayer(boxIn, true)) {
                     throw 'Error';
@@ -356,11 +350,11 @@ export class DrawLibBase {
 
         box.locked = true;
 
-        var prev = this.drawLib.previousGroup(box._draw);
+        var prev = drawLib.previousGroup(box._draw);
         if (prev) {
             var boxIn = <PlayerIn>box;
             if (boxIn.qualifIn) {
-                var boxOut = this.drawLib.groupFindPlayerOut(prev, boxIn.qualifIn);
+                var boxOut = drawLib.groupFindPlayerOut(prev, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -379,11 +373,11 @@ export class DrawLibBase {
 
         delete box.locked;
 
-        var prev = this.drawLib.previousGroup(box._draw);
+        var prev = drawLib.previousGroup(box._draw);
         if (prev) {
             var boxIn = <PlayerIn>box;
             if (boxIn.qualifIn) {
-                var boxOut = this.drawLib.groupFindPlayerOut(prev, boxIn.qualifIn);
+                var boxOut = drawLib.groupFindPlayerOut(prev, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }
@@ -397,7 +391,7 @@ export class DrawLibBase {
     public fillBox(box: Box, source: Box): boolean {   //RempliBoite
         //ASSERT(RempliBoiteOk(box, boite));
 
-        var drawLib = Services.drawLibFor(box._draw);
+        var lib = Services.drawLibFor(box._draw);
 
         var boxIn = <PlayerIn>box;
         var sourceIn = <PlayerIn>source;
@@ -407,7 +401,7 @@ export class DrawLibBase {
         if (boxIn.qualifIn
             && boxIn.qualifIn !== sourceIn.qualifIn) {
 
-            if (!drawLib.setPlayerIn(box)) {	//Enlève
+            if (!lib.setPlayerIn(box)) {	//Enlève
                 throw 'Error';
             }
         } else {
@@ -429,7 +423,7 @@ export class DrawLibBase {
 
         //Rempli avec les nouvelles valeurs
         if (sourceIn.qualifIn) {
-            if (!drawLib.setPlayerIn(box, sourceIn.qualifIn, source._player)) {
+            if (!lib.setPlayerIn(box, sourceIn.qualifIn, source._player)) {
                 throw 'Error';
             }
         } else {
@@ -448,14 +442,14 @@ export class DrawLibBase {
 
             if (match) {
                 if (sourceMatch.qualifOut) {
-                    if (!drawLib.setPlayerOut(match, sourceMatch.qualifOut)) {
+                    if (!lib.setPlayerOut(match, sourceMatch.qualifOut)) {
                         throw 'Error';
                     }
                 }
 
                 //if( isCreneau( box))
                 //v0998
-                var opponents = drawLib.boxesOpponents(match);
+                var opponents = lib.boxesOpponents(match);
                 if (opponents.box1 && opponents.box2
                     && (sourceMatch.place || sourceMatch.date)
                     ) {
@@ -473,7 +467,7 @@ export class DrawLibBase {
             }
         }
 
-        drawLib.computeScore(box._draw);
+        lib.computeScore(box._draw);
 
         return true;
     }
@@ -481,7 +475,7 @@ export class DrawLibBase {
     public movePlayer(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueur
         //ASSERT(DeplaceJoueurOk(box, iBoiteSrc, pBoite));
 
-        boiteSrc = this.drawLib.newBox(box._draw, boiteSrc);
+        boiteSrc = drawLib.newBox(box._draw, boiteSrc);
 
         if (!this.fillBox(boiteSrc, pBoite)) {	//Vide la source
             throw 'Error';

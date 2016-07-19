@@ -1,19 +1,15 @@
-import { DrawLib } from './draw/drawLib';
+import { DrawLib as drawLib } from './draw/drawLib';
 import { Guid } from './util/guid';
 import { isObject,extend } from './util/object'
 import { shuffle } from '../utils/tool';
+import { rank } from './types';
 
 var MINUTES = 60000,
     DAYS = 24 * 60 * MINUTES;
 
 export class TournamentLib {
 
-    constructor(
-        private drawLib: DrawLib,
-        private rank: Rank
-        ) { }
-
-    public newTournament(source?: Tournament): Tournament {
+    public static newTournament(source?: Tournament): Tournament {
         var tournament: Tournament = <any>{};
         if (isObject(source)) {
             extend(tournament, source);
@@ -22,7 +18,7 @@ export class TournamentLib {
         return tournament;
     }
 
-    public newInfo(source?: TournamentInfo): TournamentInfo {
+    public static newInfo(source?: TournamentInfo): TournamentInfo {
         var info: TournamentInfo = <any>{};
         if (isObject(source)) {
             extend(info, source);
@@ -30,7 +26,7 @@ export class TournamentLib {
         return info;
     }
 
-    public initTournament(tournament: Tournament): void {
+    public static initTournament(tournament: Tournament): void {
         if (tournament.players) {
             for (var i = tournament.players.length - 1; i >= 0; i--) {
                 //tournament.players[i] = new Player(tournament, tournament.players[i]);
@@ -52,7 +48,7 @@ export class TournamentLib {
     }
 
 
-    public newPlayer(parent: Tournament, source?: Player): Player {
+    public static newPlayer(parent: Tournament, source?: Player): Player {
         var player: Player = <any>{};
         if (isObject(source)) {
             extend(player, source);
@@ -64,7 +60,7 @@ export class TournamentLib {
         return player;
     }
 
-    public initPlayer(player: Player, parent: Tournament) {
+    public static initPlayer(player: Player, parent: Tournament) {
         player._tournament = parent;
         //player.toString = function () {
         //    return this.name + ' ' + this.rank;
@@ -72,7 +68,7 @@ export class TournamentLib {
     }
 
 
-    public newEvent(parent: Tournament, source?: TEvent): TEvent {
+    public static newEvent(parent: Tournament, source?: TEvent): TEvent {
         var event: TEvent = <any>{};
         if (isObject(source)) {
             extend(event, source);
@@ -84,14 +80,14 @@ export class TournamentLib {
         return event;
     }
 
-    public initEvent(event: TEvent, parent: Tournament): void {
+    public static initEvent(event: TEvent, parent: Tournament): void {
         event._tournament = parent;
 
         var c = event.draws = event.draws || [];
         if (c) {
             for (var i = c.length - 1; i >= 0; i--) {
                 var draw = c[i];
-                this.drawLib.initDraw(draw, event);
+                drawLib.initDraw(draw, event);
 
                 //init draws linked list
                 draw._previous = c[i - 1];
@@ -100,11 +96,11 @@ export class TournamentLib {
         }
     }
 
-    public isRegistred(event: TEvent, player: Player): boolean {
+    public static isRegistred(event: TEvent, player: Player): boolean {
         return player.registration && player.registration.indexOf(event.id) !== -1;
     }
 
-    public getRegistred(event: TEvent): Player[] {
+    public static getRegistred(event: TEvent): Player[] {
         var a: Player[] = [];
         var c = event._tournament.players;
         for (var i = 0, n = c.length; i < n; i++) {
@@ -116,7 +112,7 @@ export class TournamentLib {
         return a;
     }
 
-    public TriJoueurs(players: Array<Player|number>): void {
+    public static TriJoueurs(players: Array<Player|number>): void {
 
         //Tri les joueurs par classement
         var comparePlayersByRank = (p1: Player|number, p2: Player|number): number => {
@@ -132,7 +128,7 @@ export class TournamentLib {
             if (isNumber2) {
                 return 1;
             }
-            return this.rank.compare((<Player>p1).rank, (<Player>p2).rank);
+            return rank.compare((<Player>p1).rank, (<Player>p2).rank);
         };
         players.sort(comparePlayersByRank);
 
@@ -150,7 +146,7 @@ export class TournamentLib {
         }
     }
 
-    public GetJoueursInscrit(draw: Draw): Player[] {
+    public static GetJoueursInscrit(draw: Draw): Player[] {
 
         //Récupère les joueurs inscrits
         var players = draw._event._tournament.players,
@@ -160,7 +156,7 @@ export class TournamentLib {
             var pJ = players[i];
             if (this.isRegistred(draw._event, pJ)) {
                 if (!pJ.rank
-                    || this.rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
+                    || rank.within(pJ.rank, draw.minRank, draw.maxRank)) {
                     ppJoueur.push(pJ);	//no du joueur
                 }
             }
@@ -169,7 +165,7 @@ export class TournamentLib {
         return ppJoueur;
     }
 
-    public isSexeCompatible(event: TEvent, sexe: string): boolean {
+    public static isSexeCompatible(event: TEvent, sexe: string): boolean {
         return event.sexe === sexe	//sexe épreuve = sexe joueur
         || (event.sexe === 'M' && !event.typeDouble);	//ou simple mixte
     }

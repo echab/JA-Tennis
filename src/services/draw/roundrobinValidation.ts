@@ -1,28 +1,18 @@
-﻿import { Validation,IValidation } from '../validation';
-import { DrawLibBase,IDrawLib } from './drawLibBase';
+﻿import { Validation } from '../validation';
+import { DrawLibBase } from './drawLibBase';
 import { DrawLib } from './drawLib';
-import { Knockout } from './knockout';
-import { KnockoutLib } from './knockoutLib';
-import { TournamentLib } from '../tournamentLib';
-import {Find} from '../util/Find';
-import {Guid} from '../util/Guid';
-import { TEvent } from '../../models/tournament';
-import { Draw,Match,Box,ISize,IPoint } from '../../models/draw';
-import { Player,PlayerIn } from '../../models/player';
-import { DrawType } from '../../models/enums';
-import { Rank } from '../../models/types';
-import { GenerateType } from '../../models/enums';
+import { DrawLib as drawLib } from './drawLib';
+import { TournamentLib as tournamentLib } from '../tournamentLib';
+import { Find } from '../util/Find';
+import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object';
-import { shuffle } from '../../utils/tool';
+import { shuffle,filledArray } from '../../utils/tool';
 import { Services } from '../services';
-import { filledArray } from '../../utils/tool';
-import { Category,Score,RankString} from '../../models/types';
+import { category, rank, score, validation } from '../types';
 
 export class RoundrobinValidation implements IValidation {
 
-    constructor(
-        private validation: Validation
-        ) {
+    constructor() {
         validation.addValidator(this);
     }
 
@@ -140,10 +130,3 @@ export class RoundrobinValidation implements IValidation {
 function isMatch(box: Box): boolean {
     return 'score' in box;
 }
-
-// angular.module('jat.services.validation.roundrobin', ['jat.services.validation'])
-//     .factory('roundrobinValidation', [
-//         'validation',
-//         (validation: Validation) => {
-//             return new RoundrobinValidation(validation);
-//         }]);

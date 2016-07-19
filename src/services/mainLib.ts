@@ -1,27 +1,20 @@
-﻿import { TournamentLib } from './tournamentLib';
-import { DrawLib } from './draw/drawLib';
-import { Validation } from './validation';
+﻿import { TournamentLib as tournamentLib } from './tournamentLib';
+import { DrawLib as drawLib } from './draw/drawLib';
+import { validation } from './types';
 import { Services } from './services';
 import { Selection,ModelType } from './util/selection';
 import { Find } from './util/find';
 import { Guid } from './util/guid';
 import { Undo } from './util/undo';
 import { copy } from '../utils/tool';
+import {HttpClient} from 'aurelia-http-client';
 
 export class MainLib {
 
-    constructor(
-        //private $log: ng.ILogService,
-        //private $http: ng.IHttpService,
-        //private $q: ng.IQService,
-        //private $window: ng.IWindowService,
-        private selection: Selection,
-        private tournamentLib: TournamentLib,
-        private drawLib: DrawLib,
-        private validation: Validation,
-        //private rank: Rank,
-        private undo: Undo
-        ) {
+    private selection = new Selection();
+    private undo = new Undo();
+
+    constructor() {
     }
 
     newTournament(): Tournament {
@@ -44,7 +37,7 @@ export class MainLib {
             var data = window.localStorage['tournament'];
             if (data) {
                 var tournament: Tournament = JSON.parse(data);
-                this.tournamentLib.initTournament(tournament);
+                tournamentLib.initTournament(tournament);
                 this.selection.select(tournament, ModelType.Tournament);
                 deferred.resolve(tournament);
             } else {
@@ -54,7 +47,7 @@ export class MainLib {
             this.$http.get(file_url)
                 .success((tournament: Tournament, status: number) => {
                     tournament._url = <string>file_url;
-                    this.tournamentLib.initTournament(tournament);
+                    tournamentLib.initTournament(tournament);
                     this.selection.select(tournament, ModelType.Tournament);
                     deferred.resolve(tournament);
                 })
@@ -67,7 +60,7 @@ export class MainLib {
                 try {
                     var tournament: Tournament = JSON.parse(reader.result);
                     tournament._url = (<File>file_url).name;    //TODO missing path
-                    this.tournamentLib.initTournament(tournament);
+                    tournamentLib.initTournament(tournament);
                     this.selection.select(tournament, ModelType.Tournament);
                     deferred.resolve(tournament);
                 } catch (ex) {
@@ -167,16 +160,16 @@ export class MainLib {
         var afterIndex = afterDraw ? Find.indexOf(c, 'id', afterDraw.id) : c.length - 1;
 
         if (generate) {
-            var drawLib = Services.drawLibFor(draw);
-            var draws = drawLib.generateDraw(draw, generate, afterIndex);
+            var lib = Services.drawLibFor(draw);
+            var draws = lib.generateDraw(draw, generate, afterIndex);
             if (!draws || !draws.length) {
                 return;
             }
             this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, ModelType.Draw); //c.splice( i, 1, draws);
 
             for (var i = 0; i < draws.length; i++) {
-                var drawLib = Services.drawLibFor(draws[i]);
-                this.drawLib.initDraw(draws[i], draw._event);
+                var lib = Services.drawLibFor(draws[i]);
+                drawLib.initDraw(draws[i], draw._event);
             }
             this.selection.select(draws[0], ModelType.Draw);
 
@@ -189,15 +182,15 @@ export class MainLib {
 
     updateDraw(draw: Draw, oldDraw?: Draw, generate?: GenerateType): void {
         var isSelected = this.selection.draw === oldDraw;
-        var drawLib = Services.drawLibFor(draw);
-        var group = this.drawLib.group(oldDraw || draw);
+        var lib = Services.drawLibFor(draw);
+        var group = drawLib.group(oldDraw || draw);
         if (generate) {
-            var draws = drawLib.generateDraw(draw, generate, -1);
+            var draws = lib.generateDraw(draw, generate, -1);
             if (!draws || !draws.length) {
                 return;
             }
         } else {
-            drawLib.resize(draw, oldDraw);
+            lib.resize(draw, oldDraw);
         }
         var c = draw._event.draws;
         if (generate && draws && group && draws.length) {
@@ -205,7 +198,7 @@ export class MainLib {
             this.undo.splice(c, i, group.length, draws, "Generate " + GenerateType[generate] + ' ' + draw.name, ModelType.Draw);
 
             for (var i = 0; i < draws.length; i++) {
-                this.drawLib.initDraw(draws[i], draw._event);
+                drawLib.initDraw(draws[i], draw._event);
             }
             draw = draws[0];
         } else {    //edit draw
@@ -214,13 +207,13 @@ export class MainLib {
         }
         if (isSelected || generate) {
             this.selection.select(draw, ModelType.Draw);
-            this.drawLib.refresh(draw);  //force angular refresh
+            drawLib.refresh(draw);  //force angular refresh
         }
     }
 
     updateQualif(draw: Draw): void {
         this.undo.newGroup('Update qualified', () => {
-            this.drawLib.updateQualif(draw);
+            drawLib.updateQualif(draw);
             return true;
         }, draw);
     }
@@ -235,31 +228,31 @@ export class MainLib {
     }
 
     validateDraw(draw: Draw): void {
-        this.validation.resetDraw(draw);
-        this.validation.validateDraw(draw);
+        validation.resetDraw(draw);
+        validation.validateDraw(draw);
         if (this.selection.draw === draw) {
-            this.drawLib.refresh(draw);  //force angular refresh
+            drawLib.refresh(draw);  //force angular refresh
         }
     }
     //#endregion draw
 
     //#region match
     editMatch(editedMatch: Match, match: Match): void {
-        this.drawLib.initBox(editedMatch, editedMatch._draw);
+        drawLib.initBox(editedMatch, editedMatch._draw);
         var c = match._draw.boxes;
         var i = Find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
         this.undo.newGroup("Edit match", () => {
             this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, ModelType.Match); //c[i] = editedMatch;
             if (editedMatch.qualifOut) {
                 //report qualified player to next draw
-                var nextGroup = this.drawLib.nextGroup(editedMatch._draw);
+                var nextGroup = drawLib.nextGroup(editedMatch._draw);
                 if (nextGroup) {
-                    var boxIn = this.drawLib.groupFindPlayerIn(nextGroup, editedMatch.qualifOut);
+                    var boxIn = drawLib.groupFindPlayerIn(nextGroup, editedMatch.qualifOut);
                     if (boxIn) {
                         //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
                         //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
                         this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player',
-                            () => this.drawLib.initBox(boxIn, boxIn._draw));  //boxIn.playerId = editedMatch.playerId;
+                            () => drawLib.initBox(boxIn, boxIn._draw));  //boxIn.playerId = editedMatch.playerId;
                     }
                 }
             }
@@ -274,13 +267,13 @@ export class MainLib {
     //    //}, box);
 
     //    //this.undo.update(box, 'playerId', null, "Erase player",     //box.playerId = undefined;
-    //    //    () => this.drawLib.initBox(box, box._draw)
+    //    //    () => drawLib.initBox(box, box._draw)
     //    //    );  
 
     //    var prev = box.playerId;
     //    this.undo.action((bUndo: boolean) => {
     //        box.playerId = bUndo ? prev : undefined;
-    //        this.drawLib.initBox(box, box._draw)
+    //        drawLib.initBox(box, box._draw)
     //        this.selection.select(box, ModelType.Box);
     //    }, "Erase player");
     //}
@@ -303,61 +296,3 @@ export class MainLib {
     //    this.selection.select(r, type);
     //}
 }
-
-// angular.module('jat.services.mainLib', [
-//     'jat.services.selection',
-//     'jat.services.find',
-//     'jat.services.undo',
-//     'jat.services.guid',
-//     'jat.services.type',
-//     'jat.services.tournamentLib',
-//     'jat.services.services',
-//     'jat.services.drawLib',
-//     'jat.services.knockout',
-//     'jat.services.roundrobin',
-//     'jat.services.validation',
-//     'jat.services.validation.knockout',
-//     'jat.services.validation.roundrobin',
-//     'jat.services.validation.fft'
-// ])
-//     .factory('mainLib',
-//     [
-//         '$log',
-//         '$http',
-//         '$q',
-//         '$window',
-//         'selection',
-//         'tournamentLib',
-//         'services',
-//         'drawLib',
-//         'knockout',
-//         'roundrobin',
-//         'validation',
-//         'knockoutValidation',
-//         'roundrobinValidation',
-//         'fftValidation',
-//     //'rank',
-//         'undo',
-//         'find',
-//         'guid',
-//         (
-//             $log: ng.ILogService,
-//             $http: ng.IHttpService,
-//             $q: ng.IQService,
-//             $window: ng.IWindowService,
-//             selection: Selection,
-//             tournamentLib: TournamentLib,
-//             services: Services,
-//             drawLib: DrawLib,
-//             knockout: Knockout,
-//             roundrobin: Roundrobin,
-//             validation: Validation,
-//             knockoutValidation: KnockoutValidation,
-//             roundrobinValidation: RoundrobinValidation,
-//             fftValidation: FFTValidation,
-//             //rank: Rank,
-//             undo: Undo,
-//             find: Find,
-//             guid: Guid) => {
-//             return new MainLib($log, $http, $q, $window, selection, tournamentLib, services, drawLib, validation, undo, find, guid);
-//         }]);

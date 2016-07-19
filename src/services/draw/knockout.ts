@@ -1,12 +1,14 @@
 import { DrawLibBase } from './drawLibBase';
-import { DrawLib } from './drawLib';
+import { DrawLib as drawLib } from './drawLib';
 import { KnockoutLib as k } from './knockoutLib';
-import { TournamentLib } from '../tournamentLib';
-import {Find} from '../util/Find';
-import {Guid} from '../util/Guid';
+import { TournamentLib as tournamentLib } from '../tournamentLib';
+import { Find } from '../util/Find';
+import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle, filledArray } from '../../utils/tool';
 import { Services } from '../services';
+import { rank } from '../types';
+import { override } from '../util/object';
 
 var MIN_COL = 0,
     MAX_COL = 9,
@@ -35,12 +37,8 @@ var MIN_COL = 0,
 
 export class Knockout extends DrawLibBase implements IDrawLib {
 
-    constructor(
-        drawLib: DrawLib,
-        private tournamentLib: TournamentLib,
-        rank: Rank
-        ) {
-        super( drawLib, rank);
+    constructor() {
+        super();
         Services.registerDrawlib(this, DrawType.Normal);
         Services.registerDrawlib(this, DrawType.Final);
     }
@@ -48,12 +46,12 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private findBox(draw: Draw, position: number, create?: boolean): Box {
         var box = Find.by(draw.boxes, 'position', position);
         if (!box && create) {
-            box = this.drawLib.newBox(draw, undefined, position);
+            box = drawLib.newBox(draw, undefined, position);
         }
         return box;
     }
 
-    //Override
+    @override
     public nbColumnForPlayers(draw: Draw, nJoueur: number): number {
 
         
@@ -69,7 +67,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return c - colMin + 1;
     }
 
-    //Override
+    @override
     public resize(draw: Draw, oldDraw?: Draw, nPlayer?: number): void {
 
         //ASSERT( SetDimensionOk( draw, oldDraw, nPlayer));
@@ -94,17 +92,17 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
     }
 
-    //Override
+    @override
     public generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[] {
         if (generate === GenerateType.Create) {   //from registred players
             var m_nMatchCol = filledArray(MAX_COL, 0);
 
-            var players: Array<Player|number> = this.tournamentLib.GetJoueursInscrit(draw);
+            var players: Array<Player|number> = tournamentLib.GetJoueursInscrit(draw);
 
             //Récupère les qualifiés sortants du tableau précédent
-            var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = this.drawLib.previousGroup(draw);
+            var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = drawLib.previousGroup(draw);
             if (prev) {
-                players = players.concat(this.drawLib.groupFindAllPlayerOut(prev, true));
+                players = players.concat(drawLib.groupFindAllPlayerOut(prev, true));
             }
 
             this.resetDraw(draw, players.length);
@@ -124,7 +122,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         //Tri et Mélange les joueurs de même classement
-        this.tournamentLib.TriJoueurs(players);
+        tournamentLib.TriJoueurs(players);
 
         draw = this.ConstruitMatch(draw, m_nMatchCol, players);
         return [draw];
@@ -364,7 +362,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private ConstruitMatch(oldDraw: Draw, m_nMatchCol: number[], players: Array<Player|number>): Draw {
 
         
-        var draw = this.drawLib.newDraw(oldDraw._event, oldDraw);
+        var draw = drawLib.newDraw(oldDraw._event, oldDraw);
         draw.boxes = [];
 
         var colMin = k.columnMin(draw.nbOut),
@@ -416,7 +414,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     iJoueur++;
                     nj--;
 
-                    var box = this.drawLib.newBox(draw, draw._event.matchFormat, b);
+                    var box = drawLib.newBox(draw, draw._event.matchFormat, b);
                     draw.boxes.push(box);
                 }
             } else {
@@ -425,7 +423,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     pbMatch[b] = true;
                     m--;
 
-                    var match = <Match> this.drawLib.newBox(draw, draw._event.matchFormat, b);
+                    var match = <Match> drawLib.newBox(draw, draw._event.matchFormat, b);
                     match.score = '';
                     draw.boxes.push(match);
                 }
@@ -474,8 +472,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     } else {	//Joueur
                         this.putPlayer(boxIn, <Player>players[iJoueur]);
 
-                        if ((!draw.minRank || !this.rank.isNC(draw.minRank))
-                            || (!draw.maxRank || !this.rank.isNC(draw.maxRank))) {
+                        if ((!draw.minRank || !rank.isNC(draw.minRank))
+                            || (!draw.maxRank || !rank.isNC(draw.maxRank))) {
                             //Mets les têtes de série (sauf tableau NC)
                             if (WITH_TDS_HAUTBAS) {
                                 t = this.iTeteSerieQhb(b, draw.nbOut);
@@ -503,10 +501,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (draw.type !== DrawType.Final) {
 
             //Find the first unused qualif number
-            var group = this.drawLib.group(draw);
+            var group = drawLib.group(draw);
             if (group) {
                 for (i = 1; i <= MAX_QUALIF; i++) {
-                    if (!this.drawLib.groupFindPlayerOut(group, i)) {
+                    if (!drawLib.groupFindPlayerOut(group, i)) {
                         break;
                     }
                 }
@@ -527,7 +525,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return draw;
     }
 
-    //Override
+    @override
     public boxesOpponents(match: Match): { box1: Box; box2: Box } {
         
         var pos1 = k.positionOpponent1(match.position),
@@ -538,7 +536,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         };
     }
 
-    //Override
+    @override
     public getSize(draw: Draw): ISize {
 
         
@@ -553,7 +551,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         };
     }
 
-    //Override
+    @override
     public computePositions(draw: Draw): IPoint[] {
 
         
@@ -590,7 +588,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return positions;
     }
 
-    //Override
+    @override
     public computeScore(draw: Draw): boolean {
         return true;
     }
@@ -614,7 +612,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 );
     }
 
-    //Override
+    @override
     public setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
@@ -622,10 +620,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            var prev = this.drawLib.previousGroup(draw);
+            var prev = drawLib.previousGroup(draw);
             if (!player && prev && prev.length && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
-                var boxOut = this.drawLib.groupFindPlayerOut(prev, inNumber);
+                var boxOut = drawLib.groupFindPlayerOut(prev, inNumber);
                 if (isObject(boxOut)) {	//V0997
                     player = boxOut._player;
                 }
@@ -658,7 +656,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             box.qualifIn = 0;
 
-            if (this.drawLib.previousGroup(draw) && !this.removePlayer(box)) {
+            if (drawLib.previousGroup(draw) && !this.removePlayer(box)) {
                 ASSERT(false);
             }
 
@@ -671,11 +669,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    //Override
+    @override
     public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
-        var next = this.drawLib.nextGroup(box._draw);
+        var next = drawLib.nextGroup(box._draw);
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
@@ -683,7 +681,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             //Met à jour le tableau suivant
             if (next && box.playerId && box.qualifOut) {
-                var boxIn = this.drawLib.groupFindPlayerIn(next, outNumber);
+                var boxIn = drawLib.groupFindPlayerIn(next, outNumber);
                 if (boxIn) {
                     ASSERT(boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn)) {
@@ -710,7 +708,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         } else {	//Enlève un qualifié sortant
             if (next && box.playerId) {
                 //Met à jour le tableau suivant
-                var boxIn = this.drawLib.groupFindPlayerIn(next, box.qualifOut);
+                var boxIn = drawLib.groupFindPlayerIn(next, box.qualifOut);
                 if (boxIn) {
                     ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn, true)) {
@@ -725,7 +723,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    //Override
+    @override
     public findPlayerIn(draw: Draw, iQualifie: number): PlayerIn {
 
         ASSERT(0 <= iQualifie);
@@ -746,7 +744,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
     }
 
-    //Override
+    @override
     public findPlayerOut(draw: Draw, iQualifie: number): Match {
 
         ASSERT(0 < iQualifie);
@@ -982,22 +980,3 @@ function log2(x: number): number {
 function exp2(col: number): number {
     return 1 << col;
 }
-
-// angular.module('jat.services.knockout', ['jat.services.services', 'jat.services.tournamentLib', 'jat.services.drawLib', 'jat.services.type', 'jat.services.find', 'jat.services.knockoutLib'])
-// .factory('knockout', [
-//     'services',
-//     'drawLib',
-//     'knockoutLib',
-//     'tournamentLib',
-//     'rank',
-//     'find',
-//     'guid',
-//     (services: Services,
-//         drawLib: DrawLib,
-//         knockoutLib: KnockoutLib,
-//         tournamentLib: TournamentLib,
-//         rank: Rank,
-//         find: Find,
-//         guid: Guid) => {
-//         return new Knockout(services, drawLib, knockoutLib, tournamentLib, rank, find, guid);
-//     }]);
