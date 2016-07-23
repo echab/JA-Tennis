@@ -25,13 +25,13 @@
             <label class="span3">
                 Category:
                 <select type="text" name="category" value.bind="dlg.event.category" class="span2">
-                     <option "value of dlg.categories">${value}</option>
+                     <option repeat.for="value of dlg.categories">${value}</option>
                 </select>
             </label>
             <label class="span3">
                 Max Rank:
                 <select type="text" name="maxRank" value.bind="dlg.event.maxRank" class="span2">
-                    <option "value of dlg.ranks">${value}</option>
+                    <option repeat.for="value of dlg.ranks">${value}</option>
                 </select>
             </label>
         </div>
@@ -81,7 +81,7 @@
                 <label>
                     Rank:
                     <select type="text" name="rank" value.bind="dlg.event.rank">
-                        <option "value of dlg.ranks">${value}</option>
+                        <option repeat.for="value of dlg.ranks">${value}</option>
                     </select>
                 </label>
             </div>

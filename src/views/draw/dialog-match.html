@@ -31,7 +31,7 @@
             <div tab="" heading="Planning">
                 <div class="row">
                     <label class="span3">Court: <select value.bind="dlg.match.place" class="span2">
-                        <option "place of dlg.places">${place}</option> 
+                        <option repeat.for="place of dlg.places">${place}</option> 
                         </select></label>
                     <label class="span3">Date: <input type="datetime" value.bind="dlg.match.date" class="span2" /></label>
                 </div>
@@ -49,7 +49,7 @@
             <div tab="" heading="Comment">
                 <div class="row">
                     <label class="span5">Format: <select value.bind="dlg.match.matchFormat" class="span4">
-                         <option "(key,matchFormat) of dlg.matchFormats" name.bind="key">${matchFormat.name}</option>
+                         <option repeat.for="(key,matchFormat) of dlg.matchFormats" name.bind="key">${matchFormat.name}</option>
                         </select></label>
                 </div>
 

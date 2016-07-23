@@ -43,3 +43,8 @@ tr.error, div.error, span.error {
 .table .selected {
     background-color: #96d3f2 !important;
 }
+
+ai-dialog-overlay.active {
+    background-color: black;
+    opacity: .5;
+}

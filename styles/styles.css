@@ -173,3 +173,8 @@ div.au-stagger {
     opacity: 1;
   }
 }
+
+ai-dialog-overlay.active {
+  background-color: black;
+  opacity: .3 !important;
+}

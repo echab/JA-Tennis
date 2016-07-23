@@ -61,11 +61,11 @@ export class ScoreDeltaFFT {
 
     public deltaSet(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
-        var n = 0;
-        for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
-            n += (this.m_Jeu[i].j1 > this.m_Jeu[i].j2) ? 1 : this.m_Jeu[i].j1 < this.m_Jeu[i].j2 ? -1 : 0;
-        }
-        var dSet: number;
+        // var n = 0;
+        // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
+        //     n += (this.m_Jeu[i].j1 > this.m_Jeu[i].j2) ? 1 : this.m_Jeu[i].j1 < this.m_Jeu[i].j2 ? -1 : 0;
+        // }
+        // var dSet: number;
 
         //        if (isWO())
         //            return bVainqueur ? 3 : -3;	//dSet2
@@ -141,18 +141,18 @@ export class ScoreDeltaFFT {
         //                return 0;	//Match nul //TODO Poule
         //        }
 
-        return dSet;
+        // return dSet;
     }
 
     public deltaJeu(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
 
-        var n = 0;
-        for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
-            n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
-        }
+        // var n = 0;
+        // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
+        //     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
+        // }
 
-        var dJeu: number;
+        // var dJeu: number;
 
         //    if (isWO())
         //        return bVainqueur ? 5 : -5;
@@ -227,18 +227,18 @@ export class ScoreDeltaFFT {
         //        if (!isVide() && !deltaSet(bVainqueur, fm /*, bEquipe */) && !dJeu)
         //            return 0;		//Match nul //TODO Poule
         //    }
-        return dJeu;
+        // return dJeu;
     }
 
     public deltaPoint(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
 
-        var n = 0;
-        for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
-            n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
-        }
+        // var n = 0;
+        // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
+        //     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
+        // }
 
-        var dSet: number, dJeu: number;
+        // var dSet: number, dJeu: number;
 
         //    if (isWO())
         //        return bVainqueur ? 2 : 0;
@@ -256,6 +256,6 @@ export class ScoreDeltaFFT {
         //                return 0;	//Match nul //TODO Poule
         //        }
 
-        return n;
+        // return n;
     }
 }

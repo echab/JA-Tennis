@@ -49,13 +49,13 @@
             <form class="form-horizontal">
                 <select value.bind="main.selection.event" change.trigger="main.select(main.selection.event)" 
                     class="span2" title="Select an event">
-                    <option "event of main.selection.tournament.events">${event.name}</option> 
+                    <option repeat.for="evt of main.selection.tournament.events">${evt.name}</option> 
                 </select>
 
                 <i class="icon2-info" click.trigger="main.editDraw(main.selection.draw)" disabled.bind="!main.selection.draw" title="Edit draw properties"></i>
                 <select value.bind="main.selection.draw" change.trigger="main.select(main.selection.draw)" 
                     class="span2" title="Select a draw">
-                    <option "draw of main.selection.event.draws">${draw.name}</option> 
+                    <option repeat.for="draw of main.selection.event.draws">${draw.name}</option> 
                 </select>
                 
                 <div class="btn-group" title="Lock/unlock the draw modifications">

@@ -28,13 +28,13 @@
             <label class="span3">
                 Rank, from:
                 <select name="minRank" value.bind="dlg.draw.minRank" class="span2">
-                    <options "value of dlg.ranks">${value}</options> 
+                    <option repeat.for="value of dlg.ranks">${value}</option> 
                 </select>
             </label>
             <label class="span3">
                 to:
                 <select name="maxRank" value.bind="dlg.draw.maxRank" class="span2">
-                    <options "value of dlg.ranks">${value}</options> 
+                    <option repeat.for="value of dlg.ranks">${value}</option> 
                 </select>
             </label>
         </div>
