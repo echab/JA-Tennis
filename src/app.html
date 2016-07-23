@@ -1,10 +1,14 @@
 <template>
   <require from="nav-bar.html"></require>
+  <require from='views/player/list-players.html'></require>
   <require from="bootstrap/css/bootstrap.css"></require>
 
   <nav-bar router.bind="router"></nav-bar>
 
   <div class="page-host">
+
+    <list-players players.bind="selection.tournament.players" test="1073" sel="${selection}" ></list-players>
+
     <router-view></router-view>
   </div>
 </template>

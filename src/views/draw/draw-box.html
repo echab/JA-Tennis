@@ -1,0 +1,21 @@
+﻿<template>
+<div class="${ctrlBox.isMatch ? 'match' : ''} ${!ctrlBox.isMatch ? 'inPlayer':''} ${ctrlBox.isPlayed() ? 'played:''}
+     ${ctrlBox.box.hidden ? 'hidden':''} ${ ctrlBox.box === main.selection.box ? 'selected':''} ${ctrlBox.error ? 'error':''}"
+     title="${ctrlBox.error ? ctrlBox.error.message +' '+ ctrlBox.error.detail : ''}"
+     click.trigger="main.select(ctrlBox.box, main.ModelType.Box)"
+     ng-switch="ctrlBox.isMatch">
+    <span if.bind="ctrlBox.box.qualifIn" class="qualifIn">${ctrlBox.box.qualifIn === -1 ? 'Q?' : 'Q' + ctrlBox.box.qualifIn}</span>
+    <span if.bind="ctrlBox.box.seeded" class="seeded">${ctrlBox.box.seeded}</span>
+    ${ctrlBox.box._player.name}
+    <span ng-switch-when="false" class="rank">${ctrlBox.box._player.rank}</span>
+    <span if.bind="ctrlBox.box.qualifOut" class="qualifOut">Q${ctrlBox.box.qualifOut}</span>
+    <br />
+    <span ng-switch-when="true">
+        <span class="place">${ctrlBox.box.place}</span>
+        <span class="date">${ctrlBox.box.date}</span>
+        <span class="score">${ctrlBox.box.score}</span>
+    </span>
+    <span ng-switch-when="false" class="club">${ctrlBox.box._player.club}</span>
+    &nbsp;
+</div>
+<template>

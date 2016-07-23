@@ -1,0 +1,86 @@
+﻿<template>
+<div if.bind="ctrlDraw.isKnockout" class="draw knockout" ng-style="{width: ctrlDraw.width +'px', height: ctrlDraw.height +'px'}"
+     click.trigger="main.select(null,main.ModelType.Box)">
+    <canvas draw-lines="ctrlDraw._refresh"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
+    <div repeat.for="box of ctrlDraw.draw.boxes" if.bind="!ctrlDraw.simple">
+        <div draw-box="box" class="box"
+             ng-style="{left:(box._x * ctrlDraw.boxWidth) +'px', top:(box._y * ctrlDraw.boxHeight) +'px'}"></div>
+    </div>
+</div>
+<table if.bind="!ctrlDraw.isKnockout" class="draw roundrobin"
+       click.trigger="main.select(null,main.ModelType.Box)">
+    <tbody>
+        <tr ng-style="{height: ctrlDraw.boxHeight +'px'}">
+            <td ng-style="{width: ctrlDraw.boxWidth +'px'}"></td>
+            <td repeat.for="row of ctrlDraw.rows" ng-style="{width: ctrlDraw.boxWidth +'px'}">
+                <div draw-box="ctrlDraw.getBox(row[0])" if.bind="!ctrlDraw.simple"></div>
+            </td>
+            <td>
+                <div repeat.for="i of ctrlDraw.range(1, ctrlDraw.draw.nbOut)" class="qualifOut">Q${i}</div>
+            </td>
+        </tr>
+        <tr repeat.for="row of ctrlDraw.rows" ng-style="{height: ctrlDraw.boxHeight +'px'}">
+            <td repeat.for="col of row" class="${ctrlDraw.isDiag(col) ?'diag':''}">
+                <div draw-box="ctrlDraw.getBox(col)" if.bind="!ctrlDraw.simple"></div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="action"
+     if.bind="!ctrlDraw.simple && main.selection.box"
+     ng-style="{left:(1+ main.selection.box._x * ctrlDraw.boxWidth) +'px', top:((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}"
+     ng-switch="ctrlDraw.draw.mode">
+    <div class="btn-group" ng-switch-when="0">
+        <button class="btn dropdown-toggle" disabled.bind="ctrlDraw.isMatch(main.selection.box)" title="Select the qualified">
+            <i class="icon2-qualif-in"></i><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li repeat.for="q of ctrlDraw.getQualifsIn()">
+                <a click.trigger="ctrlDraw.setPlayer(main.selection.box, q._player, q.qualifOut)">
+                    <i class="icon2-white" class="${ctrlDraw.findQualifIn(q.qualifOut) ? 'icon2-checkmark':''}"></i><!-- -->
+                    ${'Q' + q.qualifOut + ' ' + q._player.name}
+                </a>
+            </li>
+        </ul>
+    </div><div class="btn-group" ng-switch-when="0">
+        <button class="btn dropdown-toggle" disabled.bind="ctrlDraw.isMatch(main.selection.box)" title="Edit the player">
+            <i class="icon2-player"></i><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a click.trigger="main.editPlayer(main.selection.box._player)"><i class="icon2-info"></i> Edit</a></li>
+            <li class="divider"></li>
+            <li repeat.for="player of ctrlDraw.getPlayers()">
+                <a click.trigger="ctrlDraw.setPlayer(main.selection.box, player)">
+                    <i class="icon2-white" class="${ctrlDraw.findPlayer(player.id) ? 'icon2-checkmark':''}"></i>
+                    ${player.name +' '+ player.rank}
+                </a>
+            </li>
+        </ul>
+    </div><button class="btn" ng-switch-when="0" disabled.bind="!main.selection.box.playerId"
+                  click.trigger="ctrlDraw.swapPlayer(main.selection.box)" title="Swap the player">
+        <i class="icon2-switch"></i>
+    </button><button class="btn" ng-switch-when="0" disabled.bind="!main.selection.box.playerId && !main.selection.box.qualifIn"
+                     click.trigger="ctrlDraw.setPlayer(main.selection.box)" title="Remove the player">
+        <i class="icon2-erase"></i>
+    </button>
+
+    <button class="btn" ng-switch-when="1" disabled.bind="!ctrlDraw.isMatch(main.selection.box)"
+            click.trigger="main.editMatch(main.selection.box)" title="Set the date and hour of the match">
+        <i class="icon2-planning"></i>
+    </button><button class="btn" ng-switch-when="1" disabled.bind="!ctrlDraw.isMatch(main.selection.box)"
+                     click.trigger="main.editMatch(main.selection.box)" title="Change the match place">
+        <i class="icon-map-marker"></i>
+    </button><button class="btn" ng-switch-when="1" disabled.bind="!main.selection.box.place && !main.selection.box.date"
+                     click.trigger="main.editMatch(main.selection.box)" title="Remove the place and date of the match">
+        <i class="icon2-erase"></i>
+    </button>
+
+    <button class="btn" ng-switch-when="2" disabled.bind="!ctrlDraw.isMatch(main.selection.box)"
+            click.trigger="main.editMatch(main.selection.box)" title="Edit the match">
+        <i class="icon2-match"></i>
+    </button><button class="btn" ng-switch-when="2" disabled.bind="!main.selection.box.playerId"
+                     click.trigger="main.editMatch(main.selection.box)" title="Remove the result">
+        <i class="icon2-erase"></i>
+    </button>
+</div>
+</template>

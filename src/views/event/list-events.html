@@ -1,0 +1,50 @@
+﻿<template>
+<table class="table table-hover table-condensed" style="width:auto;">
+    <!--<caption>Events</caption>-->
+    <thead>
+        <tr>
+            <!--<th class="span1"><input type="checkbox" /></th>-->
+            <th>Event name</th>
+            <th>Draws</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr repeat.for="event of list.events" class="${event === main.selection.event ? 'info':''}">
+            <!--<td><input type="checkbox" /> <small>${event.id}</small></td>-->
+            <td class="${event === main.selection.event ? 'selected':''}">
+                <i class="icon2-info" click.trigger="main.editEvent(event)"></i>
+                <span click.trigger="main.select(event)">${event.name}</span>
+                <i class="icon-trash" click.trigger="main.removeEvent(event)"></i>
+            </td>
+            <td>
+                <div repeat.for="draw of event.draws" class="inline ${main.validation.hasErrorDraw(draw) ? 'error':''} ${draw === main.selection.draw ? 'selected':''}" style="border-left: solid 1px blue; padding-left: 3px;">
+                    <i class="icon2-info" click.trigger="main.editDraw(draw)"></i>
+                    <span click.trigger="main.select(draw)">${draw.name} ${draw.suite ? '(S)' : ''}</span>
+                    <i class="icon-trash" click.trigger="main.removeDraw(draw)"></i>
+                    <div draw="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
+                         style="position:relative;"
+                         click.trigger="main.select(draw)">
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr show.bind="list.events.length == 0">
+            <td colspan="3">No event</td>
+        </tr>
+    </tbody>
+</table>
+<!--<div class="action"
+     show.bind="main.selection.event"
+     ng-style="{left:(4 + main.selection.box._x * ctrlDraw.boxWidth) +'px', top:((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}">
+    <button class="btn" click.trigger="main.editEvent(main.selection.event)" title="Edit the selected event properties">
+        <i class="icon2-info"></i>
+    </button><button class="btn" click.trigger="main.removeEvent(main.selection.event)" title="Remove the selected event">
+        <i class="icon-trash"></i>
+    </button><button class="btn" click.trigger="main.editDraw(main.selection.draw)" title="Edit the selected draw properties">
+        <i class="icon2-info"></i>
+    </button><button class="btn" disabled.bind="!main.isMatch(main.selection.box)" click.trigger="main.removeDraw(main.selection.draw)" title="Remove the selected draw">
+        <i class="icon-trash"></i>
+    </button>
+</div>-->
+</template>

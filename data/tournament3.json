@@ -1,0 +1,151 @@
+﻿{
+  "info": {
+    "name": "Tournoi 1"
+  },
+  "players": [
+    {
+      "id": "j0",
+      "name": "Alphonse",
+      "club": "TAC",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j1",
+      "name": "Bernard",
+      "club": "TCB",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j2",
+      "name": "Claude",
+      "club": "TROC",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j3",
+      "name": "Daniel",
+      "club": "ST",
+      "rank": "NC",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j4",
+      "name": "Eloi",
+      "club": "ST",
+      "rank": "30/3",
+      "registration": [
+        "e0"
+      ]
+    },
+    {
+      "id": "j5",
+      "name": "Frank",
+      "club": "ST",
+      "rank": "30/5",
+      "registration": [
+        "e0"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "e0",
+      "name": "Simple messieurs",
+      "draws": [
+        {
+          "id": "e0d0",
+          "name": "NC - 40",
+          "type": 0,
+          "minRank": "NC",
+          "maxRank": "40",
+          "nbColumn": 2,
+          "nbOut": 2,
+          "boxes": [
+            {
+              "position": 2,
+              "score": "",
+              "qualifOut": 1
+            },
+            {
+              "position": 1,
+              "score": "",
+              "qualifOut": 2
+            },
+            {
+              "position": 6,
+              "playerId": "j3",
+              "order": 0,
+              "seeded": 1
+            },
+            {
+              "position": 3,
+              "playerId": "j2",
+              "order": 0,
+              "seeded": 2
+            },
+            {
+              "position": 4,
+              "playerId": "j1",
+              "order": 0
+            },
+            {
+              "position": 5,
+              "playerId": "j0",
+              "order": 0
+            }
+          ]
+        },
+        {
+          "id": "e0d1",
+          "name": "4e série",
+          "type": 0,
+          "minRank": "30/5",
+          "maxRank": "30/1",
+          "nbColumn": 3,
+          "nbOut": 1
+        },
+        {
+          "id": "e0d2",
+          "name": "Tableau final",
+          "type": 1,
+          "nbOut": 1
+        }
+      ]
+    },
+    {
+      "id": "e1",
+      "name": "Simple dames",
+      "draws": [
+        {
+          "id": "e1d0",
+          "name": "NC"
+        },
+        {
+          "id": "e1d1",
+          "name": "Tableau final"
+        }
+      ]
+    },
+    {
+      "id": "e2",
+      "name": "Double",
+      "draws": []
+    }
+  ],
+  "places": [
+    "Court 1",
+    "Court 2",
+    "Court 3"
+  ]
+} 
