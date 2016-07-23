@@ -1,25 +1,35 @@
-import {autoinject} from 'aurelia-framework';
-import {bindable} from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
+import { bindable } from 'aurelia-framework';
+import { DialogController } from 'aurelia-dialog';
 
 import { TournamentLib as tournamentLib } from '../../services/tournamentLib';
-import { rank, category} from '../../services/types';
+import { rank, category } from '../../services/types';
+
+interface EventModel {
+    title: string;
+    selection: Selection;
+    event: TEvent;
+};
 
 @autoinject
 export class DialogEvent {
+
+    private title: string;
+    private selection: Selection;
 
     ranks: RankString[];
     categories: CategoryString[];
     registred: Player[];
 
-    constructor(
-        private selection: Selection,
-        private title: string,
-        private event: TEvent
-        ) {
-
+    constructor(private controller: DialogController) {
         this.ranks = rank.list();
         this.categories = category.list();
+    }
 
-        this.registred = tournamentLib.getRegistred(event);
+    activate(model: EventModel) {
+        this.title = model.title;
+        this.selection = model.selection;
+
+        this.registred = tournamentLib.getRegistred(model.event);
     }
 }

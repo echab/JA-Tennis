@@ -1,8 +1,8 @@
 <template>
-<form name="playerForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
+<form name="playerForm" ng-submit="controller.ok('Ok')" class="modal-form form-horizontal">
 
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="$dismiss()">&times;</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
         <h3>${dlg.title} <!--<small>Id: ${dlg.player.id}</small>--></h3>
     </div>
     <div class="modal-body">
@@ -95,7 +95,7 @@
     </div>
     <div class="modal-footer">
         <button type="submit" disabled.bind="!!playerForm.$error.required" class="btn btn-primary btn-success ${!!playerForm.$error.required ? 'disabled':''}"><i class="icon-ok-sign icon-white"></i>OK</button>
-        <a href="#" click.trigger="$close('Del')">
+        <a href="#" click.trigger="controller.ok('Del')">
             <i class="icon-trash"></i>
         </a>
     </div>

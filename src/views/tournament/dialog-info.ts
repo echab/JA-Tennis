@@ -1,13 +1,22 @@
-﻿import {autoinject} from 'aurelia-framework';
-import {bindable} from 'aurelia-framework';
+﻿import { autoinject } from 'aurelia-framework';
+import { bindable } from 'aurelia-framework';
+import { DialogController } from 'aurelia-dialog';
+
+interface InfoModel {
+    title: string;
+    info: TournamentInfo;
+};
 
 @autoinject
 export class DialogInfo {
 
-    constructor(
-        private title: string,
-        private info: TournamentInfo
-        ) {
+    title: string;
+    info: TournamentInfo;
 
+    constructor(private controller: DialogController) { }
+
+    activate(model: InfoModel) {
+        this.title = model.title;
+        this.info = model.info;
     }
 }
