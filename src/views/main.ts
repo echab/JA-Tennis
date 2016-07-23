@@ -23,6 +23,10 @@ export class Main {	//mainCtrl {
     public ModelType = ModelType;
     public Mode = Mode;
 
+    private tournamentOpened=true; 
+    private drawsOpened=true;
+    private planningOpen=false;
+
     constructor(
         private mainLib: MainLib, 
         private dialogService: DialogService,
