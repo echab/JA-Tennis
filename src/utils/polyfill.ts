@@ -1,14 +1,14 @@
 ﻿//TODO autofocus directive
 
-if (!('console' in window)) {
-    window.console = <any> {
-        info: angular.noop,
-        log: angular.noop,
-        warn: angular.noop,
-        error: angular.noop
-    };
-}
-
+// if (!('console' in window)) {   //for IE8
+//     let noop = () => {};
+//     window.console = {
+//         info: noop,
+//         log: noop,
+//         warn: noop,
+//         error: noop
+//     };
+// }
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement, fromIndex) {

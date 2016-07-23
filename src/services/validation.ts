@@ -115,10 +115,3 @@ export class Validation implements IValidation {
         }
     }
 }
-
-// angular.module('jat.services.validation', ['jat.services.find'])
-//     .factory('validation', [
-//         'find',
-//         (find: jat.service.Find) => {
-//         return new Validation(find);
-//     }]);

@@ -340,10 +340,6 @@ export class Undo {
             + ", maxUndo=" + this.maxUndo;
     }
 }
-
-// angular.module('jat.services.undo', [])
-//     .service('undo', Undo);
-
 //	https://github.com/ArthurClemens/Javascript-Undo-Manager
 //	http://alan.dipert.org/post/332027463/lazy-public-definitions-and-undo-in-javascript
 //	https://github.com/dsimard/jskata/blob/master/src/jskata.undo.js

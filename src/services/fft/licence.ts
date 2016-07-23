@@ -18,6 +18,3 @@ export class LicenceFFT implements Licence {
         return k == a[2];
     }
 }
-
-// angular.module('jat.services.fft.licence', [])
-//     .service('licence', LicenceFFT);

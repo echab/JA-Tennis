@@ -1,20 +1,16 @@
-﻿'use strict';
-module jat.tournament {
+﻿export class dialogInfoCtrl {
 
-    class dialogInfoCtrl {
+    static $inject = [
+        'title',
+        'info'
+    ];
+    constructor(
+        private title: string,
+        private info: TournamentInfo
+        ) {
 
-        static $inject = [
-            'title',
-            'info'
-        ];
-        constructor(
-            private title: string,
-            private info: TournamentInfo
-            ) {
-
-        }
     }
-
-    angular.module('jat.tournament.dialog', [])
-        .controller('dialogInfoCtrl', dialogInfoCtrl);
 }
+
+// angular.module('jat.tournament.dialog', [])
+//     .controller('dialogInfoCtrl', dialogInfoCtrl);

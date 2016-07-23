@@ -69,6 +69,3 @@ export class RankFFT implements Rank {
         return this._groupOf[<string>rank];
     }
 }
-
-// angular.module('jat.services.fft.rank', [])
-//     .service('rank', RankFFT);

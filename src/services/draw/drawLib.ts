@@ -19,7 +19,7 @@ export class DrawLib {
             extend(draw, source);
         }
         draw.id = draw.id || Guid.create('d');
-        delete (<any>draw).$$hashKey;   //remove angular id
+        delete (<any>draw).$$hashKey;   //TODO remove angular id
 
         //default values
         draw.type = draw.type || DrawType.Normal;
@@ -100,7 +100,7 @@ export class DrawLib {
     //         }
 
     public static refresh(draw: Draw): void {
-        draw._refresh = new Date(); //force angular refresh
+        draw._refresh = new Date(); //force refresh
     }
 
     public static updateQualif(draw: Draw): void {
@@ -313,19 +313,3 @@ function ASSERT(b: boolean, message?: string): void {
         throw message || 'Assertion is false';
     }
 }
-
-// angular.module('jat.services.drawLib', ['jat.services.services', 'jat.services.find', 'jat.services.type', 'jat.services.guid'])
-//     .factory('drawLib', [
-//         'services',
-//         'find',
-//         'rank',
-//         'guid',
-//         (services: jat.service.Services,
-//             find: Find,
-//             rank: Rank,
-//             guid: Guid
-
-//             ) => {
-//             return new DrawLib(services, find, rank, guid);
-//         }]);
-// }

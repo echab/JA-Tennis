@@ -93,11 +93,3 @@ export class Selection {
     }
 
 }
-
-// angular.module('jat.services.selection', ['jat.services.find'])
-// //.service('selection', Selection);
-//     .factory('selection', [
-//         'find',
-//         (find: jat.service.Find) =>
-//             new Selection(find)
-//     ])

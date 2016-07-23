@@ -259,6 +259,3 @@ export class ScoreDeltaFFT {
         return n;
     }
 }
-
-// angular.module('jat.services.fft.score', [])
-//     .service('score', ScoreFFT); 

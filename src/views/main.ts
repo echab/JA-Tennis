@@ -296,34 +296,34 @@ module jat.main {
         }
     }
 
-    angular.module('jat.main', [
-        'jat.services.mainLib',
-        'jat.services.selection',
-        'jat.services.undo',
-        'jat.services.tournamentLib',
-        'jat.services.drawLib',
-        'jat.services.knockout',
-        'jat.services.roundrobin',
+    // angular.module('jat.main', [
+    //     'jat.services.mainLib',
+    //     'jat.services.selection',
+    //     'jat.services.undo',
+    //     'jat.services.tournamentLib',
+    //     'jat.services.drawLib',
+    //     'jat.services.knockout',
+    //     'jat.services.roundrobin',
 
-        'jat.services.validation',
-        'jat.services.validation.knockout',
-        'jat.services.validation.roundrobin',
-        'jat.services.validation.fft',
+    //     'jat.services.validation',
+    //     'jat.services.validation.knockout',
+    //     'jat.services.validation.roundrobin',
+    //     'jat.services.validation.fft',
 
-        'jat.tournament.dialog',
-        'jat.player.dialog',
-        'jat.player.list',
-        'jat.event.dialog',
-        'jat.event.list',
-        'jat.draw.dialog',
-        'jat.draw.list',
-        'jat.draw.box',
-        'jat.match.dialog',
-        'ec.panels',
-        'ec.inputFile',
-    //'polyfill',
-        'ui.bootstrap'])
+    //     'jat.tournament.dialog',
+    //     'jat.player.dialog',
+    //     'jat.player.list',
+    //     'jat.event.dialog',
+    //     'jat.event.list',
+    //     'jat.draw.dialog',
+    //     'jat.draw.list',
+    //     'jat.draw.box',
+    //     'jat.match.dialog',
+    //     'ec.panels',
+    //     'ec.inputFile',
+    // //'polyfill',
+    //     'ui.bootstrap'])
 
-        .directive('main', mainDirective)
-        .controller('mainCtrl', mainCtrl);
+    //     .directive('main', mainDirective)
+    //     .controller('mainCtrl', mainCtrl);
 }

@@ -81,7 +81,7 @@ export class MainLib {
         var data = {};
         copy(tournament, data);
         if (!url) {
-            //this.$log.info(angular.toJson(data, true));
+            //this.$log.info(JSON.stringify(data));
             window.localStorage['tournament'] = JSON.stringify(data);
             return;
         }
@@ -208,7 +208,7 @@ export class MainLib {
         }
         if (isSelected || generate) {
             this.selection.select(draw, ModelType.Draw);
-            drawLib.refresh(draw);  //force angular refresh
+            drawLib.refresh(draw);  //force refresh
         }
     }
 
@@ -232,7 +232,7 @@ export class MainLib {
         validation.resetDraw(draw);
         validation.validateDraw(draw);
         if (this.selection.draw === draw) {
-            drawLib.refresh(draw);  //force angular refresh
+            drawLib.refresh(draw);  //force refresh
         }
     }
     //#endregion draw

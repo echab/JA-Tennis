@@ -66,6 +66,3 @@ export class RankingFFT implements Ranking {
         return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
     }
 }
-
-// angular.module('jat.services.fft.ranking', [])
-//     .service('ranking', ['score', RankingFFT]);

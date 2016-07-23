@@ -128,6 +128,3 @@ export class CategoryFFT implements Category {
         //		&& AgeMin() <= playerCategory.AgeMax() );
     }
 }
-
-// angular.module('jat.services.fft.category', [])
-//     .service('category', CategoryFFT);

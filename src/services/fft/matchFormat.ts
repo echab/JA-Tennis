@@ -16,6 +16,3 @@ export class MatchFormatsFFT implements MatchFormats {
         return this._matchFormats;
     }
 }
-
-// angular.module('jat.services.fft.matchFormat', [])
-//     .service('matchFormat', MatchFormatFFT);

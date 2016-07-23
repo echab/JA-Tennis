@@ -54,7 +54,7 @@ export class TournamentLib {
             extend(player, source);
         }
         player.id = player.id || Guid.create('p');
-        delete (<any>player).$$hashKey;   //remove angular id
+        delete (<any>player).$$hashKey;   //TODO remove angular id
 
         this.initPlayer(player, parent);
         return player;
@@ -74,7 +74,7 @@ export class TournamentLib {
             extend(event, source);
         }
         event.id = event.id || Guid.create('e');
-        delete (<any>event).$$hashKey;   //remove angular id
+        delete (<any>event).$$hashKey;   //TODO remove angular id
 
         this.initEvent(event, parent);
         return event;
@@ -170,10 +170,3 @@ export class TournamentLib {
         || (event.sexe === 'M' && !event.typeDouble);	//ou simple mixte
     }
 }
-
-// angular.module('jat.services.tournamentLib', ['jat.services.drawLib', 'jat.services.type', 'jat.services.guid'])
-//     .factory('tournamentLib',
-//         ['drawLib', 'rank', 'guid',
-//         (drawLib: DrawLib, rank: Rank, guid: Guid) => {
-//         return new TournamentLib(drawLib, rank, guid);
-//     }]);

@@ -33,7 +33,7 @@ interface Draw {
     _next?: Draw;
 
     _event?: TEvent;
-    _refresh?: Date; //force angular refresh //TODO?
+    _refresh?: Date; //force refresh //TODO?
 }
 
 //interface IDrawDimensions {
