@@ -7,7 +7,8 @@ import { Find } from './util/find';
 import { Guid } from './util/guid';
 import { Undo } from './util/undo';
 import { copy } from '../utils/tool';
-import {HttpClient} from 'aurelia-http-client';
+//import { HttpClient } from 'aurelia-fetch-client';
+import { HttpClient } from 'aurelia-http-client';
 
 export class MainLib {
 
@@ -31,53 +32,52 @@ export class MainLib {
     }
 
     /** This function load tournament data from an url. */
-    loadTournament(file_url?: File|string): Promise<Tournament> {
-        var deferred = this.$q.defer();
+    loadTournament(file_url?: Blob|string): Promise<Tournament> {
         if (!file_url) {
-            var data = window.localStorage['tournament'];
-            if (data) {
-                var tournament: Tournament = JSON.parse(data);
-                tournamentLib.initTournament(tournament);
-                this.selection.select(tournament, ModelType.Tournament);
-                deferred.resolve(tournament);
-            } else {
-                deferred.reject('nothing in storage');
-            }
-        } else if (typeof file_url === 'string') {
-            this.$http.get(file_url)
-                .success((tournament: Tournament, status: number) => {
-                    tournament._url = <string>file_url;
+            return new Promise((resolve, reject) => {
+                var data = window.localStorage['tournament'];
+                if (data) {
+                    var tournament: Tournament = JSON.parse(data);
                     tournamentLib.initTournament(tournament);
                     this.selection.select(tournament, ModelType.Tournament);
-                    deferred.resolve(tournament);
-                })
-                .error((data: any, status: number) => {
-                    deferred.reject(data);
-                });
-        } else {
-            var reader = new FileReader();
-            reader.addEventListener('loadend', () => {
-                try {
-                    var tournament: Tournament = JSON.parse(reader.result);
-                    tournament._url = (<File>file_url).name;    //TODO missing path
-                    tournamentLib.initTournament(tournament);
-                    this.selection.select(tournament, ModelType.Tournament);
-                    deferred.resolve(tournament);
-                } catch (ex) {
-                    deferred.reject(ex.message);
+                    resolve(tournament);
+                } else {
+                    reject('nothing in storage');
                 }
             });
-            reader.addEventListener('onerror', () =>
-                deferred.reject(reader.error.name));
-            reader.addEventListener('onabort', () =>
-                deferred.reject('aborted'));
-
-            reader.readAsText(file_url);
+        } else if (typeof file_url === 'string') {
+            let client = new HttpClient();
+            return client.get(file_url).then(data => {
+                let tournament : Tournament = <any>{
+                    _url: <string>file_url
+                };
+                tournamentLib.initTournament(tournament);
+                this.selection.select(tournament, ModelType.Tournament);
+                return tournament;
+            //}).catch( reason => {                
+            });
+        } else { //if (file_url instanceof Blob) {
+            return new Promise((resolve, reject) => {
+                var reader = new FileReader();
+                reader.addEventListener('loadend', () => {
+                    try {
+                        var tournament: Tournament = JSON.parse(reader.result);
+                        tournament._url = (<File>file_url).name;    //TODO missing path
+                        tournamentLib.initTournament(tournament);
+                        this.selection.select(tournament, ModelType.Tournament);
+                        resolve(tournament);
+                    } catch (ex) {
+                        reject(ex.message);
+                    }
+                });
+                reader.addEventListener('error', () => reject(reader.error.name));
+                reader.addEventListener('abort', () => reject('aborted'));
+                reader.readAsText(<Blob>file_url);  //TODO remove cast
+            });
         }
-        return deferred.promise;
     }
 
-    saveTournament(tournament: Tournament, url?: string): void {
+    saveTournament(tournament: Tournament, url?: string): Promise<void> {
         var data = {};
         copy(tournament, data);
         if (!url) {
@@ -85,11 +85,12 @@ export class MainLib {
             window.localStorage['tournament'] = JSON.stringify(data);
             return;
         }
-        this.$http.post(url || tournament._url, data)
-            .success((data: any, status: number) => {
+        let client = new HttpClient();
+        return client.post(url || tournament._url, data)
+            .then(data => {
                 //TODO
             })
-            .error((data: any, status: number) => {
+            .catch(reason => {
                 //TODO
             });
     }

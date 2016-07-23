@@ -5,9 +5,8 @@ import { TournamentLib } from './tournamentLib';
 import {Find} from './util/Find';
 import {Guid} from './util/Guid';
 import { isObject,isArray,extend } from './util/object'
-import { shuffle } from '../utils/tool';
+import { shuffle,filledArray } from '../utils/tool';
 import { Services } from './services';
-import { filledArray } from '../utils/tool'
 
 export class Validation implements IValidation {
 

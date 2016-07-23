@@ -6,6 +6,7 @@
     "aurelia-dependency-injection": "github:aurelia/dependency-injection",
     "aurelia-event-aggregator": "github:aurelia/event-aggregator",
     "aurelia-fetch-client": "github:aurelia/fetch-client",
+    "aurelia-http-client": "github:aurelia/http-client",
     "aurelia-framework": "github:aurelia/framework",
     "aurelia-history": "github:aurelia/history",
     "aurelia-history-browser": "github:aurelia/history-browser",

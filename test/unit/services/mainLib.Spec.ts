@@ -1,17 +1,12 @@
-﻿// /// <reference path="../../lib/typings/mocks/math-mock.d.ts" />
-
-//import {Container} from 'aurelia-dependency-injection';
+﻿//import {Container} from 'aurelia-dependency-injection';
 import { MainLib } from '../../../src/services//mainLib';
 import { DrawLib as drawLib } from '../../../src/services//draw/drawLib';
-import { Guid } from '../../../src/services/util/guid';
 import { Find } from '../../../src/services//util/Find';
+//import { GuidMock as Guid } from '../../mocks/guid-mock';
+import { mathMock as math } from '../../mocks/math-mock';
 
 describe('services.mainLib', () => {
     let main: MainLib;
-    let math: mock.Math;
-
-    // beforeEach(module('jat.services.guid.mock'));
-    // beforeEach(module('math.mock'));
 
     beforeEach(()=> {
         main = new MainLib();
