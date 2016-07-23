@@ -1,61 +1,51 @@
-/* TODO ec-imput-file ?
+// TODO ec-imput-file ?
 
-'use strict';
-module ec.ui {
+import { autoinject } from 'aurelia-framework';
+import { bindable } from 'aurelia-framework';
+import { BindingEngine } from 'aurelia-framework'
 
-    interface InputFileScope extends ng.IScope {
-        onloaded: (data: { file: File }) => void;
-    }
-    interface InputFileEventTarget extends EventTarget {
-        files: FileList;
-    }
-    interface InputFileEvent extends JQueryEventObject {
-        target: InputFileEventTarget;
-    }
+@autoinject
+export class EcInputFileCustomElement {
 
-    function ecInputFileDirective(): ng.IDirective {
-        return {
-            restrict: 'EA',
-            //replace: true,
-            templateUrl: 'template/inputFile.html',
-            transclude: true,    //implies a new scope
-            scope: {
-                onloaded: '&'
-            },
-            link: function postLink(scope: InputFileScope, elm: JQuery, attrs: any) {
-                elm.css({ position: 'relative' });
-                elm.find('input').on('change', (event: InputFileEvent) => {
-                    scope.onloaded({ file: event.target.files[0] });
-                });
-            }
-        };
-    }
+    @bindable onloaded: (data: { file: File }) => void;
 
-    function templateCache($templateCache: ng.ITemplateCacheService):void {
-        $templateCache.put("template/inputFile.html",
-            //"<span style='position: relative;'>"
-            "<input type='file' accept='application/json,text/plain'"
-            + " style='position: relative; text-align: right; -webkit-opacity:0; -moz-opacity:0; filter: alpha(opacity: 0); opacity: 0; z-index: 2; width: 80px;'>"
-            + "<button style='position:absolute; left:0px; width:100%; z-index:1;' class='btn' ng-transclude></button>"
-        //+ "<span style='position:absolute; left:0px; width:100%; z-index:1;' ng-transclude></span>"
-        //+ "</span>"
-            );
+    bind(bindingContext: Object, overrideContext: Object) {
+        
+        let elm : HTMLElement = <HTMLElement> overrideContext; //TODO
+        elm.style.position = 'relative';
 
-        /*
-        <span class="fileinputs">
-           <input type="file" id="inputFile" accept="text/plain,application/json">
-            <button class="fakefile">Load</button>
-        </span>
-        */
-    }
+        let input : HTMLInputElement = elm.querySelector('input');
+        input.addEventListener('change', (event: Event) => {
+            this.onloaded({ file: input.files[0] });
+        });
 
-    angular.module('ec.inputFile', [])
-    //.controller('PanelController', PanelController)
-        .directive('ecInputFile', ecInputFileDirective)
-        .run(["$templateCache", templateCache])
-    ;
-
+    }    
 }
+
+// function ecInputFileDirective(): ng.IDirective {
+//     return {
+//         restrict: 'EA',
+//         //replace: true,
+//         templateUrl: 'template/inputFile.html',
+//         transclude: true,    //implies a new scope
+//         scope: {
+//             onloaded: '&'
+//         },
+//         link: function postLink(scope: InputFileScope, elm: JQuery, attrs: any) {
+//             elm.css({ position: 'relative' });
+//             elm.find('input').on('change', (event: InputFileEvent) => {
+//                 scope.onloaded({ file: event.target.files[0] });
+//             });
+//         }
+//     };
+// }
+
+/*
+<span class="fileinputs">
+    <input type="file" id="inputFile" accept="text/plain,application/json">
+    <button class="fakefile">Load</button>
+</span>
+*/
 
 /*
 <!DOCTYPE html>

@@ -14,7 +14,7 @@
     <ec-panelset>
         <ec-badge>A</ec-badge><panel heading="Vertical Panel 1"><b>First</b> Content!</panel>
         <panel heading="Vertical Panel 2"><i>Second</i> Content!</panel>
-    </panelset>
+    </ec-panelset>
     <hr />
     <panelset vertical="true">
         <panel heading="Vertical Panel 1"><b>First</b> Vertical Content!</panel>
@@ -24,13 +24,19 @@
 </example>
     */
 
-import { EcPanel } from './ec-panel';    
-import { EcPanelBadge } from './ec-panel-badge';    
+import { autoinject } from 'aurelia-framework';
+import { bindable } from 'aurelia-framework';
 
-export class EcPanelSet {
+import { EcPanel } from './ec-panel';    
+import { EcBadge } from './ec-badge';    
+
+@autoinject
+export class EcPanelset {
+
+    @bindable vertical:boolean;
 
     panels: EcPanel[] = [];
-    badges: EcPanelBadge[] = [];
+    badges: EcBadge[] = [];
 
     selectCount: number = 0;
 
@@ -68,11 +74,11 @@ export class EcPanelSet {
 
     }
 
-    public addBadge(badge: EcPanelBadge): void {
+    public addBadge(badge: EcBadge): void {
         this.badges.push(badge);
-        badge.$on('$destroy', () =>
-            this.removeBadge(badge)
-            );
+        // badge.$on('$destroy', () =>
+        //     this.removeBadge(badge)
+        // );
     }
 
     public addPanel(panel: EcPanel): void {
@@ -100,7 +106,7 @@ export class EcPanelSet {
         this.panels.splice(index, 1);
     }
 
-    public removeBadge(badge: EcPanelBadge): void {
+    public removeBadge(badge: EcBadge): void {
         var index = this.badges.indexOf(badge);
         if (badge.panel) {
             delete badge.panel.badge;
@@ -108,16 +114,3 @@ export class EcPanelSet {
         this.badges.splice(index, 1);
     }
 }
-// function ecPanelsetDirective(): ng.IDirective {
-//     return {
-//         restrict: 'EA',
-//         transclude: true,
-//         replace: true,
-//         scope: {},
-//         controller: 'PanelsetController',
-//         templateUrl: 'template/panels/panelset.html'
-//         //,link: (scope, element, attrs) => {
-//         //    scope.vertical = angular.isDefined(attrs.vertical) ? scope.$parent.$eval(attrs.vertical) : false;
-//         //}
-//     };
-// }

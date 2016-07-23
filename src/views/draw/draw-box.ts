@@ -4,6 +4,8 @@ import {bindable} from 'aurelia-framework';
 @autoinject
 export class DrawBox {
 
+    @bindable drawBox: string;
+
     box: Box;
     isMatch: boolean;
     error: IError;
@@ -15,10 +17,6 @@ export class DrawBox {
     //constructor() {
     //}
 }
-
-// interface BoxAttributes extends ng.IAttributes {
-//     drawBox: string;
-// }
 
 // function drawBoxDirective(validation: Validation): ng.IDirective {
 //     return {

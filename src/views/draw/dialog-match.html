@@ -1,5 +1,5 @@
 ﻿<template>
-<form name="matchForm" ng-submit="controller.ok('Ok')" class="modal-form form-horizontal">
+<form name="matchForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
         <h3>${dlg.title} <!--<small>Id: ${dlg.match.id}</small>--></h3>
@@ -9,8 +9,8 @@
             <div class="row">
                 <label class="span1">Winner:</label>
                 <div class="offset1">
-                    <label class="radio"><input type="radio" value.bind="dlg.match.playerId" ng-value="dlg.player1.id" /> ${dlg.player1.name} ${dlg.player1.rank}</label><br />
-                    <label class="radio"><input type="radio" value.bind="dlg.match.playerId" ng-value="dlg.player2.id" /> ${dlg.player2.name} ${dlg.player2.rank}</label>
+                    <label class="radio"><input type="radio" name.bind="dlg.match.playerId" value.bind="dlg.player1.id" /> ${dlg.player1.name} ${dlg.player1.rank}</label><br />
+                    <label class="radio"><input type="radio" name.bind="dlg.match.playerId" value.bind="dlg.player2.id" /> ${dlg.player2.name} ${dlg.player2.rank}</label>
                 </div>
             </div>
             <div class="row">
@@ -30,7 +30,9 @@
         <div tabset="">
             <div tab="" heading="Planning">
                 <div class="row">
-                    <label class="span3">Court: <select value.bind="dlg.match.place" ng-options="place for place in dlg.places" class="span2"></select></label>
+                    <label class="span3">Court: <select value.bind="dlg.match.place" class="span2">
+                        <option "place of dlg.places">${place}</option> 
+                        </select></label>
                     <label class="span3">Date: <input type="datetime" value.bind="dlg.match.date" class="span2" /></label>
                 </div>
                 <div class="row">
@@ -46,7 +48,9 @@
             </div>
             <div tab="" heading="Comment">
                 <div class="row">
-                    <label class="span5">Format: <select value.bind="dlg.match.matchFormat" ng-options="key as matchFormat.name for (key,matchFormat) in dlg.matchFormats" class="span4"></select></label>
+                    <label class="span5">Format: <select value.bind="dlg.match.matchFormat" class="span4">
+                         <option "(key,matchFormat) of dlg.matchFormats" name.bind="key">${matchFormat.name}</option>
+                        </select></label>
                 </div>
 
                 <div class="row">

@@ -1,5 +1,5 @@
 <template>
-<form name="playerForm" ng-submit="controller.ok('Ok')" class="modal-form form-horizontal">
+<form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
@@ -28,7 +28,9 @@
         <div class="row">
             <label class="span3">
                 Rank:
-                <select type="text" name="rank" value.bind="dlg.player.rank" ng-options="value for value in dlg.ranks" class="span2"></select>
+                <select type="text" name="rank" value.bind="dlg.player.rank" class="span2">
+                    <option "value of dlg.ranks">${value}</option> 
+                </select>
             </label>
         </div>
 
@@ -107,7 +109,9 @@
             <div>
                 <label>
                     Rank:
-            <select type="text" name="rank" value.bind="player.rank" ng-options="value for value in ranks"></select></label>
+            <select type="text" name="rank" value.bind="player.rank">
+                <option "value of ranks">${value}</option>
+            </select></label>
             </div>
         </fieldset>-->
     <!--${ playerForm.$error }-->

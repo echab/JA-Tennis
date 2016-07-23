@@ -1,13 +1,21 @@
 <template>
-<div ec-panelset="" class="ng-cloak" ng-init="tournamentOpened=true; drawsOpened=true; planningOpen=false;">
-    <div ec-panel="" class="tournament" is-open="tournamentOpened">
-        <div ec-badge="" class="tournament"><i class="icon2-ball"></i></div>
-        <div ec-header="">
+<require from="./controls/ec-panel/ec-panelset.html"></require>
+<require from="./controls/ec-panel/ec-panel.html"></require>
+<require from="./controls/ec-panel/ec-badge.html"></require>
+<require from="./controls/ec-panel/ec-header.html"></require>
+<require from="./controls/event/list-events.html"></require>
+<require from="./controls/player/list-players.html"></require>
+<require from="./controls/draw/draw-draw.html"></require>
+
+<ec-panelset class="ng-cloak" ng-init="tournamentOpened=true; drawsOpened=true; planningOpen=false;">
+    <ec-panel class="tournament" is-open="tournamentOpened">
+        <ec-badge class="tournament"><i class="icon2-ball"></i></ec-badge>
+        <ec-header>
             <i class="icon2-info" click.trigger="main.editTournament(main.selection.tournament)"></i>
             ${main.selection.tournament.info.name}
-        </div>
+        </ec-header>
         <div class="content">
-            <div class="inline" list-events="main.selection.tournament.events"></div>
+            <list-events class="inline" events="main.selection.tournament.events"></list-events>
 
             <div app-version></div>
         </div>
@@ -24,29 +32,31 @@
             </div>
             <button class="btn" click.trigger="main.addEvent(main.selection.event)"><i class="icon-plus"></i> Add event</button>
         </div>
-    </div><div ec-panel="" class="players" is-open="playersOpened">
-        <div ec-badge="" class="players"><i class="icon2-player"></i></div>
-        <div ec-header="">
-            Players
-        </div>
+    </ec-panel><ec-panel class="players" is-open="playersOpened">
+        <ec-badge class="players"><i class="icon2-player"></i></ec-badge>
+        <ec-header>Players</ec-header>
         <div class="content">
-            <div list-players="main.selection.tournament.players"></div>
+            <list-players players="main.selection.tournament.players"></list-players>
         </div>
         <div class="footer">
             <form class="form-horizontal">
                 <button class="btn" click.trigger="main.addPlayer()"><i class="icon-plus"></i> Add player</button>
             </form>
         </div>
-    </div><div ec-panel="" class="draws" is-open="drawsOpened">
-        <div ec-badge="" class="draws"><i class="icon2-draw"></i></div>
-        <div ec-header="">
+    </ec-panel><ec-panel class="draws" is-open="drawsOpened">
+        <ec-badge class="draws"><i class="icon2-draw"></i></ec-badge>
+        <ec-header>
             <form class="form-horizontal">
                 <select value.bind="main.selection.event" ng-change="main.select(main.selection.event)" 
-                    ng-options="event.name for event in main.selection.tournament.events" class="span2" title="Select an event"></select>
+                    class="span2" title="Select an event">
+                    <option "event of main.selection.tournament.events">${event.name}</option> 
+                </select>
 
                 <i class="icon2-info" click.trigger="main.editDraw(main.selection.draw)" disabled.bind="!main.selection.draw" title="Edit draw properties"></i>
                 <select value.bind="main.selection.draw" ng-change="main.select(main.selection.draw)" 
-                    ng-options="draw.name for draw in main.selection.event.draws" class="span2" title="Select a draw"></select>
+                    class="span2" title="Select a draw">
+                    <option "draw of main.selection.event.draws">${draw.name}</option> 
+                </select>
                 
                 <div class="btn-group" title="Lock/unlock the draw modifications">
                     <button class="btn" value.bind="main.selection.draw.mode" btn-radio="main.Mode.Build" disabled.bind="!main.selection.draw" title="Switch to draw build mode"><i class="icon2-draw"></i></button>
@@ -55,9 +65,9 @@
                     <button class="btn" value.bind="main.selection.draw.mode" btn-radio="main.Mode.Lock" disabled.bind="!main.selection.draw" title="Lock the draw"><i class="icon2-locker"></i></button>
                 </div>
             </form>
-        </div>
+        </ec-header>
         <div class="content">
-            <div draw="main.selection.draw" class="inline" style="position:relative;"></div>
+            <draw-draw draw="main.selection.draw" class="inline" style="position:relative;"></draw-draw>
 
             <div class="inline">
                 Validation errors:
@@ -86,14 +96,14 @@
                 </div>
             </form>
         </div>
-    </div><div ec-panel="" is-open="planningOpened" class="planning">
-        <div ec-badge="" class="planning"><i class="icon2-planning"></i></div>
-        <div ec-header="">Planning</div>
+    </ec-panel><ec-panel is-open="planningOpened" class="planning">
+        <ec-badge class="planning"><i class="icon2-planning"></i></ec-badge>
+        <ec-header>Planning</ec-header>
         <div class="content">
             Not implemented.
         </div>
         <div class="footer">
         </div>
-    </div>
-</div>
+    </ec-panel>
+</ec-panelset>
 </template>

@@ -1,5 +1,5 @@
 ﻿<template>
-<form name="drawForm" ng-submit="controller.ok('Ok')" class="modal-form form-horizontal">
+<form name="drawForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
         <h3>${dlg.title} <!--<small>Id: ${dlg.draw.id}</small>--> ${dlg.draw.name}</h3>
@@ -17,7 +17,9 @@
         <div class="row">
             <label class="span3">
                 Type:
-                <select name="type" value.bind="dlg.draw.type" ng-options="type.value as type.label for type in dlg.drawTypes" required class="span2"></select>
+                <select name="type" value.bind="dlg.draw.type" required class="span2">
+                     <option repeat.for="type of dlg.drawTypes" value.bind="type.value">${type.label}</option>
+                </select>
             </label>
             <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
         </div>
@@ -25,11 +27,15 @@
         <div class="row">
             <label class="span3">
                 Rank, from:
-                <select name="minRank" value.bind="dlg.draw.minRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+                <select name="minRank" value.bind="dlg.draw.minRank" class="span2">
+                    <options "value of dlg.ranks">${value}</options> 
+                </select>
             </label>
             <label class="span3">
                 to:
-                <select name="maxRank" value.bind="dlg.draw.maxRank" ng-options="value for value in dlg.ranks" class="span2"></select>
+                <select name="maxRank" value.bind="dlg.draw.maxRank" class="span2">
+                    <options "value of dlg.ranks">${value}</options> 
+                </select>
             </label>
         </div>
 

@@ -17,7 +17,6 @@
 export class ListEvents {
     events: TEvent[];
 
-    //static $inject = ['selection'];
     //constructor(selection: Selection) {
     //}
 }

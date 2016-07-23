@@ -1,7 +1,6 @@
 <template>
-    <div class='panel' 
-        ng-class='{active: isOpen, disabled: isDisabled}' 
-        ng-style="{'width': isOpen ? getWidth() : 0}" 
-        ng-transclude>
+    <div class="panel ${isOpen ? 'active':''} ${isDisabled ? 'disabled':''}" 
+        style="width: ${isOpen ? getWidth() : 0}">
+        <slot></slot>
     </div>
 </template>

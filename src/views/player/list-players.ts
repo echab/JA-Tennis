@@ -1,6 +1,6 @@
 //import {useView} from 'aurelia-framework';
-import {autoinject} from 'aurelia-framework';
-import {bindable} from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
+import { bindable } from 'aurelia-framework';
 
 //import {Logger} from 'aurelia-logging';
 
@@ -10,18 +10,26 @@ import { Find } from '../../services/util/find';
 
 //@useView('./list-players.html')
 @autoinject
-export class ListPlayers {
+export class ListPlayersCustomElement {
 
     @bindable players: Player[];
 
-    @bindable test:number;
-    
+    @bindable test: number;
+
     private main: Main; //TODO
 
-    constructor( private selection: Selection) {
+    constructor(private selection: Selection) {
 
-        console.info('Players:'+ this.players);
+        console.info('Players:' + this.players);
 
+    }
+
+    attached() {
+        console.info('Attached: Players=' + this.players);
+    }
+
+    activate() {
+        console.info('Activate: Players=' + this.players);
     }
 
     eventById(id: string): TEvent {
@@ -30,7 +38,4 @@ export class ListPlayers {
         }
     }
 
-     activate() {
-        console.info('Activate: Players='+ this.players);
-     }
 }

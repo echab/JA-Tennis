@@ -2,8 +2,8 @@ import { autoinject } from 'aurelia-framework';
 import { bindable } from 'aurelia-framework';
 import { BindingEngine } from 'aurelia-framework'
 
-import { EcPanelSet } from './ec-panel-set';
-import { EcPanelBadge } from './ec-panel-badge';
+import { EcPanelset } from './ec-panelset';
+import { EcBadge } from './ec-badge';
 
 @autoinject
 export class EcPanel {
@@ -14,8 +14,8 @@ export class EcPanel {
     @bindable isOpen: boolean;
     @bindable isDisabled: boolean;
 
-    panelsetCtrl : EcPanelSet;
-    badge: EcPanelBadge;
+    panelSet : EcPanelset;
+    badge: EcBadge;
     marginLeft: number;
 
     constructor(
@@ -23,12 +23,17 @@ export class EcPanel {
     ) {
     }
 
+    bind( bindingContext: EcPanelset, overrideContext: Object) {
+        this.panelSet = bindingContext;
+
+    }
+
     attached() {
-        this.panelsetCtrl.addPanel(this);
+        this.panelSet.addPanel(this);
 
         //scope.$watch('isOpen', (value) => {
         this.bindingEngine.propertyObserver( this, 'isOpen').subscribe( (value: boolean) => {
-            this.panelsetCtrl.select(this, !!value)
+            this.panelSet.select(this, !!value)
         });
     }
 
@@ -39,51 +44,10 @@ export class EcPanel {
     }
 
     getWidth() {
-        return this.panelsetCtrl.selectCount ? (Math.floor(100 / this.panelsetCtrl.selectCount) + '%') : 'auto';
+        return this.panelSet.selectCount ? (Math.floor(100 / this.panelSet.selectCount) + '%') : 'auto';
     }
 
     detached() {
-        this.panelsetCtrl.removePanel(this);
+        this.panelSet.removePanel(this);
     }
 }
-
-// //ecPanelDirective.$inject = ['$parse'];
-// function ecPanelDirective(): ng.IDirective {   //$parse: ng.IParseService
-//     return {
-//         require: '^ecPanelset',
-//         restrict: 'EA',
-//         replace: true,
-//         templateUrl: 'template/panels/panel.html',
-//         transclude: true,
-//         scope: {    //isolated scope
-//             //heading: '@',
-//             isOpen: '=?',
-//             isDisabled: '=?'
-//             //,onSelect: '&select', //This callback is called in contentHeadingTransclude
-//             ////once it inserts the panel's content into the dom
-//             //onDeselect: '&deselect'
-//         },
-//         controller: 'PanelController',  //Empty controller so other directives can require being 'under' a panel
-//         link: function postLink(scope: Panel, elm: JQuery, attrs: any, panelsetCtrl: PanelsetController) {  //,transclude
-
-//             //scope.isOpen = scope.isOpen == 'true';
-
-//             panelsetCtrl.addPanel(scope);
-
-//             bindingEngine.propertyObserver( this, 'isOpen').subscribe( (value: boolean) => {
-//             //scope.$watch('isOpen', (value) => {
-//                 panelsetCtrl.select(scope, !!value)
-//             });
-
-//             scope.toggleOpen = () => {
-//                 if (!scope.isDisabled) {
-//                     scope.isOpen = !scope.isOpen;
-//                 }
-//             };
-
-//             scope.getWidth = () => {
-//                 return panelsetCtrl.selectCount ? (Math.floor(100 / panelsetCtrl.selectCount) + '%') : 'auto';
-//             };
-//         }
-//     };
-// }
