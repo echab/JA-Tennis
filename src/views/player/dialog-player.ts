@@ -1,23 +1,18 @@
+import {autoinject} from 'aurelia-framework';
+import {bindable} from 'aurelia-framework';
 
+import { rank, category} from '../../services/types';
+
+@autoinject
 export class DialogPlayer {
 
     ranks: RankString[];
     categories: CategoryString[];
 
-    static $inject = [
-        'title',
-        'player',
-        'events',
-        'rank',
-        'category'
-    ];
-
     constructor(
         private title: string,
         private player: Player,
-        private events: TEvent[],
-        rank: Rank,
-        category: Category
+        private events: TEvent[]
         ) {
 
         this.ranks = rank.list();

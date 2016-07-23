@@ -29,7 +29,8 @@ export class DrawBox {
 //         controllerAs: 'ctrlBox',
 //         link: (scope: ng.IScope, element: JQuery, attrs: BoxAttributes, ctrlBox: boxCtrl) => {
 
-//             scope.$watch(attrs.drawBox, (box: Box) => {
+//             bindingEngine.propertyObserver( attrs, 'drawBox').subscribe( (box: Box) => {
+//             //scope.$watch(attrs.drawBox, (box: Box) => {
 //                 ctrlBox.box = box;
 //                 ctrlBox.isMatch = isMatch(box);
 //                 ctrlBox.error = validation.getErrorBox(box);

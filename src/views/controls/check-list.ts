@@ -13,7 +13,8 @@ angular.module('jat.utils.checkList', [])
             },
             link: (scope: CheckListScope, elem: JQuery, attrs: any) => {
 
-                scope.$watch('list', (list:string[]) => {
+                bindingEngine.propertyObserver( this, 'list').subscribe( (list:string[]) => {
+                //scope.$watch('list', (list:string[]) => {
                     if (list) {
                         var index = list.indexOf(scope.value);
                         elem.prop('checked', index != -1);

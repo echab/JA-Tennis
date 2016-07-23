@@ -6,8 +6,8 @@ import { Undo } from './services/util/undo';
 import { MainLib } from './services/mainLib';
 import { TournamentLib } from './services/tournamentLib';
 
-// export var selection = new Selection(); //TODO use DI
-// export var undo = new Undo(); //TODO use DI
+import {DialogService,DialogResult} from 'aurelia-dialog';
+import {DialogInfo} from './views/tournament/dialog-info';
 
 @autoinject
 export class App {
@@ -15,15 +15,12 @@ export class App {
   
   //public static selection = new Selection(); //TODO use DI
 
-  constructor(public selection:Selection, private undo:Undo) {
+  constructor(public selection:Selection, private undo:Undo,
+    private dialogService:DialogService
+  ) {
 
         //TODO refactor. For initial test only    
-        this.selection.tournament = TournamentLib.newTournament();
-        var filename = 'data/tournament8.json';
-        //var filename = '/data/to2006.json';
-        MainLib.loadTournament(filename).then(tournament => {
-            this.selection.select(tournament, ModelType.Tournament);
-        });
+        this.loadTournament('data/tournament8.json');
   }
 
   configureRouter(config: RouterConfiguration, router: Router) {
@@ -36,4 +33,30 @@ export class App {
 
     this.router = router;
   }
+
+   loadTournament(filename: File|string): void {
+        MainLib.loadTournament(filename).then(tournament => {
+            this.selection.select(tournament, ModelType.Tournament);
+        });
+    }
+
+   editTournament(tournament: Tournament): void {
+
+        var editedInfo = TournamentLib.newInfo(this.selection.tournament.info);
+
+        this.dialogService.open({
+            viewModel: DialogInfo, 
+            model: {
+                title: "Edit info",
+                info: editedInfo
+            }
+        }).then((result: DialogResult) => {
+            if ('Ok' === result.output) {
+                //MainLib.editInfo(editedInfo, this.selection.tournament.info);
+                var c = this.selection.tournament;
+                this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
+            }
+        });
+    }
+  
 }

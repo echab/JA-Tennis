@@ -4,6 +4,7 @@
     "aurelia-binding": "github:aurelia/binding",
     "aurelia-bootstrapper": "github:aurelia/bootstrapper",
     "aurelia-dependency-injection": "github:aurelia/dependency-injection",
+    "aurelia-dialog": "github:aurelia/dialog",
     "aurelia-event-aggregator": "github:aurelia/event-aggregator",
     "aurelia-fetch-client": "github:aurelia/fetch-client",
     "aurelia-http-client": "github:aurelia/http-client",

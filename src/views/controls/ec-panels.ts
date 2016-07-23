@@ -238,9 +238,10 @@ module ec.ui {
 
                 panelsetCtrl.addPanel(scope);
 
-                scope.$watch('isOpen', (value) =>
+                bindingEngine.propertyObserver( this, 'isOpen').subscribe( (value: boolean) => {
+                //scope.$watch('isOpen', (value) => {
                     panelsetCtrl.select(scope, !!value)
-                    );
+                });
 
                 scope.toggleOpen = () => {
                     if (!scope.isDisabled) {

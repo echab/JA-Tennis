@@ -242,8 +242,10 @@ function drawDirective(): ng.IDirective {   //$compile:ng.ICompileService
                 }
             };
 
+            //bindingEngine.propertyObserver( draw, 'minRank').subscribe( (minRank: string) => {
             scope.$watch(attrs.draw, doRefresh);
 
+            //bindingEngine.propertyObserver( draw, 'minRank').subscribe( (minRank: string) => {
             scope.$watch(attrs.draw + '._refresh', (refesh: Date, oldRefresh: Date) => {
                 if (refesh !== oldRefresh) {
                     doRefresh(ctrlDraw.draw);
@@ -315,6 +317,7 @@ function drawLinesDirective(): ng.IDirective {
         require: '^draw',
         link: (scope: ng.IScope, element: JQuery, attrs: any, ctrlDraw: drawCtrl) => {
             //attrs.$observe( 'drawLines', () => {
+            //bindingEngine.propertyObserver( draw, 'minRank').subscribe( (minRank: string) => {
             scope.$watch(attrs.drawLines, () => {
                 ctrlDraw.drawLines(element);
             });

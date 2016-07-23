@@ -1,4 +1,5 @@
-﻿<form name="matchForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
+﻿<template>
+<form name="matchForm" ng-submit="$close('Ok')" class="modal-form form-horizontal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="$dismiss()">&times;</button>
         <h3>${dlg.title} <!--<small>Id: ${dlg.match.id}</small>--></h3>
@@ -59,3 +60,4 @@
         <!--<a href="#" click.trigger="$close('Del')"><i class="icon-trash"></i></a>-->
     </div>
 </form>
+</template>

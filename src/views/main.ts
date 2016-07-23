@@ -1,5 +1,7 @@
 import {autoinject} from 'aurelia-framework';
 import {bindable} from 'aurelia-framework';
+import {DialogService,DialogResult} from 'aurelia-dialog';
+import {DialogInfo} from './tournament/dialog-info';
 
 import { Selection,ModelType } from '../services/util/selection';
 import { Undo } from '../services/util/undo';
@@ -9,17 +11,6 @@ import { TournamentLib } from '../services/tournamentLib';
 import { DrawLib } from '../services/draw/drawLib';
 import { Validation } from '../services/validation';
 
-// function mainDirective(): ng.IDirective {
-//     var dir = {
-//         templateUrl: 'views/main.html',
-//         controller: 'mainCtrl',
-//         controllerAs: 'main',
-//         restrict: 'EA'
-//         //,scope: true
-//     };
-//     return dir;
-// }
-
 /** Main controller for the application */
 @autoinject
 export class Main {	//mainCtrl {
@@ -28,10 +19,8 @@ export class Main {	//mainCtrl {
     public ModelType = ModelType;
     public Mode = Mode;
 
-    public $modal : any;    //TODO use aurelia-modal
-
     constructor(
-        //private $modal: uib.IModalService<string>,
+        private dialogService: DialogService,
         private selection:Selection, 
         private undo:Undo
         ) {
@@ -79,20 +68,19 @@ export class Main {	//mainCtrl {
 
         var editedInfo = TournamentLib.newInfo(this.selection.tournament.info);
 
-        this.$modal.open({
-            templateUrl: 'views/tournament/dialogInfo.html',
-            controller: 'dialogInfoCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "Edit info",
-                info: () => editedInfo
+        this.dialogService.open({
+            viewModel: DialogInfo, 
+            model: {
+                title: "Edit info",
+                info: editedInfo
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
-                    //MainLib.editInfo(editedInfo, this.selection.tournament.info);
-                    var c = this.selection.tournament;
-                    this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
-                }
-            });
+        }).then((result: DialogResult) => {
+            if ('Ok' === result.output) {
+                //MainLib.editInfo(editedInfo, this.selection.tournament.info);
+                var c = this.selection.tournament;
+                this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
+            }
+        });
     }
     //#endregion tournament
 
@@ -112,16 +100,15 @@ export class Main {	//mainCtrl {
 
         var newPlayer = TournamentLib.newPlayer(this.selection.tournament);
 
-        this.$modal.open({
-            templateUrl: 'views/player/dialogPlayer.html',
-            controller: 'dialogPlayerCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "New player",
-                player: () => newPlayer,
-                events: () => this.selection.tournament.events
+        this.dialogService.open({
+            viewModel: DialogPlayer, 
+            model: {
+                title: "New player",
+                player: newPlayer,
+                events: this.selection.tournament.events
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
+        }).then((result) => {
+                if ('Ok' === result.output) {
                     MainLib.addPlayer(this.selection.tournament, newPlayer);
                 }
             });
@@ -131,18 +118,17 @@ export class Main {	//mainCtrl {
 
         var editedPlayer = TournamentLib.newPlayer(this.selection.tournament, player);
 
-        this.$modal.open({
-            templateUrl: 'views/player/dialogPlayer.html',
-            controller: 'dialogPlayerCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "Edit player",
-                player: () => editedPlayer,
-                events: () => this.selection.tournament.events
+        this.dialogService.open({
+            viewModel: DialogPlayer, 
+            model: {
+                title: "Edit player",
+                player: editedPlayer,
+                events: this.selection.tournament.events
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
+        }).then((result: DialogResult) => {
+                if ('Ok' === result.output) {
                     MainLib.editPlayer(editedPlayer, player);
-                } else if ('Del' === result) {
+                } else if ('Del' === result.output) {
                     MainLib.removePlayer(player)
             }
             });
@@ -157,15 +143,14 @@ export class Main {	//mainCtrl {
 
         var newEvent = TournamentLib.newEvent(this.selection.tournament);
 
-        this.$modal.open({
-            templateUrl: 'views/event/dialogEvent.html',
-            controller: 'dialogEventCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "New event",
-                event: () => newEvent
+        this.dialogService.open({
+            viewModel: DialogEvent, 
+            model: {
+                title: "New event",
+                event: newEvent
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
+        }).then((result: DialogResult) => {
+                if ('Ok' === result.output) {
                     MainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
                 }
             });
@@ -175,17 +160,16 @@ export class Main {	//mainCtrl {
 
         var editedEvent = TournamentLib.newEvent(this.selection.tournament, event);
 
-        this.$modal.open({
-            templateUrl: 'views/event/dialogEvent.html',
-            controller: 'dialogEventCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "Edit event",
-                event: () => editedEvent
+        this.dialogService.open({
+            viewModel: DialogEvent, 
+            model: {
+                title: "Edit event",
+                event: editedEvent
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
+        }).then((result: DialogResult) => {
+                if ('Ok' === result.output) {
                     MainLib.editEvent(editedEvent, event);
-                } else if ('Del' === result) {
+                } else if ('Del' === result.output) {
                     MainLib.removeEvent(event)
             }
             });
@@ -201,18 +185,17 @@ export class Main {	//mainCtrl {
 
         var newDraw = DrawLib.newDraw(this.selection.event, undefined, after);
 
-        this.$modal.open({
-            templateUrl: 'views/draw/dialogDraw.html',
-            controller: 'dialogDrawCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "New draw",
-                draw: () => newDraw
+        this.dialogService.open({
+            viewModel: DialogDraw, 
+            model: {
+                title: "New draw",
+                draw: newDraw
             }
-        }).result.then((result: string) => {
+        }).then((result: DialogResult) => {
                 //TODO add event after selected draw
-                if ('Ok' === result) {
+                if ('Ok' === result.output) {
                     MainLib.addDraw(newDraw, 0, after);
-                } else if ('Generate' === result) {
+                } else if ('Generate' === result.output) {
                     MainLib.addDraw(newDraw, 1, after);
                 }
             });
@@ -222,19 +205,18 @@ export class Main {	//mainCtrl {
 
         var editedDraw = DrawLib.newDraw(draw._event, draw);
 
-        this.$modal.open({
-            templateUrl: 'views/draw/dialogDraw.html',
-            controller: 'dialogDrawCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "Edit draw",
-                draw: () => editedDraw
+        this.dialogService.open({
+            viewModel: DialogDraw, 
+            model: {
+                title: "Edit draw",
+                draw: editedDraw
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
+        }).then((result: DialogResult) => {
+                if ('Ok' === result.output) {
                     MainLib.updateDraw(editedDraw, draw);
-                } else if ('Generate' === result) {
+                } else if ('Generate' === result.output) {
                     MainLib.updateDraw(editedDraw, draw, 1);
-                } else if ('Del' === result) {
+                } else if ('Del' === result.output) {
                     MainLib.removeDraw(draw);
                 }
             });
@@ -265,15 +247,14 @@ export class Main {	//mainCtrl {
 
         var editedMatch = <Match> DrawLib.newBox(match._draw, match);
 
-        this.$modal.open({
-            templateUrl: 'views/draw/dialogMatch.html',
-            controller: 'dialogMatchCtrl as dlg',    //required for resolve
-            resolve: {
-                title: () => "Edit match",
-                match: () => editedMatch
+        this.dialogService.open({
+            viewModel: DialogMatch, 
+            model: {
+                title: "Edit match",
+                match: editedMatch
             }
-        }).result.then((result: string) => {
-                if ('Ok' === result) {
+        }).then((result: DialogResult) => {
+                if ('Ok' === result.output) {
                     MainLib.editMatch(editedMatch, match);
                 }
             });

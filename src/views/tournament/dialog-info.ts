@@ -1,9 +1,9 @@
-﻿export class dialogInfoCtrl {
+﻿import {autoinject} from 'aurelia-framework';
+import {bindable} from 'aurelia-framework';
 
-    static $inject = [
-        'title',
-        'info'
-    ];
+@autoinject
+export class DialogInfo {
+
     constructor(
         private title: string,
         private info: TournamentInfo
@@ -11,6 +11,3 @@
 
     }
 }
-
-// angular.module('jat.tournament.dialog', [])
-//     .controller('dialogInfoCtrl', dialogInfoCtrl);

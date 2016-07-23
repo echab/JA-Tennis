@@ -7,6 +7,8 @@
 
   <div class="page-host">
 
+    <button click.trigger="editTournament(selection.tournament)" >Dialog...</button>
+
     <list-players players.bind="selection.tournament.players" test="1073" sel="${selection}" ></list-players>
 
     <router-view></router-view>
