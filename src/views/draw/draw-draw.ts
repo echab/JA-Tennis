@@ -14,7 +14,7 @@ interface DrawAttributes extends ng.IAttributes {
     simple: string;
 }
 
-class DrawDtrl implements ISize {
+class DrawDraw implements ISize {
 
     draw: Draw;
     isKnockout: boolean;
@@ -61,11 +61,11 @@ class DrawDtrl implements ISize {
         }
         this._drawLib = Services.drawLibFor(this.draw);
 
-        this.players = this.tournamentLib.GetJoueursInscrit(this.draw);
+        this.players = TournamentLib.GetJoueursInscrit(this.draw);
 
         //qualifs in
-        var prev = this.drawLib.previousGroup(this.draw);
-        this.qualifsIn = prev ? this.drawLib.findAllPlayerOutBox(prev) : undefined;
+        var prev = DrawLib.previousGroup(this.draw);
+        this.qualifsIn = prev ? DrawLib.findAllPlayerOutBox(prev) : undefined;
 
         //qualifs out
         this.qualifsOut = [];
@@ -107,7 +107,7 @@ class DrawDtrl implements ISize {
         }
     }
 
-    drawLines(canvas: JQuery): void {
+    drawLines(canvas: HTMLCanvasElement): void {
         canvas.attr('width', this.width).attr('height', this.height);
         var draw = this.draw;
         if (!draw || !draw.boxes || !draw.boxes.length || 2 <= draw.type) {
@@ -187,7 +187,7 @@ class DrawDtrl implements ISize {
                 this._drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
             } else {
                 box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
-                this.drawLib.initBox(box, box._draw);
+                DrawLib.initBox(box, box._draw);
             }
             this.selection.select(box, ModelType.Box);
         }, player ? 'Set player' : 'Erase player');
@@ -220,9 +220,9 @@ function drawDirective(): ng.IDirective {   //$compile:ng.ICompileService
         restrict: 'EA',
         scope: true,
         templateUrl: 'views/draw/drawDraw.html',
-        controller: drawCtrl,   //controller: ['drawLib', 'knockout', 'roundrobin', 'tournamentLib', 'find', drawCtrl],
+        controller: DrawDraw,   //controller: ['drawLib', 'knockout', 'roundrobin', 'tournamentLib', 'find', drawCtrl],
         controllerAs: 'ctrlDraw',
-        link: (scope: ng.IScope, element: JQuery, attrs: DrawAttributes, ctrlDraw: drawCtrl) => {
+        link: (scope: ng.IScope, element: Element, attrs: DrawAttributes, ctrlDraw: DrawDraw) => {
 
             var doRefresh = (draw: Draw, oldValue?: Draw) => {
                 ctrlDraw.draw = draw;
@@ -264,7 +264,7 @@ function initVml(): void {
     }
 
     //emulate canvas context using VML
-    vmlContext = function(element: JQuery, width: number, height: number) {
+    vmlContext = function(element: Element, width: number, height: number) {
         this._width = width;
         this._height = height;
         this.beginPath();

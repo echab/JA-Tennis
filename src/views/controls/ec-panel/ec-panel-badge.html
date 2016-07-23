@@ -1,0 +1,7 @@
+<template>
+    <div class='panelbadge' ng-class='{active: panel.isOpen, disabled: panel.isDisabled}'
+        ng-style="{'margin-left': (panel.marginLeft) * 3 +'em'}"
+        ng-click='panel.toggleOpen()' ng-dblclick='panel.toggleOpen(true)'
+        ng-transclude>
+    </div>
+</template>

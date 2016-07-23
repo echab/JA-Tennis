@@ -24,6 +24,7 @@ export class Main {	//mainCtrl {
     public Mode = Mode;
 
     constructor(
+        private mainLib: MainLib, 
         private dialogService: DialogService,
         private selection:Selection, 
         private undo:Undo
@@ -35,15 +36,15 @@ export class Main {	//mainCtrl {
         //var filename = '/data/to2006.json';
 
         //Load saved tournament if exists
-        //MainLib.loadTournament().then((data) => {
+        //this.mainLib.loadTournament().then((data) => {
         //}, (reason) => {
-        MainLib.loadTournament(filename).then((data) => {
+        this.mainLib.loadTournament(filename).then((data) => {
         });
         //});
 
         //Auto save tournament on exit
         let onBeforeUnloadHandler = (event: BeforeUnloadEvent) => {
-            MainLib.saveTournament(this.selection.tournament);
+            this.mainLib.saveTournament(this.selection.tournament);
         };
         if (window.addEventListener) {
             window.addEventListener('beforeunload', onBeforeUnloadHandler);
@@ -58,14 +59,14 @@ export class Main {	//mainCtrl {
     newTournament(): void {
         //TODO confirmation
         //TODO undo
-        MainLib.newTournament();
+        this.mainLib.newTournament();
         this.editTournament(this.selection.tournament);
     }
     loadTournament(file: File): void {
-        MainLib.loadTournament(file);
+        this.mainLib.loadTournament(file);
     }
     saveTournament(): void {
-        MainLib.saveTournament(this.selection.tournament, '');
+        this.mainLib.saveTournament(this.selection.tournament, '');
 
     }
     editTournament(tournament: Tournament): void {
@@ -80,7 +81,7 @@ export class Main {	//mainCtrl {
             }
         }).then((result: DialogResult) => {
             if ('Ok' === result.output) {
-                //MainLib.editInfo(editedInfo, this.selection.tournament.info);
+                //this.mainLib.editInfo(editedInfo, this.selection.tournament.info);
                 var c = this.selection.tournament;
                 this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
             }
@@ -113,7 +114,7 @@ export class Main {	//mainCtrl {
             }
         }).then((result) => {
                 if ('Ok' === result.output) {
-                    MainLib.addPlayer(this.selection.tournament, newPlayer);
+                    this.mainLib.addPlayer(this.selection.tournament, newPlayer);
                 }
             });
     }
@@ -131,14 +132,14 @@ export class Main {	//mainCtrl {
             }
         }).then((result: DialogResult) => {
                 if ('Ok' === result.output) {
-                    MainLib.editPlayer(editedPlayer, player);
+                    this.mainLib.editPlayer(editedPlayer, player);
                 } else if ('Del' === result.output) {
-                    MainLib.removePlayer(player)
+                    this.mainLib.removePlayer(player)
             }
             });
     }
     removePlayer(player: Player): void {
-        MainLib.removePlayer(player);
+        this.mainLib.removePlayer(player);
     }
     //#endregion player
 
@@ -155,7 +156,7 @@ export class Main {	//mainCtrl {
             }
         }).then((result: DialogResult) => {
                 if ('Ok' === result.output) {
-                    MainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
+                    this.mainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
                 }
             });
     }
@@ -172,15 +173,15 @@ export class Main {	//mainCtrl {
             }
         }).then((result: DialogResult) => {
                 if ('Ok' === result.output) {
-                    MainLib.editEvent(editedEvent, event);
+                    this.mainLib.editEvent(editedEvent, event);
                 } else if ('Del' === result.output) {
-                    MainLib.removeEvent(event)
+                    this.mainLib.removeEvent(event)
             }
             });
     }
 
     removeEvent(event: TEvent): void {
-        MainLib.removeEvent(event);
+        this.mainLib.removeEvent(event);
     }
     //#endregion event
 
@@ -198,9 +199,9 @@ export class Main {	//mainCtrl {
         }).then((result: DialogResult) => {
                 //TODO add event after selected draw
                 if ('Ok' === result.output) {
-                    MainLib.addDraw(newDraw, 0, after);
+                    this.mainLib.addDraw(newDraw, 0, after);
                 } else if ('Generate' === result.output) {
-                    MainLib.addDraw(newDraw, 1, after);
+                    this.mainLib.addDraw(newDraw, 1, after);
                 }
             });
     }
@@ -217,29 +218,29 @@ export class Main {	//mainCtrl {
             }
         }).then((result: DialogResult) => {
                 if ('Ok' === result.output) {
-                    MainLib.updateDraw(editedDraw, draw);
+                    this.mainLib.updateDraw(editedDraw, draw);
                 } else if ('Generate' === result.output) {
-                    MainLib.updateDraw(editedDraw, draw, 1);
+                    this.mainLib.updateDraw(editedDraw, draw, 1);
                 } else if ('Del' === result.output) {
-                    MainLib.removeDraw(draw);
+                    this.mainLib.removeDraw(draw);
                 }
             });
     }
 
     validateDraw(draw: Draw): void {
-        MainLib.validateDraw(draw);
+        this.mainLib.validateDraw(draw);
     }
 
     generateDraw(draw: Draw, generate?: GenerateType): void {
-        MainLib.updateDraw(draw, undefined, generate || GenerateType.Create);
+        this.mainLib.updateDraw(draw, undefined, generate || GenerateType.Create);
     }
 
     updateQualif(draw: Draw): void {
-        MainLib.updateQualif(draw);
+        this.mainLib.updateQualif(draw);
     }
 
     removeDraw(draw: Draw): void {
-        MainLib.removeDraw(draw);
+        this.mainLib.removeDraw(draw);
     }
     //#endregion draw
 
@@ -259,7 +260,7 @@ export class Main {	//mainCtrl {
             }
         }).then((result: DialogResult) => {
                 if ('Ok' === result.output) {
-                    MainLib.editMatch(editedMatch, match);
+                    this.mainLib.editMatch(editedMatch, match);
                 }
             });
     }

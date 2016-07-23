@@ -15,7 +15,7 @@ export class App {
   
   //public static selection = new Selection(); //TODO use DI
 
-  constructor(public selection:Selection, private undo:Undo,
+  constructor(private mainLib:MainLib, public selection:Selection, private undo:Undo,
     private dialogService:DialogService
   ) {
 
@@ -35,7 +35,7 @@ export class App {
   }
 
    loadTournament(filename: File|string): void {
-        MainLib.loadTournament(filename).then(tournament => {
+        this.mainLib.loadTournament(filename).then(tournament => {
             this.selection.select(tournament, ModelType.Tournament);
         });
     }

@@ -1,3 +1,5 @@
+/*TODO check-list
+
 interface CheckListScope extends ng.IScope {
     list: string[];
     value: string;

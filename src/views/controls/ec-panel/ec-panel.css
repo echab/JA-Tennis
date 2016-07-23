@@ -1,0 +1,60 @@
+/**
+    * @ngdoc overview
+    * @name ec.panels
+    *
+    * @description
+    * AngularJS version of the panels directive.
+    */
+html, body {
+    width:100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    }
+.panels {
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+}
+.panel {
+    display: inline-block;
+    height: 100%;
+    background-color: #bbb;
+    -webkit-transition: width .5s;
+    transition: width .5s;
+}
+
+.panel .header {
+    display: block;
+    margin-left: 3em;
+    height: 3em;
+    background-color: #f8f8f8;
+    border-color: #e7e7e7;
+    -webkit-transition: margin-left .5s;
+    transition: margin-left .5s;
+}
+.panelbadge {
+    position: absolute;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    color: #555;
+    background-color: #bbb;
+    padding: 1em;
+    text-align:center;
+    z-index: 2;
+    -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+    -webkit-transition: all .5s;
+    transition: all .5s;
+}
+.panel .header .title {
+    display: inline-block;
+    right: 0em;
+    height: 3em;
+    color: #333;
+}
+
+.panelbadge:not(.active) {
+    background-color: lightsteelblue;
+    color: black;
+}
