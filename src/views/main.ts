@@ -2,6 +2,10 @@ import {autoinject} from 'aurelia-framework';
 import {bindable} from 'aurelia-framework';
 import {DialogService,DialogResult} from 'aurelia-dialog';
 import {DialogInfo} from './tournament/dialog-info';
+import {DialogPlayer} from './player/dialog-player';
+import {DialogEvent} from './event/dialog-event';
+import {DialogDraw} from './draw/dialog-draw';
+import {DialogMatch} from './draw/dialog-match';
 
 import { Selection,ModelType } from '../services/util/selection';
 import { Undo } from '../services/util/undo';

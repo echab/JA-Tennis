@@ -12,9 +12,6 @@ import {autoinject} from 'aurelia-framework';
 //import { HttpClient } from 'aurelia-fetch-client';
 import { HttpClient } from 'aurelia-http-client';
 
-// import { selection } from '../app';   //TODO use DI
-// import { undo } from '../app';   //TODO use DI
-
 @autoinject
 export class MainLib {
 
