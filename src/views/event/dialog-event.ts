@@ -7,7 +7,6 @@ import { rank, category } from '../../services/types';
 
 interface EventModel {
     title: string;
-    selection: Selection;
     event: TEvent;
 };
 
@@ -15,7 +14,7 @@ interface EventModel {
 export class DialogEvent {
 
     private title: string;
-    private selection: Selection;
+    private event: TEvent;
 
     ranks: RankString[];
     categories: CategoryString[];
@@ -28,7 +27,7 @@ export class DialogEvent {
 
     activate(model: EventModel) {
         this.title = model.title;
-        this.selection = model.selection;
+        this.event = model.event;
 
         this.registred = tournamentLib.getRegistred(model.event);
     }

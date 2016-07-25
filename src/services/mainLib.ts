@@ -195,7 +195,7 @@ export class MainLib {
         var c = draw._event.draws;
         if (generate && draws && group && draws.length) {
             var i = Find.indexOf(c, "id", group[0].id, "Draw to edit not found");
-            this.undo.splice(c, i, group.length, draws, "Generate " + GenerateType[generate] + ' ' + draw.name, ModelType.Draw);
+            this.undo.splice(c, i, group.length, draws, "Generate " + /*GenerateType[generate]*/ generate + ' ' + draw.name, ModelType.Draw);
 
             for (var i = 0; i < draws.length; i++) {
                 drawLib.initDraw(draws[i], draw._event);

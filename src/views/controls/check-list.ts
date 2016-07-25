@@ -1,3 +1,50 @@
+import { autoinject } from 'aurelia-framework';
+
+@autoinject
+export class CheckListCustomAttribute {
+
+    private list: string[];
+    private input : HTMLInputElement;
+
+    constructor(private element: Element) {
+        if( element.tagName !== 'INPUT') {
+            throw "Bad element";
+        }
+        this.input = <HTMLInputElement>element;
+
+        this.input.addEventListener("change", this.changeHandler.bind(this));
+    }
+
+    bind() {
+        this.list = (<any>this).value;
+        this.valueChanged(this.list, undefined);
+    }
+
+    valueChanged(list, oldValue) {
+        if (list) {
+            var index = list.indexOf(this.input.value);
+            this.input.checked = index !== -1;
+        }
+    }
+
+
+    private changeHandler() {
+        let input = this.input;
+        var checked = input.checked;
+        if (!this.list) {
+            this.list = [];
+        }
+        var index = this.list.indexOf(input.value);
+
+        if (checked && index == -1) {
+            this.list.push(input.value);
+        } else if (!checked && index != -1) {
+            this.list.splice(index, 1);
+        }
+    }
+
+}
+
 /*TODO check-list
 
 interface CheckListScope extends ng.IScope {

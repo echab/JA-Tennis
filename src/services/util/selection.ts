@@ -1,6 +1,6 @@
 import {Find} from './find'; 
 
-export enum ModelType { None, Tournament, Player, TEvent, Draw, Match, Box }
+export const enum ModelType { None, Tournament, Player, TEvent, Draw, Match, Box }
 
 export class Selection {
     public tournament: Tournament;

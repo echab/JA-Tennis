@@ -1,11 +1,13 @@
-﻿<template>
-<div class="modal-dialog">
+﻿<template class="modal-dialog">
+
+    <require from="../controls/check-list"></require>
+
     <div class="modal-content">
         <form name="eventForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                <h3>${dlg.title} <!--<small>Id: ${dlg.event.id}</small>--> ${dlg.event.name}</h3>
+                <h3>${title} <!--<small>Id: ${event.id}</small>--> ${event.name}</h3>
             </div>
             <div class="modal-body">
 
@@ -19,40 +21,40 @@
                 <div class="row">
                     <label class="span4">
                         Name:
-                        <input type="text" name="name" value.bind="dlg.event.name" required class="span3" autofocus />
+                        <input type="text" name="name" value.bind="event.name" required class="span3" autofocus attach-focus="true" />
                     </label>
                     <!--<span class="error" show.bind="eventForm.name.$error.required">Required!</span>-->
                 </div>
                 <div class="row">
                     <label class="span3">
                         Category:
-                        <select type="text" name="category" value.bind="dlg.event.category" class="span2">
-                            <option repeat.for="value of dlg.categories">${value}</option>
+                        <select type="text" name="category" value.bind="event.category" class="span2">
+                            <option repeat.for="value of categories">${value}</option>
                         </select>
                     </label>
                     <label class="span3">
                         Max Rank:
-                        <select type="text" name="maxRank" value.bind="dlg.event.maxRank" class="span2">
-                            <option repeat.for="value of dlg.ranks">${value}</option>
+                        <select type="text" name="maxRank" value.bind="event.maxRank" class="span2">
+                            <option repeat.for="value of ranks">${value}</option>
                         </select>
                     </label>
                 </div>
                 <div class="row">
                     <label class="span3">
                         Date start:
-                        <input type="date" name="start" value.bind="dlg.event.start" class="span2" />
+                        <input type="date" name="start" value.bind="event.start" class="span2" />
                     </label>
                     <label class="span3">
                         end:
-                        <input type="date" name="end" value.bind="dlg.event.end" class="span2" />
+                        <input type="date" name="end" value.bind="event.end" class="span2" />
                     </label>
                 </div>
                 <!--<div class="row">
                     <label class="span2">Registrations:</label>
                     <div class="offset2">
                         <ul class="span3 unstyled">
-                            <li repeat.for="player of dlg.registred">
-                                <label><input type="checkbox" check-list="player.registration" value="${event.id}" /> ${player.name}</label>
+                            <li repeat.for="player of registred">
+                                <label><input type="checkbox" check-list.bind="player.registration" value.bind="event.id & oneTime" /> ${player.name}</label>
                             </li>
                         </ul>
                     </div>
@@ -62,7 +64,7 @@
                     <span class="span1">Draws:</span>
                     <div class="offset1">
                         <ul class="unstyled">
-                            <li repeat.for="draw of dlg.event.draws">
+                            <li repeat.for="draw of event.draws">
                                 <span><i class="icon2-draw"></i> ${draw.name}</span>
                             </li>
                         </ul>
@@ -82,8 +84,8 @@
                     <div>
                         <label>
                             Rank:
-                            <select type="text" name="rank" value.bind="dlg.event.rank">
-                                <option repeat.for="value of dlg.ranks">${value}</option>
+                            <select type="text" name="rank" value.bind="event.rank">
+                                <option repeat.for="value of ranks">${value}</option>
                             </select>
                         </label>
                     </div>
@@ -91,5 +93,4 @@
             <!--${ eventForm.$error }-->
         </form>
     </div>
-</div>
 </template>

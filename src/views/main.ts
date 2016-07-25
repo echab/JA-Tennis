@@ -31,7 +31,7 @@ export class Main {	//mainCtrl {
     constructor(
         private mainLib: MainLib, 
         private dialogService: DialogService,
-        private selection:Selection, 
+        public selection:Selection, 
         private undo:Undo
         ) {
 

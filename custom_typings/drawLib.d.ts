@@ -1,5 +1,5 @@
 
-declare enum GenerateType { None, Create, PlusEchelonne, PlusEnLigne, Mix }
+declare const enum GenerateType { None, Create, PlusEchelonne, PlusEnLigne, Mix }
 
 interface IDrawLib {
     getSize(draw: Draw): ISize;

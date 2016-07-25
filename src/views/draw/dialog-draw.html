@@ -4,14 +4,14 @@
         <form name="drawForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                <h3>${dlg.title} <!--<small>Id: ${dlg.draw.id}</small>--> ${dlg.draw.name}</h3>
+                <h3>${title} <!--<small>Id: ${draw.id}</small>--> ${draw.name}</h3>
             </div>
             <div class="modal-body">
 
                 <div class="row">
                     <label class="span4">
                         Name:
-                        <input type="text" name="name" value.bind="dlg.draw.name" required class="span3" autofocus />
+                        <input type="text" name="name" value.bind="draw.name" required class="span3" autofocus attach-focus="true" />
                     </label>
                     <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
                 </div>
@@ -19,8 +19,8 @@
                 <div class="row">
                     <label class="span3">
                         Type:
-                        <select name="type" value.bind="dlg.draw.type" required class="span2">
-                            <option repeat.for="type of dlg.drawTypes" value.bind="type.value">${type.label}</option>
+                        <select name="type" value.bind="draw.type" required class="span2">
+                            <option repeat.for="type of drawTypes" value.bind="type.value">${type.label}</option>
                         </select>
                     </label>
                     <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
@@ -29,21 +29,21 @@
                 <div class="row">
                     <label class="span3">
                         Rank, from:
-                        <select name="minRank" value.bind="dlg.draw.minRank" class="span2">
-                            <option repeat.for="value of dlg.ranks">${value}</option> 
+                        <select name="minRank" value.bind="draw.minRank" class="span2">
+                            <option repeat.for="value of ranks">${value}</option> 
                         </select>
                     </label>
                     <label class="span3">
                         to:
-                        <select name="maxRank" value.bind="dlg.draw.maxRank" class="span2">
-                            <option repeat.for="value of dlg.ranks">${value}</option> 
+                        <select name="maxRank" value.bind="draw.maxRank" class="span2">
+                            <option repeat.for="value of ranks">${value}</option> 
                         </select>
                     </label>
                 </div>
 
                 <div class="row">
                     <div class="offset1">
-                        <label>${dlg.getRegisteredCount()} registered</label>
+                        <label>${getRegisteredCount()} registered</label>
                     </div>
                 </div>
 
@@ -52,17 +52,17 @@
                     <!--<div class="row">
                         <label class="span2">
                             Entries:
-                            <input type="number" readonly value.bind="dlg.getNbEntry()" class="span1"/>
+                            <input type="number" readonly value.bind="getNbEntry()" class="span1"/>
                         </label>
                     </div>-->
                     <div class="row">
                         <label class="span2">
                             Columns:
-                            <input type="number" name="nbColumn" value.bind="dlg.draw.nbColumn" min="2" max="9" required class="span1" />
+                            <input type="number" name="nbColumn" value.bind="draw.nbColumn" min="2" max="9" required class="span1" />
                         </label>
                         <label class="span2">
                             Outputs:
-                            <input type="number" name="nbOut" value.bind="dlg.draw.nbOut" min="1" max="16" required class="span1" />
+                            <input type="number" name="nbOut" value.bind="draw.nbOut" min="1" max="16" required class="span1" />
                         </label>
                     </div>
                 </fieldset>

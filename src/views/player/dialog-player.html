@@ -1,11 +1,13 @@
-<template>
-<div class="modal-dialog">
+<template class="modal-dialog">
+
+    <require from="../controls/check-list"></require>
+
     <div class="modal-content">
         <form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                <h3>${dlg.title} <!--<small>Id: ${dlg.player.id}</small>--></h3>
+                <h3>${title} <!--<small>Id: ${player.id}</small>--></h3>
             </div>
             <div class="modal-body">
 
@@ -19,19 +21,19 @@
                 <div class="row">
                     <label class="span3">
                         Name:
-                        <input type="text" value.bind="dlg.player.name" required class="span2" />
+                        <input type="text" value.bind="player.name" required class="span2" autofocus attach-focus="true" />
                     </label>
                     <!--<span class="error" show.bind="playerForm.name.$error.required">Required!</span>-->
                     <label class="span3">
                         Surname:
-                        <input type="text" value.bind="dlg.player.firstname" class="span2" />
+                        <input type="text" value.bind="player.firstname" class="span2" />
                     </label>
                 </div>
                 <div class="row">
                     <label class="span3">
                         Rank:
-                        <select type="text" name="rank" value.bind="dlg.player.rank" class="span2">
-                            <option repeat.for="value of dlg.ranks">${value}</option> 
+                        <select type="text" name="rank" value.bind="player.rank" class="span2">
+                            <option repeat.for="value of ranks">${value}</option> 
                         </select>
                     </label>
                 </div>
@@ -39,13 +41,13 @@
                 <div tabset="">
                     <div tab="" heading="General">
                         <div class="row">
-                            <label class="span4">Birth: <input type="date" value.bind="dlg.player.birth" class="span3" /></label>
+                            <label class="span4">Birth: <input type="date" value.bind="player.birth" class="span3" /></label>
                         </div>
                         <div class="row">
-                            <label class="span4">Club: <input type="text" value.bind="dlg.player.club" class="span3" /></label>
+                            <label class="span4">Club: <input type="text" value.bind="player.club" class="span3" /></label>
                         </div>
                         <div class="row">
-                            <label class="span3">Licence: <input type="text" value.bind="dlg.player.licence" class="span2" /></label>
+                            <label class="span3">Licence: <input type="text" value.bind="player.licence" class="span2" /></label>
                         </div>
                     </div>
                     <div tab="" heading="Registration">
@@ -53,8 +55,8 @@
                             <label class="span1">Events:</label>
                             <div class="offset1">
                                 <ul class="span3 unstyled">
-                                    <li repeat.for="event of dlg.events">
-                                        <label><input type="checkbox" check-list="dlg.player.registration" value="${event.id}" /> ${event.name}</label>
+                                    <li repeat.for="event of events">
+                                        <label><input type="checkbox" check-list.bind="player.registration" value.bind="event.id & oneTime" /> ${event.name}</label>
                                     </li>
                                 </ul>
                             </div>
@@ -62,26 +64,26 @@
                     </div>
                     <div tab="" heading="Coordinates">
                         <div class="row">
-                            <label class="span5">Adress: <input type="text" value.bind="dlg.player.adress1" class="span4" /></label>
-                            <label class="span5"><input type="text" value.bind="dlg.player.adress2" class="span4" /></label>
+                            <label class="span5">Adress: <input type="text" value.bind="player.adress1" class="span4" /></label>
+                            <label class="span5"><input type="text" value.bind="player.adress2" class="span4" /></label>
                             <label class="span5">
-                                <input type="text" value.bind="dlg.player.zipcode" class="span1" />
+                                <input type="text" value.bind="player.zipcode" class="span1" />
                                 <span class="spacer"></span>
-                                <input type="text" value.bind="dlg.player.city" class="span3" />
+                                <input type="text" value.bind="player.city" class="span3" />
                             </label>
                         </div>
                         <div class="row">
                             <label class="span5">
                                 Phones:
-                                <input type="tel" value.bind="dlg.player.phone1" class="span2" />
+                                <input type="tel" value.bind="player.phone1" class="span2" />
                                 <span class="spacer"></span>
-                                <input type="tel" value.bind="dlg.player.phone2" class="span2" />
+                                <input type="tel" value.bind="player.phone2" class="span2" />
                             </label>
                         </div>
                         <div class="row">
                             <label class="span5">
                                 eMail:
-                                <input type="email" value.bind="dlg.player.email" class="span4" />
+                                <input type="email" value.bind="player.email" class="span4" />
                             </label>
                         </div>
                     </div>
@@ -91,7 +93,7 @@
                         <div class="row">
                             <label class="span6">
                                 Note:
-                                <textarea value.bind="dlg.player.note" class="span5"></textarea>
+                                <textarea value.bind="player.note" class="span5"></textarea>
                             </label>
                         </div>
                     </div>
@@ -119,5 +121,4 @@
             <!--${ playerForm.$error }-->
         </form>
     </div>
-</div>
 </template>

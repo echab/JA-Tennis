@@ -1,7 +1,6 @@
 
-declare enum DrawType { Normal, Final, PouleSimple, PouleAR }
-
-declare enum Mode { Build, Plan, Play, Lock }
+declare const enum DrawType { Normal, Final, PouleSimple, PouleAR }
+declare const enum Mode { Build, Plan, Play, Lock }
 
 interface Draw {
     id: string; //new draw has no id

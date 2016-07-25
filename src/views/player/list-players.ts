@@ -13,7 +13,7 @@ export class ListPlayers { //ListPlayersCustomElement
 
     private main: Main;
 
-    constructor(private selection: Selection) {
+    constructor() {
         //console.info('Players:' + this.players);
     }
 
@@ -30,8 +30,8 @@ export class ListPlayers { //ListPlayersCustomElement
     }
 
     eventById(id: string): TEvent {
-        if (this.selection.tournament && this.selection.tournament.events) {
-            return Find.byId(this.selection.tournament.events, id);
+        if (this.main.selection.tournament && this.main.selection.tournament.events) {
+            return Find.byId(this.main.selection.tournament.events, id);
         }
     }
 

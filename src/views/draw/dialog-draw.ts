@@ -1,8 +1,6 @@
-import { autoinject } from 'aurelia-framework';
-import { bindable } from 'aurelia-framework';
+import { autoinject, bindable, BindingEngine, Disposable } from 'aurelia-framework';
 import { DialogController } from 'aurelia-dialog';
 
-import { BindingEngine } from 'aurelia-framework'
 import { TournamentLib as tournamentLib } from '../../services/tournamentLib';
 import { DrawLib as drawLib } from '../../services/draw/drawLib';
 import { rank, category } from '../../services/types';
@@ -10,28 +8,30 @@ import { rank, category } from '../../services/types';
 interface DrawModel {
     title: string;
     draw: Draw;
-    //selection: Selection;
 };
 
 @autoinject
 export class DialogDraw {
 
-    title: string;
-    draw: Draw;
-    //selection: Selection;
+    private title: string;
+    private draw: Draw;
 
-    ranks: RankString[];
-    categories: RankString[];
-    drawTypes: { value: number; label: string; }[];
+    private ranks: RankString[];
+    private categories: RankString[];
+    private drawTypes: { value: number; label: string; }[];
+
+    // private disposeMinRank: Disposable;
+    // private disposeMaxRank: Disposable;
 
     constructor(
         private controller: DialogController,
-        private bindingEngine: BindingEngine    //$watch
+        private bindingEngine: BindingEngine
     ) {
         this.drawTypes = [];
-        for (var i = 0; i < 4; i++) {
-            this.drawTypes[i] = { value: i, label: DrawType[i] };
-        }
+        this.drawTypes[DrawType.Normal] = { value: DrawType.Normal, label: "Normal" }; //TODO translate
+        this.drawTypes[DrawType.Final] = { value: DrawType.Final, label: "Final" };
+        this.drawTypes[DrawType.PouleSimple] = { value: DrawType.PouleSimple, label: "Round-robin simple" };
+        this.drawTypes[DrawType.PouleAR] = { value: DrawType.PouleAR, label: "Round-robin double" };
 
         this.ranks = rank.list();
         this.categories = category.list();
@@ -42,17 +42,24 @@ export class DialogDraw {
         this.draw = model.draw;
 
         //Force minRank <= maxRank
+        //this.disposeMinRank = 
         this.bindingEngine.propertyObserver(this.draw, 'minRank').subscribe((minRank: string) => {
             if (!this.draw.maxRank || rank.compare(minRank, this.draw.maxRank) > 0) {
                 this.draw.maxRank = minRank;
             }
         });
+        //this.disposeMaxRank = 
         this.bindingEngine.propertyObserver(this.draw, 'maxRank').subscribe((maxRank: string) => {
             if (maxRank && this.draw.minRank && rank.compare(this.draw.minRank, maxRank) > 0) {
                 this.draw.minRank = maxRank;
             }
         });
     }
+
+    // desactivate() {
+    //     this.disposeMaxRank.dispose();
+    //     this.disposeMinRank.dispose();
+    // }
 
     getRegisteredCount(): number {
         var n = tournamentLib.GetJoueursInscrit(this.draw).length;

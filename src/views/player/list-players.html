@@ -16,10 +16,10 @@
         <tbody>
             <tr repeat.for="player of players" class="${player === main.selection.player ? 'info' : ''}">
                 <td><input type="checkbox" checked.bind="selected"/> <!--<small>${player.id}</small>--></td>
-                <td><i class="icon2-info" click.trigger="main.editPlayer(player)"></i>${player.name} ${player.firstname}</td>
+                <td><i class="icon2-info" click.delegate="main.editPlayer(player)"></i>${player.name} ${player.firstname}</td>
                 <td>${player.rank}</td>
                 <td><span repeat.for="eventId of player.registration">${eventById(eventId).name}${$last ? '' : ', '}</span></td>
-                <td><i class="icon-trash" click.trigger="main.removePlayer(player)"></i></td>
+                <td><i class="icon-trash" click.delegate="main.removePlayer(player)"></i></td>
             </tr>
             <tr show.bind="players.length == 0">
                 <td colspan="3">No player</td>
