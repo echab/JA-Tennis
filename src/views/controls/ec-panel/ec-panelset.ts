@@ -41,6 +41,7 @@ export class EcPanelset {
     selectCount: number = 0;
 
     constructor() {
+        //console.info("panelset ctr");
     }
 
     public select(panel: EcPanel, select: boolean): void {
@@ -74,25 +75,19 @@ export class EcPanelset {
 
     }
 
-    public addBadge(badge: EcBadge): void {
-        this.badges.push(badge);
-        // badge.$on('$destroy', () =>
-        //     this.removeBadge(badge)
-        // );
-    }
-
     public addPanel(panel: EcPanel): void {
-        var badge = this.badges[this.panels.length];
-        badge.panel = panel;
-        panel.badge = badge;
+        // var badge = this.badges[this.panels.length];
+        // badge.panel = panel;
+        // panel.badge = badge;
         panel.marginLeft = 0;
         this.panels.push(panel);
         if (panel.isOpen) {
             this.selectCount++;
         }
-        // panel.$on('$destroy', () =>
-        //     this.removePanel(panel)
-        // );
+    }
+
+    public addBadge(badge: EcBadge): void {
+        this.badges.push(badge);
     }
 
     public removePanel(panel: EcPanel): void {

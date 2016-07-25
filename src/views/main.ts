@@ -19,9 +19,9 @@ import { Validation } from '../services/validation';
 @autoinject
 export class Main {	//mainCtrl {
 
-    public GenerateType = GenerateType;
-    public ModelType = ModelType;
-    public Mode = Mode;
+    // public GenerateType = GenerateType;
+    // public ModelType = ModelType;
+    // public Mode = Mode;
 
     private tournamentOpened=true; 
     private drawsOpened=true;

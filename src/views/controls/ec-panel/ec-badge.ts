@@ -1,21 +1,32 @@
+//import { View } from 'aurelia-templating';
 import { EcPanelset } from './ec-panelset';
 import { EcPanel } from './ec-panel';
 
 export class EcBadge {
 
-    panelSet : EcPanelset;
     panel : EcPanel;
 
-    bind( bindingContext: EcPanelset, overrideContext: Object) {
-        this.panelSet = bindingContext;
+    constructor() {
+        //console.info('badge ctr');
     }
 
-    attached() {
-        this.panel.panelSet.addBadge(this);
+    created(owningView /*: View*/, myView /*: View*/) {
+        //console.info('badge created');
+        this.panel = myView.container.parent.viewModel;
+        this.panel.addBadge( this);
     }
 
-    detached() {
-        this.panel.panelSet.removeBadge(this);
+    // bind( bindingContext: Object /*Main*/, overrideContext: Object) {
+    // }
+
+    // attached() {
+    // }
+
+    // detached() {
+    // }
+
+    unbind() {
+        this.panel.panelset.removeBadge(this);
     }
 
 }

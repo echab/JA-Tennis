@@ -1,4 +1,4 @@
-import { autoinject,bindable,useView } from 'aurelia-framework';
+import { autoinject,bindable } from 'aurelia-framework';
 
 //import {Logger} from 'aurelia-logging';
 
@@ -6,7 +6,6 @@ import { Main } from '../main';
 import { Selection } from '../../services/util/selection';
 import { Find } from '../../services/util/find';
 
-@useView('./list-players.html')
 @autoinject
 export class ListPlayers { //ListPlayersCustomElement
 
@@ -17,9 +16,7 @@ export class ListPlayers { //ListPlayersCustomElement
     private main: Main; //TODO
 
     constructor(private selection: Selection) {
-
-        console.info('Players:' + this.players);
-
+        //console.info('Players:' + this.players);
     }
 
     attached() {

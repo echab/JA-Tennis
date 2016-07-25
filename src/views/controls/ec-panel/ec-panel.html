@@ -1,6 +1,6 @@
 <template>
     <div class="panel ${isOpen ? 'active':''} ${isDisabled ? 'disabled':''}" 
-        css="width: ${isOpen ? getWidth() : 0}">
+        css="width: ${isOpen ? width : 0}">
         <slot></slot>
     </div>
 </template>

@@ -1,6 +1,4 @@
-import { autoinject } from 'aurelia-framework';
-import { bindable } from 'aurelia-framework';
-import { BindingEngine } from 'aurelia-framework'
+import { autoinject,bindable,BindingEngine, computedFrom } from 'aurelia-framework';
 
 import { EcPanelset } from './ec-panelset';
 import { EcBadge } from './ec-badge';
@@ -14,27 +12,35 @@ export class EcPanel {
     @bindable isOpen: boolean;
     @bindable isDisabled: boolean;
 
-    panelSet : EcPanelset;
+    panelset : EcPanelset;
     badge: EcBadge;
     marginLeft: number;
 
     constructor(
         private bindingEngine: BindingEngine    //$watch
     ) {
+        //console.info("panel ctr");
     }
 
-    bind( bindingContext: EcPanelset, overrideContext: Object) {
-        this.panelSet = bindingContext;
-
-    }
-
-    attached() {
-        this.panelSet.addPanel(this);
+    created(owningView /*: View*/, myView /*: View*/) {
+        this.panelset = myView.container.parent.viewModel;
+        this.panelset.addPanel(this);
 
         //scope.$watch('isOpen', (value) => {
         this.bindingEngine.propertyObserver( this, 'isOpen').subscribe( (value: boolean) => {
-            this.panelSet.select(this, !!value)
+            this.panelset.select(this, !!value)
         });
+    }
+
+    // bind( bindingContext: EcPanelset, overrideContext: Object) {
+    // }
+
+    // attached() {
+    // }
+
+    public addBadge(badge: EcBadge): void {
+        this.badge = badge;
+        this.panelset.addBadge(badge);
     }
 
     toggleOpen() {
@@ -43,11 +49,16 @@ export class EcPanel {
         }
     }
 
-    getWidth() {
-        return this.panelSet.selectCount ? (Math.floor(100 / this.panelSet.selectCount) + '%') : 'auto';
+    @computedFrom('panelset.selectCount')
+    get width() {
+        return this.panelset && this.panelset.selectCount ? (Math.floor(100 / this.panelset.selectCount) + '%') : 'auto';
     }
 
-    detached() {
-        this.panelSet.removePanel(this);
+    // detached() {
+    // }
+
+    unbind() {
+        //console.info("panel unbind");
+        this.panelset.removePanel(this);
     }
 }

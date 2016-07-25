@@ -19,7 +19,8 @@ export class Selection {
             return;
         }
 
-        if (type === ModelType.Box || ('_player' in r && (<Box>r)._draw)) { //box
+        //if (type === ModelType.Box || ('_player' in r && (<Box>r)._draw)) { //box
+        if (type === ModelType.Box || (r['_player'] && (<Box>r)._draw)) { //box
             var b = <Box>r;
             this.tournament = b._draw._event._tournament;
             this.event = b._draw._event;
