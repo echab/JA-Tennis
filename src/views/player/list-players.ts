@@ -1,6 +1,4 @@
-//import {useView} from 'aurelia-framework';
-import { autoinject } from 'aurelia-framework';
-import { bindable } from 'aurelia-framework';
+import { autoinject,bindable,useView } from 'aurelia-framework';
 
 //import {Logger} from 'aurelia-logging';
 
@@ -8,9 +6,9 @@ import { Main } from '../main';
 import { Selection } from '../../services/util/selection';
 import { Find } from '../../services/util/find';
 
-//@useView('./list-players.html')
+@useView('./list-players.html')
 @autoinject
-export class ListPlayersCustomElement {
+export class ListPlayers { //ListPlayersCustomElement
 
     @bindable players: Player[];
 

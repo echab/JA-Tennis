@@ -1,119 +1,123 @@
 <template>
-<form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-        <h3>${dlg.title} <!--<small>Id: ${dlg.player.id}</small>--></h3>
-    </div>
-    <div class="modal-body">
-
-        <!--<div class="control-group">
-            <label for="name" class="control-label">Name:</label>
-            <div class="controls">
-                <input type="text" id="name" name="name" value.bind="player.name" required />*
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                <h3>${dlg.title} <!--<small>Id: ${dlg.player.id}</small>--></h3>
             </div>
-        </div>-->
+            <div class="modal-body">
 
-        <div class="row">
-            <label class="span3">
-                Name:
-                <input type="text" value.bind="dlg.player.name" required class="span2" />
-            </label>
-            <!--<span class="error" show.bind="playerForm.name.$error.required">Required!</span>-->
-            <label class="span3">
-                Surname:
-                <input type="text" value.bind="dlg.player.firstname" class="span2" />
-            </label>
-        </div>
-        <div class="row">
-            <label class="span3">
-                Rank:
-                <select type="text" name="rank" value.bind="dlg.player.rank" class="span2">
-                    <option repeat.for="value of dlg.ranks">${value}</option> 
-                </select>
-            </label>
-        </div>
+                <!--<div class="control-group">
+                    <label for="name" class="control-label">Name:</label>
+                    <div class="controls">
+                        <input type="text" id="name" name="name" value.bind="player.name" required />*
+                    </div>
+                </div>-->
 
-        <div tabset="">
-            <div tab="" heading="General">
                 <div class="row">
-                    <label class="span4">Birth: <input type="date" value.bind="dlg.player.birth" class="span3" /></label>
+                    <label class="span3">
+                        Name:
+                        <input type="text" value.bind="dlg.player.name" required class="span2" />
+                    </label>
+                    <!--<span class="error" show.bind="playerForm.name.$error.required">Required!</span>-->
+                    <label class="span3">
+                        Surname:
+                        <input type="text" value.bind="dlg.player.firstname" class="span2" />
+                    </label>
                 </div>
                 <div class="row">
-                    <label class="span4">Club: <input type="text" value.bind="dlg.player.club" class="span3" /></label>
+                    <label class="span3">
+                        Rank:
+                        <select type="text" name="rank" value.bind="dlg.player.rank" class="span2">
+                            <option repeat.for="value of dlg.ranks">${value}</option> 
+                        </select>
+                    </label>
                 </div>
-                <div class="row">
-                    <label class="span3">Licence: <input type="text" value.bind="dlg.player.licence" class="span2" /></label>
-                </div>
-            </div>
-            <div tab="" heading="Registration">
-                <div class="row">
-                    <label class="span1">Events:</label>
-                    <div class="offset1">
-                        <ul class="span3 unstyled">
-                            <li repeat.for="event of dlg.events">
-                                <label><input type="checkbox" check-list="dlg.player.registration" value="${event.id}" /> ${event.name}</label>
-                            </li>
-                        </ul>
+
+                <div tabset="">
+                    <div tab="" heading="General">
+                        <div class="row">
+                            <label class="span4">Birth: <input type="date" value.bind="dlg.player.birth" class="span3" /></label>
+                        </div>
+                        <div class="row">
+                            <label class="span4">Club: <input type="text" value.bind="dlg.player.club" class="span3" /></label>
+                        </div>
+                        <div class="row">
+                            <label class="span3">Licence: <input type="text" value.bind="dlg.player.licence" class="span2" /></label>
+                        </div>
+                    </div>
+                    <div tab="" heading="Registration">
+                        <div class="row">
+                            <label class="span1">Events:</label>
+                            <div class="offset1">
+                                <ul class="span3 unstyled">
+                                    <li repeat.for="event of dlg.events">
+                                        <label><input type="checkbox" check-list="dlg.player.registration" value="${event.id}" /> ${event.name}</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div tab="" heading="Coordinates">
+                        <div class="row">
+                            <label class="span5">Adress: <input type="text" value.bind="dlg.player.adress1" class="span4" /></label>
+                            <label class="span5"><input type="text" value.bind="dlg.player.adress2" class="span4" /></label>
+                            <label class="span5">
+                                <input type="text" value.bind="dlg.player.zipcode" class="span1" />
+                                <span class="spacer"></span>
+                                <input type="text" value.bind="dlg.player.city" class="span3" />
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="span5">
+                                Phones:
+                                <input type="tel" value.bind="dlg.player.phone1" class="span2" />
+                                <span class="spacer"></span>
+                                <input type="tel" value.bind="dlg.player.phone2" class="span2" />
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="span5">
+                                eMail:
+                                <input type="email" value.bind="dlg.player.email" class="span4" />
+                            </label>
+                        </div>
+                    </div>
+                    <!--<div tab="" heading="Team">
+                    </div>-->
+                    <div tab="" heading="Comment">
+                        <div class="row">
+                            <label class="span6">
+                                Note:
+                                <textarea value.bind="dlg.player.note" class="span5"></textarea>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div tab="" heading="Coordinates">
-                <div class="row">
-                    <label class="span5">Adress: <input type="text" value.bind="dlg.player.adress1" class="span4" /></label>
-                    <label class="span5"><input type="text" value.bind="dlg.player.adress2" class="span4" /></label>
-                    <label class="span5">
-                        <input type="text" value.bind="dlg.player.zipcode" class="span1" />
-                        <span class="spacer"></span>
-                        <input type="text" value.bind="dlg.player.city" class="span3" />
-                    </label>
-                </div>
-                <div class="row">
-                    <label class="span5">
-                        Phones:
-                        <input type="tel" value.bind="dlg.player.phone1" class="span2" />
-                        <span class="spacer"></span>
-                        <input type="tel" value.bind="dlg.player.phone2" class="span2" />
-                    </label>
-                </div>
-                <div class="row">
-                    <label class="span5">
-                        eMail:
-                        <input type="email" value.bind="dlg.player.email" class="span4" />
-                    </label>
-                </div>
+            <div class="modal-footer">
+                <button type="submit" disabled.bind="!!playerForm.$error.required" class="btn btn-primary btn-success ${!!playerForm.$error.required ? 'disabled':''}"><i class="icon-ok-sign icon-white"></i>OK</button>
+                <a href="#" click.trigger="controller.ok('Del')">
+                    <i class="icon-trash"></i>
+                </a>
             </div>
-            <!--<div tab="" heading="Team">
-            </div>-->
-            <div tab="" heading="Comment">
-                <div class="row">
-                    <label class="span6">
-                        Note:
-                        <textarea value.bind="dlg.player.note" class="span5"></textarea>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="submit" disabled.bind="!!playerForm.$error.required" class="btn btn-primary btn-success ${!!playerForm.$error.required ? 'disabled':''}"><i class="icon-ok-sign icon-white"></i>OK</button>
-        <a href="#" click.trigger="controller.ok('Del')">
-            <i class="icon-trash"></i>
-        </a>
-    </div>
-    <!--<fieldset>
-            <legend>Coordinate</legend>
-            <div>
-            </div>
+            <!--<fieldset>
+                    <legend>Coordinate</legend>
+                    <div>
+                    </div>
 
-            <div>
-                <label>
-                    Rank:
-            <select type="text" name="rank" value.bind="player.rank">
-                <option repeat.for="value of ranks">${value}</option>
-            </select></label>
-            </div>
-        </fieldset>-->
-    <!--${ playerForm.$error }-->
-</form>
+                    <div>
+                        <label>
+                            Rank:
+                    <select type="text" name="rank" value.bind="player.rank">
+                        <option repeat.for="value of ranks">${value}</option>
+                    </select></label>
+                    </div>
+                </fieldset>-->
+            <!--${ playerForm.$error }-->
+        </form>
+    </div>
+</div>
 </template>

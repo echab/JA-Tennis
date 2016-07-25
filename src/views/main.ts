@@ -1,6 +1,6 @@
-import {autoinject} from 'aurelia-framework';
-import {bindable} from 'aurelia-framework';
+import {autoinject,bindable} from 'aurelia-framework';
 import {DialogService,DialogResult} from 'aurelia-dialog';
+
 import {DialogInfo} from './tournament/dialog-info';
 import {DialogPlayer} from './player/dialog-player';
 import {DialogEvent} from './event/dialog-event';

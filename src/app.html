@@ -1,7 +1,7 @@
 <template>
-  <!--<require from='views/main.html'></require>-->
+  <!--<require from='views/main'></require>-->
   <require from="nav-bar.html"></require>
-  <require from='views/player/list-players.html'></require>
+  <require from='views/player/list-players'></require>
   <require from="bootstrap/css/bootstrap.css"></require>
 
   <!--<main></main>-->
@@ -10,7 +10,10 @@
 
   <div class="page-host">
 
-    <button click.trigger="editTournament(selection.tournament)" >Dialog...</button>
+    <button click.trigger="editTournament(selection.tournament)" >Tournament...</button>
+    <button click.trigger="editEvent(selection.event)" >Event...</button>
+    <button click.trigger="editDraw(selection.draw)" >Draw...</button>
+    <button click.trigger="editPlayer(selection.player)" >Player...</button>
 
     <list-players players.bind="selection.tournament.players" test="1073" sel="${selection}" ></list-players>
 

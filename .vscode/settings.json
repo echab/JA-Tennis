@@ -1,4 +1,11 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+
+    // The number of spaces a tab is equal to.
+    "editor.tabSize": 3,
+
+    // Insert spaces when pressing Tab.
+    "editor.insertSpaces": false
 }

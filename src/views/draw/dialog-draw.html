@@ -1,74 +1,78 @@
 ﻿<template>
-<form name="drawForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-        <h3>${dlg.title} <!--<small>Id: ${dlg.draw.id}</small>--> ${dlg.draw.name}</h3>
-    </div>
-    <div class="modal-body">
-
-        <div class="row">
-            <label class="span4">
-                Name:
-                <input type="text" name="name" value.bind="dlg.draw.name" required class="span3" autofocus />
-            </label>
-            <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
-        </div>
-
-        <div class="row">
-            <label class="span3">
-                Type:
-                <select name="type" value.bind="dlg.draw.type" required class="span2">
-                     <option repeat.for="type of dlg.drawTypes" value.bind="type.value">${type.label}</option>
-                </select>
-            </label>
-            <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
-        </div>
-
-        <div class="row">
-            <label class="span3">
-                Rank, from:
-                <select name="minRank" value.bind="dlg.draw.minRank" class="span2">
-                    <option repeat.for="value of dlg.ranks">${value}</option> 
-                </select>
-            </label>
-            <label class="span3">
-                to:
-                <select name="maxRank" value.bind="dlg.draw.maxRank" class="span2">
-                    <option repeat.for="value of dlg.ranks">${value}</option> 
-                </select>
-            </label>
-        </div>
-
-        <div class="row">
-            <div class="offset1">
-                <label>${dlg.getRegisteredCount()} registered</label>
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form name="drawForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                <h3>${dlg.title} <!--<small>Id: ${dlg.draw.id}</small>--> ${dlg.draw.name}</h3>
             </div>
-        </div>
+            <div class="modal-body">
 
-        <fieldset>
-            <legend>Dimensions:</legend>
-            <!--<div class="row">
-                <label class="span2">
-                    Entries:
-                    <input type="number" readonly value.bind="dlg.getNbEntry()" class="span1"/>
-                </label>
-            </div>-->
-            <div class="row">
-                <label class="span2">
-                    Columns:
-                    <input type="number" name="nbColumn" value.bind="dlg.draw.nbColumn" min="2" max="9" required class="span1" />
-                </label>
-                <label class="span2">
-                    Outputs:
-                    <input type="number" name="nbOut" value.bind="dlg.draw.nbOut" min="1" max="16" required class="span1" />
-                </label>
+                <div class="row">
+                    <label class="span4">
+                        Name:
+                        <input type="text" name="name" value.bind="dlg.draw.name" required class="span3" autofocus />
+                    </label>
+                    <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+                </div>
+
+                <div class="row">
+                    <label class="span3">
+                        Type:
+                        <select name="type" value.bind="dlg.draw.type" required class="span2">
+                            <option repeat.for="type of dlg.drawTypes" value.bind="type.value">${type.label}</option>
+                        </select>
+                    </label>
+                    <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+                </div>
+
+                <div class="row">
+                    <label class="span3">
+                        Rank, from:
+                        <select name="minRank" value.bind="dlg.draw.minRank" class="span2">
+                            <option repeat.for="value of dlg.ranks">${value}</option> 
+                        </select>
+                    </label>
+                    <label class="span3">
+                        to:
+                        <select name="maxRank" value.bind="dlg.draw.maxRank" class="span2">
+                            <option repeat.for="value of dlg.ranks">${value}</option> 
+                        </select>
+                    </label>
+                </div>
+
+                <div class="row">
+                    <div class="offset1">
+                        <label>${dlg.getRegisteredCount()} registered</label>
+                    </div>
+                </div>
+
+                <fieldset>
+                    <legend>Dimensions:</legend>
+                    <!--<div class="row">
+                        <label class="span2">
+                            Entries:
+                            <input type="number" readonly value.bind="dlg.getNbEntry()" class="span1"/>
+                        </label>
+                    </div>-->
+                    <div class="row">
+                        <label class="span2">
+                            Columns:
+                            <input type="number" name="nbColumn" value.bind="dlg.draw.nbColumn" min="2" max="9" required class="span1" />
+                        </label>
+                        <label class="span2">
+                            Outputs:
+                            <input type="number" name="nbOut" value.bind="dlg.draw.nbOut" min="1" max="16" required class="span1" />
+                        </label>
+                    </div>
+                </fieldset>
             </div>
-        </fieldset>
+            <div class="modal-footer">
+                <button type="button" click.trigger="controller.ok('Generate')" disabled.bind="!!drawForm.$error.required" class="btn btn-success ${!!drawForm.$error.required ? 'disabled' :''}"><i class="icon2-draw-generate"></i> Generate</button>
+                <button type="submit" disabled.bind="!!drawForm.$error.required" class="btn btn-primary btn-success ${!!drawForm.$error.required ? 'disabled': ''}"><i class="icon-ok-sign icon-white"></i> OK</button>
+                <a href="#" click.trigger="controller.ok('Del')"><i class="icon-trash"></i></a>
+            </div>
+        </form>
     </div>
-    <div class="modal-footer">
-        <button type="button" click.trigger="controller.ok('Generate')" disabled.bind="!!drawForm.$error.required" class="btn btn-success ${!!drawForm.$error.required ? 'disabled' :''}"><i class="icon2-draw-generate"></i> Generate</button>
-        <button type="submit" disabled.bind="!!drawForm.$error.required" class="btn btn-primary btn-success ${!!drawForm.$error.required ? 'disabled': ''}"><i class="icon-ok-sign icon-white"></i> OK</button>
-        <a href="#" click.trigger="controller.ok('Del')"><i class="icon-trash"></i></a>
-    </div>
-</form>
+</div>
 </template>
