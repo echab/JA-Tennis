@@ -23,9 +23,10 @@ export class Main {	//mainCtrl {
     // public ModelType = ModelType;
     // public Mode = Mode;
 
-    private tournamentOpened=true; 
-    private drawsOpened=true;
-    private planningOpen=false;
+    private tournamentOpened = true; 
+    private playersOpened = true;
+    private drawsOpened = true;
+    private planningOpened = false;
 
     constructor(
         private mainLib: MainLib, 
@@ -42,7 +43,8 @@ export class Main {	//mainCtrl {
         //Load saved tournament if exists
         //this.mainLib.loadTournament().then((data) => {
         //}, (reason) => {
-        this.mainLib.loadTournament(filename).then((data) => {
+        this.mainLib.loadTournament(filename).then(tournament => {
+            this.selection.select(tournament, ModelType.Tournament);
         });
         //});
 
@@ -269,6 +271,14 @@ export class Main {	//mainCtrl {
     }
     public doRedo(): void {
         this.selection.select(this.undo.redo(), this.undo.getMeta());
+    }
+
+    static getAncestorViewModel(container /*:Container*/, clazz:Function) {
+        for( let c = container; c; c = c.parent) {
+            if( c.viewModel && c.viewModel instanceof clazz) {
+                return c.viewModel;
+            }
+        } 
     }
 }
 

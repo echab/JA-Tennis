@@ -7,26 +7,24 @@ import { Undo } from './services/util/undo';
 import { MainLib } from './services/mainLib';
 import { TournamentLib } from './services/tournamentLib';
 
-import {DialogService,DialogResult} from 'aurelia-dialog';  //for quick test
-import {DialogInfo} from './views/tournament/dialog-info';
+// import {DialogService,DialogResult} from 'aurelia-dialog';  //for quick test
+// import {DialogInfo} from './views/tournament/dialog-info';
 
-import {ListPlayers} from './views/player/list-players';  //for quick test
+// import {ListPlayers} from './views/player/list-players';  //for quick test
 
 @autoinject
 export class App {
 
    router: Router;
   
-   //public static selection = new Selection(); //TODO use DI
+//    constructor(
+//     private mainLib:MainLib, public selection:Selection, private undo:Undo,
+//      private dialogService:DialogService
+//    ) {
 
-   constructor(
-    private mainLib:MainLib, public selection:Selection, private undo:Undo,
-     private dialogService:DialogService
-   ) {
-
-       //TODO refactor. For initial test only    
-       this.loadTournament('data/tournament8.json');
-   }
+//       //TODO refactor. For initial test only    
+//        this.loadTournament('data/tournament8.json');
+//    }
 
    configureRouter(config: RouterConfiguration, router: Router) {
       config.title = 'Aurelia';
@@ -39,29 +37,29 @@ export class App {
       this.router = router;
    }
 
-   loadTournament(filename: File|string): void {
-        this.mainLib.loadTournament(filename).then(tournament => {
-            this.selection.select(tournament, ModelType.Tournament);
-        });
-    }
+//    loadTournament(filename: File|string): void {
+//         this.mainLib.loadTournament(filename).then(tournament => {
+//             this.selection.select(tournament, ModelType.Tournament);
+//         });
+//     }
 
-   editTournament(tournament: Tournament): void {
+//    editTournament(tournament: Tournament): void {
 
-        var editedInfo = TournamentLib.newInfo(this.selection.tournament.info);
+//         var editedInfo = TournamentLib.newInfo(this.selection.tournament.info);
 
-        this.dialogService.open({
-            viewModel: DialogInfo, 
-            model: {
-                title: "Edit info",
-                info: editedInfo
-            }
-        }).then((result: DialogResult) => {
-            if ('Ok' === result.output) {
-                //MainLib.editInfo(editedInfo, this.selection.tournament.info);
-                var c = this.selection.tournament;
-                this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
-            }
-        });
-    }
+//         this.dialogService.open({
+//             viewModel: DialogInfo, 
+//             model: {
+//                 title: "Edit info",
+//                 info: editedInfo
+//             }
+//         }).then((result: DialogResult) => {
+//             if ('Ok' === result.output) {
+//                 //MainLib.editInfo(editedInfo, this.selection.tournament.info);
+//                 var c = this.selection.tournament;
+//                 this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
+//             }
+//         });
+//     }
   
 }

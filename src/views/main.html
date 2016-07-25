@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="styles/icons.css">
 
 <ec-panelset>
-    <ec-panel class="tournament" is-open="tournamentOpened">
+    <ec-panel class="tournament" is-open.bind="tournamentOpened">
         <ec-badge class="tournament"><i class="icon2-ball"></i></ec-badge>
         <ec-header>
             <i class="icon2-info" click.trigger="editTournament(selection.tournament)"></i>
@@ -38,7 +38,7 @@
             </div>
             <button class="btn" click.trigger="addEvent(selection.event)"><i class="icon-plus"></i> Add event</button>
         </div>
-    </ec-panel><ec-panel class="players" is-open="playersOpened">
+    </ec-panel><ec-panel class="players" is-open.bind="playersOpened">
         <ec-badge class="players"><i class="icon2-player"></i></ec-badge>
         <ec-header>Players</ec-header>
         <div class="content">
@@ -49,7 +49,7 @@
                 <button class="btn" click.trigger="addPlayer()"><i class="icon-plus"></i> Add player</button>
             </form>
         </div>
-    </ec-panel><ec-panel class="draws" is-open="drawsOpened">
+    </ec-panel><ec-panel class="draws" is-open.bind="drawsOpened">
         <ec-badge class="draws"><i class="icon2-draw"></i></ec-badge>
         <ec-header>
             <form class="form-horizontal">
@@ -102,7 +102,7 @@
                 </div>
             </form>
         </div>
-    </ec-panel><ec-panel is-open="planningOpened" class="planning">
+    </ec-panel><ec-panel is-open.bind="planningOpened" class="planning">
         <ec-badge class="planning"><i class="icon2-planning"></i></ec-badge>
         <ec-header>Planning</ec-header>
         <div class="content">

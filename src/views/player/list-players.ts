@@ -11,20 +11,22 @@ export class ListPlayers { //ListPlayersCustomElement
 
     @bindable players: Player[];
 
-    @bindable test: number;
-
-    private main: Main; //TODO
+    private main: Main;
 
     constructor(private selection: Selection) {
         //console.info('Players:' + this.players);
     }
 
+    created(owningView /*: View*/, myView /*: View*/) {
+        this.main = Main.getAncestorViewModel( myView.container, Main);
+    }
+
     attached() {
-        console.info('Attached: Players=' + this.players);
+        //console.info('Attached: Players=' + this.players);
     }
 
     activate() {
-        console.info('Activate: Players=' + this.players);
+        //console.info('Activate: Players=' + this.players);
     }
 
     eventById(id: string): TEvent {

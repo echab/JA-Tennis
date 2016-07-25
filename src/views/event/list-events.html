@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr repeat.for="event of list.events" class="${event === main.selection.event ? 'info':''}">
+        <tr repeat.for="event of events" class="${event === main.selection.event ? 'info':''}">
             <!--<td><input type="checkbox" /> <small>${event.id}</small></td>-->
             <td class="${event === main.selection.event ? 'selected':''}">
                 <i class="icon2-info" click.trigger="main.editEvent(event)"></i>
@@ -29,7 +29,7 @@
                 </div>
             </td>
         </tr>
-        <tr show.bind="list.events.length == 0">
+        <tr show.bind="events.length == 0">
             <td colspan="3">No event</td>
         </tr>
     </tbody>
