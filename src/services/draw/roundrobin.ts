@@ -45,12 +45,12 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         return box;
     }
 
-    @override
+    //@override
     public nbColumnForPlayers(draw: Draw, nJoueur: number): number {
         return nJoueur;
     }
 
-    @override
+    //@override
     public boxesOpponents(match: Match): { box1: Box; box2: Box } {
         var n = match._draw.nbColumn;
         var pos1 = seedPositionOpponent1(match.position, n),
@@ -61,7 +61,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         }
     }
 
-    @override
+    //@override
     public getSize(draw: Draw): ISize {
 
         if (!draw.nbColumn) {
@@ -75,13 +75,13 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         };
     }
 
-    @override
+    //@override
     public computePositions(draw: Draw): IPoint[] {
         //nothing to do for round robin
         return;
     }
 
-    @override
+    //@override
     public resize(draw: Draw, oldDraw?: Draw, nJoueur?: number): void {
 
         if (nJoueur) {
@@ -133,7 +133,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         }
     }
 
-    @override
+    //@override
     public findPlayerIn(draw: Draw, iQualifie: number): PlayerIn {
 
         ASSERT(iQualifie >= 0);
@@ -155,7 +155,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         }
     }
 
-    @override
+    //@override
     public findPlayerOut(draw: Draw, iQualifie: number): Match {
 
         ASSERT(0 < iQualifie);
@@ -172,7 +172,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         }
     }
 
-    @override
+    //@override
     public setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
@@ -219,7 +219,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    @override
+    //@override
     public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
@@ -318,7 +318,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         return ppJoueur;
     }
 
-    @override
+    //@override
     public generateDraw(refDraw: Draw, generate?: GenerateType, afterIndex?: number): Draw[] {
 
         var oldDraws = drawLib.group(refDraw);
@@ -407,7 +407,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     }
 
     //Calcul classement des poules
-    @override
+    //@override
     public computeScore(draw: Draw): boolean {
 
         //TODO

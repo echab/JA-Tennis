@@ -27,7 +27,6 @@ export class CheckListCustomAttribute {
         }
     }
 
-
     private changeHandler() {
         let input = this.input;
         var checked = input.checked;

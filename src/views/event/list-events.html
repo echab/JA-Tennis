@@ -1,4 +1,7 @@
 ﻿<template>
+
+<require from="../draw/draw-draw"></require>
+
 <table class="table table-hover table-condensed" style="width:auto;">
     <!--<caption>Events</caption>-->
     <thead>
@@ -22,10 +25,10 @@
                     <i class="icon2-info" click.trigger="main.editDraw(draw)"></i>
                     <span click.trigger="main.select(draw)">${draw.name} ${draw.suite ? '(S)' : ''}</span>
                     <i class="icon-trash" click.trigger="main.removeDraw(draw)"></i>
-                    <div draw="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
+                    <draw-draw draw.bind="draw" simple.bind="true" box-width.bind="10" box-height.bind="4" inter-box-width.bind="2" inter-box-height.bind="0"
                          style="position:relative;"
                          click.trigger="main.select(draw)">
-                    </div>
+                    </draw-draw>
                 </div>
             </td>
         </tr>

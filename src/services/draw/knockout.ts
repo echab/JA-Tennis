@@ -51,7 +51,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return box;
     }
 
-    @override
+    //@override
     public nbColumnForPlayers(draw: Draw, nJoueur: number): number {
 
         
@@ -67,7 +67,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return c - colMin + 1;
     }
 
-    @override
+    //@override
     public resize(draw: Draw, oldDraw?: Draw, nPlayer?: number): void {
 
         //ASSERT( SetDimensionOk( draw, oldDraw, nPlayer));
@@ -92,7 +92,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
     }
 
-    @override
+    //@override
     public generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[] {
         if (generate === GenerateType.Create) {   //from registred players
             var m_nMatchCol = filledArray(MAX_COL, 0);
@@ -525,7 +525,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return draw;
     }
 
-    @override
+    //@override
     public boxesOpponents(match: Match): { box1: Box; box2: Box } {
         
         var pos1 = k.positionOpponent1(match.position),
@@ -536,7 +536,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         };
     }
 
-    @override
+    //@override
     public getSize(draw: Draw): ISize {
 
         
@@ -551,7 +551,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         };
     }
 
-    @override
+    //@override
     public computePositions(draw: Draw): IPoint[] {
 
         
@@ -588,7 +588,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return positions;
     }
 
-    @override
+    //@override
     public computeScore(draw: Draw): boolean {
         return true;
     }
@@ -612,7 +612,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 );
     }
 
-    @override
+    //@override
     public setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
@@ -669,7 +669,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    @override
+    //@override
     public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
@@ -723,7 +723,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    @override
+    //@override
     public findPlayerIn(draw: Draw, iQualifie: number): PlayerIn {
 
         ASSERT(0 <= iQualifie);
@@ -744,7 +744,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
     }
 
-    @override
+    //@override
     public findPlayerOut(draw: Draw, iQualifie: number): Match {
 
         ASSERT(0 < iQualifie);

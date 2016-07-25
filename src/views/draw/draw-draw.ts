@@ -8,11 +8,18 @@ import { DrawLib } from '../../services/draw/drawLib';
 import { TournamentLib } from '../../services/tournamentLib';
 import { Find } from '../../services/util/find';
 import { Undo } from '../../services/util/undo';
+import { Main } from '../main';
 
 @autoinject
 export class DrawDraw implements ISize {
 
-    draw: Draw;
+    @bindable draw: Draw;
+    @bindable boxWidth: number = 150;
+    @bindable boxHeight: number = 40;
+    @bindable interBoxWidth: number = 10;
+    @bindable interBoxHeight: number = 10;
+    @bindable simple: boolean = false;
+
     isKnockout: boolean;
     players: Player[];
     qualifsIn: Match[];
@@ -21,14 +28,10 @@ export class DrawDraw implements ISize {
     width: number;
     height: number;
     rows: number[][];
-
-    @bindable boxWidth: number = 150;
-    @bindable boxHeight: number = 40;
-    @bindable interBoxWidth: number = 10;
-    @bindable interBoxHeight: number = 10;
-    @bindable simple: boolean = false;
-
     _drawLib: IDrawLib;
+    //canvas: HTMLCanvasElement;
+
+    private main: Main;
 
     constructor(
         //private knockout: Knockout, //for dependencies
@@ -39,23 +42,40 @@ export class DrawDraw implements ISize {
         ) {
     }
 
-    bind(bindingContext: Object, overrideContext: Object) {
+    created(owningView /*: View*/, myView /*: View*/) {
+        this.main = Main.getAncestorViewModel( myView.container, Main);
 
-        //this.bindingEngine.propertyObserver( draw, 'minRank').subscribe( (minRank: string) => {
-        //TODO scope.$watch(attrs.draw, doRefresh);
-
-        this.bindingEngine.propertyObserver( this.draw, '_refresh').subscribe( (refesh: Date, oldRefresh: Date) => {
-            if (refesh !== oldRefresh) {
-                this.doRefresh(this.draw);
-            }
-        });
+        // let elemDrawDraw = myView.container.element; 
+        // this.canvas = elemDrawDraw.ownerDocument.getElementById('drawLines');
     }
 
-    init() {
+    bind(bindingContext: Object, overrideContext: Object) {
+
+        //TODO scope.$watch(attrs.draw, drawChanged);
+        //this.bindingEngine.propertyObserver( this, 'draw').subscribe( this.drawChanged.bind(this)));
+
+        //this.drawChanged(this.draw);
+
+        // this.bindingEngine.propertyObserver( this.draw, '_refresh').subscribe( (refesh: Date, oldRefresh: Date) => {
+        //     if (refesh !== oldRefresh) {
+        //         this.drawChanged(this.draw);
+        //     }
+        // });
+    }
+
+    drawChanged(draw: Draw, oldValue?: Draw) {
+        this.draw = draw;
+        this.isKnockout = draw && draw.type < 2;
+
         if (!this.draw || this.simple) {
             return;
         }
+
         this._drawLib = Services.drawLibFor(this.draw);
+
+        if(!this._drawLib) {
+            return; //TODO
+        }
 
         this.players = TournamentLib.GetJoueursInscrit(this.draw);
 
@@ -68,30 +88,26 @@ export class DrawDraw implements ISize {
         for (var i = 1; i <= this.draw.nbOut; i++) {
             this.qualifsOut.push(i);
         }
-    }
 
-    doRefresh(draw: Draw, oldValue?: Draw) {
-        this.draw = draw;
-        this.isKnockout = draw && draw.type < 2;
-
-        this.init();
         this.computeCoordinates();
 
+        //this.drawLines( this.canvas);
+        
         // //IE8 patch
         // if (this.isKnockout && useVML) {
         //     this.drawLines(element);
         // }
     }
-
+ 
     //TODO to be moved into knockout and roundrobin drawLib
     computeCoordinates(): void {
-        if (!this.draw) {
+        let draw = this.draw;
+        if (!draw) {
             return;
         }
-        var draw = this.draw;
-        if (!this._drawLib) {
-            this._drawLib = Services.drawLibFor(draw);
-        }
+        // if (!this._drawLib) {
+        //     this._drawLib = Services.drawLibFor(draw);
+        // }
         var size = this._drawLib.getSize(draw);
         this.width = size.width * this.boxWidth - this.interBoxWidth;
         this.height = size.height * this.boxHeight;
@@ -125,9 +141,8 @@ export class DrawDraw implements ISize {
         }
 
         //draw the lines...
-        var _canvas = <HTMLCanvasElement> canvas[0];
         var ctx = //useVML ? new vmlContext(canvas, this.width, this.height) :
-            _canvas.getContext('2d');
+            canvas.getContext('2d');
         ctx.lineWidth = .5;
         ctx.translate(.5, .5);
         var boxHeight2 = this.boxHeight >> 1;
@@ -277,20 +292,6 @@ function positionOpponents(pos: number): { pos1: number; pos2: number } { //ADVE
 //             //    .attr('strokecolor', this.strokeStyle)
 //             //    .attr('strokeweight', this.lineWidth + 'px')
 //             //    .attr('path', this._path.join(''));
-//         }
-//     };
-// }
-
-// function drawLinesDirective(): ng.IDirective {
-//     return {
-//         restrict: 'A',
-//         require: '^draw',
-//         link: (scope: ng.IScope, element: JQuery, attrs: any, ctrlDraw: DrawDraw) => {
-//             //attrs.$observe( 'drawLines', () => {
-//             //bindingEngine.propertyObserver( draw, 'minRank').subscribe( (minRank: string) => {
-//             scope.$watch(attrs.drawLines, () => {
-//                 ctrlDraw.drawLines(element);
-//             });
 //         }
 //     };
 // }

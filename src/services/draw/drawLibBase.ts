@@ -8,7 +8,13 @@ var MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1;
 
-export class DrawLibBase {
+export abstract class DrawLibBase {
+
+    public abstract nbColumnForPlayers(draw: Draw, nJoueur: number): number;
+    public abstract getSize(draw: Draw): ISize;
+    public abstract computePositions(draw: Draw): IPoint[];
+    public abstract resize(draw: Draw, oldDraw?: Draw, nJoueur?: number): void;
+    public abstract generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[];
 
     public resetDraw(draw: Draw, nPlayer: number): void {
         //remove qualif out

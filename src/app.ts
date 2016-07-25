@@ -7,6 +7,9 @@ import { Undo } from './services/util/undo';
 import { MainLib } from './services/mainLib';
 import { TournamentLib } from './services/tournamentLib';
 
+import { Knockout } from './services/draw/knockout';
+import { Roundrobin } from './services/draw/roundrobin';
+
 // import {DialogService,DialogResult} from 'aurelia-dialog';  //for quick test
 // import {DialogInfo} from './views/tournament/dialog-info';
 
@@ -17,14 +20,11 @@ export class App {
 
    router: Router;
   
-//    constructor(
-//     private mainLib:MainLib, public selection:Selection, private undo:Undo,
-//      private dialogService:DialogService
-//    ) {
-
-//       //TODO refactor. For initial test only    
-//        this.loadTournament('data/tournament8.json');
-//    }
+   constructor(
+      private knockout:Knockout, 
+      private roundrobin:Roundrobin 
+   ) {
+   }
 
    configureRouter(config: RouterConfiguration, router: Router) {
       config.title = 'Aurelia';
@@ -36,30 +36,5 @@ export class App {
 
       this.router = router;
    }
-
-//    loadTournament(filename: File|string): void {
-//         this.mainLib.loadTournament(filename).then(tournament => {
-//             this.selection.select(tournament, ModelType.Tournament);
-//         });
-//     }
-
-//    editTournament(tournament: Tournament): void {
-
-//         var editedInfo = TournamentLib.newInfo(this.selection.tournament.info);
-
-//         this.dialogService.open({
-//             viewModel: DialogInfo, 
-//             model: {
-//                 title: "Edit info",
-//                 info: editedInfo
-//             }
-//         }).then((result: DialogResult) => {
-//             if ('Ok' === result.output) {
-//                 //MainLib.editInfo(editedInfo, this.selection.tournament.info);
-//                 var c = this.selection.tournament;
-//                 this.undo.update(this.selection.tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
-//             }
-//         });
-//     }
   
 }

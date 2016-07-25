@@ -8,8 +8,8 @@ export class Services {
 	}
 
 	static drawLibFor(draw: Draw | DrawType): IDrawLib {
-		//TODO remove cast?
-		return this._drawLibs[ <number> ( (<Draw>draw).type ? (<Draw>draw).type : draw)];
+		let drawType : DrawType = 'number' === typeof draw ? draw : (<Draw>draw).type;
+		return this._drawLibs[drawType];
 	}
 
 }
