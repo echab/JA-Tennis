@@ -1,25 +1,25 @@
 ﻿<template>
-<div if.bind="ctrlDraw.isKnockout" class="draw knockout" style="width: ${ctrlDraw.width +'px'}; height: ${ctrlDraw.height +'px'}"
+<div if.bind="ctrlDraw.isKnockout" class="draw knockout" css="width: ${ctrlDraw.width +'px'}; height: ${ctrlDraw.height +'px'}"
      click.trigger="main.select(null,main.ModelType.Box)">
     <canvas draw-lines="ctrlDraw._refresh"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
     <div repeat.for="box of ctrlDraw.draw.boxes" if.bind="!ctrlDraw.simple">
         <div draw-box="box" class="box"
-             style="left:${(box._x * ctrlDraw.boxWidth) +'px'}; top:${(box._y * ctrlDraw.boxHeight) +'px'}"></div>
+             css="left:${(box._x * ctrlDraw.boxWidth) +'px'}; top:${(box._y * ctrlDraw.boxHeight) +'px'}"></div>
     </div>
 </div>
 <table if.bind="!ctrlDraw.isKnockout" class="draw roundrobin"
        click.trigger="main.select(null,main.ModelType.Box)">
     <tbody>
-        <tr style="height: ${ctrlDraw.boxHeight +'px'}">
-            <td style="width: ${ctrlDraw.boxWidth +'px'}"></td>
-            <td repeat.for="row of ctrlDraw.rows" style="width: ${ctrlDraw.boxWidth +'px'}">
+        <tr css="height: ${ctrlDraw.boxHeight +'px'}">
+            <td css="width: ${ctrlDraw.boxWidth +'px'}"></td>
+            <td repeat.for="row of ctrlDraw.rows" css="width: ${ctrlDraw.boxWidth +'px'}">
                 <div draw-box="ctrlDraw.getBox(row[0])" if.bind="!ctrlDraw.simple"></div>
             </td>
             <td>
                 <div repeat.for="i of ctrlDraw.range(1, ctrlDraw.draw.nbOut)" class="qualifOut">Q${i}</div>
             </td>
         </tr>
-        <tr repeat.for="row of ctrlDraw.rows" style="height: ${ctrlDraw.boxHeight +'px'}">
+        <tr repeat.for="row of ctrlDraw.rows" css="height: ${ctrlDraw.boxHeight +'px'}">
             <td repeat.for="col of row" class="${ctrlDraw.isDiag(col) ?'diag':''}">
                 <div draw-box="ctrlDraw.getBox(col)" if.bind="!ctrlDraw.simple"></div>
             </td>
@@ -28,7 +28,7 @@
 </table>
 <div class="action"
      if.bind="!ctrlDraw.simple && main.selection.box"
-     style="left: ${(1+ main.selection.box._x * ctrlDraw.boxWidth) +'px'}; top:${((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}"
+     css="left: ${(1+ main.selection.box._x * ctrlDraw.boxWidth) +'px'}; top:${((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}"
     >
     <div class="btn-group" if.bind="ctrlDraw.draw.mode == 0">
         <button class="btn dropdown-toggle" disabled.bind="ctrlDraw.isMatch(main.selection.box)" title="Select the qualified">

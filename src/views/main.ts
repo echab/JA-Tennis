@@ -47,15 +47,9 @@ export class Main {	//mainCtrl {
         //});
 
         //Auto save tournament on exit
-        let onBeforeUnloadHandler = (event: BeforeUnloadEvent) => {
-            this.mainLib.saveTournament(this.selection.tournament);
-        };
-        if (window.addEventListener) {
-            window.addEventListener('beforeunload', onBeforeUnloadHandler);
-        } else {
-            window.onbeforeunload = onBeforeUnloadHandler;
-        }
-
+        window.addEventListener('beforeunload',  () =>
+            this.mainLib.saveTournament(this.selection.tournament)
+        );
 
     }
 
