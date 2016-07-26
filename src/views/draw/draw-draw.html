@@ -3,9 +3,9 @@
 
     <div if.bind="isKnockout" class="draw knockout" css="width: ${width +'px'}; height: ${height +'px'}"
         click.trigger="main.select(null,main.ModelType.Box)">
-        <canvas draw-lines.bind="_this"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
+        <canvas draw-lines.bind="draw"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
         <div repeat.for="box of draw.boxes" if.bind="!simple">
-            <draw-box box.bind="box" dd.bind="_this" class="box"
+            <draw-box box.bind="box" class="box"
                 css="left:${(box._x * boxWidth) +'px'}; top:${(box._y * boxHeight) +'px'}"></draw-box>
         </div>
     </div>

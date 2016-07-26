@@ -12,6 +12,7 @@
 <require from="../styles/icons.css"></require>
 -->
 <link rel="stylesheet" href="styles/app.css">
+<link rel="stylesheet" href="styles/draw.css">
 <link rel="stylesheet" href="styles/icons.css">
 
 <ec-panelset>
@@ -61,16 +62,16 @@
                 </select>
 
                 <i class="icon2-info" click.trigger="editDraw(selection.draw)" disabled.bind="!selection.draw" title="Edit draw properties"></i>
-                <select value.one-way="selection.draw.id" change.trigger="select(this.value, modelTypeDraw)"
+                <select value.one-way="selection.draw.id" change.trigger="select($event.target.value, modelTypeDraw)"
                     class="span2" title="Select a draw">
                     <option repeat.for="draw of selection.event.draws" value.bind="draw.id">${draw.name}</option> 
                 </select>
                 
                 <div class="btn-group" title="Lock/unlock the draw modifications">
-                    <button class="btn" value.bind="selection.draw.mode" btn-radio="Mode.Build" disabled.bind="!selection.draw" title="Switch to draw build mode"><i class="icon2-draw"></i></button>
-                    <button class="btn" value.bind="selection.draw.mode" btn-radio="Mode.Plan" disabled.bind="!selection.draw" title="Switch to planning mode"><i class="icon2-planning"></i></button>
-                    <button class="btn" value.bind="selection.draw.mode" btn-radio="Mode.Play" disabled.bind="!selection.draw" title="Switch to match mode"><i class="icon2-match"></i></button>
-                    <button class="btn" value.bind="selection.draw.mode" btn-radio="Mode.Lock" disabled.bind="!selection.draw" title="Lock the draw"><i class="icon2-locker"></i></button>
+                    <button class="btn" name="drawMode" value.bind="selection.draw.mode" btn-radio="Mode.Build" disabled.bind="!selection.draw" title="Switch to draw build mode"><i class="icon2-draw"></i></button>
+                    <button class="btn" name="drawMode" value.bind="selection.draw.mode" btn-radio="Mode.Plan" disabled.bind="!selection.draw" title="Switch to planning mode"><i class="icon2-planning"></i></button>
+                    <button class="btn" name="drawMode" value.bind="selection.draw.mode" btn-radio="Mode.Play" disabled.bind="!selection.draw" title="Switch to match mode"><i class="icon2-match"></i></button>
+                    <button class="btn" name="drawMode" value.bind="selection.draw.mode" btn-radio="Mode.Lock" disabled.bind="!selection.draw" title="Lock the draw"><i class="icon2-locker"></i></button>
                 </div>
             </form>
         </ec-header>

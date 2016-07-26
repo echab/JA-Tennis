@@ -29,40 +29,23 @@ export class DrawDraw implements ISize {
     height: number;
     rows: number[][];
     _drawLib: IDrawLib;
-    //canvas: HTMLCanvasElement;
-    _this: DrawDraw;    //used by draw-lines custom attribute
 
     main: Main;
 
     constructor(
-        //private knockout: Knockout, //for dependencies
-        //private roundrobin: Roundrobin, //for dependencies
         private undo: Undo,
         private selection: Selection,
         private bindingEngine: BindingEngine
         ) {
-        this._this = this;
     }
 
     created(owningView /*: View*/, myView /*: View*/) {
         this.main = Main.getAncestorViewModel( myView.container, Main);
-
-        // let elemDrawDraw = myView.container.element; 
-        // this.canvas = elemDrawDraw.ownerDocument.getElementById('drawLines');
     }
 
     bind(bindingContext: Object, overrideContext: Object) {
-
-        //TODO scope.$watch(attrs.draw, drawChanged);
-        //this.bindingEngine.propertyObserver( this, 'draw').subscribe( this.drawChanged.bind(this)));
-
-        //this.drawChanged(this.draw);
-
-        // this.bindingEngine.propertyObserver( this.draw, '_refresh').subscribe( (refesh: Date, oldRefresh: Date) => {
-        //     if (refesh !== oldRefresh) {
-        //         this.drawChanged(this.draw);
-        //     }
-        // });
+        // the databinding framework will not invoke the changed handlers for the view-model's 
+        // bindable properties until the "next" time those properties are updated.
     }
 
     drawChanged(draw: Draw, oldValue?: Draw) {
@@ -74,7 +57,7 @@ export class DrawDraw implements ISize {
         }
 
         this._drawLib = Services.drawLibFor(this.draw);
-
+        console.assert( !!this._drawLib);
         if(!this._drawLib) {
             return; //TODO
         }
@@ -92,13 +75,6 @@ export class DrawDraw implements ISize {
         }
 
         this.computeCoordinates();
-
-        //this.drawLines( this.canvas);
-        
-        // //IE8 patch
-        // if (this.isKnockout && useVML) {
-        //     this.drawLines(element);
-        // }
     }
  
     //TODO to be moved into knockout and roundrobin drawLib
@@ -143,8 +119,7 @@ export class DrawDraw implements ISize {
         }
 
         //draw the lines...
-        var ctx = //useVML ? new vmlContext(canvas, this.width, this.height) :
-            canvas.getContext('2d');
+        var ctx = canvas.getContext('2d');
         ctx.lineWidth = .5;
         ctx.translate(.5, .5);
         var boxHeight2 = this.boxHeight >> 1;
@@ -242,101 +217,23 @@ function positionOpponents(pos: number): { pos1: number; pos2: number } { //ADVE
     };
 }
 
-// //IE8 patch to use VML instead of canvas
-// var useVML: boolean = !(<any>window).HTMLCanvasElement;
-// var vmlContext: any;
-// function initVml(): void {
-//     if (!useVML) {
-//         return;
-//     }
-
-//     //emulate canvas context using VML
-//     vmlContext = function(element: Element, width: number, height: number) {
-//         this._width = width;
-//         this._height = height;
-//         this.beginPath();
-//         this._element = element;
-//         this._element.find('shape').remove();
-//         //this._element = element.find('shape');
-//         //this._element.css({ width: this._width + 'px', height: this._height + 'px' });
-//         debugger;
-//     };
-//     vmlContext.prototype = {
-//         _path: [], _tx: 0, _ty: 0,
-//         translate: function(tx: number, ty: number): void {
-//             //this._tx = tx;
-//             //this._ty = ty;
-//         },
-//         beginPath: function(): void {
-//             this._path.length = 0;
-//             this.lineWidth = 1;
-//             this.strokeStyle = 'black';
-//         },
-//         moveTo: function(x: number, y: number): void {
-//             this._path.push('m', (this._tx + x), ',', (this._ty + y));
-//         },
-//         lineTo: function(x: number, y: number): void {
-//             this._path.push('l', (this._tx + x), ',', (this._ty + y));
-//         },
-//         stroke: function(): void {
-//             //this._path.push('e');
-//         },
-//         done: function(): void {
-//             var shape = angular.element('<v:shape'
-//                 + ' coordsize="' + this._width + ' ' + this._height + '"'
-//                 + ' style="position:absolute; left:0px; top:0px; width:' + this._width + 'px; height:' + this._height + 'px;"'
-//                 + ' filled="0" stroked="1" strokecolor="' + this.strokeStyle + '" strokeweight="' + this.lineWidth + 'px"'
-//                 + ' path="' + this._path.join('') + '" />');
-//             this._element.append(shape);
-//             //this._element.attr('coordsize', this._width + ' ' + this._height)
-//             //    .attr('filled', 0)
-//             //    .attr('stroked', 1)
-//             //    .attr('strokecolor', this.strokeStyle)
-//             //    .attr('strokeweight', this.lineWidth + 'px')
-//             //    .attr('path', this._path.join(''));
-//         }
-//     };
-// }
-
 @autoinject
 export class DrawLinesCustomAttribute {
 
 	private canvas:HTMLCanvasElement;
-
     private drawDraw: DrawDraw;
 
 	constructor(private element: Element){
-		if( element.tagName !== 'CANVAS') {
-			throw "Bad element";
-		}
+        console.assert(element.tagName === 'CANVAS', "Bad element");
 		this.canvas = <HTMLCanvasElement>element;
 	}
 
-    bind() {
-        let value = (<any>this).value;
-        this.drawDraw = value;
-        this.valueChanged(value, undefined);
+    bind(bindingContext: Object, overrideContext?: Object) {
+        this.drawDraw = <DrawDraw>bindingContext;
+        this.valueChanged();
     }
 
-    valueChanged(drawDraw, oldValue) {
-        if( !this.drawDraw) {
-            return;
-        }
+    valueChanged(draw?: Draw, oldValue?: Draw) {
         this.drawDraw.drawLines( this.canvas);
     }
-	
 }
-
-// function drawLinesDirective(): ng.IDirective {
-//     return {
-//         restrict: 'A',
-//         require: '^draw',
-//         link: (scope: ng.IScope, element: JQuery, attrs: any, ctrlDraw: DrawDraw) => {
-//             //attrs.$observe( 'drawLines', () => {
-//             //bindingEngine.propertyObserver( draw, 'drawLines').subscribe( (drawLines: string) => {
-//             scope.$watch(attrs.drawLines, () => {
-//                 ctrlDraw.drawLines(element);
-//             });
-//         }
-//     };
-// }
