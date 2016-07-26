@@ -12,7 +12,7 @@ export class Selection {
     constructor() {
     }
 
-    select(r: Box | Draw | TEvent | Player | Tournament, type?: ModelType): void {
+    select(r: Box | Draw | TEvent | Player | Tournament | string, type?: ModelType): void {
 
         if (!r) {
             this.unselect(type);
@@ -27,11 +27,27 @@ export class Selection {
             this.draw = b._draw;
             this.box = b;
 
+        } else if (type === ModelType.Draw && 'string' === typeof r) { //draw id
+            let id = <string>r;
+            var d = this.event.draws.find( (draw:Draw) => draw.id === id);
+            // this.tournament = d._event._tournament;
+            // this.event = d._event;
+            this.draw = d;
+            this.box = undefined;
+
         } else if (type === ModelType.Draw || (<Draw>r)._event) { //draw
             var d = <Draw>r;
             this.tournament = d._event._tournament;
             this.event = d._event;
             this.draw = d;
+            this.box = undefined;
+
+        } else if (type === ModelType.TEvent && 'string' === typeof r) { //event id
+            let id = <string>r;
+            var e = this.tournament.events.find( (evt:TEvent) => evt.id === id);
+            // this.tournament = e._tournament;
+            this.event = e;
+            this.draw = e.draws ? e.draws[0] : undefined;
             this.box = undefined;
 
         } else if (type === ModelType.TEvent || ((<TEvent>r).draws && (<TEvent>r)._tournament)) { //event
@@ -40,6 +56,12 @@ export class Selection {
             this.event = e;
             this.draw = e.draws ? e.draws[0] : undefined;
             this.box = undefined;
+
+        } else if (type === ModelType.Player || ((<Player>r).name && (<Player>r)._tournament)) {   //player id
+            let id = <string>r;
+            var p = this.tournament.players.find( (player:Player) => player.id === id);
+            // this.tournament = p._tournament;
+            this.player = p;
 
         } else if (type === ModelType.Player || ((<Player>r).name && (<Player>r)._tournament)) {   //player
             var p = <Player>r;

@@ -30,8 +30,9 @@ export class DrawDraw implements ISize {
     rows: number[][];
     _drawLib: IDrawLib;
     //canvas: HTMLCanvasElement;
+    _this: DrawDraw;    //used by draw-lines custom attribute
 
-    private main: Main;
+    main: Main;
 
     constructor(
         //private knockout: Knockout, //for dependencies
@@ -40,6 +41,7 @@ export class DrawDraw implements ISize {
         private selection: Selection,
         private bindingEngine: BindingEngine
         ) {
+        this._this = this;
     }
 
     created(owningView /*: View*/, myView /*: View*/) {
@@ -117,13 +119,13 @@ export class DrawDraw implements ISize {
 
         if (!this.isKnockout) {
             //for roundrobin, fill the list of rows/columns for the view
-            var n = draw.nbColumn;
+            let n = draw.nbColumn;
             this.rows = new Array(n);
-            for (var r = 0; r < n; r++) {
-                var cols: number[] = new Array(n + 1);
+            for (let r = 0; r < n; r++) {
+                let cols: number[] = new Array(n + 1);
 
-                var b = (n + 1) * n - r - 1;
-                for (var c = 0; c <= n; c++) {
+                let b = (n + 1) * n - r - 1;
+                for (let c = 0; c <= n; c++) {
                     cols[c] = b;
                     b -= n;
                 }
@@ -292,6 +294,49 @@ function positionOpponents(pos: number): { pos1: number; pos2: number } { //ADVE
 //             //    .attr('strokecolor', this.strokeStyle)
 //             //    .attr('strokeweight', this.lineWidth + 'px')
 //             //    .attr('path', this._path.join(''));
+//         }
+//     };
+// }
+
+@autoinject
+export class DrawLinesCustomAttribute {
+
+	private canvas:HTMLCanvasElement;
+
+    private drawDraw: DrawDraw;
+
+	constructor(private element: Element){
+		if( element.tagName !== 'CANVAS') {
+			throw "Bad element";
+		}
+		this.canvas = <HTMLCanvasElement>element;
+	}
+
+    bind() {
+        let value = (<any>this).value;
+        this.drawDraw = value;
+        this.valueChanged(value, undefined);
+    }
+
+    valueChanged(drawDraw, oldValue) {
+        if( !this.drawDraw) {
+            return;
+        }
+        this.drawDraw.drawLines( this.canvas);
+    }
+	
+}
+
+// function drawLinesDirective(): ng.IDirective {
+//     return {
+//         restrict: 'A',
+//         require: '^draw',
+//         link: (scope: ng.IScope, element: JQuery, attrs: any, ctrlDraw: DrawDraw) => {
+//             //attrs.$observe( 'drawLines', () => {
+//             //bindingEngine.propertyObserver( draw, 'drawLines').subscribe( (drawLines: string) => {
+//             scope.$watch(attrs.drawLines, () => {
+//                 ctrlDraw.drawLines(element);
+//             });
 //         }
 //     };
 // }

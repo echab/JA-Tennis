@@ -17,16 +17,16 @@ import { Validation } from '../services/validation';
 
 /** Main controller for the application */
 @autoinject
-export class Main {	//mainCtrl {
-
-    // public GenerateType = GenerateType;
-    // public ModelType = ModelType;
-    // public Mode = Mode;
+export class Main {
 
     private tournamentOpened = true; 
-    private playersOpened = true;
+    private playersOpened = false;
     private drawsOpened = true;
     private planningOpened = false;
+
+    private modelTypeEvent = ModelType.TEvent;  //used in view for selection
+    private modelTypeDraw = ModelType.Draw;
+    private modelTypeBox  = ModelType.Box;
 
     constructor(
         private mainLib: MainLib, 
@@ -37,8 +37,8 @@ export class Main {	//mainCtrl {
 
         this.selection.tournament = TournamentLib.newTournament();
 
-        var filename = '/data/tournament8.json';
-        //var filename = '/data/to2006.json';
+        //var filename = '/data/tournament8.json';
+        var filename = '/data/jeu4test.json';
 
         //Load saved tournament if exists
         //this.mainLib.loadTournament().then((data) => {
@@ -89,7 +89,7 @@ export class Main {	//mainCtrl {
     }
     //#endregion tournament
 
-    select(item: Box | Draw | TEvent | Player | Tournament, type?: ModelType): void {
+    select(item: Box | Draw | TEvent | Player | Tournament | string, type?: ModelType): void {
         if (item && type) {
             //first unselect any item to close the actions dropdown
             this.selection.unselect(type);
@@ -113,10 +113,10 @@ export class Main {	//mainCtrl {
                 events: this.selection.tournament.events
             }
         }).then((result) => {
-                if ('Ok' === result.output) {
-                    this.mainLib.addPlayer(this.selection.tournament, newPlayer);
-                }
-            });
+            if ('Ok' === result.output) {
+                this.mainLib.addPlayer(this.selection.tournament, newPlayer);
+            }
+        });
     }
 
     editPlayer(player: Player): void {
@@ -131,12 +131,12 @@ export class Main {	//mainCtrl {
                 events: this.selection.tournament.events
             }
         }).then((result: DialogResult) => {
-                if ('Ok' === result.output) {
-                    this.mainLib.editPlayer(editedPlayer, player);
-                } else if ('Del' === result.output) {
-                    this.mainLib.removePlayer(player)
+            if ('Ok' === result.output) {
+                this.mainLib.editPlayer(editedPlayer, player);
+            } else if ('Del' === result.output) {
+                this.mainLib.removePlayer(player)
             }
-            });
+        });
     }
     removePlayer(player: Player): void {
         this.mainLib.removePlayer(player);
@@ -155,10 +155,10 @@ export class Main {	//mainCtrl {
                 event: newEvent
             }
         }).then((result: DialogResult) => {
-                if ('Ok' === result.output) {
-                    this.mainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
-                }
-            });
+            if ('Ok' === result.output) {
+                this.mainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
+            }
+        });
     }
 
     editEvent(event: TEvent): void {
@@ -172,12 +172,12 @@ export class Main {	//mainCtrl {
                 event: editedEvent
             }
         }).then((result: DialogResult) => {
-                if ('Ok' === result.output) {
-                    this.mainLib.editEvent(editedEvent, event);
-                } else if ('Del' === result.output) {
-                    this.mainLib.removeEvent(event)
+            if ('Ok' === result.output) {
+                this.mainLib.editEvent(editedEvent, event);
+            } else if ('Del' === result.output) {
+                this.mainLib.removeEvent(event)
             }
-            });
+        });
     }
 
     removeEvent(event: TEvent): void {
@@ -197,17 +197,19 @@ export class Main {	//mainCtrl {
                 draw: newDraw
             }
         }).then((result: DialogResult) => {
-                //TODO add event after selected draw
-                if ('Ok' === result.output) {
-                    this.mainLib.addDraw(newDraw, 0, after);
-                } else if ('Generate' === result.output) {
-                    this.mainLib.addDraw(newDraw, 1, after);
-                }
-            });
+            //TODO add event after selected draw
+            if ('Ok' === result.output) {
+                this.mainLib.addDraw(newDraw, 0, after);
+            } else if ('Generate' === result.output) {
+                this.mainLib.addDraw(newDraw, 1, after);
+            }
+        });
     }
 
     editDraw(draw: Draw): void {
-
+        if(!draw) {
+            return;
+        }
         var editedDraw = DrawLib.newDraw(draw._event, draw);
 
         this.dialogService.open({
@@ -217,14 +219,14 @@ export class Main {	//mainCtrl {
                 draw: editedDraw
             }
         }).then((result: DialogResult) => {
-                if ('Ok' === result.output) {
-                    this.mainLib.updateDraw(editedDraw, draw);
-                } else if ('Generate' === result.output) {
-                    this.mainLib.updateDraw(editedDraw, draw, 1);
-                } else if ('Del' === result.output) {
-                    this.mainLib.removeDraw(draw);
-                }
-            });
+            if ('Ok' === result.output) {
+                this.mainLib.updateDraw(editedDraw, draw);
+            } else if ('Generate' === result.output) {
+                this.mainLib.updateDraw(editedDraw, draw, GenerateType.Create);
+            } else if ('Del' === result.output) {
+                this.mainLib.removeDraw(draw);
+            }
+        });
     }
 
     validateDraw(draw: Draw): void {
@@ -259,10 +261,10 @@ export class Main {	//mainCtrl {
                 match: editedMatch
             }
         }).then((result: DialogResult) => {
-                if ('Ok' === result.output) {
-                    this.mainLib.editMatch(editedMatch, match);
-                }
-            });
+            if ('Ok' === result.output) {
+                this.mainLib.editMatch(editedMatch, match);
+            }
+        });
     }
     //#endregion match
 
@@ -281,34 +283,3 @@ export class Main {	//mainCtrl {
         } 
     }
 }
-
-// angular.module('jat.main', [
-//     'jat.services.mainLib',
-//     'jat.services.selection',
-//     'jat.services.undo',
-//     'jat.services.tournamentLib',
-//     'jat.services.drawLib',
-//     'jat.services.knockout',
-//     'jat.services.roundrobin',
-
-//     'jat.services.validation',
-//     'jat.services.validation.knockout',
-//     'jat.services.validation.roundrobin',
-//     'jat.services.validation.fft',
-
-//     'jat.tournament.dialog',
-//     'jat.player.dialog',
-//     'jat.player.list',
-//     'jat.event.dialog',
-//     'jat.event.list',
-//     'jat.draw.dialog',
-//     'jat.draw.list',
-//     'jat.draw.box',
-//     'jat.match.dialog',
-//     'ec.panels',
-//     'ec.inputFile',
-// //'polyfill',
-//     'ui.bootstrap'])
-
-//     .directive('main', mainDirective)
-//     .controller('mainCtrl', mainCtrl);

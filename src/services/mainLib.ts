@@ -1,4 +1,8 @@
-﻿import { TournamentLib as tournamentLib } from './tournamentLib';
+﻿import {autoinject} from 'aurelia-framework';
+//import { HttpClient } from 'aurelia-fetch-client';
+import { HttpClient } from 'aurelia-http-client';
+
+import { TournamentLib as tournamentLib } from './tournamentLib';
 import { DrawLib as drawLib } from './draw/drawLib';
 import { validation } from './types';
 import { Services } from './services';
@@ -7,10 +11,6 @@ import { Find } from './util/find';
 import { Guid } from './util/guid';
 import { Undo } from './util/undo';
 import { copy } from '../utils/tool';
-
-import {autoinject} from 'aurelia-framework';
-//import { HttpClient } from 'aurelia-fetch-client';
-import { HttpClient } from 'aurelia-http-client';
 
 @autoinject
 export class MainLib {

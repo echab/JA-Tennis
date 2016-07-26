@@ -1,21 +1,21 @@
 ﻿<template>
-<div class="${ctrlBox.isMatch ? 'match' : ''} ${!ctrlBox.isMatch ? 'inPlayer':''} ${ctrlBox.isPlayed() ? 'played:''}
-     ${ctrlBox.box.hidden ? 'hidden':''} ${ ctrlBox.box === main.selection.box ? 'selected':''} ${ctrlBox.error ? 'error':''}"
-     title="${ctrlBox.error ? ctrlBox.error.message +' '+ ctrlBox.error.detail : ''}"
-     click.trigger="main.select(ctrlBox.box, main.ModelType.Box)"
+<div class="${isMatch ? 'match' : ''} ${!isMatch ? 'inPlayer':''} ${isPlayed() ? 'played:''}
+     ${box.hidden ? 'hidden':''} ${ box === main.selection.box ? 'selected':''} ${error ? 'error':''}"
+     title="${error ? error.message +' '+ error.detail : ''}"
+     click.trigger="main.select(box, main.modelTypeBox)"
      >
-    <span if.bind="ctrlBox.box.qualifIn" class="qualifIn">${ctrlBox.box.qualifIn === -1 ? 'Q?' : 'Q' + ctrlBox.box.qualifIn}</span>
-    <span if.bind="ctrlBox.box.seeded" class="seeded">${ctrlBox.box.seeded}</span>
-    ${ctrlBox.box._player.name}
-    <span if.bind="!ctrlBox.isMatch" class="rank">${ctrlBox.box._player.rank}</span>
-    <span if.bind="ctrlBox.box.qualifOut" class="qualifOut">Q${ctrlBox.box.qualifOut}</span>
+    <span if.bind="box.qualifIn" class="qualifIn">${box.qualifIn === -1 ? 'Q?' : 'Q' + box.qualifIn}</span>
+    <span if.bind="box.seeded" class="seeded">${box.seeded}</span>
+    ${box._player.name}
+    <span if.bind="!isMatch" class="rank">${box._player.rank}</span>
+    <span if.bind="box.qualifOut" class="qualifOut">Q${box.qualifOut}</span>
     <br />
-    <span if.bind="ctrlBox.isMatch">
-        <span class="place">${ctrlBox.box.place}</span>
-        <span class="date">${ctrlBox.box.date}</span>
-        <span class="score">${ctrlBox.box.score}</span>
+    <span if.bind="isMatch">
+        <span class="place">${box.place}</span>
+        <span class="date">${box.date}</span>
+        <span class="score">${box.score}</span>
     </span>
-    <span if.bind="!ctrlBox.isMatch" class="club">${ctrlBox.box._player.club}</span>
+    <span if.bind="!isMatch" class="club">${box._player.club}</span>
     &nbsp;
 </div>
 <template>

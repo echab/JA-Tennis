@@ -6,6 +6,7 @@
 <require from="./event/list-events"></require>
 <require from="./player/list-players"></require>
 <require from="./draw/draw-draw"></require>
+
 <!--
 <require from="../styles/app.css"></require>
 <require from="../styles/icons.css"></require>
@@ -27,7 +28,7 @@
         </div>
         <div class="footer">
             <div class="btn-group">
-                <button class="btn" click.trigger="newTournament()"><i class="icon-file"></i> New</button>
+                <button class="btn" click.trigger="newTournament()"><i class="glyphicon glyphicon-file"></i> New</button>
                 <button class="btn" click.trigger="loadTournament()"><i class="icon2-open"></i> Open</button>
                 <!--<span ec-input-file onloaded="loadTournament(file)"><i class="icon2-open"></i> Open</span>-->
                 <button class="btn" click.trigger="saveTournament()"><i class="icon2-save"></i> Save</button>
@@ -36,7 +37,7 @@
                 <button class="btn" disabled.bind="!undo.canUndo()" click.trigger="doUndo()"><i class="icon2-undo" title="Undo ${undo.messageUndo()}"></i></button>
                 <button class="btn" disabled.bind="!undo.canRedo()" click.trigger="doRedo()"><i class="icon2-redo" title="Redo ${undo.messageRedo()}"></i></button>
             </div>
-            <button class="btn" click.trigger="addEvent(selection.event)"><i class="icon-plus"></i> Add event</button>
+            <button class="btn" click.trigger="addEvent(selection.event)"><i class="glyphicon glyphicon-plus"></i> Add event</button>
         </div>
     </ec-panel><ec-panel class="players" is-open.bind="playersOpened">
         <ec-badge class="players"><i class="icon2-player"></i></ec-badge>
@@ -46,22 +47,23 @@
         </div>
         <div class="footer">
             <form class="form-horizontal">
-                <button class="btn" click.trigger="addPlayer()"><i class="icon-plus"></i> Add player</button>
+                <button class="btn" click.trigger="addPlayer()"><i class="glyphicon glyphicon-plus"></i> Add player</button>
             </form>
         </div>
     </ec-panel><ec-panel class="draws" is-open.bind="drawsOpened">
         <ec-badge class="draws"><i class="icon2-draw"></i></ec-badge>
         <ec-header>
             <form class="form-horizontal">
-                <select value.bind="selection.event" change.trigger="select(selection.event)" 
+                <select value.one-way="selection.event.id" change.trigger="select($event.target.value, modelTypeEvent)" 
                     class="span2" title="Select an event">
-                    <option repeat.for="evt of selection.tournament.events">${evt.name}</option> 
+                    <option value="null">&lt; select an event &gt;</option>
+                    <option repeat.for="evt of selection.tournament.events" value.bind="evt.id">${evt.name}</option> 
                 </select>
 
                 <i class="icon2-info" click.trigger="editDraw(selection.draw)" disabled.bind="!selection.draw" title="Edit draw properties"></i>
-                <select value.bind="selection.draw" change.trigger="select(selection.draw)" 
+                <select value.one-way="selection.draw.id" change.trigger="select(this.value, modelTypeDraw)"
                     class="span2" title="Select a draw">
-                    <option repeat.for="draw of selection.event.draws">${draw.name}</option> 
+                    <option repeat.for="draw of selection.event.draws" value.bind="draw.id">${draw.name}</option> 
                 </select>
                 
                 <div class="btn-group" title="Lock/unlock the draw modifications">
@@ -84,7 +86,7 @@
         </div>
         <div class="footer">
             <form class="form-horizontal">
-                <button class="btn" click.trigger="addDraw(selection.draw)" disabled.bind="!selection.event"><i class="icon-plus"></i> Add draw</button>
+                <button class="btn" click.trigger="addDraw(selection.draw)" disabled.bind="!selection.event"><i class="glyphicon glyphicon-plus"></i> Add draw</button>
                 <button class="btn" if.bind="selection.draw.mode === 0"
                         click.trigger="generateDraw(selection.draw, GenerateType.Create)" disabled.bind="!selection.draw">
                     <i class="icon2-draw-generate"></i> Generate

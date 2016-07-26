@@ -1,21 +1,40 @@
-﻿import {autoinject} from 'aurelia-framework';
-import {bindable} from 'aurelia-framework';
+﻿import { autoinject,bindable } from 'aurelia-framework';
+
+import { DrawDraw } from './draw-draw';
+import { Main } from '../main';
 
 @autoinject
 export class DrawBox {
 
-    @bindable drawBox: string;
+    //drawBox: string;
 
-    box: Box;
+    @bindable box: Box;
     isMatch: boolean;
     error: IError;
+
+    @bindable dd: DrawDraw;
+    private main: Main;
 
     isPlayed(): boolean {
         return this.isMatch && !!(<Match>this.box).score;
     }
 
-    //constructor() {
-    //}
+    // constructor() {
+    // }
+
+    created(owningView /*: View*/, myView /*: View*/) {
+        //this.main = Main.getAncestorViewModel( myView.container, Main);
+    }
+
+    bind(bindingContext: Object, overrideContext: Object) {
+        this.main = this.dd.main;
+        this.boxChanged(this.box, undefined);
+    }
+
+    boxChanged(box:Box, oldValue:Box) {
+        this.isMatch = isMatch(box);
+        //this.error = validation.getErrorBox(box);
+    }
 }
 
 // function drawBoxDirective(validation: Validation): ng.IDirective {
