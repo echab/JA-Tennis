@@ -1,7 +1,6 @@
 ﻿import { autoinject,bindable } from 'aurelia-framework';
 
-import { DrawDraw } from './draw-draw';
-import { Main } from '../main';
+import { Selection } from '../../services/util/selection';
 
 @autoinject
 export class DrawBox {
@@ -11,11 +10,7 @@ export class DrawBox {
     isMatch: boolean;
     error: IError;
 
-    private main: Main;
-
-    bind(bindingContext: Object, overrideContext: Object) {
-        this.main = (<DrawDraw>bindingContext).main;
-        this.boxChanged(this.box, undefined);
+    constructor(private selection:Selection) {
     }
 
     boxChanged(box:Box, oldValue:Box) {
