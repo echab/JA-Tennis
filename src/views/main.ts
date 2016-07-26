@@ -24,10 +24,6 @@ export class Main {
     private drawsOpened = true;
     private planningOpened = false;
 
-    private modelTypeEvent = ModelType.TEvent;  //used in view for selection
-    private modelTypeDraw = ModelType.Draw;
-    private modelTypeBox  = ModelType.Box;
-
     constructor(
         private mainLib: MainLib, 
         private dialogService: DialogService,
@@ -275,11 +271,11 @@ export class Main {
         this.selection.select(this.undo.redo(), this.undo.getMeta());
     }
 
-    static getAncestorViewModel(container /*:Container*/, clazz:Function) {
-        for( let c = container; c; c = c.parent) {
-            if( c.viewModel && c.viewModel instanceof clazz) {
-                return c.viewModel;
-            }
-        } 
-    }
+    // static getAncestorViewModel(container /*:Container*/, clazz:Function) {
+    //     for( let c = container; c; c = c.parent) {
+    //         if( c.viewModel && c.viewModel instanceof clazz) {
+    //             return c.viewModel;
+    //         }
+    //     } 
+    // }
 }

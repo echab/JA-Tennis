@@ -2,7 +2,7 @@
 <div class="${isMatch ? 'match' : ''} ${!isMatch ? 'inPlayer':''} ${isPlayed() ? 'played:''}
      ${box.hidden ? 'hidden':''} ${ box === main.selection.box ? 'selected':''} ${error ? 'error':''}"
      title="${error ? error.message +' '+ error.detail : ''}"
-     click.trigger="main.select(box, main.modelTypeBox)"
+     click.trigger="main.select(box, main.selection.modelTypeBox)"
      >
     <span if.bind="box.qualifIn" class="qualifIn">${box.qualifIn === -1 ? 'Q?' : 'Q' + box.qualifIn}</span>
     <span if.bind="box.seeded" class="seeded">${box.seeded}</span>

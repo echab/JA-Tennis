@@ -25,7 +25,7 @@
                     <i class="icon2-info" click.trigger="main.editDraw(draw)"></i>
                     <span click.trigger="main.select(draw)">${draw.name} ${draw.suite ? '(S)' : ''}</span>
                     <i class="glyphicon glyphicon-trash" click.trigger="main.removeDraw(draw)"></i>
-                    <draw-draw draw.bind="draw" simple="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
+                    <draw-draw draw.one-time="draw" simple.one-time="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
                          style="position:relative;"
                          click.trigger="main.select(draw)">
                     </draw-draw>

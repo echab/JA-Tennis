@@ -3,6 +3,7 @@ import { autoinject, bindable } from 'aurelia-framework';
 import { Main } from '../main';
 
 export class ListEvents {
+    
     @bindable events: TEvent[];
 
     private main: Main;
@@ -10,8 +11,14 @@ export class ListEvents {
     //constructor(selection: Selection) {
     //}
 
-    created(owningView /*: View*/, myView /*: View*/) {
-        this.main = Main.getAncestorViewModel( myView.container, Main);
+    // created(owningView /*: View*/, myView /*: View*/) {
+    //     this.main = Main.getAncestorViewModel( myView.container, Main);
+    // }
+    
+    bind(bindingContext: Object, overrideContext: Object) {
+        if( bindingContext instanceof Main) {
+            this.main = bindingContext;
+        }
     }
     
 }

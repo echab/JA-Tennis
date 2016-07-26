@@ -17,22 +17,27 @@ export class ListPlayers { //ListPlayersCustomElement
         //console.info('Players:' + this.players);
     }
 
-    created(owningView /*: View*/, myView /*: View*/) {
-        this.main = Main.getAncestorViewModel( myView.container, Main);
+    // created(owningView /*: View*/, myView /*: View*/) {
+    //     this.main = Main.getAncestorViewModel( myView.container, Main);
+    // }
+
+    bind(bindingContext: Object, overrideContext: Object) {
+        if( bindingContext instanceof Main) {
+            this.main = bindingContext;
+        }
     }
 
-    attached() {
-        //console.info('Attached: Players=' + this.players);
-    }
+    // attached() {
+    //     //console.info('Attached: Players=' + this.players);
+    // }
 
-    activate() {
-        //console.info('Activate: Players=' + this.players);
-    }
+    // activate() {
+    //     //console.info('Activate: Players=' + this.players);
+    // }
 
     eventById(id: string): TEvent {
         if (this.main.selection.tournament && this.main.selection.tournament.events) {
             return Find.byId(this.main.selection.tournament.events, id);
         }
     }
-
 }

@@ -9,6 +9,14 @@ export class Selection {
     public box: Box;
     public player: Player;
 
+    modelTypeNone = ModelType.None;
+    modelTypeTournament = ModelType.Tournament;
+    modelTypePlayer = ModelType.Player;
+    modelTypeEvent = ModelType.TEvent;
+    modelTypeDraw = ModelType.Draw;
+    modelTypeMatch = ModelType.Match;
+    modelTypeBox = ModelType.Box;
+
     constructor() {
     }
 

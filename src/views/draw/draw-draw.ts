@@ -40,19 +40,24 @@ export class DrawDraw implements ISize {
     }
 
     created(owningView /*: View*/, myView /*: View*/) {
-        this.main = Main.getAncestorViewModel( myView.container, Main);
+        //this.main = Main.getAncestorViewModel( myView.container, Main);
     }
 
     bind(bindingContext: Object, overrideContext: Object) {
         // the databinding framework will not invoke the changed handlers for the view-model's 
         // bindable properties until the "next" time those properties are updated.
+        if( bindingContext instanceof Main) {
+            this.main = bindingContext;
+        }
+        if( this.simple) {
+            this.drawChanged(this.draw);
+        }
     }
 
     drawChanged(draw: Draw, oldValue?: Draw) {
         this.draw = draw;
         this.isKnockout = draw && draw.type < 2;
-
-        if (!this.draw || this.simple) {
+        if (!draw) {
             return;
         }
 
@@ -62,16 +67,18 @@ export class DrawDraw implements ISize {
             return; //TODO
         }
 
-        this.players = TournamentLib.GetJoueursInscrit(this.draw);
+        if( !this.simple) {
+            this.players = TournamentLib.GetJoueursInscrit(this.draw);
 
-        //qualifs in
-        var prev = DrawLib.previousGroup(this.draw);
-        this.qualifsIn = prev ? DrawLib.findAllPlayerOutBox(prev) : undefined;
+            //qualifs in
+            var prev = DrawLib.previousGroup(this.draw);
+            this.qualifsIn = prev ? DrawLib.findAllPlayerOutBox(prev) : undefined;
 
-        //qualifs out
-        this.qualifsOut = [];
-        for (var i = 1; i <= this.draw.nbOut; i++) {
-            this.qualifsOut.push(i);
+            //qualifs out
+            this.qualifsOut = [];
+            for (var i = 1; i <= this.draw.nbOut; i++) {
+                this.qualifsOut.push(i);
+            }
         }
 
         this.computeCoordinates();
@@ -123,6 +130,7 @@ export class DrawDraw implements ISize {
         ctx.lineWidth = .5;
         ctx.translate(.5, .5);
         var boxHeight2 = this.boxHeight >> 1;
+        this.boxWidth = +this.boxWidth; //convert string to number
 
         for (var i = draw.boxes.length - 1; i >= 0; i--) {
             var box = draw.boxes[i];

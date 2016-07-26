@@ -2,7 +2,7 @@
     <require from="./draw-box"></require>
 
     <div if.bind="isKnockout" class="draw knockout" css="width: ${width +'px'}; height: ${height +'px'}"
-        click.trigger="main.select(null,main.ModelType.Box)">
+        click.trigger="selection.select(null,selection.modelTypeBox)">
         <canvas draw-lines.bind="draw"><v:shape filled="0" stroked="1" style="position:absolute; left:0px; top:0px;"/></canvas>
         <div repeat.for="box of draw.boxes" if.bind="!simple">
             <draw-box box.bind="box" class="box"
@@ -10,7 +10,7 @@
         </div>
     </div>
     <table if.bind="!isKnockout" class="draw roundrobin"
-        click.trigger="main.select(null,main.ModelType.Box)">
+        click.trigger="selection.select(null,selection.modelTypeBox)">
         <tbody>
             <tr css="height: ${boxHeight +'px'}">
                 <td css="width: ${boxWidth +'px'}"></td>
@@ -29,59 +29,59 @@
         </tbody>
     </table>
     <div class="action"
-        if.bind="!simple && main.selection.box"
-        css="left: ${(1+ main.selection.box._x * boxWidth) +'px'}; top:${((main.selection.box._y +1) * boxHeight -2) +'px'}"
+        if.bind="!simple && selection.box"
+        css="left: ${(1+ selection.box._x * boxWidth) +'px'}; top:${((selection.box._y +1) * boxHeight -2) +'px'}"
         >
         <div class="btn-group" if.bind="draw.mode == 0">
-            <button class="btn dropdown-toggle" disabled.bind="isMatch(main.selection.box)" title="Select the qualified">
+            <button class="btn dropdown-toggle" disabled.bind="isMatch(selection.box)" title="Select the qualified">
                 <i class="icon2-qualif-in"></i><span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
                 <li repeat.for="q of getQualifsIn()">
-                    <a click.trigger="setPlayer(main.selection.box, q._player, q.qualifOut)">
+                    <a click.trigger="setPlayer(selection.box, q._player, q.qualifOut)">
                         <i class="icon2-white" class="${findQualifIn(q.qualifOut) ? 'icon2-checkmark':''}"></i><!-- -->
                         ${'Q' + q.qualifOut + ' ' + q._player.name}
                     </a>
                 </li>
             </ul>
         </div><div class="btn-group" if.bind="draw.mode == 0">
-            <button class="btn dropdown-toggle" disabled.bind="isMatch(main.selection.box)" title="Edit the player">
+            <button class="btn dropdown-toggle" disabled.bind="isMatch(selection.box)" title="Edit the player">
                 <i class="icon2-player"></i><span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a click.trigger="main.editPlayer(main.selection.box._player)"><i class="icon2-info"></i> Edit</a></li>
+                <li><a click.trigger="main.editPlayer(selection.box._player)"><i class="icon2-info"></i> Edit</a></li>
                 <li class="divider"></li>
                 <li repeat.for="player of getPlayers()">
-                    <a click.trigger="setPlayer(main.selection.box, player)">
+                    <a click.trigger="setPlayer(selection.box, player)">
                         <i class="icon2-white" class="${findPlayer(player.id) ? 'icon2-checkmark':''}"></i>
                         ${player.name +' '+ player.rank}
                     </a>
                 </li>
             </ul>
-        </div><button class="btn" if.bind="draw.mode == 0" disabled.bind="!main.selection.box.playerId"
-                    click.trigger="swapPlayer(main.selection.box)" title="Swap the player">
+        </div><button class="btn" if.bind="draw.mode == 0" disabled.bind="!selection.box.playerId"
+                    click.trigger="swapPlayer(selection.box)" title="Swap the player">
             <i class="icon2-switch"></i>
-        </button><button class="btn" if.bind="draw.mode == 0" disabled.bind="!main.selection.box.playerId && !main.selection.box.qualifIn"
-                        click.trigger="setPlayer(main.selection.box)" title="Remove the player">
+        </button><button class="btn" if.bind="draw.mode == 0" disabled.bind="!selection.box.playerId && !selection.box.qualifIn"
+                        click.trigger="setPlayer(selection.box)" title="Remove the player">
             <i class="icon2-erase"></i>
         </button>
 
-        <button class="btn" if.bind="draw.mode == 1" disabled.bind="!isMatch(main.selection.box)"
-                click.trigger="main.editMatch(main.selection.box)" title="Set the date and hour of the match">
+        <button class="btn" if.bind="draw.mode == 1" disabled.bind="!isMatch(selection.box)"
+                click.trigger="main.editMatch(selection.box)" title="Set the date and hour of the match">
             <i class="icon2-planning"></i>
-        </button><button class="btn" if.bind="draw.mode == 1" disabled.bind="!isMatch(main.selection.box)"
-                        click.trigger="main.editMatch(main.selection.box)" title="Change the match place">
+        </button><button class="btn" if.bind="draw.mode == 1" disabled.bind="!isMatch(selection.box)"
+                        click.trigger="main.editMatch(selection.box)" title="Change the match place">
             <i class="glyphicon glyphicon-map-marker"></i>
-        </button><button class="btn" if.bind="draw.mode == 1" disabled.bind="!main.selection.box.place && !main.selection.box.date"
-                        click.trigger="main.editMatch(main.selection.box)" title="Remove the place and date of the match">
+        </button><button class="btn" if.bind="draw.mode == 1" disabled.bind="!selection.box.place && !selection.box.date"
+                        click.trigger="main.editMatch(selection.box)" title="Remove the place and date of the match">
             <i class="icon2-erase"></i>
         </button>
 
-        <button class="btn" if.bind="draw.mode == 2" disabled.bind="!isMatch(main.selection.box)"
-                click.trigger="main.editMatch(main.selection.box)" title="Edit the match">
+        <button class="btn" if.bind="draw.mode == 2" disabled.bind="!isMatch(selection.box)"
+                click.trigger="main.editMatch(selection.box)" title="Edit the match">
             <i class="icon2-match"></i>
-        </button><button class="btn" if.bind="draw.mode == 2" disabled.bind="!main.selection.box.playerId"
-                        click.trigger="main.editMatch(main.selection.box)" title="Remove the result">
+        </button><button class="btn" if.bind="draw.mode == 2" disabled.bind="!selection.box.playerId"
+                        click.trigger="main.editMatch(selection.box)" title="Remove the result">
             <i class="icon2-erase"></i>
         </button>
     </div>
