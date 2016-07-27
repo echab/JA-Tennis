@@ -307,11 +307,11 @@ export class Undo {
         return -1 <= this.head && this.head < this.stack.length - 1;
     }
 
-    public messageUndo(): string {
+    get messageUndo(): string {
         return this.canUndo ? this.stack[this.head].message : "";
     }
 
-    public messageRedo(): string {
+    get messageRedo(): string {
         return this.canRedo ? this.stack[this.head + 1].message : "";
     }
 
@@ -337,8 +337,8 @@ export class Undo {
 
     public toString(): string {
         return (this.group ? "Grouping (" + this.group.message + "), " : "")
-            + (this.canUndo ? (this.head + 1) + " undo(" + this.messageUndo() + ")" : "No undo")
-            + ", " + (this.canRedo ? (this.stack.length - this.head) + " redo(" + this.messageRedo() + ")" : "No redo")
+            + (this.canUndo ? (this.head + 1) + " undo(" + this.messageUndo + ")" : "No undo")
+            + ", " + (this.canRedo ? (this.stack.length - this.head) + " redo(" + this.messageRedo + ")" : "No redo")
             + ", maxUndo=" + this.maxUndo;
     }
 }
