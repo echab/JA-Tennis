@@ -4,7 +4,7 @@ import { TournamentEditor } from '../services/tournamentEditor';
 import { EventEditor } from '../services/eventEditor';
 import { DrawEditor } from '../services/drawEditor';
 
-import { Selection,ModelType } from '../services/util/selection';
+import { Selection,ModelType } from '../services/selection';
 import { Undo } from '../services/util/undo';
 
 import { MainLib } from '../services/mainLib';

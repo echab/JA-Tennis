@@ -7,7 +7,7 @@ import {DialogEvent} from '../views/event/dialog-event';
 import {DialogDraw} from '../views/draw/dialog-draw';
 import {DialogMatch} from '../views/draw/dialog-match';
 
-import { Selection,ModelType } from './util/selection';
+import { Selection,ModelType } from './selection';
 import { Undo } from './util/undo';
 
 import { MainLib } from './mainLib';

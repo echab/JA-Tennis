@@ -1,7 +1,7 @@
 import { autoinject,bindable } from 'aurelia-framework';
 
 import { PlayerEditor } from '../../services/playerEditor';
-import { Selection } from '../../services/util/selection';
+import { Selection } from '../../services/selection';
 import { Find } from '../../services/util/find';
 
 @autoinject

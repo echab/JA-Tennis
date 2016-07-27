@@ -1,6 +1,6 @@
 ﻿import { autoinject,bindable } from 'aurelia-framework';
 
-import { Selection } from '../../services/util/selection';
+import { Selection } from '../../services/selection';
 
 @autoinject
 export class DrawBox {

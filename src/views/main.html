@@ -55,14 +55,14 @@
         <ec-badge class="draws"><i class="icon2-draw"></i></ec-badge>
         <ec-header>
             <form class="form-horizontal">
-                <select value.one-way="selection.event.id" change.trigger="select($event.target.value, selection.modelTypeEvent)" 
+                <select value.one-way="selection.event.id" change.trigger="selection.select($event.target.value, selection.modelTypeEvent)" 
                     class="span2" title="Select an event">
                     <option value="null">&lt; select an event &gt;</option>
                     <option repeat.for="evt of selection.tournament.events" value.bind="evt.id">${evt.name}</option> 
                 </select>
 
                 <i class="icon2-info" click.trigger="drawEditor.edit(selection.draw)" disabled.bind="!selection.draw" title="Edit draw properties"></i>
-                <select value.one-way="selection.draw.id" change.trigger="select($event.target.value, selection.modelTypeDraw)"
+                <select value.one-way="selection.draw.id" change.trigger="selection.select($event.target.value, selection.modelTypeDraw)"
                     class="span2" title="Select a draw">
                     <option repeat.for="draw of selection.event.draws" value.bind="draw.id">${draw.name}</option> 
                 </select>

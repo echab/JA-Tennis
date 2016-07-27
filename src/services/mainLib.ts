@@ -6,7 +6,7 @@ import { TournamentLib as tournamentLib } from './tournamentLib';
 import { DrawLib as drawLib } from './draw/drawLib';
 import { validation } from './types';
 import { Services } from './services';
-import { Selection,ModelType } from './util/selection';
+import { Selection,ModelType } from './selection';
 import { Find } from './util/find';
 import { Guid } from './util/guid';
 import { Undo } from './util/undo';

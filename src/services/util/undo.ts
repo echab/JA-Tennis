@@ -1,4 +1,4 @@
-// Undo service
+import { computedFrom } from 'aurelia-framework';
 
 interface IUndoAction {
     type: number;
@@ -297,10 +297,12 @@ export class Undo {
         return this._do(this.stack[this.head], false);
     }
 
+    //TODO @computedFrom('head', 'stack')
     public canUndo(): boolean {
         return 0 <= this.head && this.head < this.stack.length;
     }
 
+    //TODO @computedFrom('head', 'stack')
     public canRedo(): boolean {
         return -1 <= this.head && this.head < this.stack.length - 1;
     }

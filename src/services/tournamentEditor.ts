@@ -3,7 +3,7 @@ import {DialogService,DialogResult} from 'aurelia-dialog';
 
 import {DialogInfo} from '../views/tournament/dialog-info';
 
-import { Selection,ModelType } from './util/selection';
+import { Selection,ModelType } from './selection';
 import { Undo } from './util/undo';
 
 import { MainLib } from './mainLib';

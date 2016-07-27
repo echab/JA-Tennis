@@ -2,7 +2,7 @@ import { autoinject } from 'aurelia-framework';
 import { bindable } from 'aurelia-framework';
 import { BindingEngine } from 'aurelia-framework'
 
-import { Selection,ModelType} from '../../services/util/selection';
+import { Selection,ModelType} from '../../services/selection';
 import { Services } from '../../services/services';
 import { DrawLib } from '../../services/draw/drawLib';
 import { TournamentLib } from '../../services/tournamentLib';

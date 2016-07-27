@@ -1,4 +1,4 @@
-import {Find} from './find'; 
+import {Find} from './util/find'; 
 
 export const enum ModelType { None, Tournament, Player, TEvent, Draw, Match, Box }
 
