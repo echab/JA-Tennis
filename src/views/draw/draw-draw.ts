@@ -1,6 +1,4 @@
-import { autoinject } from 'aurelia-framework';
-import { bindable } from 'aurelia-framework';
-import { BindingEngine } from 'aurelia-framework'
+import { autoinject, bindable } from 'aurelia-framework';
 
 import { Selection,ModelType} from '../../services/selection';
 import { LibLocator } from '../../services/libLocator';
@@ -33,8 +31,7 @@ export class DrawDraw implements ISize {
     constructor(
         private drawEditor: DrawEditor,
         private undo: Undo,
-        private selection: Selection,
-        private bindingEngine: BindingEngine
+        private selection: Selection
         ) {
     }
 

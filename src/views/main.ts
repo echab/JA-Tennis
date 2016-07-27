@@ -15,7 +15,7 @@ import { TournamentLib } from '../services/tournamentLib';
 export class Main {
 
     private tournamentOpened = true; 
-    private playersOpened = false;
+    private playersOpened = true;
     private drawsOpened = true;
     private planningOpened = false;
 
