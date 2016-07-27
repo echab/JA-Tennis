@@ -24,7 +24,7 @@ export class Main {
         private eventEditor: EventEditor,
         private drawEditor: DrawEditor,
         private mainLib: MainLib, 
-        public selection:Selection, 
+        private selection:Selection, 
         private undo:Undo
         ) {
 
@@ -48,20 +48,11 @@ export class Main {
 
     }
 
-    //#region draw
-
     public doUndo(): void {
         this.selection.select(this.undo.undo(), this.undo.getMeta());
     }
+
     public doRedo(): void {
         this.selection.select(this.undo.redo(), this.undo.getMeta());
     }
-
-    // static getAncestorViewModel(container /*:Container*/, clazz:Function) {
-    //     for( let c = container; c; c = c.parent) {
-    //         if( c.viewModel && c.viewModel instanceof clazz) {
-    //             return c.viewModel;
-    //         }
-    //     } 
-    // }
 }

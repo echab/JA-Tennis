@@ -15,8 +15,8 @@ interface IUndoAction {
 }
 
 /**
-     * Undo manager for typescript 
-    */
+ * Undo manager for typescript 
+*/
 export class Undo {
 
     private stack: IUndoAction[] = [];
@@ -27,8 +27,8 @@ export class Undo {
     private meta: any;
 
     /**
-         * Reset the undo stacks
-        */
+     * Reset the undo stacks
+    */
     public reset() {
         this.stack = [];
         this.head = -1;
@@ -281,7 +281,7 @@ export class Undo {
     }
 
     public undo(): any {
-        if (!this.canUndo()) {
+        if (!this.canUndo) {
             throw "Can't undo";
         }
         var r = this._do(this.stack[this.head], true);
@@ -290,7 +290,7 @@ export class Undo {
     }
 
     public redo(): any {
-        if (!this.canRedo()) {
+        if (!this.canRedo) {
             throw "Can't redo";
         }
         this.head++;
@@ -298,21 +298,21 @@ export class Undo {
     }
 
     //TODO @computedFrom('head', 'stack')
-    public canUndo(): boolean {
+    get canUndo(): boolean {
         return 0 <= this.head && this.head < this.stack.length;
     }
 
     //TODO @computedFrom('head', 'stack')
-    public canRedo(): boolean {
+    get canRedo(): boolean {
         return -1 <= this.head && this.head < this.stack.length - 1;
     }
 
     public messageUndo(): string {
-        return this.canUndo() ? this.stack[this.head].message : "";
+        return this.canUndo ? this.stack[this.head].message : "";
     }
 
     public messageRedo(): string {
-        return this.canRedo() ? this.stack[this.head + 1].message : "";
+        return this.canRedo ? this.stack[this.head + 1].message : "";
     }
 
     public setMaxUndo(v: number): void {
@@ -337,8 +337,8 @@ export class Undo {
 
     public toString(): string {
         return (this.group ? "Grouping (" + this.group.message + "), " : "")
-            + (this.canUndo() ? (this.head + 1) + " undo(" + this.messageUndo() + ")" : "No undo")
-            + ", " + (this.canRedo() ? (this.stack.length - this.head) + " redo(" + this.messageRedo() + ")" : "No redo")
+            + (this.canUndo ? (this.head + 1) + " undo(" + this.messageUndo() + ")" : "No undo")
+            + ", " + (this.canRedo ? (this.stack.length - this.head) + " redo(" + this.messageRedo() + ")" : "No redo")
             + ", maxUndo=" + this.maxUndo;
     }
 }
