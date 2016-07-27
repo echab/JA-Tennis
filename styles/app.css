@@ -39,8 +39,11 @@ tr.error, div.error, span.error {
     background-position-y: bottom;
 }
 
+.events.selected {
+    background-color: #b6e6ff !important;
+}
 
-.table .selected {
+.selected h3, .draws.selected {
     background-color: #96d3f2 !important;
 }
 
