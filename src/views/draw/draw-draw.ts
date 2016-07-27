@@ -8,7 +8,7 @@ import { DrawLib } from '../../services/draw/drawLib';
 import { TournamentLib } from '../../services/tournamentLib';
 import { Find } from '../../services/util/find';
 import { Undo } from '../../services/util/undo';
-import { Main } from '../main';
+import { DrawEditor } from '../../services/drawEditor';
 
 @autoinject
 export class DrawDraw implements ISize {
@@ -30,25 +30,17 @@ export class DrawDraw implements ISize {
     rows: number[][];
     _drawLib: IDrawLib;
 
-    main: Main;
-
     constructor(
+        private drawEditor: DrawEditor,
         private undo: Undo,
         private selection: Selection,
         private bindingEngine: BindingEngine
         ) {
     }
 
-    created(owningView /*: View*/, myView /*: View*/) {
-        //this.main = Main.getAncestorViewModel( myView.container, Main);
-    }
-
     bind(bindingContext: Object, overrideContext: Object) {
         // the databinding framework will not invoke the changed handlers for the view-model's 
         // bindable properties until the "next" time those properties are updated.
-        if( bindingContext instanceof Main) {
-            this.main = bindingContext;
-        }
         if( this.simple) {
             this.drawChanged(this.draw);
         }

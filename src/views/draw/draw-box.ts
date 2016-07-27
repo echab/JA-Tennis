@@ -10,7 +10,9 @@ export class DrawBox {
     isMatch: boolean;
     error: IError;
 
-    constructor(private selection:Selection) {
+    constructor(
+        private selection:Selection
+    ) {
     }
 
     boxChanged(box:Box, oldValue:Box) {

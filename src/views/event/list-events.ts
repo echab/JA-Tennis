@@ -1,24 +1,18 @@
 import { autoinject, bindable } from 'aurelia-framework';
 
-import { Main } from '../main';
+import { EventEditor } from '../../services/eventEditor';
+import { DrawEditor } from '../../services/drawEditor';
+import { Selection } from '../../services/util/selection';
 
+@autoinject
 export class ListEvents {
     
     @bindable events: TEvent[];
 
-    private main: Main;
-
-    //constructor(selection: Selection) {
-    //}
-
-    // created(owningView /*: View*/, myView /*: View*/) {
-    //     this.main = Main.getAncestorViewModel( myView.container, Main);
-    // }
-    
-    bind(bindingContext: Object, overrideContext: Object) {
-        if( bindingContext instanceof Main) {
-            this.main = bindingContext;
-        }
+    constructor(
+        private eventEditor: EventEditor,
+        private drawEditor: DrawEditor,
+        private selection: Selection
+        ) {
     }
-    
 }

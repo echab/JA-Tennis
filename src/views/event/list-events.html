@@ -13,21 +13,21 @@
         </tr>
     </thead>
     <tbody>
-        <tr repeat.for="event of events" class="${event === main.selection.event ? 'info':''}">
+        <tr repeat.for="event of events" class="${event === selection.event ? 'info':''}">
             <!--<td><input type="checkbox" /> <small>${event.id}</small></td>-->
-            <td class="${event === main.selection.event ? 'selected':''}">
-                <i class="icon2-info" click.trigger="main.editEvent(event)"></i>
-                <span click.trigger="main.select(event)">${event.name}</span>
-                <i class="glyphicon glyphicon-trash" click.trigger="main.removeEvent(event)"></i>
+            <td class="${event === selection.event ? 'selected':''}">
+                <i class="icon2-info" click.trigger="eventEditor.edit(event)"></i>
+                <span click.trigger="selection.select2(event)">${event.name}</span>
+                <i class="glyphicon glyphicon-trash" click.trigger="eventEditor.remove(event)"></i>
             </td>
             <td>
-                <div repeat.for="draw of event.draws" class="inline ${main.validation.hasErrorDraw(draw) ? 'error':''} ${draw === main.selection.draw ? 'selected':''}" style="border-left: solid 1px blue; padding-left: 3px;">
-                    <i class="icon2-info" click.trigger="main.editDraw(draw)"></i>
-                    <span click.trigger="main.select(draw)">${draw.name} ${draw.suite ? '(S)' : ''}</span>
-                    <i class="glyphicon glyphicon-trash" click.trigger="main.removeDraw(draw)"></i>
+                <div repeat.for="draw of event.draws" class="inline ${drawEditor.validation.hasErrorDraw(draw) ? 'error':''} ${draw === selection.draw ? 'selected':''}" style="border-left: solid 1px blue; padding-left: 3px;">
+                    <i class="icon2-info" click.trigger="drawEditor.edit(draw)"></i>
+                    <span click.trigger="selection.select2(draw)">${draw.name} ${draw.suite ? '(S)' : ''}</span>
+                    <i class="glyphicon glyphicon-trash" click.trigger="drawEditor.remove(draw)"></i>
                     <draw-draw draw.one-time="draw" simple.one-time="true" box-width="10" box-height="4" inter-box-width="2" inter-box-height="0"
                          style="position:relative;"
-                         click.trigger="main.select(draw)">
+                         click.trigger="selection.select2(draw)">
                     </draw-draw>
                 </div>
             </td>
@@ -38,15 +38,15 @@
     </tbody>
 </table>
 <!--<div class="action"
-     show.bind="main.selection.event"
-     css="left:${(4 + main.selection.box._x * ctrlDraw.boxWidth) +'px'}; top:${((main.selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}">
-    <button class="btn" click.trigger="main.editEvent(main.selection.event)" title="Edit the selected event properties">
+     show.bind="selection.event"
+     css="left:${(4 + selection.box._x * ctrlDraw.boxWidth) +'px'}; top:${((selection.box._y +1) * ctrlDraw.boxHeight -2) +'px'}">
+    <button class="btn" click.trigger="eventEditor.edit(selection.event)" title="Edit the selected event properties">
         <i class="icon2-info"></i>
-    </button><button class="btn" click.trigger="main.removeEvent(main.selection.event)" title="Remove the selected event">
+    </button><button class="btn" click.trigger="eventEditor.remove(selection.event)" title="Remove the selected event">
         <i class="glyphicon glyphicon-trash"></i>
-    </button><button class="btn" click.trigger="main.editDraw(main.selection.draw)" title="Edit the selected draw properties">
+    </button><button class="btn" click.trigger="drawEditor.edit(selection.draw)" title="Edit the selected draw properties">
         <i class="icon2-info"></i>
-    </button><button class="btn" disabled.bind="!main.isMatch(main.selection.box)" click.trigger="main.removeDraw(main.selection.draw)" title="Remove the selected draw">
+    </button><button class="btn" disabled.bind="!drawEditor.isMatch(selection.box)" click.trigger="drawEditor.removeDraw(selection.draw)" title="Remove the selected draw">
         <i class="glyphicon glyphicon-trash"></i>
     </button>
 </div>-->
