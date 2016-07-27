@@ -15,7 +15,7 @@ import { TournamentLib } from '../services/tournamentLib';
 export class Main {
 
     private tournamentOpened = true; 
-    private playersOpened = true;
+    private playersOpened = false;
     private drawsOpened = true;
     private planningOpened = false;
 
@@ -27,6 +27,14 @@ export class Main {
         private selection:Selection, 
         private undo:Undo
         ) {
+
+        var conf = JSON.parse( localStorage.getItem('panelsOpened'));
+        if (conf) {
+            this.tournamentOpened = conf.tournament;
+            this.playersOpened = conf.players;
+            this.drawsOpened = conf.draws;
+            this.planningOpened = conf.planning;
+        }
 
         this.selection.tournament = TournamentLib.newTournament();
 
@@ -42,9 +50,17 @@ export class Main {
         //});
 
         //Auto save tournament on exit
-        window.addEventListener('beforeunload',  () =>
-            this.mainLib.saveTournament(this.selection.tournament)
-        );
+        window.addEventListener('beforeunload',  () => {
+            this.mainLib.saveTournament(this.selection.tournament);
+
+            localStorage.setItem('panelsOpened', JSON.stringify({
+                tournament: this.tournamentOpened,
+                players : this.playersOpened,
+                draws : this.drawsOpened,
+                planning : this.planningOpened
+            }));
+
+        });
 
     }
 

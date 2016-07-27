@@ -1,7 +1,6 @@
-import { bindable } from 'aurelia-framework';
+import { autoinject, bindable } from 'aurelia-framework';
+import { Scope } from 'aurelia-binding';
 import { Tab } from './tab';
-
-//TODO tabset and tab custom elements
 
 interface TabItem { tab: Tab, index: number };
 
@@ -21,21 +20,23 @@ interface TabItem { tab: Tab, index: number };
  * 
  * vertical (Default: false) - Whether tabs appear vertically stacked. * 
  */
+@autoinject
 export class Tabset {
 
   @bindable tabs: Array<TabItem> = [];
   @bindable active: number;
-  @bindable justified: boolean;
+  @bindable justified: boolean = false;
   @bindable type: 'tabs' | 'pills' = 'tabs';
-  @bindable vertical: boolean;
+  @bindable vertical: boolean = false;
 
   private oldIndex: number;
   private destroyed: boolean = false;
 
-  bind(bindingContext: Object, overrideContext: Object) {
-    //TODO use binding :: Expression.evaluate to convert string to boolean
-    //this.vertical = !!this.vertical;
-    //this.justified = !!this.justified;
+  verticalChanged(value) {
+    this.vertical = parseBoolean( value);
+  }
+  justifiedChanged(value) {
+    this.justified = parseBoolean( value);
   }
 
   select(index: number, evt?: Event) {
@@ -67,24 +68,17 @@ export class Tabset {
       tab: tab,
       index: tab.index
     });
-    this.tabs.sort((t1, t2) => {
-      if (t1.index > t2.index) {
-        return 1;
-      }
-      if (t1.index < t2.index) {
-        return -1;
-      }
-      return 0;
-    });
+    this.tabs.sort(byIndex);
 
-    if (tab.index === this.active || 'undefined' !== typeof this.active && this.tabs.length === 1) {
+    if (tab.index === this.active 
+    || ('undefined' === typeof this.active && this.tabs.length === 1)) {
       var newActiveIndex = this.findTabIndex(tab.index);
       this.select(newActiveIndex);
     }
   };
 
   removeTab(tab) {
-    var index;
+    var index
     for (var i = 0; i < this.tabs.length; i++) {
       if (this.tabs[i].tab === tab) {
         index = i;
@@ -107,10 +101,6 @@ export class Tabset {
     }
   }
 
-  //   var destroyed;
-  //   $scope.$on('$destroy', function() {
-  //     destroyed = true;
-  //   });
   detached() {
     this.destroyed = true;
   }
@@ -123,6 +113,14 @@ export class Tabset {
     }
   }
 }
+
+function parseBoolean( b) {
+  return 'boolean' === typeof b ? b : /^true|yes|1$/i.test(b);
+}
+
+function byIndex(t1:TabItem, t2:TabItem) {
+  return t1.index > t2.index ? 1 : t1.index < t2.index ? -1 : 0;
+} 
 
 // .directive('uibTabset', function() {
 //   return {

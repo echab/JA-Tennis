@@ -43,9 +43,10 @@ export class DrawLib {
     public static initDraw(draw: Draw, parent: TEvent): void {
         draw._event = parent;
 
-        draw.type = draw.type || 0;
+        draw.type = draw.type || DrawType.Normal;
         draw.nbColumn = draw.nbColumn || 0;
         draw.nbOut = draw.nbOut || 0;
+        draw.mode = draw.mode || Mode.Build;
 
         //init boxes
         if (!draw.boxes) {

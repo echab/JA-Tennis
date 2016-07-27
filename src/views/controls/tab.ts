@@ -36,8 +36,8 @@ export class Tab {
 
 	private tabset: Tabset;
 
-	constructor(private element: Element) {	// Inject the instance of this element
-	}
+	// constructor(private element: Element) {	// Inject the instance of this element
+	// }
 
 	created(owningView /*: View*/, myView /*: View */) {
 		this.tabset = myView.container.parent.viewModel;
