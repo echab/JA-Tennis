@@ -5,7 +5,7 @@ import { HttpClient } from 'aurelia-http-client';
 import { TournamentLib as tournamentLib } from './tournamentLib';
 import { DrawLib as drawLib } from './draw/drawLib';
 import { validation } from './types';
-import { Services } from './services';
+import { LibLocator } from './libLocator';
 import { Selection,ModelType } from './selection';
 import { Find } from './util/find';
 import { Guid } from './util/guid';
@@ -160,7 +160,7 @@ export class MainLib {
         var afterIndex = afterDraw ? Find.indexOf(c, 'id', afterDraw.id) : c.length - 1;
 
         if (generate) {
-            var lib = Services.drawLibFor(draw);
+            var lib = LibLocator.drawLibFor(draw);
             var draws = lib.generateDraw(draw, generate, afterIndex);
             if (!draws || !draws.length) {
                 return;
@@ -168,7 +168,7 @@ export class MainLib {
             this.undo.splice(c, afterIndex + 1, 0, draws, "Add " + draw.name, ModelType.Draw); //c.splice( i, 1, draws);
 
             for (var i = 0; i < draws.length; i++) {
-                var lib = Services.drawLibFor(draws[i]);
+                var lib = LibLocator.drawLibFor(draws[i]);
                 drawLib.initDraw(draws[i], draw._event);
             }
             this.selection.select(draws[0], ModelType.Draw);
@@ -182,7 +182,7 @@ export class MainLib {
 
     updateDraw(draw: Draw, oldDraw?: Draw, generate?: GenerateType): void {
         var isSelected = this.selection.draw === oldDraw;
-        var lib = Services.drawLibFor(draw);
+        var lib = LibLocator.drawLibFor(draw);
         var group = drawLib.group(oldDraw || draw);
         if (generate) {
             var draws = lib.generateDraw(draw, generate, -1);

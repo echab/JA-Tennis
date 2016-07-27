@@ -3,7 +3,7 @@
 import { Validation } from '../validation';
 import { DrawLib as drawLib } from '../draw/drawLib';
 import { Find } from '../util/find';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 import { override } from '../util/object';
 
 export class FFTValidation extends Validation {
@@ -32,7 +32,7 @@ export class FFTValidation extends Validation {
     @override
     validateDraw(draw: Draw): boolean {
         var bRes = true;
-        let lib = Services.drawLibFor( draw);
+        let lib = LibLocator.drawLibFor( draw);
 
         var isTypePoule = draw.type >= 2;
 

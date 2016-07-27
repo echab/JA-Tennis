@@ -2,7 +2,7 @@
 import { Find } from '../util/find';
 import { Guid } from '../util/guid';
 import { isArray } from '../util/object';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 
 var MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
@@ -23,7 +23,7 @@ export abstract class DrawLibBase {
             for (var i = 0; i < next.length; i++) {
                 var boxes = next[i].boxes;
                 if (boxes) {
-                    var drawLibNext = Services.drawLibFor( next[i]);
+                    var drawLibNext = LibLocator.drawLibFor( next[i]);
                     for (var b = 0; b < boxes.length; b++) {
                         var box = <Match> boxes[b];
                         if (box && box.qualifOut) {
@@ -35,7 +35,7 @@ export abstract class DrawLibBase {
         }
 
         //reset boxes
-        var lib = Services.drawLibFor( draw);
+        var lib = LibLocator.drawLibFor( draw);
         draw.boxes = [];
         draw.nbColumn = lib.nbColumnForPlayers(draw, nPlayer);
     }
@@ -205,7 +205,7 @@ export abstract class DrawLibBase {
 
         box.score = boite.score;
 
-        var lib = Services.drawLibFor(box._draw);  
+        var lib = LibLocator.drawLibFor(box._draw);  
         lib.computeScore(box._draw);
 
         return true;
@@ -397,7 +397,7 @@ export abstract class DrawLibBase {
     public fillBox(box: Box, source: Box): boolean {   //RempliBoite
         //ASSERT(RempliBoiteOk(box, boite));
 
-        var lib = Services.drawLibFor(box._draw);
+        var lib = LibLocator.drawLibFor(box._draw);
 
         var boxIn = <PlayerIn>box;
         var sourceIn = <PlayerIn>source;

@@ -5,7 +5,7 @@ import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle,filledArray } from '../../utils/tool';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 import { rank, ranking } from '../types'
 import { override } from '../util/object';
 
@@ -33,8 +33,8 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
     constructor() {
         super();
-        Services.registerDrawlib(this, DrawType.PouleSimple);
-        Services.registerDrawlib(this, DrawType.PouleAR);
+        LibLocator.registerDrawlib(this, DrawType.PouleSimple);
+        LibLocator.registerDrawlib(this, DrawType.PouleAR);
     }
 
     private findBox(draw: Draw, position: number, create?: boolean): Box {

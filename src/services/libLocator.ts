@@ -1,5 +1,5 @@
 
-export class Services {
+export class LibLocator {
 
 	private static _drawLibs: {[t:number]:IDrawLib} = {};
 

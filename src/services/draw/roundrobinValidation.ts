@@ -7,7 +7,7 @@ import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object';
 import { shuffle,filledArray } from '../../utils/tool';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 import { category, rank, score, validation } from '../types';
 
 export class RoundrobinValidation implements IValidation {

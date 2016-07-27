@@ -3,7 +3,7 @@ import { bindable } from 'aurelia-framework';
 import { BindingEngine } from 'aurelia-framework'
 
 import { Selection,ModelType} from '../../services/selection';
-import { Services } from '../../services/services';
+import { LibLocator } from '../../services/libLocator';
 import { DrawLib } from '../../services/draw/drawLib';
 import { TournamentLib } from '../../services/tournamentLib';
 import { Find } from '../../services/util/find';
@@ -53,7 +53,7 @@ export class DrawDraw implements ISize {
             return;
         }
 
-        this._drawLib = Services.drawLibFor(this.draw);
+        this._drawLib = LibLocator.drawLibFor(this.draw);
         console.assert( !!this._drawLib);
         if(!this._drawLib) {
             return; //TODO

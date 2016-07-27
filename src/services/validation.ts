@@ -6,7 +6,7 @@ import {Find} from './util/Find';
 import {Guid} from './util/Guid';
 import { isObject,isArray,extend } from './util/object'
 import { shuffle,filledArray } from '../utils/tool';
-import { Services } from './services';
+import { LibLocator } from './libLocator';
 
 export class Validation implements IValidation {
 

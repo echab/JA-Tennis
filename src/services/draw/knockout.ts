@@ -6,7 +6,7 @@ import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle, filledArray } from '../../utils/tool';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 import { rank } from '../types';
 import { override } from '../util/object';
 
@@ -39,8 +39,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     constructor() {
         super();
-        Services.registerDrawlib(this, DrawType.Normal);
-        Services.registerDrawlib(this, DrawType.Final);
+        LibLocator.registerDrawlib(this, DrawType.Normal);
+        LibLocator.registerDrawlib(this, DrawType.Final);
     }
 
     private findBox(draw: Draw, position: number, create?: boolean): Box {

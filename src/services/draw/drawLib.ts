@@ -3,7 +3,7 @@ import {Guid} from '../util/Guid';
 //import { DrawType } from '../../models/enums';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle } from '../../utils/tool';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 
 import { rank } from '../types';
 
@@ -105,7 +105,7 @@ export class DrawLib {
 
     public static updateQualif(draw: Draw): void {
 
-        var drawLib = Services.drawLibFor(draw);
+        var drawLib = LibLocator.drawLibFor(draw);
 
         //retreive qualifIn box
         var qualifs: PlayerIn[] = [];
@@ -218,7 +218,7 @@ export class DrawLib {
         //var group = isArray(group) ? <Draw[]>group : this.group(<Draw>group);
         for (var i = 0; i < group.length; i++) {
             var d = group[i];
-            var drawLib = Services.drawLibFor(d);
+            var drawLib = LibLocator.drawLibFor(d);
             var playerIn = drawLib.findPlayerIn(d, iQualifie);
             if (playerIn) {
                 return playerIn;
@@ -231,7 +231,7 @@ export class DrawLib {
         //var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
             var d = group[i];
-            var drawLib = Services.drawLibFor(d);
+            var drawLib = LibLocator.drawLibFor(d);
             var boxOut = drawLib.findPlayerOut(d, iQualifie);
             if (boxOut) {
                 return boxOut;

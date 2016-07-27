@@ -6,7 +6,7 @@ import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object';
 import { shuffle,filledArray } from '../../utils/tool';
-import { Services } from '../services';
+import { LibLocator } from '../libLocator';
 import { category, rank, score, validation } from '../types';
 
 var MAX_TETESERIE = 32,
@@ -19,7 +19,7 @@ export class KnockoutValidation implements IValidation {
     private knockout: Knockout;
 
     constructor() {
-        this.knockout = <Knockout>Services.drawLibFor(DrawType.Normal);
+        this.knockout = <Knockout>LibLocator.drawLibFor(DrawType.Normal);
         validation.addValidator(this);
     }
 
@@ -109,7 +109,7 @@ export class KnockoutValidation implements IValidation {
         var nqs = 0;
         var tournament = draw._event._tournament;
         var isTypePoule = draw.type >= 2;
-        var lib = Services.drawLibFor(draw);
+        var lib = LibLocator.drawLibFor(draw);
 
         if (draw.type !== DrawType.Normal
             && draw.type !== DrawType.Final) {

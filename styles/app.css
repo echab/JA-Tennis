@@ -43,7 +43,7 @@ tr.error, div.error, span.error {
     background-color: #b6e6ff !important;
 }
 
-.selected h3, .draws.selected {
+.selected h3, .selected {
     background-color: #96d3f2 !important;
 }
 
