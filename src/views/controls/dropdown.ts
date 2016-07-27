@@ -95,7 +95,7 @@ export class DropdownToggleCustomAttribute {
 		element.classList.add('dropdown-toggle');
 
 		this.toggleElement = <HTMLElement>element;
-		this.appendTo = document.body;
+		this.appendTo = null;
 	}
 
 	//   init() {
@@ -103,16 +103,16 @@ export class DropdownToggleCustomAttribute {
 	//  if ('undefined' !== typeof (this.dropdownAppendTo)) {
 	//    var appendToEl = $parse(this.dropdownAppendTo)(this);
 	//    if (appendToEl) {
-	//      appendTo = angular.element(appendToEl);
+	//      this.appendTo = angular.element(appendToEl);
 	//    }
 	//  }
 
 	//  if (appendToBody && !appendTo) {
-	//    appendTo = body;
+	//    this.appendTo = document.body;
 	//  }
 
-	//  if (appendTo && this.dropdownMenu) {
-	//    appendTo.append(this.dropdownMenu);
+	//  if (this.appendTo && this.dropdownMenu) {
+	//    this.appendTo.appendChild(this.dropdownMenu);
 	//    this.element.on('$destroy', function handleDestroyEvent() {
 	//      this.dropdownMenu.remove();
 	//    });
@@ -195,7 +195,7 @@ export class DropdownToggleCustomAttribute {
 			setCss(this.dropdownMenu, css);
 		}
 
-		var openContainer = this.appendTo ? this.appendTo : this.element;
+		var openContainer = this.appendTo ? this.appendTo : this.element.parentElement;	//TODO parentElement is element with dropdown class
 		var hasOpenClass = openContainer.classList.contains(this.appendTo ? appendToOpenClass : openClass);
 
 		if (hasOpenClass === !isOpen) {
