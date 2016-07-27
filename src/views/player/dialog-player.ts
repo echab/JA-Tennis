@@ -28,6 +28,9 @@ export class DialogPlayer {
     activate(model: PlayerModel) {
         this.title = model.title;
         this.player = model.player;
+        if( !this.player.registration) {
+            this.player.registration = [];
+        }
         this.events = model.events;
     }
 }

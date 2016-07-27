@@ -1,5 +1,5 @@
 ﻿<template>
-<div class="${isMatch ? 'match' : ''} ${!isMatch ? 'inPlayer':''} ${isPlayed() ? 'played:''}
+<div class="${isMatch ? 'match' : 'inPlayer'} ${isPlayed ? 'played':''}
      ${box.hidden ? 'hidden':''} ${ box === selection.box ? 'selected':''} ${error ? 'error':''}"
      title="${error ? error.message +' '+ error.detail : ''}"
      click.trigger="selection.select2(box, selection.modelTypeBox)"

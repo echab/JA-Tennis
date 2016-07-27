@@ -1,6 +1,6 @@
 <template class="modal-dialog">
 
-    <require from="../controls/check-list"></require>
+    <require from="../controls/tabset"/>
 
     <div class="modal-content">
         <form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
@@ -38,8 +38,8 @@
                     </label>
                 </div>
 
-                <div tabset="">
-                    <div tab="" heading="General">
+                <tabset>
+                    <tab heading="General">
                         <div class="row">
                             <label class="span4">Birth: <input type="date" value.bind="player.birth" class="span3" /></label>
                         </div>
@@ -49,20 +49,20 @@
                         <div class="row">
                             <label class="span3">Licence: <input type="text" value.bind="player.licence" class="span2" /></label>
                         </div>
-                    </div>
-                    <div tab="" heading="Registration">
+                    </tab>
+                    <tab heading="Registration">
                         <div class="row">
                             <label class="span1">Events:</label>
                             <div class="offset1">
                                 <ul class="span3 unstyled">
                                     <li repeat.for="event of events">
-                                        <label><input type="checkbox" check-list.bind="player.registration" value.bind="event.id & oneTime" /> ${event.name}</label>
+                                        <label><input type="checkbox" model.bind="event.id" checked.bind="player.registration" /> ${event.name}</label>
                                     </li>
                                 </ul>
                             </div>
                         </div>
-                    </div>
-                    <div tab="" heading="Coordinates">
+                    </tab>
+                    <tab heading="Coordinates">
                         <div class="row">
                             <label class="span5">Adress: <input type="text" value.bind="player.adress1" class="span4" /></label>
                             <label class="span5"><input type="text" value.bind="player.adress2" class="span4" /></label>
@@ -86,18 +86,18 @@
                                 <input type="email" value.bind="player.email" class="span4" />
                             </label>
                         </div>
-                    </div>
-                    <!--<div tab="" heading="Team">
-                    </div>-->
-                    <div tab="" heading="Comment">
+                    </tab>
+                    <!--<tab heading="Team">
+                    </tab>-->
+                    <tab heading="Comment">
                         <div class="row">
                             <label class="span6">
                                 Note:
                                 <textarea value.bind="player.note" class="span5"></textarea>
                             </label>
                         </div>
-                    </div>
-                </div>
+                    </tab>
+                </tabset>
             </div>
             <div class="modal-footer">
                 <button type="submit" disabled.bind="!!playerForm.$error.required" class="btn btn-primary btn-success ${!!playerForm.$error.required ? 'disabled':''}"><i class="glyphicon glyphicon-ok-sign icon-white"></i>OK</button>

@@ -17,6 +17,11 @@ import { Validation } from './validation';
 @autoinject
 export class DrawEditor {
 
+    modeBuild = Mode.Build;
+    modePlan = Mode.Plan;
+    modePlay = Mode.Play;
+    modeLock = Mode.Lock;
+
     constructor(
         private mainLib: MainLib, 
         private dialogService: DialogService,

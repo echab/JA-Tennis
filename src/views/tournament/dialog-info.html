@@ -1,5 +1,7 @@
-﻿<template>
-<div class="modal-dialog">
+﻿<template class="modal-dialog">
+
+    <require from="../controls/tabset"/>
+
     <div class="modal-content">
         <form name="infoForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
             <div class="modal-header">
@@ -19,8 +21,8 @@
                     <label class="span6">Homologation: <input type="text" value.bind="info.homologation" class="span2" /></label>
                 </div>
 
-                <div tabset="">
-                    <div tab="" heading="Club">
+                <tabset>
+                    <tab heading="Club">
                         <div class="row">
                             <label class="span4">Name: <input type="text" value.bind="info.club.name" class="offset1 span3" /></label>
                         </div>
@@ -33,9 +35,9 @@
                                 <input type="text" value.bind="info.club.city" class="span2" />
                             </label>
                         </div>
-                    </div>
+                    </tab>
 
-                    <div tab="" heading="Referee">
+                    <tab heading="Referee">
                         <div class="row">
                             <label class="span4">Name: <input type="text" value.bind="info.referee.name" class="offset1 span3" /></label>
                         </div>
@@ -51,8 +53,8 @@
                                 <input type="text" value.bind="info.referee.city" class="span2" />
                             </label>
                         </div>
-                    </div>
-                </div>
+                    </tab>
+                </tabset>
             </div>
             <div class="modal-footer">
                 <button type="submit" disabled.bind="!!infoForm.$error.required" 
@@ -62,5 +64,4 @@
             </div>
         </form>
     </div>
-</div>
 </template>

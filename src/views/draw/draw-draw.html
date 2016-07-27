@@ -18,7 +18,7 @@
                     <draw-box box.bind="getBox(row[0])" if.bind="!simple"></draw-box>
                 </td>
                 <td>
-                    <div repeat.for="i of range(1, draw.nbOut)" class="qualifOut">Q${i}</div>
+                    <div repeat.for="i of (draw.nbOut -1)" class="qualifOut">Q${i +1}</div>
                 </td>
             </tr>
             <tr repeat.for="row of rows" css="height: ${boxHeight +'px'}">
@@ -30,7 +30,7 @@
     </table>
     <div class="action"
         if.bind="!simple && selection.box"
-        css="left: ${(1+ selection.box._x * boxWidth) +'px'}; top:${((selection.box._y +1) * boxHeight -2) +'px'}"
+        css="left: ${1+ selection.box._x * boxWidth}px; top:${(selection.box._y +1) * boxHeight -2}px"
         >
         <div class="btn-group" if.bind="draw.mode == 0">
             <button class="btn dropdown-toggle" disabled.bind="isMatch(selection.box)" title="Select the qualified">

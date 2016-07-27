@@ -82,9 +82,6 @@ export class DrawDraw implements ISize {
         if (!draw) {
             return;
         }
-        // if (!this._drawLib) {
-        //     this._drawLib = Services.drawLibFor(draw);
-        // }
         var size = this._drawLib.getSize(draw);
         this.width = size.width * this.boxWidth - this.interBoxWidth;
         this.height = size.height * this.boxHeight;
@@ -158,14 +155,14 @@ export class DrawDraw implements ISize {
             return (position % n) * (n + 1) === position;
         }
     }
-    range(min: number, max: number, step?: number): number[] {
-        step = step || 1;
-        var a: number[] = [];
-        for (var i = min; i <= max; i += step) {
-            a.push(i);
-        }
-        return a;
-    }
+    // range(min: number, max: number, step?: number): number[] {
+    //     step = step || 1;
+    //     var a: number[] = [];
+    //     for (var i = min; i <= max; i += step) {
+    //         a.push(i);
+    //     }
+    //     return a;
+    // }
     getQualifsIn(): Match[] {
         return this.qualifsIn;
     }

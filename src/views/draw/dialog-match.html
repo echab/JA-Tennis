@@ -1,5 +1,7 @@
-﻿<template>
-<div class="modal-dialog">
+﻿<template class="modal-dialog">
+
+    <require from="../controls/tabset"/>
+
     <div class="modal-content">
         <form name="matchForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
             <div class="modal-header">
@@ -29,12 +31,14 @@
                             <label class="checkbox span2"><input type="checkbox" checked.bind="match.vainqDef" />Vainqueur defaillant</label>
                         </div>
                     </div>
-                <div tabset="">
-                    <div tab="" heading="Planning">
+                <tabset>
+                    <tab heading="Planning">
                         <div class="row">
-                            <label class="span3">Court: <select value.bind="match.place" class="span2">
-                                <option repeat.for="place of places">${place}</option> 
-                                </select></label>
+                            <label class="span3">Court: 
+                                <select value.bind="match.place" class="span2">
+                                    <option repeat.for="place of places">${place}</option> 
+                                </select>
+                            </label>
                             <label class="span3">Date: <input type="datetime" value.bind="match.date" class="span2" /></label>
                         </div>
                         <div class="row">
@@ -47,19 +51,22 @@
                             <label class="checkbox span2"><input type="checkbox" checked.bind="match.aware2" />Aware</label>
                             <label class="checkbox span2"><input type="checkbox" checked.bind="match.receive2" />Receive</label>
                         </div>
-                    </div>
-                    <div tab="" heading="Comment">
+                    </tab>
+                    <tab heading="Comment">                                                
                         <div class="row">
-                            <label class="span5">Format: <select value.bind="match.matchFormat" class="span4">
-                                <option repeat.for="(key,matchFormat) of matchFormats" name.bind="key">${matchFormat.name}</option>
-                                </select></label>
-                        </div>
-
+                            <label class="span5">Format:
+                                <!--TODO 
+                                <select value.bind="match.matchFormat" class="span4">
+                                    <option repeat.for="[key, matchFormat] of matchFormats" model.bind="key">${matchFormat.name}</option>
+                                </select>
+                                -->
+                            </label>
+                        </div>                        
                         <div class="row">
                             <label class="span6">Note: <textarea value.bind="match.note" class="span5"></textarea></label>
                         </div>
-                    </div>
-                </div>
+                    </tab>
+                </tabset>
             </div>
             <div class="modal-footer">
                 <button type="submit" disabled.bind="!!matchForm.$error.required" class="btn btn-primary btn-success ${!!matchForm.$error.required ? 'disabled':''}"><i class="glyphicon glyphicon-ok-sign icon-white"></i> OK</button>
@@ -67,5 +74,4 @@
             </div>
         </form>
     </div>
-</div>
 </template>

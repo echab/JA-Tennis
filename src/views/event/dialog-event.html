@@ -1,7 +1,4 @@
 ﻿<template class="modal-dialog">
-
-    <require from="../controls/check-list"></require>
-
     <div class="modal-content">
         <form name="eventForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
@@ -54,7 +51,7 @@
                     <div class="offset2">
                         <ul class="span3 unstyled">
                             <li repeat.for="player of registred">
-                                <label><input type="checkbox" check-list.bind="player.registration" value.bind="event.id & oneTime" /> ${player.name}</label>
+                                <label><input type="checkbox" checked.bind="player.registration" model.bind="event.id" /> ${player.name}</label>
                             </li>
                         </ul>
                     </div>
