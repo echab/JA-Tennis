@@ -17,8 +17,7 @@ export class EventEditor {
         private dialogService: DialogService,
         public selection:Selection, 
         private undo:Undo
-        ) {
-		  }
+        ) {}
 
     add(after?: TEvent): void { //TODO afterEvent
 

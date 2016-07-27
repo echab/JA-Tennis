@@ -9,6 +9,8 @@ var MINUTES = 60000,
 
 export class TournamentLib {
 
+    //TODO? merge functions into tournamentEditor, eventEditor, playerEditor, drawEditor
+
     public static newTournament(source?: Tournament): Tournament {
         var tournament: Tournament = <any>{};
         if (isObject(source)) {
