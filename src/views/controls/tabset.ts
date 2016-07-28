@@ -120,27 +120,4 @@ function parseBoolean( b) {
 
 function byIndex(t1:TabItem, t2:TabItem) {
   return t1.index > t2.index ? 1 : t1.index < t2.index ? -1 : 0;
-} 
-
-// .directive('uibTabset', function() {
-//   return {
-//     transclude: true,
-//     replace: true,
-//     scope: {},
-//     bindToController: {
-//       active: '=?',
-//       type: '@'
-//     },
-//     controller: 'UibTabsetController',
-//     controllerAs: 'tabset',
-//     templateUrl: function(element, attrs) {
-//       return attrs.templateUrl || 'uib/template/tabs/tabset.html';
-//     },
-//     link: function(scope, element, attrs) {
-//       scope.vertical = angular.isDefined(attrs.vertical) ?
-//         scope.$parent.$eval(attrs.vertical) : false;
-//       scope.justified = angular.isDefined(attrs.justified) ?
-//         scope.$parent.$eval(attrs.justified) : false;
-//     }
-//   };
-// })
+}

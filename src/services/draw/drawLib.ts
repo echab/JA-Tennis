@@ -1,6 +1,5 @@
 import {Find} from '../util/Find';
 import {Guid} from '../util/Guid';
-//import { DrawType } from '../../models/enums';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle } from '../../utils/tool';
 import { LibLocator } from '../libLocator';

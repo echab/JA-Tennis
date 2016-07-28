@@ -1,5 +1,5 @@
 import { bindable, autoinject } from 'aurelia-framework';
-
+import { View /*, BoundViewFactory, ViewSlot */ } from 'aurelia-templating';
 import { Tabset } from './tabset';
 
 // https://github.com/angular-ui/bootstrap/blob/master/src/tabs/tabs.js
@@ -7,7 +7,7 @@ import { Tabset } from './tabset';
 /**
  * uib-tab settings
  * 
- * heading - Heading text.
+ * heading - Heading text. //TODO use also tab-heading custom element content
  * 
  * index - Tab index. Must be unique number or string.
  * 
@@ -39,8 +39,8 @@ export class Tab {
 	// constructor(private element: Element) {	// Inject the instance of this element
 	// }
 
-	created(owningView /*: View*/, myView /*: View */) {
-		this.tabset = myView.container.parent.viewModel;
+	created(owningView: View, myView: View) {
+		this.tabset = (<any>myView.container.parent).viewModel;
 	}
 
 	bind(bindingContext: Object, overrideContext: Object) {
@@ -80,37 +80,3 @@ export class Tab {
 		this.tabset.removeTab(this);
 	}
 }
-
-// .directive('uibTabContentTransclude', function() {
-//   return {
-//     restrict: 'A',
-//     require: '^uibTabset',
-//     link: function(scope, elm, attrs) {
-//       var tab = scope.$eval(attrs.uibTabContentTransclude).tab;
-
-//       //Now our tab is ready to be transcluded: both the tab heading area
-//       //and the tab content area are loaded.  Transclude 'em both.
-//       tab.$transcludeFn(tab.$parent, function(contents) {
-//         angular.forEach(contents, function(node) {
-//           if (isTabHeading(node)) {
-//             //Let tabHeadingTransclude know.
-//             tab.headingElement = node;
-//           } else {
-//             elm.append(node);
-//           }
-//         });
-//       });
-//     }
-//   };
-
-// function isTabHeading(node) {
-// 	return node.tagName && (
-// 		node.hasAttribute('uib-tab-heading') ||
-// 		node.hasAttribute('data-uib-tab-heading') ||
-// 		node.hasAttribute('x-uib-tab-heading') ||
-// 		node.tagName.toLowerCase() === 'uib-tab-heading' ||
-// 		node.tagName.toLowerCase() === 'data-uib-tab-heading' ||
-// 		node.tagName.toLowerCase() === 'x-uib-tab-heading' ||
-// 		node.tagName.toLowerCase() === 'uib:tab-heading'
-// 	);
-// }
