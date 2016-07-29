@@ -1,8 +1,8 @@
 import { autoinject, bindable, BindingEngine, Disposable } from 'aurelia-framework';
 import { DialogController } from 'aurelia-dialog';
 
-import { TournamentLib as tournamentLib } from '../../services/tournamentLib';
-import { DrawLib as drawLib } from '../../services/draw/drawLib';
+import { TournamentEditor } from '../../services/tournamentEditor';
+import { DrawEditor } from '../../services/drawEditor';
 import { rank, category } from '../../services/types';
 
 interface DrawModel {
@@ -62,10 +62,10 @@ export class DialogDraw {
     // }
 
     getRegisteredCount(): number {
-        var n = tournamentLib.GetJoueursInscrit(this.draw).length;
-        var previous = drawLib.previousGroup(this.draw);
+        var n = TournamentEditor.getRegisteredPlayers(this.draw).length;
+        var previous = DrawEditor.previousGroup(this.draw);
         if (previous) {
-            var qualifs = drawLib.groupFindAllPlayerOut(previous);
+            var qualifs = DrawEditor.groupFindAllPlayerOut(previous);
             if (qualifs) {
                 n += qualifs.length;
             }
@@ -73,6 +73,6 @@ export class DialogDraw {
         return n;
     }
     //getNbEntry(): number {
-    //    return this.drawLib.countInCol(iColMax(draw), draw.nbOut);
+    //    return this.DrawEditor.countInCol(iColMax(draw), draw.nbOut);
     //}
 }

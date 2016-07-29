@@ -1,7 +1,7 @@
 import { DrawLibBase } from './drawLibBase';
-import { DrawLib as drawLib } from './drawLib';
+import { DrawEditor } from '../drawEditor';
 import { KnockoutLib as k } from './knockoutLib';
-import { TournamentLib as tournamentLib } from '../tournamentLib';
+import { TournamentEditor } from '../tournamentEditor';
 import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object'
@@ -46,7 +46,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private findBox(draw: Draw, position: number, create?: boolean): Box {
         var box = Find.by(draw.boxes, 'position', position);
         if (!box && create) {
-            box = drawLib.newBox(draw, undefined, position);
+            box = DrawEditor.newBox(draw, undefined, position);
         }
         return box;
     }
@@ -97,12 +97,12 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (generate === GenerateType.Create) {   //from registred players
             var m_nMatchCol = filledArray(MAX_COL, 0);
 
-            var players: Array<Player|number> = tournamentLib.GetJoueursInscrit(draw);
+            var players: Array<Player|number> = TournamentEditor.getRegisteredPlayers(draw);
 
             //Récupère les qualifiés sortants du tableau précédent
-            var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = drawLib.previousGroup(draw);
+            var prev = afterIndex >= 0 ? draw._event.draws[afterIndex] : draw._previous; // = DrawEditor.previousGroup(draw);
             if (prev) {
-                players = players.concat(drawLib.groupFindAllPlayerOut(prev, true));
+                players = players.concat(DrawEditor.groupFindAllPlayerOut(prev, true));
             }
 
             this.resetDraw(draw, players.length);
@@ -122,7 +122,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         //Tri et Mélange les joueurs de même classement
-        tournamentLib.TriJoueurs(players);
+        TournamentEditor.sortPlayers(players);
 
         draw = this.ConstruitMatch(draw, m_nMatchCol, players);
         return [draw];
@@ -362,7 +362,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private ConstruitMatch(oldDraw: Draw, m_nMatchCol: number[], players: Array<Player|number>): Draw {
 
         
-        var draw = drawLib.newDraw(oldDraw._event, oldDraw);
+        var draw = DrawEditor.newDraw(oldDraw._event, oldDraw);
         draw.boxes = [];
 
         var colMin = k.columnMin(draw.nbOut),
@@ -414,7 +414,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     iJoueur++;
                     nj--;
 
-                    var box = drawLib.newBox(draw, draw._event.matchFormat, b);
+                    var box = DrawEditor.newBox(draw, draw._event.matchFormat, b);
                     draw.boxes.push(box);
                 }
             } else {
@@ -423,7 +423,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     pbMatch[b] = true;
                     m--;
 
-                    var match = <Match> drawLib.newBox(draw, draw._event.matchFormat, b);
+                    var match = <Match> DrawEditor.newBox(draw, draw._event.matchFormat, b);
                     match.score = '';
                     draw.boxes.push(match);
                 }
@@ -501,10 +501,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (draw.type !== DrawType.Final) {
 
             //Find the first unused qualif number
-            var group = drawLib.group(draw);
+            var group = DrawEditor.group(draw);
             if (group) {
                 for (i = 1; i <= MAX_QUALIF; i++) {
-                    if (!drawLib.groupFindPlayerOut(group, i)) {
+                    if (!DrawEditor.groupFindPlayerOut(group, i)) {
                         break;
                     }
                 }
@@ -620,10 +620,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            var prev = drawLib.previousGroup(draw);
+            var prev = DrawEditor.previousGroup(draw);
             if (!player && prev && prev.length && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
-                var boxOut = drawLib.groupFindPlayerOut(prev, inNumber);
+                var boxOut = DrawEditor.groupFindPlayerOut(prev, inNumber);
                 if (isObject(boxOut)) {	//V0997
                     player = boxOut._player;
                 }
@@ -656,7 +656,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             box.qualifIn = 0;
 
-            if (drawLib.previousGroup(draw) && !this.removePlayer(box)) {
+            if (DrawEditor.previousGroup(draw) && !this.removePlayer(box)) {
                 ASSERT(false);
             }
 
@@ -673,7 +673,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
-        var next = drawLib.nextGroup(box._draw);
+        var next = DrawEditor.nextGroup(box._draw);
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
@@ -681,7 +681,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             //Met à jour le tableau suivant
             if (next && box.playerId && box.qualifOut) {
-                var boxIn = drawLib.groupFindPlayerIn(next, outNumber);
+                var boxIn = DrawEditor.groupFindPlayerIn(next, outNumber);
                 if (boxIn) {
                     ASSERT(boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn)) {
@@ -708,7 +708,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         } else {	//Enlève un qualifié sortant
             if (next && box.playerId) {
                 //Met à jour le tableau suivant
-                var boxIn = drawLib.groupFindPlayerIn(next, box.qualifOut);
+                var boxIn = DrawEditor.groupFindPlayerIn(next, box.qualifOut);
                 if (boxIn) {
                     ASSERT(boxIn.playerId && boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn, true)) {

@@ -1,4 +1,4 @@
-﻿import { DrawLib as drawLib } from './drawLib';
+﻿import { DrawEditor } from '../drawEditor';
 import { Find } from '../util/find';
 import { Guid } from '../util/guid';
 import { isArray } from '../util/object';
@@ -18,7 +18,7 @@ export abstract class DrawLibBase {
 
     public resetDraw(draw: Draw, nPlayer: number): void {
         //remove qualif out
-        var next = drawLib.nextGroup(draw);
+        var next = DrawEditor.nextGroup(draw);
         if (next && draw.boxes) {
             for (var i = 0; i < next.length; i++) {
                 var boxes = next[i].boxes;
@@ -66,7 +66,7 @@ export abstract class DrawLibBase {
 
     public findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-        var group = isArray(origin) ? <Draw[]>origin : drawLib.group(<Draw>origin);
+        var group = isArray(origin) ? <Draw[]>origin : DrawEditor.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
             var boxes = group[i].boxes;
             for (var j = 0; j < boxes.length; j++) {
@@ -128,9 +128,9 @@ export abstract class DrawLibBase {
 
         var boxOut = <Match>box;
         if (boxOut.qualifOut) {
-            var next = drawLib.nextGroup(box._draw);
+            var next = DrawEditor.nextGroup(box._draw);
             if (next) {
-                var boxIn = drawLib.groupFindPlayerIn(next, boxOut.qualifOut);
+                var boxIn = DrawEditor.groupFindPlayerIn(next, boxOut.qualifOut);
                 if (boxIn) {
                     if (!boxIn.playerId
                         && !this.putPlayer(boxIn, player, true)) {
@@ -253,11 +253,11 @@ export abstract class DrawLibBase {
 
         //ASSERT(EnleveJoueurOk(box, bForce));
 
-        var next = drawLib.nextGroup(box._draw);
+        var next = DrawEditor.nextGroup(box._draw);
         var boxOut = <Match> box;
         var i: number;
         if ((i = boxOut.qualifOut) && next) {
-            var boxIn = drawLib.groupFindPlayerIn(next, i);
+            var boxIn = DrawEditor.groupFindPlayerIn(next, i);
             if (boxIn) {
                 if (!this.removePlayer(boxIn, true)) {
                     throw 'Error';
@@ -356,11 +356,11 @@ export abstract class DrawLibBase {
 
         box.locked = true;
 
-        var prev = drawLib.previousGroup(box._draw);
+        var prev = DrawEditor.previousGroup(box._draw);
         if (prev) {
             var boxIn = <PlayerIn>box;
             if (boxIn.qualifIn) {
-                var boxOut = drawLib.groupFindPlayerOut(prev, boxIn.qualifIn);
+                var boxOut = DrawEditor.groupFindPlayerOut(prev, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -379,11 +379,11 @@ export abstract class DrawLibBase {
 
         delete box.locked;
 
-        var prev = drawLib.previousGroup(box._draw);
+        var prev = DrawEditor.previousGroup(box._draw);
         if (prev) {
             var boxIn = <PlayerIn>box;
             if (boxIn.qualifIn) {
-                var boxOut = drawLib.groupFindPlayerOut(prev, boxIn.qualifIn);
+                var boxOut = DrawEditor.groupFindPlayerOut(prev, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }
@@ -481,7 +481,7 @@ export abstract class DrawLibBase {
     public movePlayer(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueur
         //ASSERT(DeplaceJoueurOk(box, iBoiteSrc, pBoite));
 
-        boiteSrc = drawLib.newBox(box._draw, boiteSrc);
+        boiteSrc = DrawEditor.newBox(box._draw, boiteSrc);
 
         if (!this.fillBox(boiteSrc, pBoite)) {	//Vide la source
             throw 'Error';

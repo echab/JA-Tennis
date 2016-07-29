@@ -1,7 +1,7 @@
 ﻿// FFT validation services
 
 import { Validation } from '../validation';
-import { DrawLib as drawLib } from '../draw/drawLib';
+import { DrawEditor } from '../drawEditor';
 import { Find } from '../util/find';
 import { LibLocator } from '../libLocator';
 import { override } from '../util/object';
@@ -120,7 +120,7 @@ export class FFTValidation extends Validation {
         if (draw.type === DrawType.Final) {
 
             //VERIFIE	//5
-            var boxT = drawLib.findSeeded(draw, 1);
+            var boxT = DrawEditor.findSeeded(draw, 1);
             if (!boxT) {
                 var boxMax = Find.by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
                 this.errorDraw('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);

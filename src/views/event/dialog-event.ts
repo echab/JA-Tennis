@@ -1,8 +1,7 @@
-import { autoinject } from 'aurelia-framework';
-import { bindable } from 'aurelia-framework';
+import { autoinject, bindable } from 'aurelia-framework';
 import { DialogController } from 'aurelia-dialog';
 
-import { TournamentLib as tournamentLib } from '../../services/tournamentLib';
+import { TournamentEditor } from '../../services/tournamentEditor';
 import { rank, category } from '../../services/types';
 
 interface EventModel {
@@ -29,6 +28,6 @@ export class DialogEvent {
         this.title = model.title;
         this.event = model.event;
 
-        this.registred = tournamentLib.getRegistred(model.event);
+        this.registred = TournamentEditor.getRegistred(model.event);
     }
 }

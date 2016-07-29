@@ -3,12 +3,10 @@ import {autoinject,bindable} from 'aurelia-framework';
 import { TournamentEditor } from '../services/tournamentEditor';
 import { EventEditor } from '../services/eventEditor';
 import { DrawEditor } from '../services/drawEditor';
+import { PlayerEditor } from '../services/playerEditor';
 
 import { Selection,ModelType } from '../services/selection';
 import { Undo } from '../services/util/undo';
-
-import { MainLib } from '../services/mainLib';
-import { TournamentLib } from '../services/tournamentLib';
 
 /** Main controller for the application */
 @autoinject
@@ -23,7 +21,7 @@ export class Main {
         private tournamentEditor: TournamentEditor,
         private eventEditor: EventEditor,
         private drawEditor: DrawEditor,
-        private mainLib: MainLib, 
+        private playerEditor: PlayerEditor,
         private selection:Selection, 
         private undo:Undo
         ) {
@@ -36,22 +34,19 @@ export class Main {
             this.planningOpened = conf.planning;
         }
 
-        this.selection.tournament = TournamentLib.newTournament();
+        //tournamentEditor.add();
 
         //var filename = '/data/tournament8.json';
         var filename = '/data/jeu4test.json';
 
         //Load saved tournament if exists
-        //this.mainLib.loadTournament().then((data) => {
-        //}, (reason) => {
-        this.mainLib.loadTournament(filename).then(tournament => {
+        this.tournamentEditor.load(filename).then(tournament => {
             this.selection.select(tournament, ModelType.Tournament);
         });
-        //});
 
         //Auto save tournament on exit
         window.addEventListener('beforeunload',  () => {
-            this.mainLib.saveTournament(this.selection.tournament);
+            this.tournamentEditor.save();
 
             localStorage.setItem('panelsOpened', JSON.stringify({
                 tournament: this.tournamentOpened,

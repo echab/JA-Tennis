@@ -4,24 +4,55 @@ import {DialogService,DialogResult} from 'aurelia-dialog';
 import {DialogEvent} from '../views/event/dialog-event';
 
 import { Selection,ModelType } from './selection';
+import { Find } from './util/find';
+import { Guid } from './util/guid';
 import { Undo } from './util/undo';
 
-import { MainLib } from './mainLib';
-import { TournamentLib } from './tournamentLib';
+import { DrawEditor } from './drawEditor';
+import { isObject,extend } from './util/object'
 
 @autoinject
 export class EventEditor {
 
     constructor(
-        private mainLib: MainLib, 
         private dialogService: DialogService,
         public selection:Selection, 
+        private find:Find,
+        private guid:Guid,
         private undo:Undo
         ) {}
 
+    public static newEvent(parent: Tournament, source?: TEvent): TEvent {
+        var event: TEvent = <any>{};
+        if (isObject(source)) {
+            extend(event, source);
+        }
+        event.id = event.id || Guid.create('e');
+        //delete (<any>event).$$hashKey;   //TODO remove angular id
+
+        this.init(event, parent);
+        return event;
+    }
+
+    public static init(event: TEvent, parent: Tournament): void {
+        event._tournament = parent;
+
+        var c = event.draws = event.draws || [];
+        if (c) {
+            for (var i = c.length - 1; i >= 0; i--) {
+                var draw = c[i];
+                DrawEditor.init(draw, event);
+
+                //init draws linked list
+                draw._previous = c[i - 1];
+                draw._next = c[i + 1];
+            }
+        }
+    }
+
     add(after?: TEvent): void { //TODO afterEvent
 
-        var newEvent = TournamentLib.newEvent(this.selection.tournament);
+        var newEvent = EventEditor.newEvent(this.selection.tournament);
 
         this.dialogService.open({
             viewModel: DialogEvent, 
@@ -31,14 +62,14 @@ export class EventEditor {
             }
         }).then((result: DialogResult) => {
             if ('Ok' === result.output) {
-                this.mainLib.addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
+                this._addEvent(this.selection.tournament, newEvent, after); //TODO add event after selected event
             }
         });
     }
 
     edit(event: TEvent): void {
 
-        var editedEvent = TournamentLib.newEvent(this.selection.tournament, event);
+        var editedEvent = EventEditor.newEvent(this.selection.tournament, event);
 
         this.dialogService.open({
             viewModel: DialogEvent, 
@@ -48,14 +79,40 @@ export class EventEditor {
             }
         }).then((result: DialogResult) => {
             if ('Ok' === result.output) {
-                this.mainLib.editEvent(editedEvent, event);
+                this._editEvent(editedEvent, event);
             } else if ('Del' === result.output) {
-                this.mainLib.removeEvent(event)
+                this.remove(event)
             }
         });
     }
 
+    // =====
+
+    private _addEvent(tournament: Tournament, event: TEvent, afterEvent?: TEvent): void {
+        var c = tournament.events;
+        var index = afterEvent ? Find.indexOf(c, 'id', afterEvent.id) + 1 : c.length;
+
+        event.id = Guid.create('e');
+        this.undo.insert(c, index, event, "Add " + event.name, ModelType.TEvent);   //c.push( newEvent);
+        this.selection.select(event, ModelType.TEvent);
+    }
+
+    private _editEvent(editedEvent: TEvent, event: TEvent): void {
+        var isSelected = this.selection.event === event;
+        var c = editedEvent._tournament.events;
+        var i = Find.indexOf(c, "id", editedEvent.id, "TEvent to edit not found");
+        this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, ModelType.TEvent);   //c[i] = editedEvent;
+        if (isSelected) {
+            this.selection.select(editedEvent, ModelType.TEvent);
+        }
+    }
+
     remove(event: TEvent): void {
-        this.mainLib.removeEvent(event);
+        var c = event._tournament.events;
+        var i = Find.indexOf(c, "id", event.id, "TEvent to remove not found");
+        this.undo.remove(c, i, "Delete " + c[i].name + " " + i, ModelType.TEvent); //c.splice( i, 1);
+        if (this.selection.event === event) {
+            this.selection.select(c[i] || c[i - 1], ModelType.TEvent);
+        }
     }
 }

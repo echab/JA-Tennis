@@ -1,8 +1,7 @@
 ﻿import { Validation } from '../validation';
 import { DrawLibBase } from './drawLibBase';
-import { DrawLib } from './drawLib';
-import { DrawLib as drawLib } from './drawLib';
-import { TournamentLib as tournamentLib } from '../tournamentLib';
+import { DrawEditor } from '../drawEditor';
+import { TournamentEditor } from '../tournamentEditor';
 import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object';

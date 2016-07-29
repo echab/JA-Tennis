@@ -1,7 +1,7 @@
 ﻿import { Knockout } from './knockout';
 import { KnockoutLib as k } from './knockoutLib';
-import { DrawLib as drawLib } from './drawLib';
-import { TournamentLib as tournamentLib } from '../tournamentLib';
+import { DrawEditor } from '../drawEditor';
+import { TournamentEditor } from '../tournamentEditor';
 import { Find } from '../util/Find';
 import { Guid } from '../util/Guid';
 import { isObject,isArray,extend } from '../util/object';
@@ -38,7 +38,7 @@ export class KnockoutValidation implements IValidation {
                 bRes = false;
             }
 
-            var group = drawLib.group(draw);
+            var group = DrawEditor.group(draw);
             if (group) {
                 if (draw.type !== group[0].type) {
                     validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
@@ -55,7 +55,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        var prevGroup = drawLib.previousGroup(draw);
+        var prevGroup = DrawEditor.previousGroup(draw);
         if (prevGroup) {
             if (prevGroup[0].type !== DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
                 if (rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
@@ -65,7 +65,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        var nextGroup = drawLib.nextGroup(draw);
+        var nextGroup = DrawEditor.nextGroup(draw);
         if (nextGroup) {
             if (draw.type !== DrawType.Final && draw.maxRank && nextGroup[0].minRank) {
                 if (rank.compare(nextGroup[0].minRank, draw.maxRank) < 0) {
@@ -78,14 +78,14 @@ export class KnockoutValidation implements IValidation {
         var e = MAX_QUALIF;
         if (!draw.suite) {
             //Trouve le plus grand Qsortant
-            group =  group || drawLib.group(draw);
+            group =  group || DrawEditor.group(draw);
             for (e = MAX_QUALIF; e >= 1; e--) {
-                if (drawLib.groupFindPlayerOut(group, e)) {
+                if (DrawEditor.groupFindPlayerOut(group, e)) {
                     break;
                 }
             }
             for (var e2 = 1; e2 <= e; e2++) {
-                if (!drawLib.groupFindPlayerOut(group, e2)) {
+                if (!DrawEditor.groupFindPlayerOut(group, e2)) {
                     validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, 'Q' + e2);
                     bRes = false;
                 }
@@ -213,10 +213,10 @@ export class KnockoutValidation implements IValidation {
                 }
 
                 //Check inscriptions
-                if (!tournamentLib.isSexeCompatible(draw._event, player.sexe)) {
+                if (!TournamentEditor.isSexeCompatible(draw._event, player.sexe)) {
                     validation.errorDraw('IDS_ERR_EPR_SEXE', draw, boxIn);
 
-                } else if (!tournamentLib.isRegistred(draw._event, player)) {
+                } else if (!TournamentEditor.isRegistred(draw._event, player)) {
                     validation.errorDraw('IDS_ERR_INSCR_NO', draw, boxIn);
                 }
 
@@ -244,7 +244,7 @@ export class KnockoutValidation implements IValidation {
 
                 ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
 
-                //TODO drawLib.boxesOpponents(match)
+                //TODO DrawEditor.boxesOpponents(match)
                 var opponent = this.knockout.boxesOpponents(match);
 
                 ASSERT(!!opponent.box1 && !!opponent.box2);
@@ -442,10 +442,10 @@ export class KnockoutValidation implements IValidation {
                         bRes = false;
                     }
 
-                    var group = drawLib.previousGroup(draw);
+                    var group = DrawEditor.previousGroup(draw);
                     if (group) {
                         //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                        j = drawLib.groupFindPlayerOut(group, e);
+                        j = DrawEditor.groupFindPlayerOut(group, e);
                         if (!j) {
                             validation.errorDraw('IDS_ERR_TAB_ENTRANT_PREC_NO', draw, boxIn);
                             bRes = false;
@@ -493,7 +493,7 @@ export class KnockoutValidation implements IValidation {
         //	if( !isTypePoule)
         if (!draw.suite) {
             for (var e2 = 0, e = 1; e <= MAX_TETESERIE; e++) {
-                boxIn = drawLib.findSeeded(draw, e);
+                boxIn = DrawEditor.findSeeded(draw, e);
                 if (boxIn) {
                     if (e > e2 + 1) {
                         validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', boxIn._draw, boxIn, 'Seeded ' + e);
@@ -520,10 +520,10 @@ export class KnockoutValidation implements IValidation {
 
         //Tous les qualifiés sortants du tableau précédent sont utilisés
         if (!draw.suite) {
-            var pT = drawLib.previousGroup(draw);
+            var pT = DrawEditor.previousGroup(draw);
             if (pT && pT.length) {
                 for (var e = 1; e <= MAX_QUALIF; e++) {
-                    var boxOut = drawLib.groupFindPlayerOut(pT, e);
+                    var boxOut = DrawEditor.groupFindPlayerOut(pT, e);
                     boxIn = lib.findPlayerIn(draw, e);
                     if (boxOut && !boxIn) {
                         validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, 'Q' + boxOut.qualifOut);

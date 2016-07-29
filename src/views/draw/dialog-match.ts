@@ -1,5 +1,4 @@
-import { autoinject } from 'aurelia-framework';
-import { bindable } from 'aurelia-framework';
+import { autoinject, bindable } from 'aurelia-framework';
 import { DialogController } from 'aurelia-dialog';
 
 import { LibLocator } from '../../services/libLocator';

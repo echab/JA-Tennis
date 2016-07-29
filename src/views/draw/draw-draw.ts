@@ -2,8 +2,7 @@ import { autoinject, bindable } from 'aurelia-framework';
 
 import { Selection,ModelType} from '../../services/selection';
 import { LibLocator } from '../../services/libLocator';
-import { DrawLib } from '../../services/draw/drawLib';
-import { TournamentLib } from '../../services/tournamentLib';
+import { TournamentEditor } from '../../services/tournamentEditor';
 import { Find } from '../../services/util/find';
 import { Undo } from '../../services/util/undo';
 import { DrawEditor } from '../../services/drawEditor';
@@ -50,11 +49,11 @@ export class DrawDraw implements ISize {
         }
 
         if( !this.simple) {
-            this.players = TournamentLib.GetJoueursInscrit(this.draw);
+            this.players = TournamentEditor.getRegisteredPlayers(this.draw);
 
             //qualifs in
-            var prev = DrawLib.previousGroup(this.draw);
-            this.qualifsIn = prev ? DrawLib.findAllPlayerOutBox(prev) : undefined;
+            var prev = DrawEditor.previousGroup(this.draw);
+            this.qualifsIn = prev ? DrawEditor.findAllPlayerOutBox(prev) : undefined;
 
             //qualifs out
             this.qualifsOut = [];
@@ -162,7 +161,7 @@ export class DrawDraw implements ISize {
                 box.playerId = bUndo 
                     ? (prevPlayer ? prevPlayer.id : undefined) 
                     : (player ? player.id : undefined);
-                DrawLib.initBox(box, box._draw);
+                DrawEditor.initBox(box, box._draw);
             }
             this.selection.select(box, ModelType.Box);
         }, player ? 'Set player' : 'Erase player');

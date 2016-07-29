@@ -1,7 +1,7 @@
 ﻿import { DrawLibBase } from './draw/drawLibBase';
-import { DrawLib } from './draw/drawLib';
+import { DrawEditor } from './drawEditor';
 import { KnockoutLib } from './draw/knockoutLib';
-import { TournamentLib } from './tournamentLib';
+import { TournamentEditor } from './tournamentEditor';
 import {Find} from './util/Find';
 import {Guid} from './util/Guid';
 import { isObject,isArray,extend } from './util/object'

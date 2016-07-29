@@ -1,4 +1,4 @@
-import { DrawLib as drawLib } from './drawLib';
+import { DrawEditor } from '../drawEditor';
 import { Find } from '../util/find';
 import { Validation } from '../validation';
 import { validation } from '../types';
