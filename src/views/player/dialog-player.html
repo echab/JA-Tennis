@@ -1,112 +1,115 @@
-<template class="modal-dialog">
-
+<template>
     <require from="../controls/tabset"></require>
     <require from="../controls/tab"></require>
 
-    <div class="modal-content">
-        <form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                <h3>${title} <!--<small>Id: ${player.id}</small>--></h3>
-            </div>
-            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                    <h4>${title}
+                        <!--<small>Id: ${player.id}</small>--></h4>
+                </div>
+                <div class="modal-body">
 
-                <!--<div class="control-group">
+                    <!--<div class="control-group">
                     <label for="name" class="control-label">Name:</label>
                     <div class="controls">
                         <input type="text" id="name" name="name" value.bind="player.name" required />*
                     </div>
                 </div>-->
 
-                <div class="row">
-                    <label class="span3">
-                        Name:
-                        <input type="text" value.bind="player.name" required class="span2" autofocus attach-focus="true" />
-                    </label>
-                    <!--<span class="error" show.bind="playerForm.name.$error.required">Required!</span>-->
-                    <label class="span3">
-                        Surname:
-                        <input type="text" value.bind="player.firstname" class="span2" />
-                    </label>
-                </div>
-                <div class="row">
-                    <label class="span3">
-                        Rank:
-                        <select type="text" name="rank" value.bind="player.rank" class="span2">
-                            <option repeat.for="value of ranks">${value}</option> 
-                        </select>
-                    </label>
-                </div>
+                    <div class="row form-group">
+                        <label for="name" class="col-xs-3">Name:</label>
+                        <input id="name" type="text" value.bind="player.name" required class="col-xs-5" autofocus attach-focus="true" />
+                        <!--<span class="error" show.bind="playerForm.name.$error.required">Required!</span>-->
+                    </div>
+                    <div class="row form-group">
+                        <label for="firstname" class="col-xs-3">First name:</label>
+                        <input id="firstname" type="text" value.bind="player.firstname" class="col-xs-5" />
+                    </div>
+                    <div class="row form-group">
+                        <label for="rank" class="col-xs-3">Rank:</label>
+                        <select id="rank" type="text" name="rank" value.bind="player.rank" class="col-xs-3">
+                        <option repeat.for="value of ranks">${value}</option> 
+                    </select>
+                    </div>
 
-                <tabset>
-                    <tab heading="General">
-                        <div class="row">
-                            <label class="span4">Birth: <input type="date" value.bind="player.birth" class="span3" /></label>
-                        </div>
-                        <div class="row">
-                            <label class="span4">Club: <input type="text" value.bind="player.club" class="span3" /></label>
-                        </div>
-                        <div class="row">
-                            <label class="span3">Licence: <input type="text" value.bind="player.licence" class="span2" /></label>
-                        </div>
-                    </tab>
-                    <tab heading="Registration">
-                        <div class="row">
-                            <label class="span1">Events:</label>
-                            <div class="offset1">
-                                <ul class="span3 unstyled">
-                                    <li repeat.for="event of events">
-                                        <label><input type="checkbox" model.bind="event.id" checked.bind="player.registration" /> ${event.name}</label>
-                                    </li>
-                                </ul>
+                    <tabset>
+                        <tab heading="General">
+                            <br/>
+                            <div class="row form-group">
+                                <label class="col-xs-3">Birth:</label>
+                                <input type="date" value.bind="player.birth" class="col-xs-4" />
                             </div>
-                        </div>
-                    </tab>
-                    <tab heading="Coordinates">
-                        <div class="row">
-                            <label class="span5">Adress: <input type="text" value.bind="player.adress1" class="span4" /></label>
-                            <label class="span5"><input type="text" value.bind="player.adress2" class="span4" /></label>
-                            <label class="span5">
-                                <input type="text" value.bind="player.zipcode" class="span1" />
-                                <span class="spacer"></span>
-                                <input type="text" value.bind="player.city" class="span3" />
-                            </label>
-                        </div>
-                        <div class="row">
-                            <label class="span5">
-                                Phones:
-                                <input type="tel" value.bind="player.phone1" class="span2" />
-                                <span class="spacer"></span>
-                                <input type="tel" value.bind="player.phone2" class="span2" />
-                            </label>
-                        </div>
-                        <div class="row">
-                            <label class="span5">
-                                eMail:
-                                <input type="email" value.bind="player.email" class="span4" />
-                            </label>
-                        </div>
-                    </tab>
-                    <!--<tab heading="Team">
+                            <div class="row form-group">
+                                <label class="col-xs-3">Club:</label>
+                                <input type="text" value.bind="player.club" class="col-xs-5" />
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-3">Licence:</label>
+                                <input type="text" value.bind="player.licence" class="col-xs-4" />
+                            </div>
+                        </tab>
+                        <tab heading="Registration">
+                            <br/>
+                            <div class="row form-group">
+                                <label class="col-xs-3">Events:</label>
+                                <div class="col-xs-8" style="display: inline-block;">
+                                    <div repeat.for="event of events">
+                                        <label><input type="checkbox" model.bind="event.id" checked.bind="player.registration" /> ${event.name}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </tab>
+                        <tab heading="Coordinates">
+                            <br/>
+                            <div class="row form-group">
+                                <label for="adress" class="col-xs-3">Adress:</label>
+                                <input id="adress" type="text" value.bind="player.adress1" class="col-xs-8" />
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-3"></label>
+                                <input type="text" value.bind="player.adress2" class="col-xs-8" />
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-3"></label>
+                                <input type="text" value.bind="player.zipcode" class="col-xs-2" />
+                                <span class="col-xs-1"></span>
+                                <input type="text" value.bind="player.city" class="col-xs-5" />
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-3">Phones:</label>
+                                <input type="tel" value.bind="player.phone1" class="col-xs-3" />
+                                <span class="col-xs-1"></span>
+                                <input type="tel" value.bind="player.phone2" class="col-xs-3" />
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-3">eMail:</label>
+                                <input type="email" value.bind="player.email" class="col-xs-8" />
+                            </div>
+                        </tab>
+                        <!--<tab heading="Team">
                     </tab>-->
-                    <tab heading="Comment">
-                        <div class="row">
-                            <label class="span6">
-                                Note:
-                                <textarea value.bind="player.note" class="span5"></textarea>
-                            </label>
-                        </div>
-                    </tab>
-                </tabset>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" disabled.bind="!!playerForm.$error.required" class="btn btn-primary btn-success ${!!playerForm.$error.required ? 'disabled':''}"><i class="glyphicon glyphicon-ok-sign icon-white"></i> OK</button>
-                <a href="#" click.trigger="controller.ok('Del')">
-                    <i class="glyphicon glyphicon-trash"></i>
-                </a>
-            </div>
-            <!--<fieldset>
+                        <tab heading="Comment">
+                            <br/>
+                            <div class="row form-group">
+                                <label class="col-xs-3">Note:</label>
+                                <textarea value.bind="player.note" class="col-xs-8"></textarea>
+                            </div>
+                        </tab>
+                    </tabset>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" disabled.bind="!!playerForm.$error.required" class="btn btn-primary btn-success ${!!playerForm.$error.required ? 'disabled':''}">
+                        <i class="glyphicon glyphicon-ok-sign icon-white"></i> OK
+                    </button>
+                    <a href="#" click.trigger="controller.ok('Del')">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
+                </div>
+                <!--<fieldset>
                     <legend>Coordinate</legend>
                     <div>
                     </div>
@@ -119,7 +122,8 @@
                     </select></label>
                     </div>
                 </fieldset>-->
-            <!--${ playerForm.$error }-->
-        </form>
+                <!--${ playerForm.$error }-->
+            </form>
+        </div>
     </div>
 </template>

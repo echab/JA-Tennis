@@ -1,78 +1,88 @@
-﻿<template class="modal-dialog">
-
+﻿<template>
     <require from="../controls/tabset"></require>
     <require from="../controls/tab"></require>
 
-    <div class="modal-content">
-        <form name="matchForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                <h3>${title} <!--<small>Id: ${match.id}</small>--></h3>
-            </div>
-            <div class="modal-body">
+    <div class="modal-dialog">
 
-                    <div class="row">
-                        <label class="span1">Winner:</label>
-                        <div class="offset1">
-                            <label class="radio"><input type="radio" checked.bind="match.playerId" value.bind="player1.id" /> ${player1.name} ${player1.rank}</label><br />
-                            <label class="radio"><input type="radio" checked.bind="match.playerId" value.bind="player2.id" /> ${player2.name} ${player2.rank}</label>
-                        </div>
+        <div class="modal-content">
+            <form name="matchForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                    <h4>${title}<!--<small>Id: ${match.id}</small>--></h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row form-group">
+                        <label class="col-xs-3">Winner:</label>
+                        <input id="winner1" type="radio" checked.bind="match.playerId" value.bind="player1.id" class="col-xs-1" />
+                        <label for="winner1" class="radio col-xs-6">${player1.name} ${player1.rank}</label><br/>
+
+                        <label class="col-xs-3"></label>
+                        <input id="winner2" type="radio" checked.bind="match.playerId" value.bind="player2.id" class="col-xs-1" />
+                        <label for="winner2" class="radio col-xs-6">${player2.name} ${player2.rank}</label>
                     </div>
-                    <div class="row">
-                        <label class="span4">
-                            Score:
-                            <input type="text" name="score" value.bind="match.score" class="span3" />
-                        </label>
+                    <div class="row form-group">
+                        <label class="col-xs-3">Score:</label>
+                        <input type="text" name="score" value.bind="match.score" class="col-xs-5" />
+
                         <!--<span class="error" show.bind="matchForm.name.$error.required">Required!</span>-->
-                        <label class="checkbox span1"><input type="checkbox" checked.bind="match.wo" />WO</label>
+                        <input id="wo" type="checkbox" checked.bind="match.wo" class="col-xs-1" /><label for="wo" class="checkbox col-xs-2">WO</label>
                     </div>
-                    <div class="row">
-                        <div class="offset1">
-                            <label class="checkbox span2"><input type="checkbox" checked.bind="match.canceled" />Canceled</label>
-                            <label class="checkbox span2"><input type="checkbox" checked.bind="match.vainqDef" />Vainqueur defaillant</label>
+                    <div class="row form-group">
+                        <span class="col-xs-3"></span>
+                        <div class="display:inline-block">
+                            <label class="checkbox col-xs-4"><input type="checkbox" checked.bind="match.canceled" />Canceled</label>
+                            <label class="checkbox col-xs-4"><input type="checkbox" checked.bind="match.vainqDef" />Vainqueur defaillant</label>
                         </div>
                     </div>
-                <tabset>
-                    <tab heading="Planning">
-                        <div class="row">
-                            <label class="span3">Court: 
-                                <select value.bind="match.place" class="span2">
-                                    <option repeat.for="place of places">${place}</option> 
-                                </select>
-                            </label>
-                            <label class="span3">Date: <input type="datetime" value.bind="match.date" class="span2" /></label>
-                        </div>
-                        <div class="row">
-                            <label class="span2">${player1.name} :</label>
-                            <label class="checkbox span2"><input type="checkbox" checked.bind="match.aware1" />Aware</label>
-                            <label class="checkbox span2"><input type="checkbox" checked.bind="match.receive1" />Receive</label>
-                        </div>
-                        <div class="row">
-                            <label class="span2">${player2.name} :</label>
-                            <label class="checkbox span2"><input type="checkbox" checked.bind="match.aware2" />Aware</label>
-                            <label class="checkbox span2"><input type="checkbox" checked.bind="match.receive2" />Receive</label>
-                        </div>
-                    </tab>
-                    <tab heading="Comment">                                                
-                        <div class="row">
-                            <label class="span5">Format:
+                    <tabset>
+                        <tab heading="Planning">
+                            <br/>
+                            <div class="row form-group">
+                                <label for="place" class="col-xs-3">Court:</label>
+                                <select id="place" value.bind="match.place" class="col-xs-5">
+                                <option repeat.for="place of places">${place}</option> 
+                            </select>
+                            </div>
+                            <div class="row form-group">
+                                <label for="date" class="col-xs-3">Date:</label>
+                                <input id="date" type="datetime" value.bind="match.date" class="col-xs-4" />
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-6">${player1.name} :</label>
+                                <label class="checkbox col-xs-2"><input type="checkbox" checked.bind="match.aware1" />Aware</label>
+                                <label class="checkbox col-xs-2"><input type="checkbox" checked.bind="match.receive1" />Receive</label>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-6">${player2.name} :</label>
+                                <label class="checkbox col-xs-2"><input type="checkbox" checked.bind="match.aware2" />Aware</label>
+                                <label class="checkbox col-xs-2"><input type="checkbox" checked.bind="match.receive2" />Receive</label>
+                            </div>
+                        </tab>
+                        <tab heading="Comment">
+                            <br/>
+                            <div class="row form-group">
+                                <label for="matchformat" class="col-xs-3">Format:</label>
                                 <!--TODO 
-                                <select value.bind="match.matchFormat" class="span4">
+                                <select id="matchformat" value.bind="match.matchFormat" class="col-xs-4">
                                     <option repeat.for="[key, matchFormat] of matchFormats" model.bind="key">${matchFormat.name}</option>
                                 </select>
                                 -->
-                            </label>
-                        </div>                        
-                        <div class="row">
-                            <label class="span6">Note: <textarea value.bind="match.note" class="span5"></textarea></label>
-                        </div>
-                    </tab>
-                </tabset>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" disabled.bind="!!matchForm.$error.required" class="btn btn-primary btn-success ${!!matchForm.$error.required ? 'disabled':''}"><i class="glyphicon glyphicon-ok-sign icon-white"></i> OK</button>
-                <!--<a href="#" click.trigger="controller.ok('Del')"><i class="glyphicon glyphicon-trash"></i></a>-->
-            </div>
-        </form>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-xs-3">Note:</label>
+                                <textarea value.bind="match.note" class="col-xs-8"></textarea>
+                            </div>
+                        </tab>
+                    </tabset>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" disabled.bind="!!matchForm.$error.required" class="btn btn-primary btn-success ${!!matchForm.$error.required ? 'disabled':''}">
+                        <i class="glyphicon glyphicon-ok-sign icon-white"></i> OK
+                    </button>
+                    <!--<a href="#" click.trigger="controller.ok('Del')"><i class="glyphicon glyphicon-trash"></i></a>-->
+                </div>
+            </form>
+        </div>
     </div>
 </template>

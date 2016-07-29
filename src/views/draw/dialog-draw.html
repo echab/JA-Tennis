@@ -1,78 +1,71 @@
 ﻿<template>
-<div class="modal-dialog">
-    <div class="modal-content">
-        <form name="drawForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                <h3>${title} <!--<small>Id: ${draw.id}</small>--> ${draw.name}</h3>
-            </div>
-            <div class="modal-body">
-
-                <div class="row">
-                    <label class="span4">
-                        Name:
-                        <input type="text" name="name" value.bind="draw.name" required class="span3" autofocus attach-focus="true" />
-                    </label>
-                    <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form name="drawForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                    <h4>${title}<!--<small>Id: ${draw.id}</small>-->${draw.name}</h4>
                 </div>
+                <div class="modal-body">
 
-                <div class="row">
-                    <label class="span3">
-                        Type:
-                        <select name="type" value.bind="draw.type" required class="span2">
-                            <option repeat.for="type of drawTypes" value.bind="type.value">${type.label}</option>
-                        </select>
-                    </label>
-                    <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
-                </div>
+                    <div class="row form-group">
+                        <label for="name" class="col-xs-3">Name:</label>
+                        <input id="name" type="text" name="name" value.bind="draw.name" required class="col-xs-8" autofocus attach-focus="true" />
+                        <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+                    </div>
 
-                <div class="row">
-                    <label class="span3">
-                        Rank, from:
-                        <select name="minRank" value.bind="draw.minRank" class="span2">
+                    <div class="row form-group">
+                        <label for="type" class="col-xs-3">Type:</label>
+                        <select id="type" name="type" value.bind="draw.type" required class="col-xs-4">
+                        <option repeat.for="type of drawTypes" value.bind="type.value">${type.label}</option>
+                    </select>
+                        <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+                    </div>
+
+                    <div class="row form-group">
+                        <label for="rankfrom" class="col-xs-3">Rank, from:</label>
+                        <select id="rankfrom" name="minRank" value.bind="draw.minRank" class="col-xs-2">
                             <option repeat.for="value of ranks">${value}</option> 
                         </select>
-                    </label>
-                    <label class="span3">
-                        to:
-                        <select name="maxRank" value.bind="draw.maxRank" class="span2">
+                        <label for="rankto" class="col-xs-2">to:</label>
+                        <select id="rankto" name="maxRank" value.bind="draw.maxRank" class="col-xs-2">
                             <option repeat.for="value of ranks">${value}</option> 
                         </select>
-                    </label>
-                </div>
+                    </div>
 
-                <div class="row">
-                    <div class="offset1">
+                    <div class="row form-group">
+                        <span class="col-xs-3"></span>
                         <label>${getRegisteredCount()} registered</label>
                     </div>
-                </div>
 
-                <fieldset>
-                    <legend>Dimensions:</legend>
-                    <!--<div class="row">
-                        <label class="span2">
-                            Entries:
-                            <input type="number" readonly value.bind="getNbEntry()" class="span1"/>
-                        </label>
-                    </div>-->
-                    <div class="row">
-                        <label class="span2">
-                            Columns:
-                            <input type="number" name="nbColumn" value.bind="draw.nbColumn" min="2" max="9" required class="span1" />
-                        </label>
-                        <label class="span2">
-                            Outputs:
-                            <input type="number" name="nbOut" value.bind="draw.nbOut" min="1" max="16" required class="span1" />
-                        </label>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="modal-footer">
-                <button type="button" click.trigger="controller.ok('Generate')" disabled.bind="!!drawForm.$error.required" class="btn btn-success ${!!drawForm.$error.required ? 'disabled' :''}"><i class="icon2-draw-generate"></i> Generate</button>
-                <button type="submit" disabled.bind="!!drawForm.$error.required" class="btn btn-primary btn-success ${!!drawForm.$error.required ? 'disabled': ''}"><i class="glyphicon glyphicon-ok-sign icon-white"></i> OK</button>
-                <a href="#" click.trigger="controller.ok('Del')"><i class="glyphicon glyphicon-trash"></i></a>
-            </div>
-        </form>
+                    <fieldset>
+                        <legend>Dimensions:</legend>
+                        <!--<div class="row form-group">
+                            <label class="col-xs-4">
+                                Entries:
+                                <input type="number" readonly value.bind="getNbEntry()" class="col-xs-2"/>
+                            </label>
+                        </div>-->
+                        <div class="row form-group">
+                            <label for="nbColumn" class="col-xs-3">Columns:</label>
+                            <input id="nbColumn" type="number" name="nbColumn" value.bind="draw.nbColumn" min="2" max="9" required class="col-xs-2" />
+                        </div>
+                        <div class="row form-group">
+                            <label for="nbOut" class="col-xs-3">Outputs:</label>
+                            <input id="nbOut" type="number" name="nbOut" value.bind="draw.nbOut" min="1" max="16" required class="col-xs-2" />
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" click.trigger="controller.ok('Generate')" disabled.bind="!!drawForm.$error.required" class="btn btn-success ${!!drawForm.$error.required ? 'disabled' :''}">
+                        <i class="icon2-draw-generate"></i> Generate
+                    </button>
+                    <button type="submit" disabled.bind="!!drawForm.$error.required" class="btn btn-primary btn-success ${!!drawForm.$error.required ? 'disabled': ''}">
+                        <i class="glyphicon glyphicon-ok-sign icon-white"></i> OK
+                    </button>
+                    <a href="#" click.trigger="controller.ok('Del')"><i class="glyphicon glyphicon-trash"></i></a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </template>
