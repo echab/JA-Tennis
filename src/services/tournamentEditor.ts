@@ -27,44 +27,49 @@ export class TournamentEditor {
         private undo:Undo
     ) {}
 
-    add(): Tournament {
+    create(): Promise<Tournament> {
         //TODO confirmation
         //TODO undo
 
-        var tournament: Tournament = {
-            id: Guid.create('T'),
-            info: {
-                name: ''
-            },
-            players: [],
-            events: []
-        };
-        
-        this.edit(tournament);
-        this.selection.select(tournament, ModelType.Tournament);
+        return this.edit().then( tournament => {
+            if( tournament) {
+                //save current tournament
+                this.save();
 
-        return this.selection.tournament;
+                //reset undo and select the new tournament
+                this.undo.reset();
+                return this.selection.select(tournament, ModelType.Tournament);
+            }
+        });
     }
 
-    edit(tournament?: Tournament): void {
+    edit(tournament?: Tournament): Promise<Tournament> {
+
+        const title = tournament ? "Edit info" : "New tournament";
 
         if( !tournament) {
-            tournament = this.selection.tournament;
+            tournament = {
+                id: Guid.create('T'),
+                info: {
+                    name: ''
+                },
+                players: [],
+                events: []
+            };
         }
 
-        var editedInfo = TournamentEditor.newInfo(tournament.info);
+        var editedInfo = TournamentEditor._newInfo(tournament.info);
 
-        this.dialogService.open({
+        return this.dialogService.open({
             viewModel: DialogInfo, 
             model: {
-                title: "Edit info",
+                title: title,
                 info: editedInfo
             }
         }).then((result: DialogResult) => {
             if ('Ok' === result.output) {
-                //this.mainLib.editInfo(editedInfo, tournament.info);
-                var c = tournament;
-                this.undo.update(tournament, 'info', editedInfo, "Edit info"); //c.info = editedInfo;
+                this.undo.update(tournament, 'info', editedInfo, title); //tournament.info = editedInfo;
+                return tournament;
             }
         });
     }
@@ -148,7 +153,7 @@ export class TournamentEditor {
         return tournament;
     }
 
-    public static newInfo(source?: TournamentInfo): TournamentInfo {
+    private static _newInfo(source?: TournamentInfo): TournamentInfo {
         var info: TournamentInfo = <any>{};
         if (isObject(source)) {
             extend(info, source);

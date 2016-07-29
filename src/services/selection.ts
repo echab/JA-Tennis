@@ -31,7 +31,7 @@ export class Selection {
         this.select(item, type);
     }
 
-    select(item: Box | Draw | TEvent | Player | Tournament | string, type?: ModelType): void {
+    select(item: Box | Draw | TEvent | Player | Tournament | string, type?: ModelType): Box | Draw | TEvent | Player | Tournament {
 
         if (!item) {
             this.unselect(type);
@@ -45,49 +45,56 @@ export class Selection {
             this.event = b._draw._event;
             this.draw = b._draw;
             this.box = b;
-
-        } else if (type === ModelType.Draw && 'string' === typeof item) { //draw id
+            return b;
+        } 
+        if (type === ModelType.Draw && 'string' === typeof item) { //draw id
             let id = <string>item;
             var d = this.event.draws.find( (draw:Draw) => draw.id === id);
             // this.tournament = d._event._tournament;
             // this.event = d._event;
             this.draw = d;
             this.box = undefined;
-
-        } else if (type === ModelType.Draw || (<Draw>item)._event) { //draw
+            return d;
+        }
+        if (type === ModelType.Draw || (<Draw>item)._event) { //draw
             var d = <Draw>item;
             this.tournament = d._event._tournament;
             this.event = d._event;
             this.draw = d;
             this.box = undefined;
-
-        } else if (type === ModelType.TEvent && 'string' === typeof item) { //event id
+            return d;
+        }
+        if (type === ModelType.TEvent && 'string' === typeof item) { //event id
             let id = <string>item;
             var e = this.tournament.events.find( (evt:TEvent) => evt.id === id);
             // this.tournament = e._tournament;
             this.event = e;
             this.draw = e.draws ? e.draws[0] : undefined;
             this.box = undefined;
-
-        } else if (type === ModelType.TEvent || ((<TEvent>item).draws && (<TEvent>item)._tournament)) { //event
+            return e;
+        }
+        if (type === ModelType.TEvent || ((<TEvent>item).draws && (<TEvent>item)._tournament)) { //event
             var e = <TEvent>item;
             this.tournament = e._tournament;
             this.event = e;
             this.draw = e.draws ? e.draws[0] : undefined;
             this.box = undefined;
-
-        } else if (type === ModelType.Player || ((<Player>item).name && (<Player>item)._tournament)) {   //player id
+            return e;
+        }
+        if (type === ModelType.Player || ((<Player>item).name && (<Player>item)._tournament)) {   //player id
             let id = <string>item;
             var p = this.tournament.players.find( (player:Player) => player.id === id);
             // this.tournament = p._tournament;
             this.player = p;
-
-        } else if (type === ModelType.Player || ((<Player>item).name && (<Player>item)._tournament)) {   //player
+            return p;
+        }
+        if (type === ModelType.Player || ((<Player>item).name && (<Player>item)._tournament)) {   //player
             var p = <Player>item;
             this.tournament = p._tournament;
             this.player = p;
-
-        } else if (type === ModelType.Tournament || ((<Tournament>item).players && (<Tournament>item).events)) { //tournament
+            return p;
+        }
+        if (type === ModelType.Tournament || ((<Tournament>item).players && (<Tournament>item).events)) { //tournament
             this.tournament = <Tournament>item;
             if (this.tournament.events && this.tournament.events[0]) {
                 this.event = this.tournament.events[0];
@@ -100,17 +107,18 @@ export class Selection {
             if (this.player && this.player._tournament !== this.tournament) {
                 this.player = undefined;
             }
+            return this.tournament;
         }
     }
 
-    selectByError(draw: Draw, error: IError) {
+    selectByError(draw: Draw, error: IError): Box | Draw | TEvent | Player | Tournament {
         if (error.position) {
             var box = Find.by(draw.boxes, 'position', error.position);
-            this.select(box, ModelType.Box);
+            return this.select(box, ModelType.Box);
         } else if( error.player) {
-            this.select(error.player, ModelType.Player);
+            return this.select(error.player, ModelType.Player);
         } else {
-            this.select(draw, ModelType.Draw);
+            return this.select(draw, ModelType.Draw);
         }
     }
 

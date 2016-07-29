@@ -15,7 +15,7 @@ import { rank } from './types';
 import { LibLocator } from './libLocator';
 import { Validation } from './validation';
 
-var MAX_TETESERIE = 32,
+const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1;
 

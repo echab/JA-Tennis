@@ -26,7 +26,7 @@ export class Main {
         private undo:Undo
         ) {
 
-        var conf = JSON.parse( localStorage.getItem('panelsOpened'));
+        var conf = JSON.parse( window.localStorage['panelsOpened']);
         if (conf) {
             this.tournamentOpened = conf.tournament;
             this.playersOpened = conf.players;
@@ -34,7 +34,7 @@ export class Main {
             this.planningOpened = conf.planning;
         }
 
-        //tournamentEditor.add();
+        //tournamentEditor.create();
 
         //var filename = '/data/tournament8.json';
         var filename = '/data/jeu4test.json';
@@ -44,16 +44,19 @@ export class Main {
             this.selection.select(tournament, ModelType.Tournament);
         });
 
-        //Auto save tournament on exit
+        //on exit...
         window.addEventListener('beforeunload',  () => {
+
+            //Auto save tournament on exit
             this.tournamentEditor.save();
 
-            localStorage.setItem('panelsOpened', JSON.stringify({
+            //save settings
+            window.localStorage['panelsOpened'] = JSON.stringify({
                 tournament: this.tournamentOpened,
                 players : this.playersOpened,
                 draws : this.drawsOpened,
                 planning : this.planningOpened
-            }));
+            });
 
         });
 

@@ -61,9 +61,9 @@ export class Undo {
         */
     public update(obj: any[], member: number, value: any, message?: string, meta?: any): void;
     public update(obj: Object, member: string, value: any, message?: string, meta?: any): void;
-    public update(obj: any, member: any, value: any, message?: string, meta?: any): void {
+    public update(obj: any, member: any, value: any, message?: string, meta?: any): void {  //TODO use union type
         if ("undefined" === typeof obj) {
-            throw "Undo update: invalid obj";
+            throw "Undo update: invalid obj";   //TODO use throw new Error(...) to get stack trace
         }
         if ("undefined" === typeof member) {
             throw "Undo update: invalid member";
