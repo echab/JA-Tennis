@@ -9,6 +9,7 @@
 
 <!--
 <require from="../styles/app.css"></require>
+<require from="../styles/draw.css"></require>
 <require from="../styles/icons.css"></require>
 -->
 <link rel="stylesheet" href="styles/app.css">
@@ -19,8 +20,9 @@
     <ec-panel class="tournament" is-open.bind="tournamentOpened">
         <ec-badge class="tournament"><i class="icon2-ball"></i></ec-badge>
         <ec-header>
-            <i class="icon2-info" click.trigger="tournamentEditor.edit(selection.tournament)"></i>
-            ${selection.tournament.info.name}
+            <h4><i class="icon2-info" click.trigger="tournamentEditor.edit(selection.tournament)"></i>
+                ${selection.tournament.info.name}
+            </h4>
         </ec-header>
         <div class="content">
             <list-events class="inline" events.bind="selection.tournament.events"></list-events>

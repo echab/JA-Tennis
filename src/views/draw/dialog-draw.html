@@ -4,7 +4,7 @@
             <form submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
-                    <h4>${title}<!--<small>Id: ${draw.id}</small>-->${draw.name}</h4>
+                    <h4>${title} ${draw.name} <!--<small>Id: ${draw.id}</small>--></h4>
                 </div>
                 <div class="modal-body">
 
@@ -17,8 +17,8 @@
                     <div class="row form-group">
                         <label for="type" class="col-xs-3">Type:</label>
                         <select id="type" value.bind="draw.type" required class="col-xs-4">
-                        <option repeat.for="type of drawTypes" value.bind="type.value">${type.label}</option>
-                    </select>
+                            <option repeat.for="type of drawTypes" value.bind="type.value">${type.label}</option>
+                        </select>
                         <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
                     </div>
 
