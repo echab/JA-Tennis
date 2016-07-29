@@ -64,7 +64,7 @@
 "events":[
 {"id":"e0","name":"[E2D94]Messieurs Senior","sexe":"H","category":"S","maxRank":"15/2","format":"A",
 "draws":[
-{"id":"e0d0","name":"NC - 30/1[T1BC7]","type":0,"nbColumn":6,"nbOut":1,"minRank":"40","maxRank":"30/1","orientation":"portrait",
+{"id":"e0d0","name":"NC - 30/1[T1BC7]","type":0,"mode":2,"nbColumn":6,"nbOut":1,"minRank":"40","maxRank":"30/1","orientation":"portrait",
 "boxes":[
 {"position":0,"playerId":"j24","score":""},
 {"position":1,"playerId":"j28","score":""},

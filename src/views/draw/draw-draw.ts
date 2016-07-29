@@ -7,6 +7,7 @@ import { TournamentLib } from '../../services/tournamentLib';
 import { Find } from '../../services/util/find';
 import { Undo } from '../../services/util/undo';
 import { DrawEditor } from '../../services/drawEditor';
+import { PlayerEditor } from '../../services/playerEditor';
 
 @autoinject
 export class DrawDraw implements ISize {
@@ -22,7 +23,6 @@ export class DrawDraw implements ISize {
     players: Player[];
     qualifsIn: Match[];
     qualifsOut: number[];
-    _refresh: Date;
     width: number;
     height: number;
     rows: number[][];
@@ -30,17 +30,10 @@ export class DrawDraw implements ISize {
 
     constructor(
         private drawEditor: DrawEditor,
+        private playerEditor: PlayerEditor,
         private undo: Undo,
         private selection: Selection
         ) {
-    }
-
-    bind(bindingContext: Object, overrideContext: Object) {
-        // the databinding framework will not invoke the changed handlers for the view-model's 
-        // bindable properties until the "next" time those properties are updated.
-        if( this.simple) {
-            this.drawChanged(this.draw);
-        }
     }
 
     drawChanged(draw: Draw, oldValue?: Draw) {
@@ -84,7 +77,6 @@ export class DrawDraw implements ISize {
         this.height = size.height * this.boxHeight;
 
         draw._points = this._drawLib.computePositions(draw);    //TODO to be moved into drawLib when draw changes
-        this._refresh = new Date(); //to refresh lines
 
         if (!this.isKnockout) {
             //for roundrobin, fill the list of rows/columns for the view
@@ -152,23 +144,7 @@ export class DrawDraw implements ISize {
             return (position % n) * (n + 1) === position;
         }
     }
-    // range(min: number, max: number, step?: number): number[] {
-    //     step = step || 1;
-    //     var a: number[] = [];
-    //     for (var i = min; i <= max; i += step) {
-    //         a.push(i);
-    //     }
-    //     return a;
-    // }
-    getQualifsIn(): Match[] {
-        return this.qualifsIn;
-    }
-    getQualifsOut(): number[] {
-        return this.qualifsOut;
-    }
-    getPlayers(): Player[] {
-        return this.players;
-    }
+
     findQualifIn(qualifIn: number): boolean {
         return this.draw && !!Find.by(this.draw.boxes, 'qualifIn', qualifIn);
     }
@@ -183,15 +159,19 @@ export class DrawDraw implements ISize {
             if (prevQualif || qualifIn) {
                 this._drawLib.setPlayerIn(box, bUndo ? prevQualif : qualifIn, bUndo ? prevPlayer : player);
             } else {
-                box.playerId = bUndo ? (prevPlayer ? prevPlayer.id : undefined) : (player ? player.id : undefined);
+                box.playerId = bUndo 
+                    ? (prevPlayer ? prevPlayer.id : undefined) 
+                    : (player ? player.id : undefined);
                 DrawLib.initBox(box, box._draw);
             }
             this.selection.select(box, ModelType.Box);
         }, player ? 'Set player' : 'Erase player');
     }
+
     swapPlayer(box: PlayerIn): void {
         //TODO
     }
+
     eraseScore(match: Match): void {
         this.undo.newGroup("Erase score", () => {
             this.undo.update(match, 'score', '');  //box.score = '';

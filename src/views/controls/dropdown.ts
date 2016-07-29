@@ -141,7 +141,7 @@ export class DropdownToggleCustomAttribute {
 		this.element.setAttribute('aria-expanded', this.isOpen ? 'true' : 'false');
 
 		if (this.appendTo && this.dropdownMenu) {
-			var pos = this.$position.positionElements(this.element, this.dropdownMenu, 'bottom-left', true),
+			var pos = this.$position.positionElements(<HTMLElement>this.element, this.dropdownMenu, 'bottom-left', true),
 				css,
 				rightalign,
 				scrollbarPadding,
@@ -316,10 +316,6 @@ class DropdownService {
 
 		this.openScope.isOpen = false;
 		this.openScope.focusToggleElement();
-
-		//  if (!$rootScope.$$phase) {
-		//    openScope.$apply();
-		//  }
 	}
 
 	keybindFilter = this._keybindFilter.bind(this);
@@ -337,7 +333,7 @@ class DropdownService {
 }
 
 function parseBoolean(b) {
-	return 'boolean' === typeof b ? b : /^true|yes|1$/i.test(b);
+	return 'boolean' === typeof b ? b : /^\s*(true|yes|1)\s*$/i.test(b);
 }
 
 function setCss(elem: HTMLElement, styles) {

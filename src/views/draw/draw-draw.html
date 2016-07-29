@@ -37,9 +37,9 @@
                     <i class="icon2-qualif-in"></i><span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu au-animate">
-                    <li repeat.for="q of getQualifsIn()">
+                    <li repeat.for="q of qualifsIn">
                         <a click.trigger="setPlayer(selection.box, q._player, q.qualifOut)">
-                            <i class="icon2-white" class="${findQualifIn(q.qualifOut) ? 'icon2-checkmark':''}"></i><!-- -->
+                            <i class="icon2-white ${findQualifIn(q.qualifOut) ? 'icon2-checkmark':''}"></i><!-- -->
                             ${'Q' + q.qualifOut + ' ' + q._player.name}
                         </a>
                     </li>
@@ -52,18 +52,18 @@
                 <ul class="dropdown-menu au-animate">
                     <li><a click.trigger="playerEditor.edit(selection.box._player)"><i class="icon2-info"></i> Edit</a></li>
                     <li class="divider"></li>
-                    <li repeat.for="player of getPlayers()">
+                    <li repeat.for="player of players">
                         <a click.trigger="setPlayer(selection.box, player)">
-                            <i class="icon2-white" class="${findPlayer(player.id) ? 'icon2-checkmark':''}"></i>
+                            <i class="icon2-white ${findPlayer(player.id) ? 'icon2-checkmark':''}"></i>
                             ${player.name +' '+ player.rank}
                         </a>
                     </li>
                 </ul>
             </div>
-            <button class="btn" disabled.bind="!selection.box.playerId"
+            <!--TODO <button class="btn" disabled.bind="!selection.box.playerId"
                         click.trigger="swapPlayer(selection.box)" title="Swap the player">
                 <i class="icon2-switch"></i>
-            </button>
+            </button>-->
             <button class="btn" disabled.bind="!selection.box.playerId && !selection.box.qualifIn"
                             click.trigger="setPlayer(selection.box)" title="Remove the player">
                 <i class="icon2-erase"></i>
