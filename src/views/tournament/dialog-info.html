@@ -4,7 +4,7 @@
 
     <div class="modal-dialog">
         <div class="modal-content">
-            <form name="infoForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+            <form submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
                     <h4>${title} ${info.name}</h4>
@@ -12,16 +12,16 @@
                 <div class="modal-body">
                     <div class="row form-group">
                         <label class="col-xs-3" for="name">Name:</label>
-                        <input id="name" type="text" name="name" value.bind="info.name" required autofocus attach-focus="true" class="col-xs-8" />
+                        <input id="name" type="text" value.bind="info.name" required autofocus attach-focus="true" class="col-xs-8" />
                         <!--<span class="error help-inline" show.bind="infoForm.name.$error.required">Required!</span>-->
                     </div>
                     <div class="row form-group">
                         <label class="col-xs-3" for="start">Begin:</label>
-                        <input id="start" type="date" name="start" value.bind="info.start" class="col-xs-4" />
+                        <input id="start" type="date" value.bind="info.start" class="col-xs-4" />
                     </div>
                     <div class="row form-group">
                         <label class="col-xs-3" for="end">End:</label>
-                        <input id="end" type="date" name="end" value.bind="info.end" class="col-xs-4" />
+                        <input id="end" type="date" value.bind="info.end" class="col-xs-4" />
                     </div>
                     <div class="row form-group">
                         <label class="col-xs-3" for="homolog">Homologation:</label>

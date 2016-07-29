@@ -5,7 +5,7 @@
     <div class="modal-dialog">
 
         <div class="modal-content">
-            <form name="matchForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+            <form submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
                     <h4>${title}<!--<small>Id: ${match.id}</small>--></h4>
@@ -23,7 +23,7 @@
                     </div>
                     <div class="row form-group">
                         <label class="col-xs-3">Score:</label>
-                        <input type="text" name="score" value.bind="match.score" class="col-xs-5" />
+                        <input type="text" value.bind="match.score" class="col-xs-5" />
 
                         <!--<span class="error" show.bind="matchForm.name.$error.required">Required!</span>-->
                         <input id="wo" type="checkbox" checked.bind="match.wo" class="col-xs-1" /><label for="wo" class="checkbox col-xs-2">WO</label>

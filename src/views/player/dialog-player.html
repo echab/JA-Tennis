@@ -4,7 +4,7 @@
 
     <div class="modal-dialog">
         <div class="modal-content">
-            <form name="playerForm" submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+            <form submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
 
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
@@ -14,11 +14,11 @@
                 <div class="modal-body">
 
                     <!--<div class="control-group">
-                    <label for="name" class="control-label">Name:</label>
-                    <div class="controls">
-                        <input type="text" id="name" name="name" value.bind="player.name" required />*
-                    </div>
-                </div>-->
+                        <label for="name" class="control-label">Name:</label>
+                        <div class="controls">
+                            <input type="text" id="name" value.bind="player.name" required />*
+                        </div>
+                    </div>-->
 
                     <div class="row form-group">
                         <label for="name" class="col-xs-3">Name:</label>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="row form-group">
                         <label for="rank" class="col-xs-3">Rank:</label>
-                        <select id="rank" type="text" name="rank" value.bind="player.rank" class="col-xs-3">
+                        <select id="rank" type="text" value.bind="player.rank" class="col-xs-3">
                         <option repeat.for="value of ranks">${value}</option> 
                     </select>
                     </div>
@@ -117,7 +117,7 @@
                     <div>
                         <label>
                             Rank:
-                    <select type="text" name="rank" value.bind="player.rank">
+                    <select type="text" value.bind="player.rank">
                         <option repeat.for="value of ranks">${value}</option>
                     </select></label>
                     </div>
