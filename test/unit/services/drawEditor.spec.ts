@@ -1,3 +1,5 @@
+/// <reference path="../../../custom_typings/draw.d.ts" />
+
 //import {Container} from 'aurelia-dependency-injection';
 import { DrawEditor } from '../../../src/services/drawEditor';
 import { Undo } from '../../../src/services/util/undo';
@@ -6,21 +8,23 @@ import { Find } from '../../../src/services/util/find';
 //import { GuidMock as Guid } from '../../mocks/guid_mock';
 import { Validation } from '../../../src/services/validation';
 
-import { mathMock } from '../mocks/math_mock';
-import { DialogServiceMock } from '../mocks/dialogService_mock';
+import { mathMock } from '../../mocks/math_mock';
+//import * as mathMock from '../../mocks/math_mock';
+//import mathMock from '../../mocks/math_mock';
+import { DialogServiceMock } from '../../mocks/dialogService_mock';
 
 describe('drawEditor', () => {
 
-    let drawEditor: DrawEditor;
+    var drawEditor: DrawEditor;
 
-    let dialog: DialogServiceMock = new DialogServiceMock();
+    var dialog: DialogServiceMock = new DialogServiceMock();
 
-    beforeEach(() => {
+    //beforeEach(() => {
         let undo = new Undo();
         let selection = new Selection();
         let validation = new Validation();
         drawEditor = new DrawEditor(dialog, validation, selection, undo);
-    });
+    //});
 
     describe('Draws generation', () => {
 

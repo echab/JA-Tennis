@@ -1,9 +1,9 @@
-﻿//import {Container} from 'aurelia-dependency-injection';
+//import {Container} from 'aurelia-dependency-injection';
 import { PlayerEditor } from '../../../src/services/playerEditor';
 import { Undo } from '../../../src/services/util/undo';
-import { Selection } from '../../../src/services/selection';
-import { DialogServiceMock } from '../mocks/dialogService_mock';
-import { GuidMock as Guid } from '../mocks/guid_mock';
+import { Selection, ModelType } from '../../../src/services/selection';
+import { DialogServiceMock } from '../../mocks/dialogService_mock';
+import { GuidMock as Guid } from '../../mocks/guid_mock';
 //import '../../mocks/math_mock';
 //import { mathMock } from '../../mocks/math_mock';
 
@@ -25,6 +25,7 @@ describe('playerEditor', () => {
     beforeEach(() => {
         let undo = new Undo();
         let selection = new Selection();
+        selection.select(tournament1, ModelType.Tournament);
         playerEditor = new PlayerEditor(dialog, selection, undo);
     });
 
@@ -34,7 +35,7 @@ describe('playerEditor', () => {
 
     it('should add player', () => {
 
-        PlayerEditor.newPlayer(tournament1, player1);
+        playerEditor._addPlayer(tournament1, player1);
 
         expect(tournament1.players.length).toBe(1);
         expect(tournament1.players[0].name).toBe('Eloi');

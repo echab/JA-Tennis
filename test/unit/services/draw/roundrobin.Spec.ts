@@ -1,4 +1,6 @@
-﻿import { Roundrobin } from '../../../../src/services/draw/roundrobin';
+﻿/// <reference path="../../../../custom_typings/draw.d.ts" />
+
+import { Roundrobin } from '../../../../src/services/draw/roundrobin';
 import { DrawEditor } from '../../../../src/services/drawEditor';
 import { TournamentEditor } from '../../../../src/services/tournamentEditor';
 import { ranking } from '../../../../src/services/types'

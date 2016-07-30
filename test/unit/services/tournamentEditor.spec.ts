@@ -1,7 +1,7 @@
 import { TournamentEditor } from '../../../src/services/tournamentEditor';
 import { Undo } from '../../../src/services/util/undo';
 import { Selection } from '../../../src/services/selection';
-import { DialogServiceMock } from '../mocks/dialogService_mock';
+import { DialogServiceMock } from '../../mocks/dialogService_mock';
 
 describe('tournamentEditor', () => {
 

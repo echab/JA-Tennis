@@ -76,7 +76,7 @@ export class PlayerEditor {
         });
     }
 
-    private _addPlayer(tournament: Tournament, player: Player): void {
+    /*private*/ _addPlayer(tournament: Tournament, player: Player): void {
         var c = tournament.players;
         player.id = Guid.create('p');
 

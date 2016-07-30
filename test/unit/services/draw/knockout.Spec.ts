@@ -1,4 +1,6 @@
-﻿import { Knockout } from '../../../../src/services/draw/knockout';
+﻿/// <reference path="../../../../custom_typings/draw.d.ts" />
+
+import { Knockout } from '../../../../src/services/draw/knockout';
 import { KnockoutLib as knockoutLib } from '../../../../src/services/draw/knockoutLib';
 import { DrawEditor } from '../../../../src/services/drawEditor';
 import { TournamentEditor } from '../../../../src/services/tournamentEditor';

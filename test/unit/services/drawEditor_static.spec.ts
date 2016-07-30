@@ -1,4 +1,6 @@
-﻿import { DrawEditor } from '../../../src/services/drawEditor';
+﻿/// <reference path="../../../custom_typings/draw.d.ts" />
+
+import { DrawEditor } from '../../../src/services/drawEditor';
 import { RankFFT } from '../../../src/services/fft/rank';
 
 describe('drawEditor static', () => {

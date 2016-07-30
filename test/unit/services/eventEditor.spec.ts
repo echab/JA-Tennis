@@ -3,7 +3,7 @@ import { EventEditor } from '../../../src/services/eventEditor';
 import { Find } from '../../../src/services/util/find';
 import { Undo } from '../../../src/services/util/undo';
 import { Selection } from '../../../src/services/selection';
-import { DialogServiceMock } from '../mocks/dialogService_mock';
+import { DialogServiceMock } from '../../mocks/dialogService_mock';
 //import { GuidMock as Guid } from '../mocks/guid_mock';
 //import { mathMock } from '../mocks/math_mock';
 
