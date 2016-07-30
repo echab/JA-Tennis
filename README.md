@@ -1,4 +1,4 @@
-# aurelia-skeleton-navigation (typescript)
+# JA-Tennis (aurelia.io + typescript)
 
 ## Running The App
 
