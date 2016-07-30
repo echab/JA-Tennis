@@ -1,8 +1,8 @@
 import { DrawLibBase } from './drawLibBase';
 import { DrawEditor } from '../drawEditor';
-import { TournamentEditor } from '../TournamentEditor';
-import { Find } from '../util/Find';
-import { Guid } from '../util/Guid';
+import { TournamentEditor } from '../tournamentEditor';
+import { Find } from '../util/find';
+import { Guid } from '../util/guid';
 import { isObject,isArray,extend } from '../util/object'
 import { shuffle,filledArray } from '../../utils/tool';
 import { LibLocator } from '../libLocator';

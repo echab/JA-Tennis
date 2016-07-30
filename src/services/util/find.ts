@@ -6,24 +6,10 @@ interface IIndex {
 
 export class Find {
 
-    private static _reindex<T>(array: T[], member: string): void {
-
-        var idx: IIndex = {
-            _length: array.length
-        };
-        for (var i = 0; i < array.length; i++) {
-            var a = array[i], j = a[member];
-            if (j !== undefined) {
-                idx[j] = i;
-            }
-        }
-        array["_FindBy" + member] = idx;
-    }
-
     /**
-         * Returns the index of an object in the array. Or -1 if not found.
-        */
-    public static indexOf<T>(array: T[], member: string, value: any, error?: string): number {
+     * Returns the index of an object in the array. Or -1 if not found.
+    */
+    static indexOf<T>(array: T[], member: string, value: any, error?: string): number {
 
         var i: number, a: T;
 
@@ -62,13 +48,27 @@ export class Find {
     /**
          * Returns an object in the array by member. Or undefined if not found.
         */
-    public static by<T>(array: T[], member: string, value: any, error?: string): T {
+    static by<T>(array: T[], member: string, value: any, error?: string): T {
         var i = this.indexOf(array, member, value, error);
         return array[i];
     }
 
-    public static byId<T>(array: T[], value: any, error?: string): T {
+    static byId<T>(array: T[], value: any, error?: string): T {
         var i = this.indexOf(array, "id", value, error);
         return array[i];
+    }
+
+    private static _reindex<T>(array: T[], member: string): void {
+
+        var idx: IIndex = {
+            _length: array.length
+        };
+        for (var i = 0; i < array.length; i++) {
+            var a = array[i], j = a[member];
+            if (j !== undefined) {
+                idx[j] = i;
+            }
+        }
+        array["_FindBy" + member] = idx;
     }
 }

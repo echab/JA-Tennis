@@ -1,7 +1,7 @@
 ﻿import { Knockout } from '../../../../src/services/draw/knockout';
 import { KnockoutLib as knockoutLib } from '../../../../src/services/draw/knockoutLib';
-import { DrawLib as drawLib } from '../../../../src/services/draw/drawLib';
-import { TournamentLib as tournamentLib } from '../../../../src/services/tournamentLib';
+import { DrawEditor } from '../../../../src/services/drawEditor';
+import { TournamentEditor } from '../../../../src/services/tournamentEditor';
 import { rank } from '../../../../src/services/types'
 
 describe('services.knockout', () => {

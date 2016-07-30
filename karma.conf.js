@@ -8,6 +8,7 @@ module.exports = function(config) {
         paths: {
           "*": "*",
           "src/*": "src/*",
+          //"mocks/*": "test/unit/mocks/*",
           "typescript": "node_modules/typescript/lib/typescript.js",
           "systemjs": "node_modules/systemjs/dist/system.js",
           'system-polyfills': 'node_modules/systemjs/dist/system-polyfills.js',
@@ -17,6 +18,9 @@ module.exports = function(config) {
           'test/unit': {
             defaultExtension: 'ts'
           },
+          // 'test/mocks': {
+          //   defaultExtension: 'ts'
+          // },
           'src': {
             defaultExtension: 'ts'
           }
@@ -36,7 +40,8 @@ module.exports = function(config) {
     files: [
       'test/unit/setup.ts',
       //'test/unit/*.ts'
-      'test/unit/**/*.Spec.ts'
+      //'test/mocks/*_mock.ts',
+      'test/unit/**/*.spec.ts'
     ],
     exclude: [],
     preprocessors: { },

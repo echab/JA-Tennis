@@ -1,7 +1,7 @@
 ﻿import { Roundrobin } from '../../../../src/services/draw/roundrobin';
-import { DrawLib as drawLib } from '../../../../src/services/draw/drawLib';
+import { DrawEditor } from '../../../../src/services/drawEditor';
+import { TournamentEditor } from '../../../../src/services/tournamentEditor';
 import { ranking } from '../../../../src/services/types'
-import { TournamentLib as tournamentLib } from '../../../../src/services/tournamentLib';
 
 describe('services.roundrobin', () => {
     var roundrobin: Roundrobin;

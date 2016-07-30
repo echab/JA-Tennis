@@ -183,7 +183,7 @@ export class DrawEditor {
     }
     //#endregion match
 
-    private _addDraw(draw: Draw, generate?: GenerateType, afterDraw?: Draw): void {
+    /*private*/ _addDraw(draw: Draw, generate?: GenerateType, afterDraw?: Draw): void {
 
         var c = draw._event.draws;
         var afterIndex = afterDraw ? Find.indexOf(c, 'id', afterDraw.id) : c.length - 1;
@@ -209,7 +209,7 @@ export class DrawEditor {
         }
     }
 
-    private _updateDraw(draw: Draw, oldDraw?: Draw, generate?: GenerateType): void {
+    /*private*/ _updateDraw(draw: Draw, oldDraw?: Draw, generate?: GenerateType): void {
         var isSelected = this.selection.draw === oldDraw;
         var lib = LibLocator.drawLibFor(draw);
         var group = DrawEditor.group(oldDraw || draw);

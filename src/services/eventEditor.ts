@@ -17,8 +17,6 @@ export class EventEditor {
     constructor(
         private dialogService: DialogService,
         public selection:Selection, 
-        private find:Find,
-        private guid:Guid,
         private undo:Undo
         ) {}
 

@@ -13,7 +13,7 @@ import { Undo } from '../services/util/undo';
 export class Main {
 
     private tournamentOpened = true; 
-    private playersOpened = false;
+    private playersOpened = true;
     private drawsOpened = true;
     private planningOpened = false;
 
@@ -63,10 +63,10 @@ export class Main {
     }
 
     public doUndo(): void {
-        this.selection.select(this.undo.undo(), this.undo.getMeta());
+        this.selection.select(this.undo.undo(), this.undo.meta);
     }
 
     public doRedo(): void {
-        this.selection.select(this.undo.redo(), this.undo.getMeta());
+        this.selection.select(this.undo.redo(), this.undo.meta);
     }
 }

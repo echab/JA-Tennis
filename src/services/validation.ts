@@ -2,8 +2,8 @@
 import { DrawEditor } from './drawEditor';
 import { KnockoutLib } from './draw/knockoutLib';
 import { TournamentEditor } from './tournamentEditor';
-import {Find} from './util/Find';
-import {Guid} from './util/Guid';
+import {Find} from './util/find';
+import {Guid} from './util/guid';
 import { isObject,isArray,extend } from './util/object'
 import { shuffle,filledArray } from '../utils/tool';
 import { LibLocator } from './libLocator';

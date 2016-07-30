@@ -84,7 +84,7 @@ export class PlayerEditor {
         this.selection.select(player, ModelType.Player);
     }
 
-    private _editPlayer(editedPlayer: Player, player: Player): void {
+    /*private*/ _editPlayer(editedPlayer: Player, player: Player): void {
         var isSelected = this.selection.player === player;
         var c = editedPlayer._tournament.players;
         var i = Find.indexOf(c, "id", editedPlayer.id, "Player to update not found");

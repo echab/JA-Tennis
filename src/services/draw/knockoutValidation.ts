@@ -2,14 +2,14 @@
 import { KnockoutLib as k } from './knockoutLib';
 import { DrawEditor } from '../drawEditor';
 import { TournamentEditor } from '../tournamentEditor';
-import { Find } from '../util/Find';
-import { Guid } from '../util/Guid';
+import { Find } from '../util/find';
+import { Guid } from '../util/guid';
 import { isObject,isArray,extend } from '../util/object';
 import { shuffle,filledArray } from '../../utils/tool';
 import { LibLocator } from '../libLocator';
 import { category, rank, score, validation } from '../types';
 
-var MAX_TETESERIE = 32,
+const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1,
     MAX_MATCHJOUR = 16;
@@ -565,6 +565,7 @@ export class KnockoutValidation implements IValidation {
         var opponent = this.knockout.boxesOpponents(match);
         return !!match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
     }
+    
     private isMatchJouable(match: Box): boolean {
         if (!isMatch(match)) {
             return false;

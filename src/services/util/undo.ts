@@ -1,4 +1,4 @@
-import { computedFrom } from 'aurelia-framework';
+//import { computedFrom } from 'aurelia-framework';
 
 interface IUndoAction {
     type: number;
@@ -14,33 +14,34 @@ interface IUndoAction {
     meta: any;
 }
 
+const ACTION = { UPDATE: 1, INSERT: 2, REMOVE: 3, GROUP: 4, ACTION: 5, SPLICE: 6 };
+
 /**
  * Undo manager for typescript 
 */
 export class Undo {
 
-    private stack: IUndoAction[] = [];
-    private head = -1;
-    private group: IUndoAction;
-    private maxUndo = 20;
-    private static ActionType = { UPDATE: 1, INSERT: 2, REMOVE: 3, GROUP: 4, ACTION: 5, SPLICE: 6 };
-    private meta: any;
+    private _stack: IUndoAction[] = [];
+    private _head = -1;
+    private _group: IUndoAction;
+    private _maxUndo = 20;
+    private _meta: any;
 
     /**
      * Reset the undo stacks
     */
-    public reset() {
-        this.stack = [];
-        this.head = -1;
-        this.group = null;
+    reset() {
+        this._stack = [];
+        this._head = -1;
+        this._group = null;
     }
 
-    public action(fnAction: (bUndo?: boolean) => any, message: string, meta?: any): any {
+    action(fnAction: (bUndo?: boolean) => any, message: string, meta?: any): any {
         if ("function" !== typeof fnAction) {
             throw "Undo action: invalid fnAction";
         }
         var action = {
-            type: Undo.ActionType.ACTION,
+            type: ACTION.ACTION,
             fnAction: fnAction,
             message: message || "",
             meta: meta
@@ -59,9 +60,9 @@ export class Undo {
         * @param message  (optional).
         * @param meta     (optional).
         */
-    public update(obj: any[], member: number, value: any, message?: string, meta?: any): void;
-    public update(obj: Object, member: string, value: any, message?: string, meta?: any): void;
-    public update(obj: any, member: any, value: any, message?: string, meta?: any): void {  //TODO use union type
+    update(obj: any[], member: number, value: any, message?: string, meta?: any): void;
+    update(obj: Object, member: string, value: any, message?: string, meta?: any): void;
+    update(obj: any, member: any, value: any, message?: string, meta?: any): void {  //TODO use union type
         if ("undefined" === typeof obj) {
             throw "Undo update: invalid obj";   //TODO use throw new Error(...) to get stack trace
         }
@@ -72,7 +73,7 @@ export class Undo {
             throw "Undo update: invalid value";
         }
         var action = {
-            type: Undo.ActionType.UPDATE,
+            type: ACTION.UPDATE,
             obj: obj,
             member: member,
             value: obj[member],
@@ -88,9 +89,9 @@ export class Undo {
         this._pushAction(action);
     }
 
-    public insert(obj: Object, member: string, value: any, message: string, meta?: any): void;
-    public insert(obj: any[], member: number, value: any, message: string, meta?: any): void;
-    public insert(obj: any, member: any, value: any, message: string, meta?: any): void {
+    insert(obj: Object, member: string, value: any, message: string, meta?: any): void;
+    insert(obj: any[], member: number, value: any, message: string, meta?: any): void;
+    insert(obj: any, member: any, value: any, message: string, meta?: any): void {
         if ("undefined" === typeof obj) {
             throw "Undo insert: invalid obj";
         }
@@ -106,7 +107,7 @@ export class Undo {
             }
         }
         var action = {
-            type: Undo.ActionType.INSERT,
+            type: ACTION.INSERT,
             obj: obj,
             member: member,
             value: <any>undefined,
@@ -121,7 +122,7 @@ export class Undo {
         this._pushAction(action);
     }
 
-    public remove(obj: any, member: any, message: string, meta?: any): void {
+    remove(obj: any, member: any, message: string, meta?: any): void {
         if ("undefined" === typeof obj) {
             throw "Undo remove: invalid obj";
         }
@@ -129,7 +130,7 @@ export class Undo {
             throw "Undo remove: invalid member";
         }
         var action = {
-            type: Undo.ActionType.REMOVE,
+            type: ACTION.REMOVE,
             obj: obj,
             member: member,
             value: obj[member],
@@ -147,8 +148,8 @@ export class Undo {
         this._pushAction(action);
     }
 
-    //public splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
-    public splice(obj: any[], index: number, howmany: number, itemX: any[], message: string, meta?: any): void {
+    //splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
+    splice(obj: any[], index: number, howmany: number, itemX: any[], message: string, meta?: any): void {
         if ("undefined" === typeof obj) {
             throw "Undo splice: invalid obj";
         }
@@ -165,7 +166,7 @@ export class Undo {
         //var isarray = isArray(itemX);
 
         var action: IUndoAction = {
-            type: Undo.ActionType.SPLICE,
+            type: ACTION.SPLICE,
             obj: obj,
             index: index,
             //howmany: isarray ? itemX.length : arguments.length - 4,
@@ -184,22 +185,22 @@ export class Undo {
         this._pushAction(action);
     }
 
-    public _pushAction(action: IUndoAction): void {
-        if (this.group) {
-            this.group.stack.push(action);
+    private _pushAction(action: IUndoAction): void {
+        if (this._group) {
+            this._group.stack.push(action);
         } else {
-            this.head++;
-            this.stack.splice(this.head, this.stack.length, action);
+            this._head++;
+            this._stack.splice(this._head, this._stack.length, action);
             this._maxUndoOverflow();
         }
     }
 
-    public newGroup(message: string, fnGroup?: () => boolean, meta?: any): void {
-        if (this.group) {
+    newGroup(message: string, fnGroup?: () => boolean, meta?: any): void {
+        if (this._group) {
             throw "Cannot imbricate group";
         }
-        this.group = {
-            type: Undo.ActionType.GROUP,
+        this._group = {
+            type: ACTION.GROUP,
             stack: [],
             message: message || "",
             meta: meta
@@ -212,27 +213,27 @@ export class Undo {
             }
         }
     }
-    public endGroup(): void {
-        if (!this.group) {
+    endGroup(): void {
+        if (!this._group) {
             throw "No group defined";
         }
-        var g = this.group;
-        this.group = null;
+        var g = this._group;
+        this._group = null;
         if (g.stack.length) {
             this._pushAction(g);
         }
     }
-    public cancelGroup(): void {
-        if (!this.group) {
+    cancelGroup(): void {
+        if (!this._group) {
             throw "No group defined";
         }
-        this._do(this.group, true);
-        this.group = null;
+        this._do(this._group, true);
+        this._group = null;
     }
 
     private _do(action: IUndoAction, bUndo: boolean): any {
-        this.meta = action.meta;
-        if (action.type === Undo.ActionType.GROUP) {
+        this._meta = action.meta;
+        if (action.type === ACTION.GROUP) {
             var r: any;
             if (bUndo) {
                 for (var i = action.stack.length - 1; i >= 0; i--) {
@@ -243,26 +244,26 @@ export class Undo {
                     r = this._do(action.stack[i], false);
                 }
             }
-            this.meta = action.meta;
+            this._meta = action.meta;
             return r;
 
-        } else if (action.type === Undo.ActionType.ACTION) {
+        } else if (action.type === ACTION.ACTION) {
             return action.fnAction(bUndo);
 
-        } else if (action.type === Undo.ActionType.UPDATE) {
+        } else if (action.type === ACTION.UPDATE) {
             var temp = action.obj[action.member];
             action.obj[action.member] = action.value;
             action.value = temp;
             return temp;
 
-        } else if (action.type === Undo.ActionType.SPLICE) {
+        } else if (action.type === ACTION.SPLICE) {
             var p = action.values.slice(0, action.values.length);   //copy array
             p.unshift(action.index, action.howmany);
             action.howmany = action.values.length;
             action.values = Array.prototype.splice.apply(action.obj, p);
             return p[2];
 
-        } else if (bUndo ? action.type === Undo.ActionType.INSERT : action.type === Undo.ActionType.REMOVE) {
+        } else if (bUndo ? action.type === ACTION.INSERT : action.type === ACTION.REMOVE) {
             action.value = action.obj[action.member];
             if (action.obj.splice) {
                 action.obj.splice(action.member, 1);
@@ -280,66 +281,66 @@ export class Undo {
         }
     }
 
-    public undo(): any {
+    undo(): any {
         if (!this.canUndo) {
             throw "Can't undo";
         }
-        var r = this._do(this.stack[this.head], true);
-        this.head--;
+        var r = this._do(this._stack[this._head], true);
+        this._head--;
         return r;
     }
 
-    public redo(): any {
+    redo(): any {
         if (!this.canRedo) {
             throw "Can't redo";
         }
-        this.head++;
-        return this._do(this.stack[this.head], false);
+        this._head++;
+        return this._do(this._stack[this._head], false);
     }
 
     //TODO @computedFrom('head', 'stack')
     get canUndo(): boolean {
-        return 0 <= this.head && this.head < this.stack.length;
+        return 0 <= this._head && this._head < this._stack.length;
     }
 
     //TODO @computedFrom('head', 'stack')
     get canRedo(): boolean {
-        return -1 <= this.head && this.head < this.stack.length - 1;
+        return -1 <= this._head && this._head < this._stack.length - 1;
     }
 
     get messageUndo(): string {
-        return this.canUndo ? this.stack[this.head].message : "";
+        return this.canUndo ? this._stack[this._head].message : "";
     }
 
     get messageRedo(): string {
-        return this.canRedo ? this.stack[this.head + 1].message : "";
+        return this.canRedo ? this._stack[this._head + 1].message : "";
     }
 
-    public setMaxUndo(v: number): void {
+    setMaxUndo(v: number): void {
         if ("number" !== typeof v) {
             throw "Invalid maxUndo value";
         }
-        this.maxUndo = v;
+        this._maxUndo = v;
         this._maxUndoOverflow();
     }
 
     private _maxUndoOverflow(): void {
-        if (this.stack.length > this.maxUndo) {
-            var nOverflow = this.stack.length - this.maxUndo;
-            this.head -= nOverflow;
-            this.stack.splice(0, nOverflow);
+        if (this._stack.length > this._maxUndo) {
+            var nOverflow = this._stack.length - this._maxUndo;
+            this._head -= nOverflow;
+            this._stack.splice(0, nOverflow);
         }
     }
 
-    public getMeta(): any {
-        return this.meta;
+    get meta(): any {
+        return this._meta;
     }
 
-    public toString(): string {
-        return (this.group ? "Grouping (" + this.group.message + "), " : "")
-            + (this.canUndo ? (this.head + 1) + " undo(" + this.messageUndo + ")" : "No undo")
-            + ", " + (this.canRedo ? (this.stack.length - this.head) + " redo(" + this.messageRedo + ")" : "No redo")
-            + ", maxUndo=" + this.maxUndo;
+    toString(): string {
+        return (this._group ? "Grouping (" + this._group.message + "), " : "")
+            + (this.canUndo ? (this._head + 1) + " undo(" + this.messageUndo + ")" : "No undo")
+            + ", " + (this.canRedo ? (this._stack.length - this._head) + " redo(" + this.messageRedo + ")" : "No redo")
+            + ", maxUndo=" + this._maxUndo;
     }
 }
 //	https://github.com/ArthurClemens/Javascript-Undo-Manager

@@ -1,75 +1,28 @@
-﻿//import {Container} from 'aurelia-dependency-injection';
-import { MainLib } from '../../../src/services//mainLib';
-import { DrawLib as drawLib } from '../../../src/services//draw/drawLib';
-import { Find } from '../../../src/services//util/Find';
-//import { GuidMock as Guid } from '../../mocks/guid-mock';
-import { mathMock as math } from '../../mocks/math-mock';
+//import {Container} from 'aurelia-dependency-injection';
+import { DrawEditor } from '../../../src/services/drawEditor';
+import { Undo } from '../../../src/services/util/undo';
+import { Selection } from '../../../src/services/selection';
+import { Find } from '../../../src/services/util/find';
+//import { GuidMock as Guid } from '../../mocks/guid_mock';
+import { Validation } from '../../../src/services/validation';
 
-describe('services.mainLib', () => {
-    let main: MainLib;
+import { mathMock } from '../mocks/math_mock';
+import { DialogServiceMock } from '../mocks/dialogService_mock';
 
-    beforeEach(()=> {
-        main = new MainLib();
+describe('drawEditor', () => {
+
+    let drawEditor: DrawEditor;
+
+    let dialog: DialogServiceMock = new DialogServiceMock();
+
+    beforeEach(() => {
+        let undo = new Undo();
+        let selection = new Selection();
+        let validation = new Validation();
+        drawEditor = new DrawEditor(dialog, validation, selection, undo);
     });
 
-    describe('Load/save', () => {
-
-        it('should load a tournament from url', () => {
-
-        });
-
-    });
-
-    describe('Players management', () => {
-
-        var tournament1: Tournament = {
-            id: 't1', info: { name: 'Tournament 1' },
-            players: [],
-            events: []
-        };
-
-        var player1: Player = { id: 'p1', name: 'Eloi', rank: '30/3', registration: [], _tournament: tournament1 };
-        var player2: Player = { id: 'p2', name: 'Denis', rank: '4/6', registration: [], _tournament: tournament1 };
-
-        //clean tournament1
-        afterEach(() => tournament1.players.splice(0, tournament1.players.length));
-
-        it('should add player', () => {
-
-            main.addPlayer(tournament1, player1);
-
-            expect(tournament1.players.length).toBe(1);
-            expect(tournament1.players[0].name).toBe('Eloi');
-            expect(tournament1.players[0].rank).toBe('30/3');
-        });
-
-        it('should remove player', function () {
-            //main.select(tournament1);
-            tournament1.players.push(player1);
-
-            main.removePlayer(player1);
-
-            expect(tournament1.players.length).toBe(0);
-        });
-
-        it('should edit player', function () {
-            //main.select(tournament1);
-            tournament1.players.push(player1);
-
-            main.editPlayer(player1, player2);
-
-            expect(tournament1.players[0].name).toBe('Eloi');
-
-            //main.doUndo();
-            //expect(tournament1.players[0].name).toBe('Denis');
-        });
-    });
-
-    describe('Events management', () => {
-
-    });
-
-    describe('Draws management', () => {
+    describe('Draws generation', () => {
 
         var event1: TEvent = {
             id: 'e1', name: 'Simple messieurs', sexe: 'H', category: 'Senior', maxRank: '30/1',
@@ -91,14 +44,14 @@ describe('services.mainLib', () => {
 
         describe('Draw generation new', () => {
 
-            beforeEach(() => math.randomReturns([0.1, 0.8, 0.2]));
+            beforeEach(() => mathMock.randomReturns([0.1, 0.8, 0.2]));
 
             //clean event
             afterEach(() => event1.draws.splice(0, event1.draws.length));
 
             it('should add a first knockout draw', () => {
 
-                main.addDraw({ id: 'd1', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 });
+                drawEditor._addDraw({ id: 'd1', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 });
 
                 expect(event1.draws.length).toBe(1);
                 var draw1 = event1.draws[0];
@@ -106,7 +59,7 @@ describe('services.mainLib', () => {
             });
 
             it('should generate a first knockout draw', () => {
-                main.addDraw({ id: 'd1', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd1', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(1);
                 var draw1 = event1.draws[0];
@@ -132,7 +85,7 @@ describe('services.mainLib', () => {
 
             it('should generate a first knockout draw with 2 Q', () => {
 
-                main.addDraw({ id: 'd1', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 2, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd1', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 2, boxes: undefined, _event: event1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(1);
                 var draw1 = event1.draws[0];
@@ -161,7 +114,7 @@ describe('services.mainLib', () => {
 
             it('should generate a first roundrobin draw', () => {
 
-                main.addDraw({ id: 'd1', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd1', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(1);
                 var draw1 = event1.draws[0];
@@ -186,7 +139,7 @@ describe('services.mainLib', () => {
 
             it('should generate first two roundrobin draw', () => {
 
-                main.addDraw({ id: 'd1', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd1', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(2);
 
@@ -219,10 +172,10 @@ describe('services.mainLib', () => {
 
             it('should generate a second knockout draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
 
-                main.addDraw({ id: 'd1', name: 'draw2', type: DrawType.Normal, minRank: '40', maxRank: '30/2', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1, _previous: draw1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd1', name: 'draw2', type: DrawType.Normal, minRank: '40', maxRank: '30/2', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1, _previous: draw1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(2);
                 var draw = event1.draws[1];
@@ -230,7 +183,7 @@ describe('services.mainLib', () => {
                 expect(draw.boxes).toBeDefined();
                 expect(draw.boxes.length).toBe(5);
 
-                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
+                var boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Frank');
                 expect(boxIn._player.rank).toBe('30/5');
 
@@ -248,9 +201,9 @@ describe('services.mainLib', () => {
 
             it('should generate after a round a second knockout draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
-                main.addDraw({ id: 'd1', name: 'draw2', type: DrawType.Normal, minRank: '40', maxRank: '30/2', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1, _previous: draw1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd1', name: 'draw2', type: DrawType.Normal, minRank: '40', maxRank: '30/2', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1, _previous: draw1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(2);
                 var draw = event1.draws[1];
@@ -258,7 +211,7 @@ describe('services.mainLib', () => {
                 expect(draw.boxes).toBeDefined();
                 expect(draw.boxes.length).toBe(5);
 
-                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
+                var boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.rank).toBe('30/5');
 
                 boxIn = Find.by(draw.boxes, 'position', 4);
@@ -271,7 +224,7 @@ describe('services.mainLib', () => {
                 var boxOut = <Match>Find.by(draw.boxes, 'position', 0);
                 expect(boxOut.qualifOut).toBe(1);
 
-                var r = main.undo.undo();
+                var r = this.undo.undo();
                 expect(event1.draws.length).toBe(1);
                 expect(event1.draws[0]).toBe(draw1);
                 expect(r).toBeUndefined();
@@ -281,9 +234,9 @@ describe('services.mainLib', () => {
 
                 tournament1.players.push({ id: 'p7', name: 'Gérard', rank: 'NC', registration: ['e1'] });
                 tournament1.players.push({ id: 'p8', name: 'Henri', rank: 'NC', registration: ['e1'] });
-                math.randomReturns([0.7, 0.1, 0.4, 0.8, 0.6, 0.3, 0.2, 0.5]);
+                mathMock.randomReturns([0.7, 0.1, 0.4, 0.8, 0.6, 0.3, 0.2, 0.5]);
 
-                main.addDraw({ id: 'd0', name: 'draw6', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 3, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'draw6', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 3, boxes: undefined, _event: event1 }, GenerateType.Create);
 
                 expect(event1.draws.length).toBe(1);
 
@@ -324,77 +277,77 @@ describe('services.mainLib', () => {
 
         describe('Draw generation mix', () => {
 
-            beforeEach(() => math.randomReturns([0.1, 0.8, 0.2]));
+            beforeEach(() => mathMock.randomReturns([0.1, 0.8, 0.2]));
 
             //clean event
             afterEach(() => event1.draws.splice(0, event1.draws.length));
 
             it('should mix a knockout draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
 
-                var draw = drawLib.newDraw(draw1._event, draw1);
-                math.randomReturns([0.6, 0.2, 0.3]);
-                main.updateDraw(draw, draw1, GenerateType.Mix);
+                var draw = DrawEditor.newDraw(draw1._event, draw1);
+                mathMock.randomReturns([0.6, 0.2, 0.3]);
+                drawEditor._updateDraw(draw, draw1, GenerateType.Mix);
 
                 expect(draw.boxes.length).toBe(7);
 
-                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 6);
+                var boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 6);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 5);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Albert');
             });
 
             it('should mix a round robin draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'draw1', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'draw1', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
 
-                var draw = drawLib.newDraw(draw1._event, draw1);
-                math.randomReturns([0.1, 0.2, 0.7]);
-                main.updateDraw(draw, draw1, GenerateType.Mix);
+                var draw = DrawEditor.newDraw(draw1._event, draw1);
+                mathMock.randomReturns([0.1, 0.2, 0.7]);
+                drawEditor._updateDraw(draw, draw1, GenerateType.Mix);
 
                 expect(draw.boxes.length).toBe(10);
 
-                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 19);
+                var boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 19);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 18);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 18);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 17);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 17);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 16);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 16);
                 expect(boxIn._player.name).toBe('Albert');
             });
         });
 
         describe('Draw update', () => {
 
-            beforeEach(() => math.randomReturns([0.1, 0.8, 0.2]));
+            beforeEach(() => mathMock.randomReturns([0.1, 0.8, 0.2]));
 
             //clean event
             afterEach(() => event1.draws.splice(0, event1.draws.length));
 
             it('should resize a knockout draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: 'NC', nbColumn: 4, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
 
-                var draw = drawLib.newDraw(draw1._event, draw1);
+                var draw = DrawEditor.newDraw(draw1._event, draw1);
                 draw.nbColumn = 2;
                 draw.nbOut = 2;
 
-                main.updateDraw(draw, draw1);
+                drawEditor._updateDraw(draw, draw1);
 
                 expect(draw.boxes.length).toBe(7);
 
@@ -406,29 +359,29 @@ describe('services.mainLib', () => {
                     expect(boxOut.qualifOut).toBe(2);
                 });
 
-                var boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 6);
+                var boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 6);
                 expect(boxIn._player.name).toBe('Claude');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 5);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 5);
                 expect(boxIn._player.name).toBe('Bernard');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 4);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 4);
                 expect(boxIn._player.name).toBe('Daniel');
 
-                boxIn = <PlayerIn> Find.by(draw.boxes, 'position', 3);
+                boxIn = <PlayerIn>Find.by(draw.boxes, 'position', 3);
                 expect(boxIn._player.name).toBe('Albert');
             });
 
             it('should resize (expand) a round robin draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 2, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
                 expect(draw1.boxes.length).toBe(3);
 
-                var draw = drawLib.newDraw(draw1._event, draw1);
+                var draw = DrawEditor.newDraw(draw1._event, draw1);
                 draw.nbColumn = 3;
 
-                main.updateDraw(draw, draw1);
+                drawEditor._updateDraw(draw, draw1);
 
                 expect(draw.boxes.length).toBe(6);
 
@@ -445,14 +398,14 @@ describe('services.mainLib', () => {
 
             it('should resize (shrink) a round robin draw', () => {
 
-                main.addDraw({ id: 'd0', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
+                drawEditor._addDraw({ id: 'd0', name: 'poule', type: DrawType.PouleSimple, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 1, boxes: undefined, _event: event1 }, GenerateType.Create);
                 var draw1 = event1.draws[0];
                 expect(draw1.boxes.length).toBe(6);
 
-                var draw = drawLib.newDraw(draw1._event, draw1);
+                var draw = DrawEditor.newDraw(draw1._event, draw1);
                 draw.nbColumn = 2;
 
-                main.updateDraw(draw, draw1);
+                drawEditor._updateDraw(draw, draw1);
 
                 expect(draw.boxes.length).toBe(3);
 

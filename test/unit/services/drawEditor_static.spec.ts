@@ -1,7 +1,7 @@
-﻿import { DrawLib as drawLib } from '../../../../src/services/draw/drawLib';
-import { RankFFT } from '../../../../src/services/fft/rank';
+﻿import { DrawEditor } from '../../../src/services/drawEditor';
+import { RankFFT } from '../../../src/services/fft/rank';
 
-describe('services.drawLib', () => {
+describe('drawEditor static', () => {
 
     var player1: Player = {
         id: 'p1',
@@ -41,42 +41,35 @@ describe('services.drawLib', () => {
     };
     event1._tournament = tournament1;
 
-    //it('should inject drawLib', () => {
-    //    module('jat.services.drawLib');
-    //    inject((_drawLib_: DrawLib) => {
-    //        drawLib = _drawLib_;
-    //    });
-    //});
-
     it('should create new draw', () => {
-        //TODO drawLib.newDraw()
+        //TODO DrawEditor.newDraw()
     });
 
     it('should create new draw from existing', () => {
-        //TODO drawLib.newDraw()
+        //TODO DrawEditor.newDraw()
     });
 
     it('should init draw', () => {
-        //drawLib.initDraw()
+        //DrawEditor.initDraw()
     });
 
     it('should reset draw', () => {
-        //drawLib.resetDraw()
+        //DrawEditor.resetDraw()
     });
 
     it('should create new box', () => {
-        var box1 = drawLib.newBox(draw1, undefined, 1);
+        var box1 = DrawEditor.newBox(draw1, undefined, 1);
         expect(box1.position).toBe(1);
         expect(box1._draw).toBe(draw1);
         expect(box1._player).toBeUndefined();
 
         box1.aware = true;
 
-        var box2 = drawLib.newBox(draw1, box1);
+        var box2 = DrawEditor.newBox(draw1, box1);
         expect(box2.position).toBe(1);
         expect(box2.aware).toBeTruthy();
 
-        box2 = drawLib.newBox(draw1, box1, 2);
+        box2 = DrawEditor.newBox(draw1, box1, 2);
         expect(box2.position).toBe(2);
         expect(box2.aware).toBeTruthy();
     });
@@ -87,7 +80,7 @@ describe('services.drawLib', () => {
             position: 1,
             playerId: player1.id
         };
-        drawLib.initBox(box1, draw1);
+        DrawEditor.initBox(box1, draw1);
         expect(box1._draw).toBe(draw1);
         expect(box1._player).toBe(player1);
     });
