@@ -12,6 +12,7 @@ module.exports = function(config) {
           "*": "*",
           "src/*": "src/*",
           // "mocks/*": "test/unit/mocks/*",
+          // 'mocks/*': 'test/mocks/*mock.js',
           // "test/unit/*": "test/unit/*", // https://github.com/aurelia/skeleton-navigation/issues/265
           // "custom_typings/*": "custom_typings/*",
           "typescript": "node_modules/typescript/lib/typescript.js",
@@ -38,8 +39,7 @@ module.exports = function(config) {
           "module": "amd",
           "emitDecoratorMetadata": true,
           "experimentalDecorators": true
-          ,preserveConstEnums: true
-          ,traceResolution: true
+          //,"preserveConstEnums": true
         }
       },
       // Patterns for files that you want Karma to make available, but not loaded until a module requests them. eg. Third-party libraries. 

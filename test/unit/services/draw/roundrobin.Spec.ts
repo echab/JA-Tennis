@@ -5,6 +5,8 @@ import { DrawEditor } from '../../../../src/services/drawEditor';
 import { TournamentEditor } from '../../../../src/services/tournamentEditor';
 import { ranking } from '../../../../src/services/types'
 
+//const enum DrawType { Normal, Final, PouleSimple, PouleAR }     //TODO: redeclared as custom_typings/draw.d.ts is not working
+
 describe('services.roundrobin', () => {
     var roundrobin: Roundrobin;
 
@@ -14,7 +16,7 @@ describe('services.roundrobin', () => {
 
     var draw1: Draw = {
         id: 'd1', name: 'draw1',
-        type: DrawType.PouleSimple,
+        type: <any>DrawType.PouleSimple,
         minRank: 'NC', maxRank: '40',
         nbColumn: 4, nbOut: 1,
         boxes: []

@@ -1,4 +1,3 @@
-/// <reference path="../../../custom_typings/draw.d.ts" />
 
 //import {Container} from 'aurelia-dependency-injection';
 import { DrawEditor } from '../../../src/services/drawEditor';

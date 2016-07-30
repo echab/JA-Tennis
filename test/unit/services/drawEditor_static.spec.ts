@@ -1,7 +1,7 @@
-﻿/// <reference path="../../../custom_typings/draw.d.ts" />
-
-import { DrawEditor } from '../../../src/services/drawEditor';
+﻿import { DrawEditor } from '../../../src/services/drawEditor';
 import { RankFFT } from '../../../src/services/fft/rank';
+
+const enum _DrawType { Normal, Final, PouleSimple, PouleAR }     //TODO: redeclared as custom_typings/draw.d.ts is not working
 
 describe('drawEditor static', () => {
 
@@ -25,7 +25,7 @@ describe('drawEditor static', () => {
 
     var draw1: Draw = {
         id: 'd1', name: 'draw1',
-        type: DrawType.Normal,
+        type: <any>_DrawType.Normal,
         minRank: 'NC', maxRank: '40',
         nbColumn: 3, nbOut: 1,
         boxes: [],
