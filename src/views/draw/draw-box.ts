@@ -26,8 +26,15 @@ export class DrawBox {
     // isPlayed(): boolean {
     //     return this.isMatch && !!(<Match>this.box).score;
     // }
+
+    //for debug
+    get dump():string {
+        return JSON.stringify(this.box, (key,value) =>
+            key[0] !== '_' ? value : undefined 
+        );
+    }
 }
 
 function isMatch(box: Box): boolean {
-    return box && ('score' in box);
+    return box && ('undefined' !== typeof (<Match>box).score);
 }

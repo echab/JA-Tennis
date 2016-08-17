@@ -61,7 +61,7 @@ export abstract class DrawLibBase {
     //}
 
     public isSlot(box: Match): boolean {  //isCreneau
-        return box && ('score' in box) && (!!box.place || !!box.date);
+        return isMatch(box) && (!!box.place || !!box.date);
     }
 
     public findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
@@ -500,7 +500,7 @@ export abstract class DrawLibBase {
 }
 
 function isMatch(box: Box): boolean {
-    return box && ('score' in box);
+    return box && ('undefined' !== typeof (<Match>box).score);
 }
 
 //TODO move roundrobin specific code to roundrobin.ts

@@ -584,7 +584,7 @@ function ASSERT(b: boolean, message?: string): void {
 }
 
 function isMatch(box: Box): boolean {
-    return 'score' in box;
+    return 'undefined' !== typeof (<Match>box).score;
 }
 
 function CompString(a: string, b: string): number {

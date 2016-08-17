@@ -127,5 +127,5 @@ export class RoundrobinValidation implements IValidation {
 }
 
 function isMatch(box: Box): boolean {
-    return 'score' in box;
+    return 'undefined' !== typeof (<Match>box).score;
 }

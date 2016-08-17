@@ -143,7 +143,8 @@ export class Selection {
     }
 
     get isMatch(): boolean {
-        return this.box && ('score' in this.box);
+        // return this.box && ('score' in this.box);
+        return this.box && ('undefined' !== typeof (<Match>this.box).score);
     }
 
     get hasScore():boolean {

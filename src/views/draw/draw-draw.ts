@@ -177,7 +177,7 @@ export class DrawDraw implements ISize {
 }
 
 function isMatch(box: Box): boolean {
-    return box && ('score' in box);
+    return box && ('undefined' !== typeof (<Match>box).score);
 }
 
 function positionOpponents(pos: number): { pos1: number; pos2: number } { //ADVERSAIRE1, ADVERSAIRE2

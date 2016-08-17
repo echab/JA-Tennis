@@ -160,8 +160,8 @@ export class DrawEditor {
     }
 
     //#region match
-    isMatch(box: Box): boolean {
-        return box && 'score' in box;
+    static isMatch(box: Box): boolean {
+        return box && 'undefined' !== typeof (<Match>box).score;
     }
 
     editMatch(match: Match): void {
@@ -393,7 +393,7 @@ export class DrawEditor {
     //}
 
     public static isSlot(box: Match): boolean {  //isCreneau
-        return box && ('score' in box) && (!!box.place || !!box.date);
+        return this.isMatch(box) && (!!box.place || !!box.date);
     }
 
     public static findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie

@@ -384,7 +384,7 @@ export class FFTValidation extends Validation {
 }
 
 function isMatch(box: Box): boolean {
-    return 'score' in box;
+    return 'undefined' !== typeof (<Match>box).score;
 }
 
 function column(pos: number): number {    //iCol
