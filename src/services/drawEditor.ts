@@ -41,7 +41,6 @@ export class DrawEditor {
             extend(draw, source);
         }
         draw.id = draw.id || Guid.create('d');
-        delete (<any>draw).$$hashKey;   //TODO remove angular id
 
         //default values
         draw.type = draw.type || DrawType.Normal;
@@ -51,10 +50,10 @@ export class DrawEditor {
             draw._previous = after;
             //TODO? after._next = draw;
         }
-        if (!draw.minRank) {
-            draw.minRank = after && after.maxRank ? rank.next(after.maxRank) : 'NC';
+        if (!draw.minRank && after && after.maxRank) {
+            draw.minRank = rank.next(after.maxRank);
         }
-        if (draw.maxRank && rank.compare(draw.minRank, draw.maxRank) > 0) {
+        if (draw.maxRank && draw.minRank && rank.compare(draw.minRank, draw.maxRank) > 0) {
             draw.maxRank = draw.minRank;
         }
 
@@ -231,8 +230,8 @@ export class DrawEditor {
             }
             draw = draws[0];
         } else {    //edit draw
-            var i = Find.indexOf(c, "id", draw.id, "Draw to edit not found");
-            this.undo.update(c, i, draw, "Edit " + draw.name + " " + i, ModelType.Draw); //c[i] = draw;
+            var cDraw = Find.byId( c, draw.id);
+            this.undo.updateProperties(cDraw, draw, "Edit " + draw.name, ModelType.Draw); //cDraw.* = draw.*;
         }
         if (isSelected || generate) {
             this.selection.select(draw, ModelType.Draw);
@@ -268,20 +267,15 @@ export class DrawEditor {
     //#region match
     private _editMatch(editedMatch: Match, match: Match): void {
         DrawEditor.initBox(editedMatch, editedMatch._draw);
-        var c = match._draw.boxes;
-        var i = Find.indexOf(c, "position", editedMatch.position, "Match to edit not found");
         this.undo.newGroup("Edit match", () => {
-            this.undo.update(c, i, editedMatch, "Edit " + editedMatch.position + " " + i, ModelType.Match); //c[i] = editedMatch;
+            this.undo.updateProperties(match, editedMatch, "Edit " + editedMatch.position, ModelType.Match); //match.* = editedMatch.*;
             if (editedMatch.qualifOut) {
                 //report qualified player to next draw
                 var nextGroup = DrawEditor.nextGroup(editedMatch._draw);
                 if (nextGroup) {
                     var boxIn = DrawEditor.groupFindPlayerIn(nextGroup, editedMatch.qualifOut);
                     if (boxIn) {
-                        //this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player');  //boxIn.playerId = editedMatch.playerId;
-                        //this.undo.update(boxIn, '_player', editedMatch._player, 'Set player');  //boxIn._player = editedMatch._player;
-                        this.undo.update(boxIn, 'playerId', editedMatch.playerId, 'Set player',
-                            () => DrawEditor.initBox(boxIn, boxIn._draw));  //boxIn.playerId = editedMatch.playerId;
+                        this.undo.updateProperties(boxIn, {playerId: editedMatch.playerId, _player:editedMatch._player}, 'Set player');  //boxIn.playerId = editedMatch.playerId;
                     }
                 }
             }
@@ -289,14 +283,7 @@ export class DrawEditor {
         });
     }
     //private _erasePlayer(box: Box): void {
-    //    //this.undo.newGroup("Erase player", () => {
-    //    //    this.undo.update(box, 'playerId', null);  //box.playerId = undefined;
-    //    //    this.undo.update(box, '_player', null);  //box._player = undefined;
-    //    //    return true;
-    //    //}, box);
-    //    //this.undo.update(box, 'playerId', null, "Erase player",     //box.playerId = undefined;
-    //    //    () => DrawEditor.initBox(box, box._draw)
-    //    //    );
+    //    // this.undo.updateProperties(box, {playerId:undefined, _player:undefined}, "Erase player");  //box.playerId = undefined; box._player = undefined;
     //    var prev = box.playerId;
     //    this.undo.action((bUndo: boolean) => {
     //        box.playerId = bUndo ? prev : undefined;
@@ -305,26 +292,15 @@ export class DrawEditor {
     //    }, "Erase player");
     //}
 
-    //private _eraseScore(match: Match): void {
-    //    this.undo.newGroup("Erase score", () => {
-    //        this.undo.update(match, 'score', '');  //box.score = '';
-    //        return true;
-    //    }, match);
-    //}
+    eraseResult(match: Match): void {
+        this.undo.updateProperties(match, {score: '', wo:undefined, canceled:undefined, vainqDef:undefined}, "Erase result");  //match.score = '';
+    }
 
-    private _erasePlanning(match: Match): void {
-        this.undo.newGroup("Erase player", () => {
-            this.undo.update(match, 'place', null); //match.place = undefined;
-            this.undo.update(match, 'date', null);  //match.date = undefined;
-            return true;
-        }, match);
+    erasePlanning(match: Match): void {
+        this.undo.updateProperties(match, {place:undefined, date:undefined}, "Erase planning");  //match.place = undefined; match.date = undefined;
     }
     //#endregion match
     
-    // public static refresh(draw: Draw): void {
-    //     draw._refresh = new Date(); //force refresh
-    // }
-
     public static updateQualif(draw: Draw): void {
 
         var drawLib = LibLocator.drawLibFor(draw);

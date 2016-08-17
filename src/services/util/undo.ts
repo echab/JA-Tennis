@@ -14,7 +14,7 @@ interface IUndoAction {
     meta: any;
 }
 
-const ACTION = { UPDATE: 1, INSERT: 2, REMOVE: 3, GROUP: 4, ACTION: 5, SPLICE: 6 };
+const enum ACTION { UPDATE, INSERT, REMOVE, GROUP, ACTION, SPLICE, UPDATE_PROPERTIES };
 
 /**
  * Undo manager for typescript 
@@ -87,6 +87,33 @@ export class Undo {
             obj.splice(member, 1, value);   //to allow aurelia to observe
         } else {
             obj[member] = value;
+        }
+        this._pushAction(action);
+    }
+
+    updateProperties(obj: Object, values: Object, message?: string, meta?: any): void {
+        if ("undefined" === typeof obj) {
+            throw "Undo update: invalid obj";   //TODO use throw new Error(...) to get stack trace
+        }
+        if ("undefined" === typeof values) {
+            throw "Undo update: invalid value";
+        }
+        var action = {
+            type: ACTION.UPDATE_PROPERTIES,
+            obj: obj,
+            values: {},
+            message: message || "update",
+            meta: meta
+        };
+        for( let prop in values) {
+            if( obj[prop] !== values[prop]) {
+                action.values[prop] = obj[prop];
+                if( 'undefined' === typeof values[prop]) {
+                    delete obj[prop];
+                } else {
+                    obj[prop] = values[prop];
+                }
+            }
         }
         this._pushAction(action);
     }
@@ -261,6 +288,21 @@ export class Undo {
             }
             action.value = temp;
             return temp;
+
+        } else if (action.type === ACTION.UPDATE_PROPERTIES) {
+            let temp = {};
+            for( let prop in action.values) {
+                if( 'undefined' !== typeof action.obj[prop]) {
+                    temp[prop] = action.obj[prop];
+                }
+                if( 'undefined' === typeof action.values[prop]) {
+                    delete action.obj[prop];
+                } else {
+                    action.obj[prop] = action.values[prop];
+                }
+                action.values[prop] = temp[prop];
+            }
+            return action.obj;  //temp;
 
         } else if (action.type === ACTION.SPLICE) {
             var p = action.values.slice(0, action.values.length);   //copy array

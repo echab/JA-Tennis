@@ -26,7 +26,6 @@ export class EventEditor {
             extend(event, source);
         }
         event.id = event.id || Guid.create('e');
-        //delete (<any>event).$$hashKey;   //TODO remove angular id
 
         this.init(event, parent);
         return event;
@@ -97,9 +96,7 @@ export class EventEditor {
 
     private _editEvent(editedEvent: TEvent, event: TEvent): void {
         var isSelected = this.selection.event === event;
-        var c = editedEvent._tournament.events;
-        var i = Find.indexOf(c, "id", editedEvent.id, "TEvent to edit not found");
-        this.undo.update(c, i, editedEvent, "Edit " + editedEvent.name + " " + i, ModelType.TEvent);   //c[i] = editedEvent;
+        this.undo.updateProperties(event, editedEvent, "Edit " + editedEvent.name, ModelType.TEvent);   //event.* = editedEvent.*;
         if (isSelected) {
             this.selection.select(editedEvent, ModelType.TEvent);
         }

@@ -34,6 +34,7 @@ export class DialogDraw {
         this.drawTypes[DrawType.PouleAR] = { value: DrawType.PouleAR, label: "Round-robin double" };
 
         this.ranks = rank.list();
+        
         this.categories = category.list();
     }
 

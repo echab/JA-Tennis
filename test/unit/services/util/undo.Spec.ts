@@ -271,6 +271,62 @@ describe('services.undo', () => {
         });
     });
 
+    describe('testObjectUpdateProperties', () => {
+        var a = {
+            a: "aa",
+            b: "bb",
+            c: "cc"
+        };
+
+        it('should reset undo', initTest);
+
+        it('should do it', () => {
+            undo.updateProperties(a, {b:"bbb", c:undefined, d:"ddd"}, "Change b to bbb remove c and add d as ddd");
+            expect(a).toEqual({ a: "aa", b: "bbb", d:"ddd" });
+
+            expect(undo.canUndo);
+            var r = undo.undo();
+            expect(a).toEqual({ a: "aa", b: "bb", c: "cc" });
+            // expect(r).toEqual({b:"bbb", d:"ddd" /* , c:undefined */});
+            // expect(r.c).toBeUndefined();
+            expect(r).toEqual(a);
+
+            r = undo.redo();
+            expect(a).toEqual({ a: "aa", b: "bbb", d:"ddd" });
+            // expect(r).toEqual({b:"bb", c:"cc" /*, d:undefined */});
+            // expect(r.d).toBeUndefined();
+            expect(r).toEqual(a);
+        });
+    });
+
+    describe('testObjectUpdateProperties deep', () => {
+        var a = {
+            a: "aa",
+            b: { 
+                c: "cc"
+            }
+        };
+
+        it('should reset undo', initTest);
+
+        it('should do it', () => {
+            undo.updateProperties(a, {d:"ddd"}, "Add d as ddd");
+            expect(a).toEqual({ a: "aa", b:{ c:"cc"}, d:"ddd" });
+
+            expect(undo.canUndo);
+            var r = undo.undo();
+            expect(a).toEqual({ a: "aa", b: { c: "cc" }});
+            // expect(r).toEqual({d:"ddd"});
+            expect(r).toEqual(a);
+
+            r = undo.redo();
+            expect(a).toEqual({ a: "aa", b:{ c:"cc"}, d:"ddd" });
+            // expect(r).toEqual({/*, d:undefined */});
+            // expect(r.d).toBeUndefined();
+            expect(r).toEqual(a);
+        });
+    });
+
     //describe('testObjectUpdateMeta', () => {
     //    var a = {
     //        a: "aa", _a: "_aa",

@@ -17,7 +17,7 @@
                     <div class="row form-group">
                         <label for="type" class="col-xs-3">Type:</label>
                         <select id="type" value.bind="draw.type" required class="col-xs-4">
-                            <option repeat.for="type of drawTypes" value.bind="type.value">${type.label}</option>
+                            <option repeat.for="type of drawTypes" model.bind="type.value">${type.label}</option>
                         </select>
                         <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
                     </div>
@@ -25,10 +25,12 @@
                     <div class="row form-group">
                         <label for="rankfrom" class="col-xs-3">Rank, from:</label>
                         <select id="rankfrom" value.bind="draw.minRank" class="col-xs-2">
+                            <option model.bind="undefined"></option> 
                             <option repeat.for="value of ranks">${value}</option> 
                         </select>
                         <label for="rankto" class="col-xs-2">to:</label>
                         <select id="rankto" value.bind="draw.maxRank" class="col-xs-2">
+                            <option model.bind="undefined"></option> 
                             <option repeat.for="value of ranks">${value}</option> 
                         </select>
                     </div>

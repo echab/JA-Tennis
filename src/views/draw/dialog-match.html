@@ -41,8 +41,9 @@
                             <div class="row form-group">
                                 <label for="place" class="col-xs-3">Court:</label>
                                 <select id="place" value.bind="match.place" class="col-xs-5">
-                                <option repeat.for="place of places">${place}</option> 
-                            </select>
+                                    <option model.bind="undefined"></option> 
+                                    <option repeat.for="place of places">${place}</option> 
+                                </select>
                             </div>
                             <div class="row form-group">
                                 <label for="date" class="col-xs-3">Date:</label>

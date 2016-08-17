@@ -26,7 +26,6 @@ export class PlayerEditor {
             extend(player, source);
         }
         player.id = player.id || Guid.create('p');
-        //delete (<any>player).$$hashKey;   //TODO remove angular id
 
         this.init(player, parent);
         return player;
@@ -87,14 +86,10 @@ export class PlayerEditor {
 
     /*private*/ _editPlayer(editedPlayer: Player, player: Player): void {
         var isSelected = this.selection.player === player;
-        var c = editedPlayer._tournament.players;
-        var i = Find.indexOf(c, "id", editedPlayer.id, "Player to update not found");
-        this.undo.update(c, i, editedPlayer, "Edit " + editedPlayer.name + " " + i, ModelType.Player); //c[i] = editedPlayer;
+        this.undo.updateProperties(player, editedPlayer, "Edit " + editedPlayer.name, ModelType.Player); //player.* = editedPlayer.*;
         if (isSelected) {
             this.selection.select(editedPlayer, ModelType.Player);
         }
-        //update all _player internal references
-        TournamentEditor.init(editedPlayer._tournament);
     }
 
     remove(player: Player): void {

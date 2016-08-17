@@ -141,4 +141,13 @@ export class Selection {
         }
         //}
     }
+
+    get isMatch(): boolean {
+        return this.box && ('score' in this.box);
+    }
+
+    get hasScore():boolean {
+        var match:Match = <Match>this.box; 
+        return match && (!!match.score || match.wo && match.canceled && match.vainqDef);
+    }
 }

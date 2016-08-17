@@ -68,7 +68,7 @@ export class TournamentEditor {
             }
         }).then((result: DialogResult) => {
             if ('Ok' === result.output) {
-                this.undo.update(tournament, 'info', editedInfo, title); //tournament.info = editedInfo;
+                this.undo.updateProperties(tournament.info, editedInfo, title); //tournament.info.* = editedInfo.*;
                 return tournament;
             }
         });

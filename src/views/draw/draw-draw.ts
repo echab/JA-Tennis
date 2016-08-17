@@ -113,7 +113,7 @@ export class DrawDraw implements ISize {
             var box = draw.boxes[i];
             var x = box._x * this.boxWidth, y = box._y * this.boxHeight;
 
-            if (this.isMatch(box)) {
+            if (isMatch(box)) {
                 var opponent = positionOpponents(box.position);
                 var p1 = draw._points[opponent.pos1], p2 = draw._points[opponent.pos2];
                 if (p1 && p2) {
@@ -172,15 +172,12 @@ export class DrawDraw implements ISize {
     }
 
     eraseScore(match: Match): void {
-        this.undo.newGroup("Erase score", () => {
-            this.undo.update(match, 'score', '');  //box.score = '';
-            return true;
-        }, match);
+        this.undo.updateProperties(match, {score:''}, "Erase score");  //match.score = '';
     }
+}
 
-    isMatch(box: Box): boolean {
-        return box && ('score' in box);
-    }
+function isMatch(box: Box): boolean {
+    return box && ('score' in box);
 }
 
 function positionOpponents(pos: number): { pos1: number; pos2: number } { //ADVERSAIRE1, ADVERSAIRE2

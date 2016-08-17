@@ -5,6 +5,13 @@
     cursor: pointer;
 }
 
+[disabled] [class^="icon-"],
+[disabled] [class*=" icon-"],
+[disabled] [class^="icon2-"],
+[disabled] [class*=" icon2-"] {
+    opacity: .5;
+}
+
 [class^="icon2-"],
 [class*=" icon2-"] {
     display: inline-block;
