@@ -117,9 +117,9 @@ export class DrawEditor {
         }).then((result: DialogResult) => {
             //TODO add event after selected draw
             if ('Ok' === result.output) {
-                this._addDraw(newDraw, 0, after);
+                this._addDraw(newDraw, GenerateType.None, after);
             } else if ('Generate' === result.output) {
-                this._addDraw(newDraw, 1, after);
+                this._addDraw(newDraw, GenerateType.Create, after);
             }
         });
     }

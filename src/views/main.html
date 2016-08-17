@@ -101,19 +101,21 @@
         </div>
         <div class="footer">
             <form class="form-horizontal">
-                <button class="btn" click.trigger="addDraw(selection.draw)" disabled.bind="!selection.event"><i class="glyphicon glyphicon-plus"></i> Add draw</button>
-                <button class="btn" if.bind="selection.draw.mode === 0"
-                        click.trigger="generateDraw(selection.draw, GenerateType.Create)" disabled.bind="!selection.draw">
-                    <i class="icon2-draw-generate"></i> Generate
-                </button>
-                <div class="btn-group" if.bind="selection.draw.mode === 0">
-                    <button class="btn" click.trigger="generateDraw(selection.draw, GenerateType.PlusEchelonne)" disabled.bind="!selection.draw || selection.draw.type >= 2" title="Phased draw more"><i class="icon2-draw-left"></i></button>
-                    <button class="btn" click.trigger="generateDraw(selection.draw, GenerateType.PlusEnLigne)" disabled.bind="!selection.draw || selection.draw.type >= 2" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
-                    <button class="btn" click.trigger="generateDraw(selection.draw, GenerateType.Mix)" disabled.bind="!selection.draw" title="Mix the players"><i class="icon2-random"></i></button>
-                </div>
-                <div class="btn-group" if.bind="selection.draw.mode === 0">
-                    <button class="btn" click.trigger="updateQualif(selection.draw)" disabled.bind="!selection.draw" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
-                </div>
+                <button class="btn" click.trigger="drawEditor.add(selection.draw)" disabled.bind="!selection.event"><i class="glyphicon glyphicon-plus"></i> Add draw</button>
+                <template if.bind="selection.draw.mode === drawEditor.modeBuild">
+                    <button class="btn"
+                            click.trigger="generateDraw(selection.draw, GenerateType.Create)" disabled.bind="!selection.draw">
+                        <i class="icon2-draw-generate"></i> Generate
+                    </button>
+                    <div class="btn-group">
+                        <button class="btn" click.trigger="generateDraw(selection.draw, GenerateType.PlusEchelonne)" disabled.bind="!selection.draw || selection.draw.type >= 2" title="Phased draw more"><i class="icon2-draw-left"></i></button>
+                        <button class="btn" click.trigger="generateDraw(selection.draw, GenerateType.PlusEnLigne)" disabled.bind="!selection.draw || selection.draw.type >= 2" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
+                        <button class="btn" click.trigger="generateDraw(selection.draw, GenerateType.Mix)" disabled.bind="!selection.draw" title="Mix the players"><i class="icon2-random"></i></button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" click.trigger="updateQualif(selection.draw)" disabled.bind="!selection.draw" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
+                    </div>
+                </template>
                 <div class="btn-group">
                     <button class="btn" click.trigger="validateDraw(selection.draw)" disabled.bind="!selection.draw" title="Check the draw"><i class="icon2-checkmark"></i> Check</button>
                 </div>
