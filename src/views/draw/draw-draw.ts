@@ -19,7 +19,7 @@ export class DrawDraw implements ISize {
     @bindable simple: boolean = false;
 
     isKnockout: boolean;
-    players: Player[];
+    registeredPlayers: Player[];
     qualifsIn: Match[];
     qualifsOut: number[];
     width: number;
@@ -49,7 +49,7 @@ export class DrawDraw implements ISize {
         }
 
         if( !this.simple) {
-            this.players = TournamentEditor.getRegisteredPlayers(this.draw);
+            this.registeredPlayers = TournamentEditor.getRegisteredPlayers(this.draw);
 
             //qualifs in
             var prev = DrawEditor.previousGroup(this.draw);

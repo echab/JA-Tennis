@@ -3,6 +3,7 @@ import {DialogService,DialogResult} from 'aurelia-dialog';
 
 import {DialogPlayer} from '../views/player/dialog-player';
 
+import { TournamentEditor} from './tournamentEditor';
 import { Selection,ModelType } from './selection';
 import { Undo } from './util/undo';
 import { Find } from './util/find';
@@ -92,6 +93,8 @@ export class PlayerEditor {
         if (isSelected) {
             this.selection.select(editedPlayer, ModelType.Player);
         }
+        //update all _player internal references
+        TournamentEditor.init(editedPlayer._tournament);
     }
 
     remove(player: Player): void {
@@ -101,5 +104,7 @@ export class PlayerEditor {
         if (this.selection.player === player) {
             this.selection.select(c[i] || c[i - 1], ModelType.Player); //select next or previous
         }
+        //TODO update all _player internal references
+        TournamentEditor.init(player._tournament);
     }
 }

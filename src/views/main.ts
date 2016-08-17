@@ -13,7 +13,7 @@ import { Undo } from '../services/util/undo';
 export class Main {
 
     private tournamentOpened = true; 
-    private playersOpened = true;
+    private playersOpened:boolean = false;
     private drawsOpened = true;
     private planningOpened = false;
 
@@ -26,7 +26,7 @@ export class Main {
         private undo:Undo
         ) {
 
-        var conf = JSON.parse( window.localStorage['panelsOpened']);
+        var conf = JSON.parse( window.localStorage.getItem('panelsOpened'));
         if (conf) {
             this.tournamentOpened = conf.tournament;
             this.playersOpened = conf.players;
@@ -45,21 +45,7 @@ export class Main {
         });
 
         //on exit...
-        window.addEventListener('beforeunload',  () => {
-
-            //Auto save tournament on exit
-            this.tournamentEditor.save();
-
-            //save settings
-            window.localStorage['panelsOpened'] = JSON.stringify({
-                tournament: this.tournamentOpened,
-                players : this.playersOpened,
-                draws : this.drawsOpened,
-                planning : this.planningOpened
-            });
-
-        });
-
+        window.addEventListener('beforeunload', this.onExit.bind(this));
     }
 
     public doUndo(): void {
@@ -68,5 +54,21 @@ export class Main {
 
     public doRedo(): void {
         this.selection.select(this.undo.redo(), this.undo.meta);
+    }
+
+    protected onExit(e) {
+        //Auto save tournament on exit
+        this.tournamentEditor.save();
+
+        //save settings
+        window.localStorage.setItem('panelsOpened', JSON.stringify({
+            tournament: this.tournamentOpened,
+            players : this.playersOpened,
+            draws : this.drawsOpened,
+            planning : this.planningOpened
+        }));
+
+        (e || window.event).returnValue = null;
+        return null;
     }
 }

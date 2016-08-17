@@ -52,7 +52,7 @@
                 <ul class="dropdown-menu au-animate">
                     <li><a click.trigger="playerEditor.edit(selection.box._player)"><i class="icon2-info"></i> Edit</a></li>
                     <li class="divider"></li>
-                    <li repeat.for="player of players">
+                    <li repeat.for="player of registeredPlayers">
                         <a click.trigger="setPlayer(selection.box, player)">
                             <i class="icon2-white ${findPlayer(player.id) ? 'icon2-checkmark':''}"></i>
                             ${player.name +' '+ player.rank}

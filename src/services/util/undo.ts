@@ -84,8 +84,10 @@ export class Undo {
             if ("number" !== typeof member || member < 0 || obj.length <= member) {
                 throw "Bad array position to update";
             }
+            obj.splice(member, 1, value);   //to allow aurelia to observe
+        } else {
+            obj[member] = value;
         }
-        obj[member] = value;
         this._pushAction(action);
     }
 
@@ -252,7 +254,11 @@ export class Undo {
 
         } else if (action.type === ACTION.UPDATE) {
             var temp = action.obj[action.member];
-            action.obj[action.member] = action.value;
+            if( action.obj.splice) {
+                action.obj.splice(action.member, 1, action.value);   //to allow aurelia to observe
+            } else {
+                action.obj[action.member] = action.value;
+            }
             action.value = temp;
             return temp;
 

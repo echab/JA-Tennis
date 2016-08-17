@@ -1,4 +1,4 @@
-﻿import { autoinject,bindable, computedFrom } from 'aurelia-framework';
+﻿import { autoinject, bindable } from 'aurelia-framework';
 
 import { Selection } from '../../services/selection';
 
@@ -12,17 +12,17 @@ export class DrawBox {
     error: IError;
 
     constructor(
-        private selection:Selection
+        private selection: Selection
     ) {
     }
 
-    boxChanged(box:Box, oldValue:Box) {
+    boxChanged(box: Box, oldValue: Box) {
         this.isMatch = isMatch(box);
         this.isPlayed = this.isMatch && !!(<Match>this.box).score;
         //this.error = validation.getErrorBox(box);
     }
 
-    // //TODO @computedFrom('box.score')
+    // //TODO @computedFrom('box.score')    //path are not allowed
     // isPlayed(): boolean {
     //     return this.isMatch && !!(<Match>this.box).score;
     // }
