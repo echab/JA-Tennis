@@ -25,7 +25,7 @@ export const App: Component = () => {
     </Show>
     {/* <SelectionProvider> */}
     <div class={styles.App}>
-      <header class="px-3 flex items-stretch justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800">
+      <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800">
         {/* <i class="icon2-ball"></i> JA-Tennis */}
         <span>
           <button type="button" onclick={() => showDlgInfo(true)}>Info</button>

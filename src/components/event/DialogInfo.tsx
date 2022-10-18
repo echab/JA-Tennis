@@ -1,4 +1,4 @@
-import { Component, JSX, onMount, onCleanup } from 'solid-js';
+import { Component, JSX, onMount, onCleanup, Show } from 'solid-js';
 import { Coordinates, TournamentInfo } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
 import { rank, category } from '../../services/types';
@@ -137,8 +137,18 @@ export const DialogInfo: Component<Props> = (props) => {
                      <input id="club_name" type="text" class="w-9/12 p-1"
                         value={form.club?.name ?? ''} onChange={updateSubField("club", "name")} />
                   </div>
+                  <div class="mb-1">
+                     <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
+                     <input type="tel" value={form.club?.phone1 ?? ''} onChange={updateSubField("club", 'phone1')} class="w-4/12 p-1" />
+                     <span class="inline-block w-1/12"></span>
+                     <input type="tel" value={form.club?.phone2 ?? ''} onChange={updateSubField("club", 'phone2')} class="w-4/12 p-1" />
+                  </div>
+                  <div class="mb-1">
+                     <label class="inline-block w-3/12 text-right pr-3">eMail:</label>
+                     <input type="email" value={form.club?.email ?? ''} onChange={updateSubField("club", 'email')} class="w-9/12 p-1" />
+                  </div>
                   <details class="mb-1">
-                     <summary class="w-3/12">Adress:</summary>
+                     <summary class="w-3/12">Adress <Show when={form.club?.adress1 || form.club?.adress2 || form.club?.city || form.club?.zipCode}>*</Show></summary>
                      <div class="mb-1">
                         <label for="adress" class="inline-block w-3/12 text-right pr-3">Adress:</label>
                         <input id="adress" type="text" value={form.club?.adress1 ?? ''} onChange={updateSubField("club", 'adress1')} class="w-9/12 p-1" />
@@ -154,16 +164,6 @@ export const DialogInfo: Component<Props> = (props) => {
                         <input type="text" value={form.club?.city ?? ''} onChange={updateSubField("club", 'city')} class="w-6/12 p-1" />
                      </div>
                   </details>
-                  <div class="mb-1">
-                     <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
-                     <input type="tel" value={form.club?.phone1 ?? ''} onChange={updateSubField("club", 'phone1')} class="w-4/12 p-1" />
-                     <span class="inline-block w-1/12"></span>
-                     <input type="tel" value={form.club?.phone2 ?? ''} onChange={updateSubField("club", 'phone2')} class="w-4/12 p-1" />
-                  </div>
-                  <div class="mb-1">
-                     <label class="inline-block w-3/12 text-right pr-3">eMail:</label>
-                     <input type="email" value={form.club?.email ?? ''} onChange={updateSubField("club", 'email')} class="w-9/12 p-1" />
-                  </div>
                </fieldset>
 
                <fieldset>
@@ -173,9 +173,18 @@ export const DialogInfo: Component<Props> = (props) => {
                      <input id="referee_name" type="text" class="w-9/12 p-1"
                         value={form.referee?.name ?? ''} onChange={updateSubField("referee", "name")} />
                   </div>
-
+                  <div class="mb-1">
+                     <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
+                     <input type="tel" value={form.referee?.phone1 ?? ''} onChange={updateSubField("referee", 'phone1')} class="w-4/12 p-1" />
+                     <span class="inline-block w-1/12"></span>
+                     <input type="tel" value={form.referee?.phone2 ?? ''} onChange={updateSubField("referee", 'phone2')} class="w-4/12 p-1" />
+                  </div>
+                  <div class="mb-1">
+                     <label class="inline-block w-3/12 text-right pr-3">eMail:</label>
+                     <input type="email" value={form.referee?.email ?? ''} onChange={updateSubField("referee", 'email')} class="w-9/12 p-1" />
+                  </div>
                   <details class='mb-1'>
-                     <summary class="w-3/12">Adress:</summary>
+                     <summary class="w-3/12">Adress <Show when={form.referee?.adress1 || form.referee?.adress2 || form.referee?.city || form.referee?.zipCode}>*</Show></summary>
                      <div class="mb-1">
                         <label for="adress" class="inline-block w-3/12 text-right pr-3">Adress:</label>
                         <input id="adress" type="text" value={form.referee?.adress1 ?? ''} onChange={updateSubField("referee", 'adress1')} class="w-9/12 p-1" />
@@ -191,16 +200,6 @@ export const DialogInfo: Component<Props> = (props) => {
                         <input type="text" value={form.referee?.city ?? ''} onChange={updateSubField("referee", 'city')} class="w-6/12 p-1" />
                      </div>
                   </details>
-                  <div class="mb-1">
-                     <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
-                     <input type="tel" value={form.referee?.phone1 ?? ''} onChange={updateSubField("referee", 'phone1')} class="w-4/12 p-1" />
-                     <span class="inline-block w-1/12"></span>
-                     <input type="tel" value={form.referee?.phone2 ?? ''} onChange={updateSubField("referee", 'phone2')} class="w-4/12 p-1" />
-                  </div>
-                  <div class="mb-1">
-                     <label class="inline-block w-3/12 text-right pr-3">eMail:</label>
-                     <input type="email" value={form.referee?.email ?? ''} onChange={updateSubField("referee", 'email')} class="w-9/12 p-1" />
-                  </div>
                </fieldset>
             </div>
             <hr />
