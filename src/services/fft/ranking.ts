@@ -29,19 +29,19 @@ export class RankingFFT implements Ranking {
     //- Vainqueur WO      |    +2    |   +1,5   |    +5    |
     //- Battu WO          |     0    |   -1,5   |    -5    |
     //- Match nul         |     0    |          |          |
-    public Empty(): void {
+    Empty(): void {
         this.Points = 0;
     }
 
-    public isVide(): boolean {
+    isVide(): boolean {
         return this.Points === 0;
     }
 
-    public NomChamp(iChamp: number): string {
+    NomChamp(iChamp: number): string {
         return this._champs[iChamp];
     }
 
-    public ValeurChamp(iChamp: number): string {
+    ValeurChamp(iChamp: number): string {
         switch (iChamp) {
             case 0: return this.dPoint.toString();
             case 1: return Math.floor(this.dSet2 / 2).toString();
@@ -49,7 +49,7 @@ export class RankingFFT implements Ranking {
         }
     }
 
-    public AddResultat(bVictoire: number, score: string, fm: string): boolean {	//-1=défaite, 0=nul, 1=victoire
+    AddResultat(bVictoire: number, score: string, fm: string): boolean {	//-1=défaite, 0=nul, 1=victoire
         //bVictoire: -1=défaite, 0=nul, 1=victoire
 
         var sc = new ScoreDeltaFFT(score, fm);
@@ -62,7 +62,7 @@ export class RankingFFT implements Ranking {
         return true;
     }
 
-    public Ordre(): number {
+    Ordre(): number {
         return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
     }
 }

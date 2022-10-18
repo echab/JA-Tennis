@@ -83,6 +83,8 @@
       "jquery": "npm:jquery@^2.2.4",
       "text": "github:systemjs/plugin-text@^0.0.8"
     },
-    "devDependencies": {}
+    "devDependencies": {
+      "aurelia-stats": "github:sormy/aurelia-stats@^1.0.1"
+    }
   }
 }

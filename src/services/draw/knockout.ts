@@ -52,7 +52,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public nbColumnForPlayers(draw: Draw, nJoueur: number): number {
+    nbColumnForPlayers(draw: Draw, nJoueur: number): number {
 
         
         var colMin = k.columnMin(draw.nbOut);
@@ -68,7 +68,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public resize(draw: Draw, oldDraw?: Draw, nPlayer?: number): void {
+    resize(draw: Draw, oldDraw?: Draw, nPlayer?: number): void {
 
         //ASSERT( SetDimensionOk( draw, oldDraw, nPlayer));
 
@@ -93,7 +93,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[] {
+    generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[] {
         if (generate === GenerateType.Create) {   //from registred players
             var m_nMatchCol = filledArray(MAX_COL, 0);
 
@@ -526,7 +526,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public boxesOpponents(match: Match): { box1: Box; box2: Box } {
+    boxesOpponents(match: Match): { box1: Box; box2: Box } {
         
         var pos1 = k.positionOpponent1(match.position),
             pos2 = k.positionOpponent2(match.position);
@@ -537,7 +537,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public getSize(draw: Draw): ISize {
+    getSize(draw: Draw): ISize {
 
         
 
@@ -552,7 +552,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public computePositions(draw: Draw): IPoint[] {
+    computePositions(draw: Draw): IPoint[] {
 
         
 
@@ -589,11 +589,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public computeScore(draw: Draw): boolean {
+    computeScore(draw: Draw): boolean {
         return true;
     }
 
-    public isJoueurNouveau(box: Box): boolean {	//Première apparition du joueur dans le tableau
+    isJoueurNouveau(box: Box): boolean {	//Première apparition du joueur dans le tableau
         if (!box) {
             return false;
         }
@@ -613,7 +613,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean { //setPlayerIn
+    setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
         var draw = box._draw;
@@ -670,7 +670,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
+    setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
         var next = DrawEditor.nextGroup(box._draw);
@@ -724,7 +724,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public findPlayerIn(draw: Draw, iQualifie: number): PlayerIn {
+    findPlayerIn(draw: Draw, iQualifie: number): PlayerIn {
 
         ASSERT(0 <= iQualifie);
 
@@ -745,7 +745,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //@override
-    public findPlayerOut(draw: Draw, iQualifie: number): Match {
+    findPlayerOut(draw: Draw, iQualifie: number): Match {
 
         ASSERT(0 < iQualifie);
 

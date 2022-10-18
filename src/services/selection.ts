@@ -3,11 +3,11 @@ import {Find} from './util/find';
 export const enum ModelType { None, Tournament, Player, TEvent, Draw, Match, Box }
 
 export class Selection {
-    public tournament: Tournament;
-    public event: TEvent;
-    public draw: Draw;
-    public box: Box;
-    public player: Player;
+    tournament: Tournament;
+    event: TEvent;
+    draw: Draw;
+    box: Box;
+    player: Player;
 
     modelTypeNone = ModelType.None;
     modelTypeTournament = ModelType.Tournament;

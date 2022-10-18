@@ -51,7 +51,7 @@ export class ScoreDeltaFFT {
         return;
     }
 
-    public getnSet(): number {
+    getnSet(): number {
         var i = 0;
         while (i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2)) {
             i++;
@@ -59,7 +59,7 @@ export class ScoreDeltaFFT {
         return i - 1;
     }
 
-    public deltaSet(bVainqueur: boolean /*, BOOL bEquipe */): number {
+    deltaSet(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
         // var n = 0;
         // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
@@ -144,7 +144,7 @@ export class ScoreDeltaFFT {
         // return dSet;
     }
 
-    public deltaJeu(bVainqueur: boolean /*, BOOL bEquipe */): number {
+    deltaJeu(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
 
         // var n = 0;
@@ -230,7 +230,7 @@ export class ScoreDeltaFFT {
         // return dJeu;
     }
 
-    public deltaPoint(bVainqueur: boolean /*, BOOL bEquipe */): number {
+    deltaPoint(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
 
         // var n = 0;

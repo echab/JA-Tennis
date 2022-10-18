@@ -38,7 +38,7 @@ export class EcPanel {
     // attached() {
     // }
 
-    public addBadge(badge: EcBadge): void {
+    addBadge(badge: EcBadge): void {
         this.badge = badge;
         this.panelset.addBadge(badge);
     }

@@ -23,7 +23,7 @@ export class CategoryFFT implements Category {
         "+75ans": { ageMin: 75 }
     };
     //private _beginOfTime = new Date(0);
-    public currentYear: number; //public for Spec
+    currentYear: number; //for Spec
 
     //    this.refDate = function( date) {
     //        refDate = date;

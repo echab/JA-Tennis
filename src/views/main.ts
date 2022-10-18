@@ -36,8 +36,9 @@ export class Main {
 
         //tournamentEditor.create();
 
-        //var filename = '/data/tournament8.json';
-        var filename = '/data/jeu4test.json';
+        // var filename = '/data/tournament8.json';
+        var filename = '/data/tournament4.json';  //with poule
+        // var filename = '/data/jeu4test.json';
 
         //Load saved tournament if exists
         this.tournamentEditor.load(filename).then(tournament => {
@@ -48,11 +49,11 @@ export class Main {
         window.addEventListener('beforeunload', this.onExit.bind(this));
     }
 
-    public doUndo(): void {
+    doUndo(): void {
         this.selection.select(this.undo.undo(), this.undo.meta);
     }
 
-    public doRedo(): void {
+    doRedo(): void {
         this.selection.select(this.undo.redo(), this.undo.meta);
     }
 

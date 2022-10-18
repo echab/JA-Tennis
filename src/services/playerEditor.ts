@@ -20,7 +20,7 @@ export class PlayerEditor {
         ) {
 		  }
 
-    public static newPlayer(parent: Tournament, source?: Player): Player {
+    static newPlayer(parent: Tournament, source?: Player): Player {
         var player: Player = <any>{};
         if (isObject(source)) {
             extend(player, source);
@@ -31,7 +31,7 @@ export class PlayerEditor {
         return player;
     }
 
-    public static init(player: Player, parent: Tournament) {
+    static init(player: Player, parent: Tournament) {
         player._tournament = parent;
         //player.toString = function () {
         //    return this.name + ' ' + this.rank;

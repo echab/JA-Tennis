@@ -35,7 +35,7 @@ export class DrawEditor {
         ) {
 		  }
 
-    public static newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
+    static newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
         var draw: Draw = <any>{};
         if (isObject(source)) {
             extend(draw, source);
@@ -61,7 +61,7 @@ export class DrawEditor {
         return draw;
     }
 
-    public static init(draw: Draw, parent: TEvent): void {
+    static init(draw: Draw, parent: TEvent): void {
         draw._event = parent;
 
         draw.type = draw.type || DrawType.Normal;
@@ -79,9 +79,9 @@ export class DrawEditor {
         }
     }
 
-    //public newBox(parent: Draw, matchFormat?: string, position?: number): Box
-    //public newBox(parent: Draw, source?: Box, position?: number): Box
-    public static newBox(parent: Draw, source?: string|Box, position?: number): Box {
+    //newBox(parent: Draw, matchFormat?: string, position?: number): Box
+    //newBox(parent: Draw, source?: Box, position?: number): Box
+    static newBox(parent: Draw, source?: string|Box, position?: number): Box {
         var box: Box = <any>{};
         if (isObject(source)) {
             extend(box, source);
@@ -99,7 +99,7 @@ export class DrawEditor {
         return box;
     }
 
-    public static initBox(box: Box, parent: Draw): void {
+    static initBox(box: Box, parent: Draw): void {
         box._draw = parent;
         box._player = this.getPlayer(box);
     }
@@ -154,11 +154,7 @@ export class DrawEditor {
     generate(draw: Draw, generate?: GenerateType): void {
         this._updateDraw(draw, undefined, generate || GenerateType.Create);
     }
-
-    updateQualif(draw: Draw): void {
-        this.updateQualif(draw);
-    }
-
+ 
     //#region match
     static isMatch(box: Box): boolean {
         return box && 'undefined' !== typeof (<Match>box).score;
@@ -235,13 +231,12 @@ export class DrawEditor {
         }
         if (isSelected || generate) {
             this.selection.select(draw, ModelType.Draw);
-            //DrawEditor.refresh(draw);  //force refresh
         }
     }
 
-    private _updateQualif(draw: Draw): void {
+    updateQualif(draw: Draw): void {
         this.undo.newGroup('Update qualified', () => {
-            DrawEditor.updateQualif(draw);
+            DrawEditor._updateQualif(draw);
             return true;
         }, draw);
     }
@@ -259,7 +254,7 @@ export class DrawEditor {
         this.validation.resetDraw(draw);
         this.validation.validateDraw(draw);
         if (this.selection.draw === draw) {
-            //DrawEditor.refresh(draw);  //force refresh
+
         }
     }
     //#endregion draw
@@ -301,7 +296,7 @@ export class DrawEditor {
     }
     //#endregion match
     
-    public static updateQualif(draw: Draw): void {
+    static _updateQualif(draw: Draw): void {
 
         var drawLib = LibLocator.drawLibFor(draw);
 
@@ -327,7 +322,7 @@ export class DrawEditor {
         }
     }
 
-    public static getPlayer(box: Box): Player {
+    static getPlayer(box: Box): Player {
         return Find.byId(box._draw._event._tournament.players, box.playerId);
     }
 
@@ -351,7 +346,7 @@ export class DrawEditor {
     }
 
     //** return the group of draw of the given draw (mainly for group of round robin). */
-    public static group(draw: Draw): Draw[] {
+    static group(draw: Draw): Draw[] {
         var draws: Draw[] = [];
         var d = this.groupBegin(draw);
         while (d) {
@@ -365,18 +360,18 @@ export class DrawEditor {
     }
 
     //** return the draws of the previous group. */
-    public static previousGroup(draw: Draw): Draw[] {	//getPrecedent
+    static previousGroup(draw: Draw): Draw[] {	//getPrecedent
         var p = this.groupBegin(draw);
         return p && p._previous ? this.group(p._previous) : null;
     }
 
     //** return the draws of the next group. */
-    public static nextGroup(draw: Draw): Draw[] {	    //getSuivant
+    static nextGroup(draw: Draw): Draw[] {	    //getSuivant
         var p = this.groupEnd(draw);
         return p && p._next ? this.group(p._next) : null;
     }
 
-    //public setType(BYTE iType) {
+    //setType(BYTE iType) {
     //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
     //    if ((m_iType & TABLEAU_POULE ? 1 : 0) != (iType & TABLEAU_POULE ? 1 : 0)) {
 
@@ -392,11 +387,11 @@ export class DrawEditor {
     //    m_iType = iType;
     //}
 
-    public static isSlot(box: Match): boolean {  //isCreneau
+    static isSlot(box: Match): boolean {  //isCreneau
         return this.isMatch(box) && (!!box.place || !!box.date);
     }
 
-    public static findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
+    static findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
         var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
@@ -411,7 +406,7 @@ export class DrawEditor {
         return null;
     }
 
-    public static groupFindPlayerIn(group: Draw[], iQualifie: number): PlayerIn {
+    static groupFindPlayerIn(group: Draw[], iQualifie: number): PlayerIn {
         ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
         //var group = isArray(group) ? <Draw[]>group : this.group(<Draw>group);
         for (var i = 0; i < group.length; i++) {
@@ -424,7 +419,7 @@ export class DrawEditor {
         }
     }
 
-    public static groupFindPlayerOut(group: Draw[], iQualifie: number): Match {
+    static groupFindPlayerOut(group: Draw[], iQualifie: number): Match {
         ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
         //var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
@@ -450,7 +445,7 @@ export class DrawEditor {
         return null;
     }
 
-    public static groupFindAllPlayerOut(origin: Draw | Draw[], hideNumbers?: boolean): number[] {   //FindAllQualifieSortant
+    static groupFindAllPlayerOut(origin: Draw | Draw[], hideNumbers?: boolean): number[] {   //FindAllQualifieSortant
         //Récupère les qualifiés sortants du tableau
         var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         if (group) {
@@ -464,7 +459,7 @@ export class DrawEditor {
         }
     }
 
-    public static findAllPlayerOutBox(origin: Draw | Draw[]): Match[] { //FindAllQualifieSortantBox
+    static findAllPlayerOutBox(origin: Draw | Draw[]): Match[] { //FindAllQualifieSortantBox
         //Récupère les qualifiés sortants du tableau
         var group = isArray(origin) ? <Draw[]>origin : this.group(<Draw>origin);
         if (group) {
@@ -486,21 +481,21 @@ export class DrawEditor {
         * @param inNumber (optional)
         * @param player   (optional)
         */
-    // public static setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
+    // static setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
     //     // inNumber=0 => enlève qualifié
     //     return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
     // }
 
-    // public static setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
+    // static setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
     //     // iQualifie=0 => enlève qualifié
     //     return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
     // }
 
-    // public static computeScore(draw: Draw): boolean {
+    // static computeScore(draw: Draw): boolean {
     //     return this._drawLibs[draw.type].computeScore(draw);
     // }
 
-    // public static boxesOpponents(match: Match): { box1: Box; box2: Box } {
+    // static boxesOpponents(match: Match): { box1: Box; box2: Box } {
     //     return this._drawLibs[match._draw.type].boxesOpponents(match);
     // }
 }

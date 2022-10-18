@@ -7,7 +7,7 @@ export class DrawLibBaseOk {
 
     //TODO DrawLibBaseOk, dispatch into knockout and roundrobin
     
-// 		public SetDimensionOk( draw: Draw, oldDraw?: Draw, nJoueur?: number) :boolean {
+// 		SetDimensionOk( draw: Draw, oldDraw?: Draw, nJoueur?: number) :boolean {
 // 		
 // 			IBOITE	nBoiteNew;
 // 		
@@ -32,7 +32,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public MetJoueurOk(box: Box, player: Player, bForce: boolean): boolean {	//MetJoueurOk
+// 		MetJoueurOk(box: Box, player: Player, bForce: boolean): boolean {	//MetJoueurOk
 // 
 // 			//ASSERT( iJoueur !== -1);
 // 
@@ -68,7 +68,7 @@ export class DrawLibBaseOk {
 // 		}
 // 
 // 		//Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la box
-// 		public SetResultatOk(box: Match, box: Match): boolean {
+// 		SetResultatOk(box: Match, box: Match): boolean {
 // 
 // 			ASSERT(!box.hidden);
 // 			var boxIn = <PlayerIn>box;
@@ -105,7 +105,7 @@ export class DrawLibBaseOk {
 // 		}
 // 
 // 		//Planification d'un match : met le court, la date et l'heure
-// 		public MetCreneauOk(box: Match, boite: Match): boolean {    //MetCreneauOk
+// 		MetCreneauOk(box: Match, boite: Match): boolean {    //MetCreneauOk
 // 
 // 			ASSERT(!box.hidden);
 // 			var boxIn = <PlayerIn>box;
@@ -124,7 +124,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public EnleveCreneauOk(box: Match): boolean {  //EnleveCreneauOk
+// 		EnleveCreneauOk(box: Match): boolean {  //EnleveCreneauOk
 // 
 // 			ASSERT(!box.hidden);
 // 			ASSERT(!boxIn.qualifIn);
@@ -137,7 +137,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public MetPointageOk(box: Box, boite: Box): boolean {   //MetPointageOk
+// 		MetPointageOk(box: Box, boite: Box): boolean {   //MetPointageOk
 // 
 // 			ASSERT(!box.hidden);
 // 			ASSERT(!boxIn.qualifIn);
@@ -154,7 +154,7 @@ export class DrawLibBaseOk {
 // 		}
 // 
 // 		//Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
-// 		public EnleveJoueurOk(box: Box, bForce?: boolean): boolean {   //EnleveJoueurOk
+// 		EnleveJoueurOk(box: Box, bForce?: boolean): boolean {   //EnleveJoueurOk
 // 
 // 			if (!box.playerId && !box.score)
 // 				return true;
@@ -191,7 +191,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public SetTeteSerieOk(box: Box, iTeteSerie: number): boolean {
+// 		SetTeteSerieOk(box: Box, iTeteSerie: number): boolean {
 // 			//	iTeteSerie=0 => enlève Tête de série
 // 
 // 			ASSERT(0 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
@@ -224,7 +224,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public SetQualifieEntrantOk(box: PlayerIn, inNumber?: number, player?: Player): boolean { //SetQualifieEntrantOk
+// 		SetQualifieEntrantOk(box: PlayerIn, inNumber?: number, player?: Player): boolean { //SetQualifieEntrantOk
 // 			// inNumber=0 => enlève qualifié
 // 			var i: number;
 // 
@@ -302,7 +302,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public SetQualifieSortantOk(box: Match, outNumber?: number): boolean {
+// 		SetQualifieSortantOk(box: Match, outNumber?: number): boolean {
 // 			// outNumber=0 => enlève qualifié
 // 
 // 			ASSERT(outNumber >= 0);
@@ -405,7 +405,7 @@ export class DrawLibBaseOk {
 // 		}
 // 
 // 		//Rempli une box proprement
-// 		public RempliBoiteOk(box: Box, source: Box): boolean {   //RempliBoiteOk
+// 		RempliBoiteOk(box: Box, source: Box): boolean {   //RempliBoiteOk
 // 
 // 			var boxIn = <PlayerIn>box;
 // 
@@ -458,7 +458,7 @@ export class DrawLibBaseOk {
 // 			return true;
 // 		}
 // 
-// 		public DeplaceJoueurOk(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueurOk
+// 		DeplaceJoueurOk(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueurOk
 // 
 // 			ASSERT(box !== boxSource);
 // 

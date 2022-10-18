@@ -20,7 +20,7 @@ export class EventEditor {
         private undo:Undo
         ) {}
 
-    public static newEvent(parent: Tournament, source?: TEvent): TEvent {
+    static newEvent(parent: Tournament, source?: TEvent): TEvent {
         var event: TEvent = <any>{};
         if (isObject(source)) {
             extend(event, source);
@@ -31,7 +31,7 @@ export class EventEditor {
         return event;
     }
 
-    public static init(event: TEvent, parent: Tournament): void {
+    static init(event: TEvent, parent: Tournament): void {
         event._tournament = parent;
 
         var c = event.draws = event.draws || [];

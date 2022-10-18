@@ -10,6 +10,9 @@ export function configure(aurelia: Aurelia) {
   //Uncomment the line below to enable animation.
   aurelia.use.plugin('aurelia-animator-css');
 
+  //TODO dev only
+  //aurelia.use.plugin('aurelia-stats', {debugDirtyChecker:true});
+
   //Anyone wanting to use HTMLImports to load views, will need to install the following plugin.
   //aurelia.use.plugin('aurelia-html-import-template-loader')
 

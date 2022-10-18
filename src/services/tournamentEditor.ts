@@ -91,6 +91,7 @@ export class TournamentEditor {
         } else if (typeof file_url === 'string') {
             let client = new HttpClient();
             return client.get(file_url).then(data => {
+                data.response = data.response.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/g, ''); //remove comments
                 let tournament : Tournament = JSON.parse( data.response); 
                 tournament._url = <string>file_url;
                 TournamentEditor.init(tournament);
@@ -144,7 +145,7 @@ export class TournamentEditor {
 
     // =====
 
-    public static newTournament(source?: Tournament): Tournament {
+    static newTournament(source?: Tournament): Tournament {
         var tournament: Tournament = <any>{};
         if (isObject(source)) {
             extend(tournament, source);
@@ -161,7 +162,7 @@ export class TournamentEditor {
         return info;
     }
 
-    public static init(tournament: Tournament): void {
+    static init(tournament: Tournament): void {
         if (tournament.players) {
             for (var i = tournament.players.length - 1; i >= 0; i--) {
                 //tournament.players[i] = new Player(tournament, tournament.players[i]);
@@ -183,11 +184,11 @@ export class TournamentEditor {
     }
 
 
-    public static isRegistred(event: TEvent, player: Player): boolean {
+    static isRegistred(event: TEvent, player: Player): boolean {
         return player.registration && player.registration.indexOf(event.id) !== -1;
     }
 
-    public static getRegistred(event: TEvent): Player[] {
+    static getRegistred(event: TEvent): Player[] {
         var a: Player[] = [];
         var c = event._tournament.players;
         for (var i = 0, n = c.length; i < n; i++) {
@@ -199,7 +200,7 @@ export class TournamentEditor {
         return a;
     }
 
-    public static getRegisteredPlayers(draw: Draw): Player[] { //GetJoueursInscrit
+    static getRegisteredPlayers(draw: Draw): Player[] { //GetJoueursInscrit
 
         //Récupère les joueurs inscrits
         var players = draw._event._tournament.players,
@@ -218,7 +219,7 @@ export class TournamentEditor {
         return ppJoueur;
     }
 
-    public static sortPlayers(players: Array<Player|number>): void {
+    static sortPlayers(players: Array<Player|number>): void {
 
         //Tri les joueurs par classement
         var comparePlayersByRank = (p1: Player|number, p2: Player|number): number => {
@@ -252,7 +253,7 @@ export class TournamentEditor {
         }
     }
 
-    public static isSexeCompatible(event: TEvent, sexe: string): boolean {
+    static isSexeCompatible(event: TEvent, sexe: string): boolean {
         return event.sexe === sexe	//sexe épreuve = sexe joueur
         || (event.sexe === 'M' && !event.typeDouble);	//ou simple mixte
     }

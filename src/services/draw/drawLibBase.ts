@@ -10,13 +10,13 @@ var MAX_TETESERIE = 32,
 
 export abstract class DrawLibBase {
 
-    public abstract nbColumnForPlayers(draw: Draw, nJoueur: number): number;
-    public abstract getSize(draw: Draw): ISize;
-    public abstract computePositions(draw: Draw): IPoint[];
-    public abstract resize(draw: Draw, oldDraw?: Draw, nJoueur?: number): void;
-    public abstract generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[];
+    abstract nbColumnForPlayers(draw: Draw, nJoueur: number): number;
+    abstract getSize(draw: Draw): ISize;
+    abstract computePositions(draw: Draw): IPoint[];
+    abstract resize(draw: Draw, oldDraw?: Draw, nJoueur?: number): void;
+    abstract generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[];
 
-    public resetDraw(draw: Draw, nPlayer: number): void {
+    resetDraw(draw: Draw, nPlayer: number): void {
         //remove qualif out
         var next = DrawEditor.nextGroup(draw);
         if (next && draw.boxes) {
@@ -40,11 +40,11 @@ export abstract class DrawLibBase {
         draw.nbColumn = lib.nbColumnForPlayers(draw, nPlayer);
     }
 
-    public getPlayer(box: Box): Player {
+    getPlayer(box: Box): Player {
         return Find.byId(box._draw._event._tournament.players, box.playerId);
     }
 
-    //public setType(BYTE iType) {
+    //setType(BYTE iType) {
     //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
     //    if ((m_iType & TABLEAU_POULE ? 1 : 0) != (iType & TABLEAU_POULE ? 1 : 0)) {
 
@@ -60,11 +60,11 @@ export abstract class DrawLibBase {
     //    m_iType = iType;
     //}
 
-    public isSlot(box: Match): boolean {  //isCreneau
+    isSlot(box: Match): boolean {  //isCreneau
         return isMatch(box) && (!!box.place || !!box.date);
     }
 
-    public findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
+    findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
         var group = isArray(origin) ? <Draw[]>origin : DrawEditor.group(<Draw>origin);
         for (var i = 0; i < group.length; i++) {
@@ -87,22 +87,22 @@ export abstract class DrawLibBase {
         * @param inNumber (optional)
         * @param player   (optional)
         */
-//         public setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
+//         setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
 //             // inNumber=0 => enlève qualifié
 //             return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
 //         }
 // 
-//         public setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
+//         setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
 //             // iQualifie=0 => enlève qualifié
 //             return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
 //         }
 // 
-//         public computeScore(draw: Draw): boolean {
+//         computeScore(draw: Draw): boolean {
 //             return this._drawLibs[draw.type].computeScore(draw);
 //         }
 
     //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
-    public putPlayer(box: Box, player: Player, bForce?: boolean): boolean {   //MetJoueur
+    putPlayer(box: Box, player: Player, bForce?: boolean): boolean {   //MetJoueur
 
         //ASSERT(MetJoueurOk(box, iJoueur, bForce));
 
@@ -182,7 +182,7 @@ export abstract class DrawLibBase {
     }
 
     //Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la boite
-    public putResult(box: Match, boite: Match): boolean {   //SetResultat
+    putResult(box: Match, boite: Match): boolean {   //SetResultat
         //ASSERT(SetResultatOk(box, boite));
 
         //v0998
@@ -212,7 +212,7 @@ export abstract class DrawLibBase {
     }
 
     //Planification d'un match : met le court, la date et l'heure
-    public putSlot(box: Match, boite: Match): boolean {    //MetCreneau
+    putSlot(box: Match, boite: Match): boolean {    //MetCreneau
         ASSERT(isMatch(box));
         //ASSERT(MetCreneauOk(box, boite));
 
@@ -222,7 +222,7 @@ export abstract class DrawLibBase {
         return true;
     }
 
-    public removeSlot(box: Match): boolean {  //EnleveCreneau
+    removeSlot(box: Match): boolean {  //EnleveCreneau
         ASSERT(isMatch(box));
         //ASSERT(EnleveCreneauOk(box));
 
@@ -232,7 +232,7 @@ export abstract class DrawLibBase {
         return true;
     }
 
-    public putTick(box: Box, boite: Box): boolean {   //MetPointage
+    putTick(box: Box, boite: Box): boolean {   //MetPointage
         //ASSERT(MetPointageOk(box, boite));
 
         //TODO
@@ -244,7 +244,7 @@ export abstract class DrawLibBase {
     }
 
     //Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
-    public removePlayer(box: Box, bForce?: boolean): boolean {   //EnleveJoueur
+    removePlayer(box: Box, bForce?: boolean): boolean {   //EnleveJoueur
 
         var match = <Match>box;
         if (!match.playerId && !match.score) {
@@ -340,7 +340,7 @@ export abstract class DrawLibBase {
     }
 
     //Avec report sur le tableau suivant
-    public lockBox(box: Box): boolean {    //LockBoite
+    lockBox(box: Box): boolean {    //LockBoite
         ASSERT(!!box);
 
         if (iDiagonale(box) === box.position) {
@@ -371,7 +371,7 @@ export abstract class DrawLibBase {
     }
 
     //Avec report sur le tableau précédent
-    public unlockBox(box: Box): boolean {  //DelockBoite
+    unlockBox(box: Box): boolean {  //DelockBoite
 
         if (box.hidden) {
             return true;
@@ -394,7 +394,7 @@ export abstract class DrawLibBase {
     }
 
     //Rempli une boite proprement
-    public fillBox(box: Box, source: Box): boolean {   //RempliBoite
+    fillBox(box: Box, source: Box): boolean {   //RempliBoite
         //ASSERT(RempliBoiteOk(box, boite));
 
         var lib = LibLocator.drawLibFor(box._draw);
@@ -478,7 +478,7 @@ export abstract class DrawLibBase {
         return true;
     }
 
-    public movePlayer(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueur
+    movePlayer(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueur
         //ASSERT(DeplaceJoueurOk(box, iBoiteSrc, pBoite));
 
         boiteSrc = DrawEditor.newBox(box._draw, boiteSrc);
@@ -494,7 +494,7 @@ export abstract class DrawLibBase {
         return true;
     }
 
-    // public boxesOpponents(match: Match): { box1: Box; box2: Box } {
+    // boxesOpponents(match: Match): { box1: Box; box2: Box } {
     //     return this._drawLibs[match._draw.type].boxesOpponents(match);
     // }
 }
