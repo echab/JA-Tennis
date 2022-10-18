@@ -1,9 +1,9 @@
 ﻿import { Box } from "./draw";
-import { Tournament } from "./tournament";
+import { Coordinates, Tournament } from "./tournament";
 
 export type Id = string;
 
-export interface Player {
+export type Player = {
 
     id: Id;
 
@@ -26,13 +26,6 @@ export interface Player {
     solde?: Number;
 
     //Coordinates
-    adress1?: string;
-    adress2?: string;
-    zipCode?: string;
-    city?: string;
-    phone1?: string;
-    phone2?: string;
-    email?: string;
 
     //Teams
     players?: Player[];  //TODO class Team extends Player
@@ -42,7 +35,7 @@ export interface Player {
 
     /** @deprecated */
     _tournament?: Tournament;
-}
+} & Coordinates;
 
 export interface PlayerIn extends Box {
 

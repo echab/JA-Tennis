@@ -1,12 +1,10 @@
-import { produce } from "solid-js/store";
-import { selection, setSelection, update } from "../components/util/selection";
+import { selection, update } from "../components/util/selection";
 import type { OptionalId } from "../domain/object";
 import type { Player } from "../domain/player";
 import { TEvent } from "../domain/tournament";
-import { isSexeCompatible } from "./tournamentService";
 import { removeValue } from "./util/array";
 import type { Command } from "./util/commandManager";
-import { byId, indexOf } from "./util/find";
+import { indexOf } from "./util/find";
 import { Guid } from "./util/guid";
 
 export function updatePlayer(

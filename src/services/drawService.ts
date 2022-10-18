@@ -4,17 +4,13 @@ import { extend, isArray, isObject } from "./util/object";
 import { shuffle } from "../utils/tool";
 import { rank } from "./types";
 
-import { ValidationService } from "./validationService";
 import { Box, Draw, DrawType, Match, Mode } from "../domain/draw";
-import { Player, PlayerIn } from "../domain/player";
+import { PlayerIn } from "../domain/player";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
-import { setSelection, update } from "../components/util/selection";
-import { produce } from "solid-js/store";
-import { Knockout } from "./draw/knockout";
-import { drawLib, IDrawLib } from "./draw/drawLib";
-import { Roundrobin } from "./draw/roundrobin";
+import { update } from "../components/util/selection";
+import { drawLib } from "./draw/drawLib";
 
 const MAX_TETESERIE = 32,
   MAX_QUALIF = 32,

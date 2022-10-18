@@ -42,7 +42,7 @@ function baseExtend(dst: any, objs: any[], deep: boolean) {
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is an `Object` but not `null`.
  */
-export function isObject(value: any): value is Object {
+export function isObject(value: any): value is {} {
   // http://jsperf.com/isobject4
   return value !== null && typeof value === "object";
 }
@@ -122,4 +122,23 @@ export function defined<T extends {}>(obj: T | undefined): obj is T {
  */
  export function clone<T>(obj: T): T {
   return { ...obj };
+}
+
+export function cleanupUndefined<T extends {}>(obj: T) : T | undefined {
+  if (isObject(obj)) {
+    const o = obj as any;
+    let n = 0, t = 0;
+    for (let f in o) {
+      n++;
+      const v = cleanupUndefined(o[f]);
+      if (v === null || v === undefined) {
+        t++;
+        delete o[f];
+      }
+    }
+    if (n === t) {
+      return;
+    }
+  }
+  return obj;
 }

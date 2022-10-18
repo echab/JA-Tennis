@@ -28,7 +28,28 @@ export interface TournamentInfo {
     start?: Date;
     end?: Date;
 
+    homologation?: string;
+
+    club?: {
+        name: string;
+    } & Coordinates,
+
+    referee?: {
+        name: string;
+        licence?: string;
+    } & Coordinates;
+
     slotLength: number; // default to 90 minutes
+}
+
+export type Coordinates = {
+    adress1?: string;
+    adress2?: string;
+    zipCode?: string;
+    city?: string;
+    phone1?: string;
+    phone2?: string;
+    email?: string;
 }
 
 export interface TEvent {

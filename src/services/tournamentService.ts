@@ -1,15 +1,14 @@
 import { initEvent } from "./eventService";
-// import { initPlayer } from "./playerService";
 import { Guid } from "./util/guid";
 import { copy } from "../utils/tool";
 import { shuffle } from "../utils/tool";
 import { rank } from "./types";
-import { Draw } from "../domain/draw";
 import { Player } from "../domain/player";
 import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH } from "../domain/tournament";
 import { DAYS } from "../utils/date";
-import { Rank, RankString } from "../domain/types";
+import { RankString } from "../domain/types";
 import { Command } from "./util/commandManager";
+import { selection, update } from "../components/util/selection";
 
 /** This function load tournament data from an url. */
 export async function load(file_url?: Blob | string): Promise<Tournament> {
@@ -89,13 +88,26 @@ export function _newInfo(source?: TournamentInfo): TournamentInfo {
   return { name: '', slotLength: DEFAULT_SLOT_LENGTH, ...source };
 }
 
+export function updateInfo(info: TournamentInfo) : Command {
+  const prev = selection.tournament.info;
+
+  const act = () => {
+    update(({ tournament }) => {
+      tournament.info = info;
+    });
+  };
+  act();
+
+  const undo = () => {
+    update(({ tournament }) => {
+      tournament.info = prev;
+    });
+
+  };
+  return {name:'Update info', act, undo};
+}
+
 export function initTournament(tournament: Tournament): Tournament {
-  // if (tournament.players) {
-  //   for (var i = tournament.players.length - 1; i >= 0; i--) {
-  //     //tournament.players[i] = new Player(tournament, tournament.players[i]);
-  //     initPlayer(tournament.players[i], tournament);
-  //   }
-  // }
   if (tournament.events) {
     for (var i = tournament.events.length - 1; i >= 0; i--) {
       //tournament.events[i] = new TEvent(tournament, tournament.events[i]);

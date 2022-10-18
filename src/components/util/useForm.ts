@@ -1,5 +1,12 @@
-import { createStore } from "solid-js/store";
+import { createStore, NotWrappable, Part } from "solid-js/store";
 import { defined } from "../../services/util/object";
+
+declare type W<T> = Exclude<T, NotWrappable>;
+declare type KeyOf<T> = number extends keyof T ? 0 extends 1 & T ? keyof T
+  : [T] extends [readonly unknown[]] ? number
+  : [T] extends [never] ? never
+  : keyof T
+  : keyof T;
 
 // type FormFields = {
 //   name?: string;
@@ -23,42 +30,62 @@ import { defined } from "../../services/util/object";
 //   console.log(`submitting ${JSON.stringify(dataToSubmit)}`);
 // };
 
-export function useForm<FormFields extends object = {}>(initFields: FormFields) {
+export function useForm<FormFields extends object = {}>(
+  initFields: FormFields,
+) {
   const [form, setForm] = createStore<FormFields>(initFields);
   // Object.entries(initFields).forEach(([k,v]) => updateField)
 
   const clearField = (fieldName: keyof FormFields) => {
     setForm({
-      [fieldName]: ""
+      [fieldName]: "",
     } as any);
   };
 
   const updateField = (fieldName: keyof FormFields) => (event: Event) => {
     const inputElement = event.currentTarget as HTMLInputElement;
     if (inputElement.type === "checkbox") {
-      setForm({
-        [fieldName]: !!inputElement.checked
-      } as any);
+      setForm({ [fieldName]: !!inputElement.checked } as any);
     } else if (inputElement.type === "number") {
-      setForm({
-        [fieldName]: inputElement.valueAsNumber
-      } as any);
+      setForm({ [fieldName]: inputElement.valueAsNumber } as any);
     } else if (inputElement.type === "date") {
-      setForm({
-        [fieldName]: inputElement.valueAsDate
-      } as any);
+      setForm({ [fieldName]: inputElement.valueAsDate } as any);
     } else {
-      setForm({
-        [fieldName]: inputElement.value
-      } as any);
+      setForm({ [fieldName]: inputElement.value } as any);
+    }
+  };
+
+  const updateSubField = (
+    fieldName: Part<
+      W<FormFields>,
+      KeyOf<W<FormFields>>
+    >,
+    subFieldName: string,
+    // subFieldName: Part<
+    //   W<W<FormFields>[KeyOf<W<FormFields>>]>,
+    //   KeyOf<W<W<FormFields>[KeyOf<W<FormFields>>]>>
+    // >,
+  ) =>
+  (event: Event) => {
+    const inputElement = event.currentTarget as HTMLInputElement;
+    if (inputElement.type === "checkbox") {
+      setForm(fieldName, {[subFieldName]: !!inputElement.checked} as any);
+    } else if (inputElement.type === "number") {
+      setForm(fieldName, {[subFieldName]:  inputElement.valueAsNumber} as any);
+    } else if (inputElement.type === "date") {
+      setForm(fieldName, {[subFieldName]: inputElement.valueAsDate } as any);
+    } else {
+      setForm(fieldName, {[subFieldName]: inputElement.value } as any);
     }
   };
 
   const getRadio = (radio: RadioNodeList): string[] => {
-    const radios = (radio.length ? Array.from(radio) : Array.of(radio)) as HTMLInputElement[];
+    const radios =
+      (radio.length
+        ? Array.from(radio)
+        : Array.of(radio)) as HTMLInputElement[];
     return radios.map((e) => e.checked ? e.value : undefined).filter(defined);
-    }  ;
+  };
 
-  return { form, updateField, clearField, getRadio };
-};
-
+  return { form, updateField, updateSubField, clearField, getRadio };
+}

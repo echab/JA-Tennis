@@ -1,13 +1,13 @@
-import { indexOf, by, byId } from "./util/find";
+import { indexOf } from "./util/find";
 import { Guid } from "./util/guid";
 import { initDraw } from "./drawService";
 import { extend, isObject } from "./util/object";
 import { Tournament, TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
-import { selection, setSelection, update } from "../components/util/selection";
-import { produce } from "solid-js/store";
+import { selection, update } from "../components/util/selection";
 
+/** Add a new event or update an existing event (with id) */
 export function updateEvent(
   event: OptionalId<TEvent>,
 ): Command {
