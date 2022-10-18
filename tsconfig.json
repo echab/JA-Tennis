@@ -1,31 +1,30 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "sourceMap": true,
-    "target": "es5",
-    "module": "amd",
-    "declaration": false,
-    "noImplicitAny": false,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "lib": ["es2015", "dom"]
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client", "jest"],
+    "noEmit": true,
+    "isolatedModules": true,
+
+    // "declaration": true,
+    "lib": ["ESNext", "dom", "dom.iterable"],
+    // "removeComments": true,
+    // "sourceMap": true,
+    // "experimentalDecorators": true,
+    "outDir": "./dist"
   },
-  "filesGlob": [
-    "./src/**/*.ts",
-    "./test/**/*.ts",
-    "./typings/index.d.ts",
-    "./custom_typings/**/*.d.ts",
-    "./jspm_packages/**/*.d.ts"
+  "include": [
+    "src/**/*"
   ],
   "exclude": [
+    "dist",
     "node_modules",
-    "jspm_packages"
-  ],
-  "atom": {
-    "rewriteTsconfig": false
-  }
+    "src/views-au"
+  ]
 }

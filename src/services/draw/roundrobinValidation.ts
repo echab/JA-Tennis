@@ -1,13 +1,9 @@
-﻿import { Validation } from '../validation';
-import { DrawLibBase } from './drawLibBase';
-import { DrawEditor } from '../drawEditor';
-import { TournamentEditor } from '../tournamentEditor';
-import { Find } from '../util/find';
-import { Guid } from '../util/guid';
-import { isObject,isArray,extend } from '../util/object';
-import { shuffle,filledArray } from '../../utils/tool';
-import { LibLocator } from '../libLocator';
+﻿import { ValidationService } from '../validationService';
 import { category, rank, score, validation } from '../types';
+import { Draw, DrawType, Box, Match } from '../../domain/draw';
+import { Player, PlayerIn } from '../../domain/player';
+import { IValidation } from '../../domain/validation';
+import { TEvent, Tournament } from '../../domain/tournament';
 
 export class RoundrobinValidation implements IValidation {
 
@@ -15,13 +11,13 @@ export class RoundrobinValidation implements IValidation {
         validation.addValidator(this);
     }
 
-    //Override
+    /** @override */
     validatePlayer(player: Player): boolean {
         return true;
     }
 
-    //Override
-    validateDraw(draw: Draw): boolean {
+    /** @override */
+    validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
         var bRes = true;
 
         if (draw.type === DrawType.PouleSimple

@@ -1,21 +1,23 @@
 ﻿// FFT validation services
 
-import { Validation } from '../validation';
-import { DrawEditor } from '../drawEditor';
-import { Find } from '../util/find';
-import { LibLocator } from '../libLocator';
-import { override } from '../util/object';
+import { ValidationService } from '../validationService';
+import { by, byId } from '../util/find';
+import { Draw, DrawType, Box, Match } from '../../domain/draw';
+import { Player, PlayerIn } from '../../domain/player';
+import { findSeeded } from '../drawService';
+import { TEvent, Tournament } from '../../domain/tournament';
+import { drawLib } from '../draw/drawLib';
 
-export class FFTValidation extends Validation {
+export class FFTValidation extends ValidationService {
 
     constructor() {
         super();
         this.addValidator(this);
     }
 
-    @override
+    /** @override */
     validatePlayer(player: Player): boolean {
-        var bRes = true;
+        var bRes = super.validatePlayer(player);
 
         //if (player.sexe == 'F'
         //    && player.rank
@@ -29,10 +31,11 @@ export class FFTValidation extends Validation {
         return bRes;
     }
 
-    @override
-    validateDraw(draw: Draw): boolean {
-        var bRes = true;
-        let lib = LibLocator.drawLibFor( draw);
+    /** @override */
+    validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
+        let bRes = super.validateDraw(tournament, event, draw, players);
+
+        let lib = drawLib(event, draw);
 
         var isTypePoule = draw.type >= 2;
 
@@ -41,13 +44,12 @@ export class FFTValidation extends Validation {
         var nqe = 0;
 
         //TODOjs
-        for (var i = 0; i < draw.boxes.length; i++) {
-            var box = draw.boxes[i];
-            var boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
-            var match = isMatch(box) ? <Match>box : undefined;
+        for (let i = 0; i < draw.boxes.length; i++) {
+            const box = draw.boxes[i];
+            const boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
+            const match = isMatch(box) ? <Match>box : undefined;
 
-            var player = box._player;
-
+            const player = byId(players, box.playerId);
 
             //VERIFIE //1   //progression des classements
             //rank progress, no more than two ranks difference into a column
@@ -58,7 +60,7 @@ export class FFTValidation extends Validation {
                 if (!colRank) {
                     pColClast[player.rank] = c;
                 } else if (Math.abs(colRank - c) > 1) {
-                    this.errorDraw('IDS_ERR_CLAST_PROGR2', draw, box, player.rank);
+                    this.errorDraw('IDS_ERR_CLAST_PROGR2', draw, box, player, player.rank);
                     bRes = false;
                 }
             }
@@ -69,7 +71,7 @@ export class FFTValidation extends Validation {
                 ////TODOjs
                 ////VERIFIE //2
                 ////matches précédents de la colonne
-                //for (var j = iHautCol(iColPoule(i, m_nColonne)); j > i; j--) {
+                //for (let j = iHautCol(iColPoule(i, m_nColonne)); j > i; j--) {
 
                 //    if (isMatch(j) && !boxes[j].m_Date.isVide()
                 //        && boxes[i].m_Date == boxes[j].m_Date) {
@@ -80,7 +82,7 @@ export class FFTValidation extends Validation {
                 //}
                 //if (j <= i) {
                 //    //matches précédents de la ligne
-                //    for (var j = ADVERSAIRE1(i) - GetnColonne(); j > i; j -= GetnColonne()) {
+                //    for (let j = ADVERSAIRE1(i) - GetnColonne(); j > i; j -= GetnColonne()) {
 
                 //        if (isMatch(j) && !boxes[j].m_Date.isVide()
                 //            && boxes[i].m_Date == boxes[j].m_Date) {
@@ -100,7 +102,8 @@ export class FFTValidation extends Validation {
                 var opponent = lib.boxesOpponents(match);
                 if ((<PlayerIn> opponent.box1).qualifIn
                     && (<PlayerIn> opponent.box2).qualifIn) {
-                    this.errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1);
+                    const player1 = byId(players, opponent.box1.playerId);
+                    this.errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1, player1);
                     bRes = false;
                 }
             }
@@ -120,9 +123,9 @@ export class FFTValidation extends Validation {
         if (draw.type === DrawType.Final) {
 
             //VERIFIE	//5
-            var boxT = DrawEditor.findSeeded(draw, 1);
+            var [, boxT] = findSeeded(draw, 1);
             if (!boxT) {
-                var boxMax = Find.by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
+                var boxMax = by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
                 this.errorDraw('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);
                 bRes = false;
             }

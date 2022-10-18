@@ -1,0 +1,123 @@
+.tableau {
+    --boite-width: 9em;
+    --boite-height: 4em;
+    --boite-weigth: 1px;
+    --boite-border: var(--boite-weigth) solid var(--front);
+    --boite-corner: 7px;
+}
+
+table.tableau {
+    border-spacing: 0px;
+    padding-left: 2em;
+    /* for qualified */
+    padding-right: 2em;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+/*
+table.tableau tr:first-child>td,
+table.tableau tr:last-child>td
+{
+    height: auto;
+}
+*/
+
+.tableau td {
+    height: var(--boite-height);
+    min-width: var(--boite-width);
+    padding: 3px;
+}
+
+.tableau td {
+    position: relative;
+}
+
+.tableau td.pair::before {
+    content: '-';
+    color: transparent;
+    background-color: transparent;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: 50%;
+    border-top: var(--boite-border);
+    z-index: -1;
+}
+
+.tableau td.pair:not(.qs)::before {
+    border-right: var(--boite-border);
+    border-top-right-radius: var(--boite-corner);
+}
+
+.tableau td.impair::before {
+    content: '-';
+    color: transparent;
+    background-color: transparent;
+    position: absolute;
+    bottom: 50%;
+    width: 100%;
+    height: 50%;
+    border-bottom: var(--boite-border);
+    z-index: -1;
+}
+
+.tableau td.impair:not(.qs)::before {
+    border-right: var(--boite-border);
+    border-bottom-right-radius: var(--boite-corner);
+}
+
+/* drop box TODO: ne couvre pas le club/score */
+.tableau .joueur {
+    border: 1px dashed transparent;
+    border-radius: 5px;
+    min-height: 2.5em;
+    transition: .3s;
+}
+
+.tableau .joueur:hover {
+    border-color: var(--front2);
+    background-color: var(--back2);
+    cursor: pointer;
+}
+
+
+.tableau .joueur>.nom,
+.tableau .club {
+    padding-right: 3em;
+}
+
+.tableau span.classement {
+    /* z-index: 2; */
+    border: 1px solid var(--front2);
+    border-radius: 3px;
+    color: var(--front2);
+    background-color: var(--back2);
+    padding: 0 .1em 0 .1em;
+    position: absolute;
+    right: 1em;
+    top: calc(50% - .7em);
+}
+
+.tableau span.qe {
+    position: absolute;
+    left: -1.5em;
+    top: calc(50% - .7em);
+}
+
+.tableau span.ts {
+    position: absolute;
+    left: -1.5em;
+    top: calc(50% - .7em);
+    border-radius: 50%;
+    border: 1px solid var(--front2);
+    color: var(--front2);
+    background-color: var(--back2);
+    padding: 0em .3em 0em .3em;
+}
+
+.tableau span.qs {
+    position: absolute;
+    left: calc(100% + .5em);
+    top: calc(50% - .7em);
+}

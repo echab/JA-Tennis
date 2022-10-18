@@ -1,0 +1,15 @@
+<template>
+	<ul class="nav nav-${type} ${vertical ? 'nav-stacked':''} ${justified ? 'nav-justified':''}">
+		<li repeat.for="item of tabs" class="uib-tab nav-item ${item.tab.active ? 'active':''} ${item.tab.disabled ? 'disabled':''} ${item.tab.classes}"
+		 	unselectable="on" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none; -o-user-select:none;" 
+		>
+			<a click.trigger="item.tab.select($event)" class="nav-link">${item.tab.heading}</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<slot></slot>
+		<!--<div repeat.for="tab of tabs" class="tab-pane ${active === tab.index ? 'active':''}">
+			<slot></slot>
+		</div>-->
+	</div>
+</template>

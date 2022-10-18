@@ -1,3 +1,5 @@
+import { Score } from "../../domain/types";
+
 export class ScoreFFT implements Score {
 
     private static reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
@@ -47,7 +49,8 @@ export class ScoreDeltaFFT {
     m_Jeu: { j1: number; j2: number; }[];
 
     constructor(score: string, fm: string) {
-        //TODO parse
+        const sets = score.matchAll(/\b(\d+\/\d+)\b/g);
+        this.m_Jeu = [...sets].map((m) => ({j1: parseInt(m[1]), j2: parseInt(m[2])}) );
         return;
     }
 

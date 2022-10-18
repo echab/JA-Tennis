@@ -1,18 +1,20 @@
 //TODO implement as a configurable feature
+// import('./fft');
 
-import  { CategoryFFT } from './fft/category';
-import  { LicenceFFT } from './fft/licence';
-import  { MatchFormatsFFT } from './fft/matchFormat';
-import  { RankFFT } from './fft/rank';
-import  { RankingFFT } from './fft/ranking';
-import  { ScoreFFT } from './fft/score';
-import { FFTValidation } from './fft/fftValidation';
-import { Validation } from './validation';
+import { Category, Licence, MatchFormats, Rank, Ranking, Score } from "../domain/types";
+import { CategoryFFT } from "./fft/category";
+import { LicenceFFT } from "./fft/licence";
+import { MatchFormatsFFT } from "./fft/matchFormat";
+import { RankFFT } from "./fft/rank";
+import { RankingFFT } from "./fft/ranking";
+import { ScoreFFT } from "./fft/score";
+import { FFTValidation } from "./fft/fftValidation";
+import { ValidationService } from "./validationService";
 
-export var category : Category = new CategoryFFT();
-export var licence : Licence = new LicenceFFT();
-export var matchFormat : MatchFormats = new MatchFormatsFFT();
-export var rank : Rank = new RankFFT();
-export var score : Score = new ScoreFFT();
-export var ranking : Ranking = new RankingFFT(score);
-export var validation : Validation = new FFTValidation();
+export const category: Category = new CategoryFFT();
+export const licence: Licence = new LicenceFFT();
+export const matchFormat: MatchFormats = new MatchFormatsFFT();
+export const rank: Rank = new RankFFT();
+export const score: Score = new ScoreFFT();
+export const ranking: Ranking = new RankingFFT(score);
+export const validation: ValidationService = new FFTValidation();

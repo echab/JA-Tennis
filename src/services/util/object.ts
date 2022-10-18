@@ -1,19 +1,17 @@
+const slice = [].slice;
 
-var slice = [].slice;
-
-export function extend(dst:any, src?:any) {
-    return baseExtend(dst, slice.call(arguments, 1), false);
+export function extend(dst: any, src?: any) {
+  return baseExtend(dst, slice.call(arguments, 1), false);
 }
 
-function baseExtend(dst, objs, deep) {
-
-  for (var i = 0, ii = objs.length; i < ii; ++i) {
-    var obj = objs[i];
+function baseExtend(dst: any, objs: any[], deep: boolean) {
+  for (let i = 0, ii = objs.length; i < ii; ++i) {
+    const obj = objs[i];
     if (!isObject(obj) && !isFunction(obj)) continue;
-    var keys = Object.keys(obj);
-    for (var j = 0, jj = keys.length; j < jj; j++) {
-      var key = keys[j];
-      var src = obj[key];
+    const keys = Object.keys(obj);
+    for (let j = 0, jj = keys.length; j < jj; j++) {
+      const key = keys[j];
+      const src = obj[key];
 
       if (deep && isObject(src)) {
         if (isDate(src)) {
@@ -44,9 +42,9 @@ function baseExtend(dst, objs, deep) {
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is an `Object` but not `null`.
  */
-export function isObject(value) {
+export function isObject(value: any): value is Object {
   // http://jsperf.com/isobject4
-  return value !== null && typeof value === 'object';
+  return value !== null && typeof value === "object";
 }
 
 /**
@@ -61,10 +59,9 @@ export function isObject(value) {
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is a `Date`.
  */
-export function isDate(value) {
-  return toString.call(value) === '[object Date]';
+export function isDate(value: any): value is Date {
+  return toString.call(value) === "[object Date]";
 }
-
 
 /**
  * @ngdoc function
@@ -78,7 +75,7 @@ export function isDate(value) {
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is an `Array`.
  */
-export var isArray = Array.isArray;
+export const isArray = Array.isArray;
 
 /**
  * @ngdoc function
@@ -92,14 +89,37 @@ export var isArray = Array.isArray;
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is a `Function`.
  */
-function isFunction(value) {return typeof value === 'function';}
+function isFunction(value: any): value is Function {
+  return typeof value === "function";
+}
 
 /**
  * For annotation of overridden methods
  */
-export function override(container, key, other1) {
-    var baseType = Object.getPrototypeOf(container);
-    if(typeof baseType[key] !== 'function') {
-        throw new Error('Method ' + key + ' of ' + container.constructor.name + ' does not override any base class method');
-    }
+export function override(container: any, key: string) {
+  const baseType = Object.getPrototypeOf(container);
+  if (typeof baseType[key] !== "function") {
+    throw new Error(
+      "Method " + key + " of " + container.constructor.name +
+        " does not override any base class method",
+    );
+  }
+}
+
+/**
+ * Predicate returning true if obj is defined.
+ * 
+ * To be used for functional programing with `Array.filter()`.
+ */
+export function defined<T extends {}>(obj: T | undefined): obj is T {
+  return !!obj;
+}
+
+/**
+ * Clone an object.
+ * 
+ * To be used for functional programing with `Array.map()`.
+ */
+ export function clone<T>(obj: T): T {
+  return { ...obj };
 }

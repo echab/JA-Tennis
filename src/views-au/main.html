@@ -1,0 +1,134 @@
+<template>
+<require from="./controls/ec-panel/ec-panelset"></require>
+<require from="./controls/ec-panel/ec-panel"></require>
+<require from="./controls/ec-panel/ec-badge"></require>
+<require from="./controls/ec-panel/ec-header"></require>
+<require from="./event/list-events"></require>
+<require from="./player/list-players"></require>
+<require from="./draw/draw-draw"></require>
+
+<!--
+<require from="../styles/app.css"></require>
+<require from="../styles/draw.css"></require>
+<require from="../styles/icons.css"></require>
+-->
+<link rel="stylesheet" href="styles/app.css">
+<link rel="stylesheet" href="styles/draw.css">
+<link rel="stylesheet" href="styles/icons.css">
+
+<ec-panelset>
+    <ec-panel class="tournament" is-open.two-way="tournamentOpened">
+        <ec-badge class="tournament"><i class="icon2-ball"></i></ec-badge>
+        <ec-header>
+            <h4><i class="icon2-info" click.trigger="tournamentEditor.edit(selection.tournament)"></i>
+                ${selection.tournament.info.name}
+            </h4>
+        </ec-header>
+        <div class="content">
+            <list-events class="inline" events.bind="selection.tournament.events"></list-events>
+
+            <div app-version></div>
+        </div>
+        <div class="footer">
+            <div class="btn-group">
+                <button class="btn" click.trigger="tournamentEditor.create()"><i class="glyphicon glyphicon-file"></i> New</button>
+                <button class="btn" click.trigger="tournamentEditor.load()"><i class="icon2-open"></i> Open</button>
+                <!--<span ec-input-file onloaded="tournamentEditor.load(file)"><i class="icon2-open"></i> Open</span>-->
+                <button class="btn" click.trigger="tournamentEditor.save()"><i class="icon2-save"></i> Save</button>
+            </div>
+            <div class="btn-group">
+                <button class="btn" disabled.bind="!undo.canUndo" click.trigger="doUndo()"><i class="icon2-undo" title="Undo ${undo.messageUndo}"></i></button>
+                <button class="btn" disabled.bind="!undo.canRedo" click.trigger="doRedo()"><i class="icon2-redo" title="Redo ${undo.messageRedo}"></i></button>
+            </div>
+            <button class="btn" click.trigger="eventEditor.add(selection.event)"><i class="glyphicon glyphicon-plus"></i> Add event</button>
+        </div>
+    </ec-panel><ec-panel class="players" is-open.two-way="playersOpened">
+        <ec-badge class="players"><i class="icon2-player"></i></ec-badge>
+        <ec-header>Players</ec-header>
+        <div class="content">
+            <list-players players.bind="selection.tournament.players"></list-players>
+        </div>
+        <div class="footer">
+            <form class="form-horizontal">
+                <button class="btn" click.trigger="playerEditor.add()"><i class="glyphicon glyphicon-plus"></i> Add player</button>
+            </form>
+        </div>
+    </ec-panel><ec-panel class="draws" is-open.two-way="drawsOpened">
+        <ec-badge class="draws"><i class="icon2-draw"></i></ec-badge>
+        <ec-header>
+            <form class="form-horizontal">
+                <select value.one-way="selection.event.id" change.trigger="selection.select($event.target.value, selection.modelTypeEvent)" 
+                    class="span2" title="Select an event">
+                    <option value="null">&lt; select an event &gt;</option>
+                    <option repeat.for="evt of selection.tournament.events" value.bind="evt.id">${evt.name}</option> 
+                </select>
+
+                <i class="icon2-info" click.trigger="drawEditor.edit(selection.draw)" disabled.bind="!selection.draw" title="Edit draw properties"></i>
+                <select value.one-way="selection.draw.id" change.trigger="selection.select($event.target.value, selection.modelTypeDraw)"
+                    class="span2" title="Select a draw">
+                    <option repeat.for="draw of selection.event.draws" value.bind="draw.id">${draw.name}</option> 
+                </select>
+                
+                <div class="btn-group" title="Lock/unlock the draw modifications">
+                    <label class="btn ${selection.draw.mode === drawEditor.modeBuild ? 'selected':''}" title="Switch to draw build mode">
+                        <input type="radio" style="display:none;" name="drawMode" checked.bind="selection.draw.mode" model.bind="drawEditor.modeBuild" disabled.bind="!selection.draw" />
+                        <i class="icon2-draw"></i>
+                    </label>
+                    <label class="btn ${selection.draw.mode === drawEditor.modePlan ? 'selected':''}" title="Switch to planning mode">
+                        <input type="radio" style="display:none;" name="drawMode" checked.bind="selection.draw.mode" model.bind="drawEditor.modePlan" disabled.bind="!selection.draw" />
+                        <i class="icon2-planning"></i>
+                    </label>
+                    <label class="btn ${selection.draw.mode === drawEditor.modePlay ? 'selected':''}" title="Switch to match mode">
+                        <input type="radio" style="display:none;" name="drawMode" checked.bind="selection.draw.mode" model.bind="drawEditor.modePlay" disabled.bind="!selection.draw" />
+                        <i class="icon2-match"></i>
+                    </label>
+                    <label class="btn ${selection.draw.mode === drawEditor.modeLock ? 'selected':''}" title="Lock the draw">
+                        <input type="radio" style="display:none;" name="drawMode" checked.bind="selection.draw.mode" model.bind="drawEditor.modeLock" disabled.bind="!selection.draw" />
+                        <i class="icon2-locker"></i>
+                    </label>
+                </div>
+            </form>
+        </ec-header>
+        <div class="content">
+            <draw-draw draw.bind="selection.draw" class="inline" style="position:relative;"></draw-draw>
+
+            <div class="inline">
+                Validation errors:
+                <ul>
+                    <li repeat.for="error of validation.getErrorDraw(selection.draw)" click.trigger="selection.selectByError(selection.draw, error)">${error.message + ' '+ error.detail}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">
+            <form class="form-horizontal">
+                <button class="btn" click.trigger="drawEditor.add(selection.draw)" disabled.bind="!selection.event"><i class="glyphicon glyphicon-plus"></i> Add draw</button>
+                <template if.bind="selection.draw.mode === drawEditor.modeBuild">
+                    <button class="btn"
+                            click.trigger="drawEditor.generate(selection.draw, GenerateType.Create)" disabled.bind="!selection.draw">
+                        <i class="icon2-draw-generate"></i> Generate
+                    </button>
+                    <div class="btn-group">
+                        <button class="btn" click.trigger="drawEditor.generate(selection.draw, GenerateType.PlusEchelonne)" disabled.bind="!selection.draw || selection.draw.type >= 2" title="Phased draw more"><i class="icon2-draw-left"></i></button>
+                        <button class="btn" click.trigger="drawEditor.generate(selection.draw, GenerateType.PlusEnLigne)" disabled.bind="!selection.draw || selection.draw.type >= 2" title="Phased draw less"><i class="icon2-draw-bottom"></i></button>
+                        <button class="btn" click.trigger="drawEditor.generate(selection.draw, GenerateType.Mix)" disabled.bind="!selection.draw" title="Mix the players"><i class="icon2-random"></i></button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" click.trigger="drawEditor.updateQualif(selection.draw)" disabled.bind="!selection.draw" title="Set or reset the in qualified"><i class="icon2-qualif-in"></i></button>
+                    </div>
+                </template>
+                <div class="btn-group">
+                    <button class="btn" click.trigger="drawEditor.validate(selection.draw)" disabled.bind="!selection.draw" title="Check the draw"><i class="icon2-checkmark"></i> Check</button>
+                </div>
+            </form>
+        </div>
+    </ec-panel><ec-panel is-open.two-way="planningOpened" class="planning">
+        <ec-badge class="planning"><i class="icon2-planning"></i></ec-badge>
+        <ec-header>Planning</ec-header>
+        <div class="content">
+            Not implemented.
+        </div>
+        <div class="footer">
+        </div>
+    </ec-panel>
+</ec-panelset>
+</template>

@@ -1,3 +1,5 @@
+import { Rank, RankString, RankGroupString } from "../../domain/types";
+
 export class RankFFT implements Rank {
 
     private _group: { [groupName: string]: string } = {
@@ -28,6 +30,9 @@ export class RankFFT implements Rank {
         }
     }
 
+    first() {
+        return this._ranks[0];
+    }
     list() {
         return this._ranks;
     }

@@ -1,0 +1,89 @@
+﻿<template>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                    <h4>${title}
+                        <!--<small>Id: ${event.id}</small>-->${event.name}</h4>
+                </div>
+                <div class="modal-body">
+
+                    <!--<div class="control-group">
+                        <label for="name" class="control-label">Name:</label>
+                        <div class="controls">
+                            <input type="text" id="name" value.bind="event.name" required />*
+                        </div>
+                    </div>-->
+
+                    <div class="row form-group">
+                        <label for="name" class="col-xs-3">Name:</label>
+                        <input id="name" type="text" value.bind="event.name" required class="col-xs-8" autofocus attach-focus="true" />
+                        <!--<span class="error" show.bind="eventForm.name.$error.required">Required!</span>-->
+                    </div>
+                    <div class="row form-group">
+                        <label for="category" class="col-xs-3">Category:</label>
+                        <select id="category" type="text" value.bind="event.category" class="col-xs-3">
+                            <option repeat.for="value of categories">${value}</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label for="maxrank" class="col-xs-3">Max Rank:</label>
+                        <select id="maxrank" type="text" value.bind="event.maxRank" class="col-xs-3">
+                            <option repeat.for="value of ranks">${value}</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label for="start" class="col-xs-3">Date start:</label>
+                        <input id="start" type="date" value.bind="event.start" class="col-xs-4" />
+                    </div>
+                    <div class="row form-group">
+                        <label for="end" class="col-xs-3">End:</label>
+                        <input id="end" type="date" value.bind="event.end" class="col-xs-4" />
+                    </div>
+                    <!--<div class="row form-group">
+                        <label class="col-xs-4">Registrations:</label>
+                        <div class="offset2">
+                            <ul class="col-xs-3 unstyled">
+                                <li repeat.for="player of registred">
+                                    <label><input type="checkbox" checked.bind="player.registration" model.bind="event.id" /> ${player.name}</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>-->
+                    <hr/>
+                    <div class="row form-group">
+                        <label class="col-xs-3">Draws:</label>
+                        <div style="display:inline-block">
+                            <div repeat.for="draw of event.draws">
+                                <span><i class="icon2-draw"></i> ${draw.name}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" disabled.bind="!!eventForm.$error.required" class="btn btn-primary btn-success ${!!eventForm.$error.required ? 'disabled':''}">
+                        <i class="glyphicon glyphicon-ok-sign icon-white"></i> OK
+                    </button>
+                    <a href="#" click.trigger="controller.ok('Del')"><i class="glyphicon glyphicon-trash"></i></a>
+                </div>
+                <!--<fieldset>
+                    <legend>Coordinate</legend>
+                    <div>
+                    </div>
+
+                    <div>
+                        <label>
+                            Rank:
+                            <select type="text" value.bind="event.rank">
+                                <option repeat.for="value of ranks">${value}</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>-->
+                <!--${ eventForm.$error }-->
+            </form>
+        </div>
+    </div>
+</template>

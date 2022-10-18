@@ -1,3 +1,5 @@
+import { MatchFormats, MatchFormat } from "../../domain/types";
+
 export class MatchFormatsFFT implements MatchFormats {
 
     private _matchFormats: { [code: string]: MatchFormat } = {

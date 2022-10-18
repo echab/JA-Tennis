@@ -1,8 +1,9 @@
-﻿import { DrawEditor } from '../drawEditor';
-import { Find } from '../util/find';
-import { Guid } from '../util/guid';
+﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup } from '../drawService';
 import { isArray } from '../util/object';
-import { LibLocator } from '../libLocator';
+import { Draw, Box, DrawType, Match } from '../../domain/draw';
+import { Player, PlayerIn } from '../../domain/player';
+import { drawLib, GenerateType } from './drawLib';
+import { TEvent } from '../../domain/tournament';
 
 var MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
@@ -10,20 +11,20 @@ var MAX_TETESERIE = 32,
 
 export abstract class DrawLibBase {
 
-    abstract nbColumnForPlayers(draw: Draw, nJoueur: number): number;
-    abstract getSize(draw: Draw): ISize;
-    abstract computePositions(draw: Draw): IPoint[];
-    abstract resize(draw: Draw, oldDraw?: Draw, nJoueur?: number): void;
-    abstract generateDraw(draw: Draw, generate: GenerateType, afterIndex: number): Draw[];
+    constructor(public event: TEvent, public draw: Draw) {}
 
-    resetDraw(draw: Draw, nPlayer: number): void {
+    abstract nbColumnForPlayers( nJoueur: number): number;
+    abstract resize( oldDraw?: Draw, nJoueur?: number): void;
+    abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
+
+    resetDraw( nPlayer: number): void {
         //remove qualif out
-        var next = DrawEditor.nextGroup(draw);
-        if (next && draw.boxes) {
+        var next = nextGroup(this.draw);
+        if (next && this.draw.boxes) {
             for (var i = 0; i < next.length; i++) {
                 var boxes = next[i].boxes;
                 if (boxes) {
-                    var drawLibNext = LibLocator.drawLibFor( next[i]);
+                    var drawLibNext = drawLib(this.event, next[i]);
                     for (var b = 0; b < boxes.length; b++) {
                         var box = <Match> boxes[b];
                         if (box && box.qualifOut) {
@@ -35,14 +36,14 @@ export abstract class DrawLibBase {
         }
 
         //reset boxes
-        var lib = LibLocator.drawLibFor( draw);
-        draw.boxes = [];
-        draw.nbColumn = lib.nbColumnForPlayers(draw, nPlayer);
+        // var lib = drawLib(this.event, this.draw); // TODO lib === this
+        this.draw.boxes = [];
+        this.draw.nbColumn = this.nbColumnForPlayers(nPlayer);
     }
 
-    getPlayer(box: Box): Player {
-        return Find.byId(box._draw._event._tournament.players, box.playerId);
-    }
+    // getPlayer(box: Box): Player {
+    //     return byId(box._draw._event._tournament.players, box.playerId);
+    // }
 
     //setType(BYTE iType) {
     //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
@@ -50,8 +51,8 @@ export abstract class DrawLibBase {
 
     //        //Efface les boites si poule et plus poule ou l'inverse
     //        for (; m_nBoite > 0; m_nBoite--) {
-    //            delete draw.boxes[m_nBoite - 1];
-    //            draw.boxes[m_nBoite - 1] = NULL;
+    //            delete this.draw.boxes[m_nBoite - 1];
+    //            this.draw.boxes[m_nBoite - 1] = NULL;
     //        }
     //        m_nColonne = 0;
     //        m_nQualifie = 0;
@@ -64,9 +65,9 @@ export abstract class DrawLibBase {
         return isMatch(box) && (!!box.place || !!box.date);
     }
 
-    findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn {    //FindTeteSerie
+    findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn | undefined {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-        var group = isArray(origin) ? <Draw[]>origin : DrawEditor.group(<Draw>origin);
+        var group = isArray(origin) ? origin : groupDraw(origin);
         for (var i = 0; i < group.length; i++) {
             var boxes = group[i].boxes;
             for (var j = 0; j < boxes.length; j++) {
@@ -76,7 +77,7 @@ export abstract class DrawLibBase {
                 }
             }
         }
-        return null;
+        return undefined;
     }
 
     /**
@@ -97,44 +98,45 @@ export abstract class DrawLibBase {
 //             return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
 //         }
 // 
-//         computeScore(draw: Draw): boolean {
-//             return this._drawLibs[draw.type].computeScore(draw);
+//         computeScore(): boolean {
+//             return this._drawLibs[this.draw.type].computeScore(this.draw);
 //         }
 
     //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
-    putPlayer(box: Box, player: Player, bForce?: boolean): boolean {   //MetJoueur
+    putPlayer(box: Box, playerId: string, bForce?: boolean): boolean {   //MetJoueur
 
         //ASSERT(MetJoueurOk(box, iJoueur, bForce));
 
-        if (box.playerId !== player.id && box.playerId) {
+        if (box.playerId !== playerId && box.playerId) {
             if (!this.removePlayer(box)) {		//Enlève le joueur précédent
-                throw 'Error';
+                throw new Error('error');
             }
         }
 
-        var boxIn = <PlayerIn>box;
-        var match = isMatch(box) ? <Match>box : undefined;
-        box.playerId = player.id;
-        box._player = player;
+        const boxIn = box as PlayerIn;
+        var match = isMatch(box) ? box as Match : undefined;
+        box.playerId = playerId;
+        // box._player = player;
         //boxIn.order = 0;
         //match.score = '';
 
-        if (isGauchePoule(box)) {
+        if (this.isGauchePoule(box)) {
             //TODO boxIn.rank = 0;   //classement de la poule
         } else if (match) {
             match.date = undefined;
             match.place = undefined;
         }
 
-        var boxOut = <Match>box;
+        var boxOut = box as Match;
         if (boxOut.qualifOut) {
-            var next = DrawEditor.nextGroup(box._draw);
+            var next = nextGroup(this.draw);
             if (next) {
-                var boxIn = DrawEditor.groupFindPlayerIn(next, boxOut.qualifOut);
-                if (boxIn) {
+                const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+                if (boxIn && d) {
+                    const lib = drawLib(this.event, d);
                     if (!boxIn.playerId
-                        && !this.putPlayer(boxIn, player, true)) {
-                        throw 'Error';
+                        && !lib.putPlayer(boxIn, playerId, true)) {
+                        throw new Error('error');
                     }
                 }
             }
@@ -143,27 +145,27 @@ export abstract class DrawLibBase {
         ////Lock les adversaires (+ tableau précédent si qualifié entrant)
         //if( isMatchJoue( box))	//if( isMatchJouable( box))
         //{
-        //    lockBox( ADVERSAIRE1(box));
-        //    lockBox( ADVERSAIRE2(box));
+        //    lockBox( this.ADVERSAIRE1(box));
+        //    lockBox( this.ADVERSAIRE2(box));
         //}
 
         ////Lock les boites du match, si on a ajouter un des deux adversaires aprés le résultat...
-        //if( isTypePoule()) {
-        //    if( isGauchePoule( box)) {
+        //if( this.isTypePoule()) {
+        //    if (this.isGauchePoule( box)) {
         //        //matches de la ligne
-        //        for( i=ADVERSAIRE1( box) - GetnColonne(); i>= iBoiteMin(); i -= GetnColonne()) {
+        //        for( i=this.ADVERSAIRE1( box) - GetnColonne(); i>= iBoiteMin(); i -= GetnColonne()) {
         //            if( i != box && isMatchJoue( i)) {
         //                lockBox( box);
-        //                lockBox( ADVERSAIRE1( i));
-        //                lockBox( ADVERSAIRE2( i));
+        //                lockBox( this.ADVERSAIRE1( i));
+        //                lockBox( this.ADVERSAIRE2( i));
         //            }
         //        }
         //        //matches de la colonne
         //        for( i=iHautCol( iRowPoule( box, GetnColonne())); i>= iBasColQ( iRowPoule( box, GetnColonne())); i --) {
         //            if( i != box && isMatchJoue( i)) {
         //                lockBox( box);
-        //                lockBox( ADVERSAIRE1( i));
-        //                lockBox( ADVERSAIRE2( i));
+        //                lockBox( this.ADVERSAIRE1( i));
+        //                lockBox( this.ADVERSAIRE2( i));
         //            }
         //        }
         //    }
@@ -187,26 +189,25 @@ export abstract class DrawLibBase {
 
         //v0998
         //	//Check changement de vainqueur par vainqueur défaillant
-        //	if( !isTypePoule())
+        //	if( !this.isTypePoule())
         //	if( boite.score.isVainqDef()) {
-        //		if( boite.m_iJoueur == boxes[ ADVERSAIRE1(box)]->m_iJoueur)
-        //			boite.m_iJoueur = boxes[ ADVERSAIRE2(box)]->m_iJoueur;
+        //		if( boite.m_iJoueur == boxes[ this.ADVERSAIRE1(box)]->m_iJoueur)
+        //			boite.m_iJoueur = boxes[ this.ADVERSAIRE2(box)]->m_iJoueur;
         //		else
-        //			boite.m_iJoueur = boxes[ ADVERSAIRE1(box)]->m_iJoueur;
+        //			boite.m_iJoueur = boxes[ this.ADVERSAIRE1(box)]->m_iJoueur;
         //	}
 
         if (boite.playerId) {
-            if (!this.putPlayer(box, boite._player)) {
-                throw 'Error';
+            if (!this.putPlayer(box, boite.playerId)) {
+                throw new Error('error');
             }
         } else if (!this.removePlayer(box)) {
-            throw 'Error';
+            throw new Error('error');
         }
 
         box.score = boite.score;
 
-        var lib = LibLocator.drawLibFor(box._draw);  
-        lib.computeScore(box._draw);
+        drawLib(this.event, this.draw).computeScore();
 
         return true;
     }
@@ -246,41 +247,41 @@ export abstract class DrawLibBase {
     //Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
     removePlayer(box: Box, bForce?: boolean): boolean {   //EnleveJoueur
 
-        var match = <Match>box;
+        const match = box as Match;
         if (!match.playerId && !match.score) {
             return true;
         }
 
         //ASSERT(EnleveJoueurOk(box, bForce));
 
-        var next = DrawEditor.nextGroup(box._draw);
-        var boxOut = <Match> box;
-        var i: number;
-        if ((i = boxOut.qualifOut) && next) {
-            var boxIn = DrawEditor.groupFindPlayerIn(next, i);
-            if (boxIn) {
-                if (!this.removePlayer(boxIn, true)) {
-                    throw 'Error';
+        const next = nextGroup(this.draw);
+        const boxOut = box as Match;
+        if (boxOut.qualifOut && next) {
+            const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+            if (boxIn && d) {
+                const lib = drawLib(this.event, d);
+                if (!lib.removePlayer(boxIn, true)) {
+                    throw new Error('error');
                 }
             }
         }
 
-        box.playerId = box._player = undefined;
+        box.playerId = undefined;
         if (isMatch(box)) {
             match.score = '';
         }
 
-        var boxIn = <PlayerIn>box;
+        const boxIn = box as PlayerIn;
         //delete boxIn.order;
         /*
             //Delock les adversaires
-            if( isTypePoule()) {
+            if( this.isTypePoule()) {
                 if( isMatch( box)) {
                     //Si pas d'autre matches dans la ligne, ni dans la colonne
                     BOOL bMatch = false;
 
                     //matches de la ligne
-                    for( i=ADVERSAIRE1( box) - GetnColonne(); 
+                    for( i=this.ADVERSAIRE1( box) - GetnColonne(); 
                         i>= iBoiteMin() && !bMatch; 
                         i -= GetnColonne()) 
                     {
@@ -290,8 +291,8 @@ export abstract class DrawLibBase {
                         }
                     }
                     //matches de la colonne
-                    for( i=iHautCol( iRowPoule( ADVERSAIRE1( box), GetnColonne())); 
-                        i>= iBasColQ( iRowPoule( ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
+                    for( i=iHautCol( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())); 
+                        i>= iBasColQ( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
                         i --) 
                     {
                         if( i != box && boxes[ i]->isLock()) {
@@ -300,11 +301,11 @@ export abstract class DrawLibBase {
                         }
                     }
                     if( !bMatch)
-                        unlockBox( ADVERSAIRE1(box));
+                        unlockBox( this.ADVERSAIRE1(box));
 
                     bMatch = false;
                     //matches de la ligne
-                    for( i=ADVERSAIRE2( box) - GetnColonne(); 
+                    for( i=this.ADVERSAIRE2( box) - GetnColonne(); 
                         i>= iBoiteMin() && !bMatch; 
                         i -= GetnColonne())
                     {
@@ -314,8 +315,8 @@ export abstract class DrawLibBase {
                         }
                     }
                     //matches de la colonne
-                    for( i=iHautCol( iRowPoule( ADVERSAIRE2( box), GetnColonne())); 
-                        i>= iBasColQ( iRowPoule( ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
+                    for( i=iHautCol( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())); 
+                        i>= iBasColQ( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
                         i --) 
                     {
                         if( i != box && boxes[ i]->isLock()) {
@@ -324,16 +325,16 @@ export abstract class DrawLibBase {
                         }
                     }
                     if( !bMatch)
-                        unlockBox( ADVERSAIRE2(box));
+                        unlockBox( this.ADVERSAIRE2(box));
         
                 }
 
                 this.computeScore(box._draw);
                 //TODO Poule, Unlock
             } else
-            if(  ADVERSAIRE1(box) <= iBoiteMax()) {
-                unlockBox( ADVERSAIRE1(box));
-                unlockBox( ADVERSAIRE2(box));
+            if(  this.ADVERSAIRE1(box) <= iBoiteMax()) {
+                unlockBox( this.ADVERSAIRE1(box));
+                unlockBox( this.ADVERSAIRE2(box));
             }
         */
         return true;
@@ -343,8 +344,8 @@ export abstract class DrawLibBase {
     lockBox(box: Box): boolean {    //LockBoite
         ASSERT(!!box);
 
-        if (iDiagonale(box) === box.position) {
-            ///TODO box = ADVERSAIRE1(box);
+        if (this.iDiagonale(box) === box.position) {
+            ///TODO box = this.ADVERSAIRE1(box);
         }
 
         ASSERT(!!box);
@@ -356,11 +357,11 @@ export abstract class DrawLibBase {
 
         box.locked = true;
 
-        var prev = DrawEditor.previousGroup(box._draw);
+        var prev = previousGroup(this.draw);
         if (prev) {
-            var boxIn = <PlayerIn>box;
+            var boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                var boxOut = DrawEditor.groupFindPlayerOut(prev, boxIn.qualifIn);
+                var [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -379,11 +380,11 @@ export abstract class DrawLibBase {
 
         delete box.locked;
 
-        var prev = DrawEditor.previousGroup(box._draw);
+        var prev = previousGroup(this.draw);
         if (prev) {
-            var boxIn = <PlayerIn>box;
+            var boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                var boxOut = DrawEditor.groupFindPlayerOut(prev, boxIn.qualifIn);
+                var [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }
@@ -397,59 +398,61 @@ export abstract class DrawLibBase {
     fillBox(box: Box, source: Box): boolean {   //RempliBoite
         //ASSERT(RempliBoiteOk(box, boite));
 
-        var lib = LibLocator.drawLibFor(box._draw);
+        var lib = drawLib(this.event, this.draw);
 
-        var boxIn = <PlayerIn>box;
-        var sourceIn = <PlayerIn>source;
-        var match = isMatch(box) ? <Match>box : undefined;
-        var sourceMatch = isMatch(source) ? <Match>source : undefined;
+        var boxIn = box as PlayerIn;
+        var sourceIn = source as PlayerIn;
+        var match = isMatch(box) ? box as Match : undefined;
+        var sourceMatch = isMatch(source) ? source as Match : undefined;
 
         if (boxIn.qualifIn
             && boxIn.qualifIn !== sourceIn.qualifIn) {
 
             if (!lib.setPlayerIn(box)) {	//Enlève
-                throw 'Error';
+                throw new Error('error');
             }
         } else {
             //Vide la boite écrasée
             if (!this.removePlayer(box)) {	//enlève le joueur, le score
-                throw 'Error';
+                throw new Error('error');
             }
 
             delete boxIn.qualifIn;
             delete boxIn.seeded;
-            delete match.qualifOut;
+            if (match) {
+                delete match.qualifOut;
 
-            if (this.isSlot(match)) {
-                if (!this.removeSlot(match)) {
-                    throw 'Error';
+                if (this.isSlot(match)) {
+                    if (!this.removeSlot(match)) {
+                        throw new Error('error');
+                    }
                 }
             }
         }
 
         //Rempli avec les nouvelles valeurs
         if (sourceIn.qualifIn) {
-            if (!lib.setPlayerIn(box, sourceIn.qualifIn, source._player)) {
-                throw 'Error';
+            if (!lib.setPlayerIn(box, sourceIn.qualifIn, source.playerId)) {
+                throw new Error('error');
             }
         } else {
             if (source.playerId) {
-                if (!this.putPlayer(box, source._player)) {
-                    throw 'Error';
+                if (!this.putPlayer(box, source.playerId)) {
+                    throw new Error('error');
                 }
-                if (match) {
+                if (match && sourceMatch) {
                     match.score = sourceMatch.score;
                 }
             }
 
-            if (!isTypePoule(box._draw) && sourceIn.seeded) {
+            if (!this.isTypePoule() && sourceIn.seeded) {
                 boxIn.seeded = sourceIn.seeded;
             }
 
-            if (match) {
+            if (match && sourceMatch) {
                 if (sourceMatch.qualifOut) {
                     if (!lib.setPlayerOut(match, sourceMatch.qualifOut)) {
-                        throw 'Error';
+                        throw new Error('error');
                     }
                 }
 
@@ -460,12 +463,12 @@ export abstract class DrawLibBase {
                     && (sourceMatch.place || sourceMatch.date)
                     ) {
                     if (!this.putSlot(match, sourceMatch)) {
-                        throw 'Error';
+                        throw new Error('error');
                     }
                 }
 
                 if (!this.putTick(box, source)) {
-                    throw 'Error';
+                    throw new Error('error');
                 }
                 match.matchFormat = sourceMatch.matchFormat;
 
@@ -473,7 +476,7 @@ export abstract class DrawLibBase {
             }
         }
 
-        lib.computeScore(box._draw);
+        lib.computeScore();
 
         return true;
     }
@@ -481,14 +484,14 @@ export abstract class DrawLibBase {
     movePlayer(box: Box, boiteSrc: Box, pBoite: Box): boolean {  //DeplaceJoueur
         //ASSERT(DeplaceJoueurOk(box, iBoiteSrc, pBoite));
 
-        boiteSrc = DrawEditor.newBox(box._draw, boiteSrc);
+        boiteSrc = newBox(this.draw, boiteSrc);
 
         if (!this.fillBox(boiteSrc, pBoite)) {	//Vide la source
-            throw 'Error';
+            throw new Error('error');
         }
 
         if (!this.fillBox(box, boiteSrc)) {	//Rempli la destination
-            throw 'Error';
+            throw new Error('error');
         }
 
         return true;
@@ -497,41 +500,40 @@ export abstract class DrawLibBase {
     // boxesOpponents(match: Match): { box1: Box; box2: Box } {
     //     return this._drawLibs[match._draw.type].boxesOpponents(match);
     // }
+
+    isTypePoule(): boolean {
+        return this.draw.type === DrawType.PouleSimple || this.draw.type === DrawType.PouleAR;
+    }
+    
+    iDiagonale(box: Box): number {
+        var draw = this.draw;
+        return this.isTypePoule() ? (box.position % this.draw.nbColumn) * (this.draw.nbColumn + 1) : box.position;
+    }
+    isGauchePoule(box: Box): boolean {
+        return this.isTypePoule() ? (box.position >= (this.draw.nbColumn * this.draw.nbColumn)) : false;
+    }
+    
+    ADVERSAIRE1(box: Box): number {
+        if (this.isTypePoule()) {
+            var n = this.draw.nbColumn;
+            return box.position % n + n * n;
+        } else {
+            return (box.position << 1) + 2;
+        }
+    }
+    ADVERSAIRE2(box: Box): number {
+        if (this.isTypePoule()) {
+            var n = this.draw.nbColumn;
+            return Math.floor(box.position / n) + n * n;
+        } else {
+            return (box.position << 1) + 1;
+        }
+    }
 }
 
 function isMatch(box: Box): boolean {
-    return box && ('undefined' !== typeof (<Match>box).score);
+    return box && ('undefined' !== typeof (box as Match).score);
 }
-
-//TODO move roundrobin specific code to roundrobin.ts
-function isTypePoule(draw: Draw): boolean {
-    return draw.type === DrawType.PouleSimple || draw.type === DrawType.PouleAR;
-}
-
-function iDiagonale(box: Box): number {
-    var draw = box._draw;
-    return isTypePoule(box._draw) ? (box.position % draw.nbColumn) * (draw.nbColumn + 1) : box.position;
-}
-function isGauchePoule(box: Box): boolean {
-    return isTypePoule(box._draw) ? (box.position >= (box._draw.nbColumn * box._draw.nbColumn)) : false;
-}
-
-function ADVERSAIRE1(box: Box): number {
-    if (isTypePoule(box._draw)) {
-        var n = box._draw.nbColumn;
-        return box.position % n + n * n;
-    } else {
-        return (box.position << 1) + 2;
-    }
-};
-function ADVERSAIRE2(box: Box): number {
-    if (isTypePoule(box._draw)) {
-        var n = box._draw.nbColumn;
-        return Math.floor(box.position / n) + n * n;
-    } else {
-        return (box.position << 1) + 1;
-    }
-};
 
 function ASSERT(b: boolean, message?: string): void {
     if (!b) {

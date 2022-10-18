@@ -1,3 +1,4 @@
+import { Ranking, Score } from '../../domain/types';
 import { ScoreFFT,ScoreDeltaFFT} from './score';
 
 export class RankingFFT implements Ranking {
@@ -15,10 +16,10 @@ export class RankingFFT implements Ranking {
         "Différence de Jeux:"
     ];
 
-    private Points: number = 0;
-    private dPoint: number;
-    private dSet2: number;
-    private dJeu: number;
+    private Points = 0;
+    private dPoint = 0;
+    private dSet2 = 0;
+    private dJeu = 0;
 
     //- le nombre de sets des matchs (3 ou 5)
     //art52               |  Points  |   Sets   |   Jeux   |
@@ -46,6 +47,7 @@ export class RankingFFT implements Ranking {
             case 0: return this.dPoint.toString();
             case 1: return Math.floor(this.dSet2 / 2).toString();
             case 2: return this.dJeu.toString();
+            default: return '';
         }
     }
 

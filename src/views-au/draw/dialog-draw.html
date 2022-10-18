@@ -1,0 +1,73 @@
+﻿<template>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form submit.trigger="controller.ok('Ok')" class="modal-form form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" click.trigger="controller.cancel()">&times;</button>
+                    <h4>${title} ${draw.name} <!--<small>Id: ${draw.id}</small>--></h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row form-group">
+                        <label for="name" class="col-xs-3">Name:</label>
+                        <input id="name" type="text" value.bind="draw.name" required class="col-xs-8" autofocus attach-focus="true" />
+                        <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+                    </div>
+
+                    <div class="row form-group">
+                        <label for="type" class="col-xs-3">Type:</label>
+                        <select id="type" value.bind="draw.type" required class="col-xs-4">
+                            <option repeat.for="type of drawTypes" model.bind="type.value">${type.label}</option>
+                        </select>
+                        <!--<span class="error" show.bind="drawForm.name.$error.required">Required!</span>-->
+                    </div>
+
+                    <div class="row form-group">
+                        <label for="rankfrom" class="col-xs-3">Rank, from:</label>
+                        <select id="rankfrom" value.bind="draw.minRank" class="col-xs-2">
+                            <option model.bind="undefined"></option> 
+                            <option repeat.for="value of ranks">${value}</option> 
+                        </select>
+                        <label for="rankto" class="col-xs-2">to:</label>
+                        <select id="rankto" value.bind="draw.maxRank" class="col-xs-2">
+                            <option model.bind="undefined"></option> 
+                            <option repeat.for="value of ranks">${value}</option> 
+                        </select>
+                    </div>
+
+                    <div class="row form-group">
+                        <span class="col-xs-3"></span>
+                        <label>${getRegisteredCount()} registered</label>
+                    </div>
+
+                    <fieldset>
+                        <legend>Dimensions:</legend>
+                        <!--<div class="row form-group">
+                            <label class="col-xs-4">
+                                Entries:
+                                <input type="number" readonly value.bind="getNbEntry()" class="col-xs-2"/>
+                            </label>
+                        </div>-->
+                        <div class="row form-group">
+                            <label for="nbColumn" class="col-xs-3">Columns:</label>
+                            <input id="nbColumn" type="number" value.bind="draw.nbColumn" min="2" max="9" required class="col-xs-2" />
+                        </div>
+                        <div class="row form-group">
+                            <label for="nbOut" class="col-xs-3">Outputs:</label>
+                            <input id="nbOut" type="number" value.bind="draw.nbOut" min="1" max="16" required class="col-xs-2" />
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" click.trigger="controller.ok('Generate')" disabled.bind="!!drawForm.$error.required" class="btn btn-success ${!!drawForm.$error.required ? 'disabled' :''}">
+                        <i class="icon2-draw-generate"></i> Generate
+                    </button>
+                    <button type="submit" disabled.bind="!!drawForm.$error.required" class="btn btn-primary btn-success ${!!drawForm.$error.required ? 'disabled': ''}">
+                        <i class="glyphicon glyphicon-ok-sign icon-white"></i> OK
+                    </button>
+                    <a href="#" click.trigger="controller.ok('Del')"><i class="glyphicon glyphicon-trash"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>

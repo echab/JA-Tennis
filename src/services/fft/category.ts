@@ -1,3 +1,5 @@
+import { Category, CategoryString } from "../../domain/types";
+
 export class CategoryFFT implements Category {
 
     // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf
@@ -34,14 +36,14 @@ export class CategoryFFT implements Category {
 
     constructor() {
 
-        var now = new Date();
-        var refDate = new Date(now.getFullYear(), 9, 1);    //1er Octobre
+        const now = new Date();
+        const refDate = new Date(now.getFullYear(), 9, 1);    //1er Octobre
         this.currentYear = now.getFullYear() + (now > refDate ? 1 : 0);
 
-        for (var c in this._category) {
+        for (const c in this._category) {
             this._categories.push(c);
         }
-        for (var i = this._categories.length - 1; i >= 0; i--) {
+        for (let i = this._categories.length - 1; i >= 0; i--) {
             this._index[this._categories[i]] = i;
         }
     }
@@ -55,21 +57,23 @@ export class CategoryFFT implements Category {
     }
 
     compare(category1: string, category2: string): number {
-        var i = this._index[category1],
+        const i = this._index[category1],
             j = this._index[category2];
         return i - j;
     }
 
     getAge(date: Date): number {
-        //var age = (new Date(refDate - date)).getFullYear() - _beginOfTime.getFullYear() -1;
-        var age = this.currentYear - date.getFullYear();
+        //const age = (new Date(refDate - date)).getFullYear() - _beginOfTime.getFullYear() -1;
+        const age = this.currentYear - date.getFullYear();
         return age;
     }
 
     ofDate(date: Date): string {
-        var age = this.getAge(date), i: string, prev: string;
+        const age = this.getAge(date);
+        let prev = '';
+        let i: string;
         for (i in this._category) {
-            var categ = this._category[i];
+            const categ = this._category[i];
 
             if (categ.ageMax && categ.ageMax < age) {
                 continue;   //too old
@@ -84,6 +88,7 @@ export class CategoryFFT implements Category {
             }
             return i;
         }
+        return ''; // never
     }
 
     isCompatible(eventCategory: CategoryString, playerCategory: CategoryString): boolean {
@@ -94,27 +99,29 @@ export class CategoryFFT implements Category {
 
         //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.
 
-        var idxSenior = this._index['Senior'];
-        var idxEvent = this._index[<string>eventCategory];
+        const idxSenior = this._index['Senior'];
+        const idxEvent = this._index[eventCategory];
 
         //Epreuve senior
         if (idxEvent === idxSenior) {
             return true;
         }
 
-        var catEvent = this._category[<string>eventCategory];
-        var catPlayer = this._category[<string>playerCategory];
+        const catEvent = this._category[eventCategory];
+        const catPlayer = this._category[playerCategory];
 
         if (idxEvent < idxSenior) {
-
             //Epreuve jeunes
-            if (catPlayer.ageMax <= catEvent.ageMax) {
+            if (catPlayer.ageMax
+                && catEvent.ageMax 
+                && catPlayer.ageMax <= catEvent.ageMax) {
                 return true;
             }
         } else {
-
             //Epreuve vétérans
-            if (catEvent.ageMin <= catPlayer.ageMin) {
+            if (catEvent.ageMin 
+                && catPlayer.ageMin
+                && catEvent.ageMin <= catPlayer.ageMin) {
                 return true;
             }
         }

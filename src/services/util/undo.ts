@@ -1,20 +1,46 @@
 //import { computedFrom } from 'aurelia-framework';
 
-interface IUndoAction {
-    type: number;
-    fnAction? (bUndo?:boolean): any;
-    obj?: any;
-    index?: number;
-    message: string;
-    howmany?: number;
-    values?: any;
-    member?: string;
-    value?: any;
-    stack?: IUndoAction[];  //group
-    meta: any;
-}
-
 const enum ACTION { UPDATE, INSERT, REMOVE, GROUP, ACTION, SPLICE, UPDATE_PROPERTIES };
+
+type IUndoActionProp = {
+    type: ACTION.UPDATE | ACTION.INSERT | ACTION.REMOVE,
+    obj: any;
+    member: string;
+    value: any;
+    message: string,
+    meta: any
+}
+type IUndoActionGroup = {
+    type: ACTION.GROUP,
+    stack: IUndoAction[],
+    message: string,
+    meta: any
+}
+type IUndoActionFn = {
+    type: ACTION.ACTION,
+    fnAction: (bUndo?:boolean) => any;
+    message: string,
+    meta: any
+}
+type IUndoActionSplice = {
+    type: ACTION.SPLICE,
+    obj: any;
+    index: number;
+    howmany: number;
+    values?: any,
+    message: string,
+    meta: any
+}
+type IUndoActionUpdProp = {
+    type: ACTION.UPDATE_PROPERTIES,
+    obj: any,
+    values: any,
+    message: string,
+    meta: any
+};
+
+type IUndoAction = IUndoActionProp | IUndoActionGroup | IUndoActionFn | IUndoActionSplice | IUndoActionUpdProp;
+
 
 /**
  * Undo manager for typescript 
@@ -23,7 +49,7 @@ export class Undo {
 
     private _stack: IUndoAction[] = [];
     private _head = -1;
-    private _group: IUndoAction;
+    private _group: IUndoAction | null = null;
     private _maxUndo = 20;
     private _meta: any;
 
@@ -38,11 +64,11 @@ export class Undo {
 
     action(fnAction: (bUndo?: boolean) => any, message: string, meta?: any): any {
         if ("function" !== typeof fnAction) {
-            throw "Undo action: invalid fnAction";
+            throw new Error( "Undo action: invalid fnAction");
         }
-        var action = {
+        var action: IUndoAction = {
             type: ACTION.ACTION,
-            fnAction: fnAction,
+            fnAction,
             message: message || "",
             meta: meta
         };
@@ -64,15 +90,15 @@ export class Undo {
     update(obj: Object, member: string, value: any, message?: string, meta?: any): void;
     update(obj: any, member: any, value: any, message?: string, meta?: any): void {  //TODO use union type
         if ("undefined" === typeof obj) {
-            throw "Undo update: invalid obj";   //TODO use throw new Error(...) to get stack trace
+            throw new Error( "Undo update: invalid obj");
         }
         if ("undefined" === typeof member) {
-            throw "Undo update: invalid member";
+            throw new Error( "Undo update: invalid member");
         }
         if ("undefined" === typeof value) {
-            throw "Undo update: invalid value";
+            throw new Error( "Undo update: invalid value");
         }
-        var action = {
+        var action: IUndoAction = {
             type: ACTION.UPDATE,
             obj: obj,
             member: member,
@@ -82,7 +108,7 @@ export class Undo {
         };
         if (obj.splice) {
             if ("number" !== typeof member || member < 0 || obj.length <= member) {
-                throw "Bad array position to update";
+                throw new Error( "Bad array position to update");
             }
             obj.splice(member, 1, value);   //to allow aurelia to observe
         } else {
@@ -91,14 +117,14 @@ export class Undo {
         this._pushAction(action);
     }
 
-    updateProperties(obj: Object, values: Object, message?: string, meta?: any): void {
+    updateProperties<T>(obj: T, values: T, message?: string, meta?: any): void {
         if ("undefined" === typeof obj) {
-            throw "Undo update: invalid obj";   //TODO use throw new Error(...) to get stack trace
+            throw new Error("Undo update: invalid obj");
         }
         if ("undefined" === typeof values) {
-            throw "Undo update: invalid value";
+            throw new Error("Undo update: invalid value");
         }
-        var action = {
+        const action: IUndoAction = {
             type: ACTION.UPDATE_PROPERTIES,
             obj: obj,
             values: {},
@@ -122,20 +148,20 @@ export class Undo {
     insert(obj: any[], member: number, value: any, message: string, meta?: any): void;
     insert(obj: any, member: any, value: any, message: string, meta?: any): void {
         if ("undefined" === typeof obj) {
-            throw "Undo insert: invalid obj";
+            throw new Error("Undo insert: invalid obj");
         }
         if ("undefined" === typeof member) {
-            throw "Undo insert: invalid member";
+            throw new Error("Undo insert: invalid member");
         }
         if ("undefined" === typeof value) {
-            throw "Undo insert: invalid value";
+            throw new Error("Undo insert: invalid value");
         }
         if (obj.splice) {
             if ("number" !== typeof member || member < 0 || member > obj.length) {
                 member = obj.length;
             }
         }
-        var action = {
+        var action : IUndoAction = {
             type: ACTION.INSERT,
             obj: obj,
             member: member,
@@ -153,12 +179,12 @@ export class Undo {
 
     remove(obj: any, member: any, message: string, meta?: any): void {
         if ("undefined" === typeof obj) {
-            throw "Undo remove: invalid obj";
+            throw new Error("Undo remove: invalid obj");
         }
         if ("undefined" === typeof member) {
-            throw "Undo remove: invalid member";
+            throw new Error("Undo remove: invalid member");
         }
-        var action = {
+        var action: IUndoAction = {
             type: ACTION.REMOVE,
             obj: obj,
             member: member,
@@ -168,7 +194,7 @@ export class Undo {
         };
         if (obj.splice) {
             if ("number" !== typeof member || member < 0 || obj.length <= member) {
-                throw "Bad array position to remove";
+                throw new Error("Bad array position to remove");
             }
             obj.splice(member, 1);
         } else {
@@ -178,23 +204,23 @@ export class Undo {
     }
 
     //splice(obj: any[], index: number, howmany: number, itemX: any, itemY: any, message: string): void;
-    splice(obj: any[], index: number, howmany: number, itemX: any[], message: string, meta?: any): void {
+    splice<T>(obj: T[], index: number, howmany: number, itemX: any[], message: string, meta?: any): void {
         if ("undefined" === typeof obj) {
-            throw "Undo splice: invalid obj";
+            throw new Error("Undo splice: invalid obj");
         }
         if ("undefined" === typeof obj.slice) {
-            throw "Undo splice: invalid obj not an array";
+            throw new Error("Undo splice: invalid obj not an array");
         }
         if ("number" !== typeof index) {
-            throw "Undo splice: invalid index";
+            throw new Error("Undo splice: invalid index");
         }
         if (index < 0 || obj.length < index) {
-            throw "Undo splice: bad array position to remove";
+            throw new Error("Undo splice: bad array position to remove");
         }
 
         //var isarray = isArray(itemX);
 
-        var action: IUndoAction = {
+        const action: IUndoAction = {
             type: ACTION.SPLICE,
             obj: obj,
             index: index,
@@ -202,12 +228,12 @@ export class Undo {
             howmany: itemX.length,
             //message: arguments[arguments.length - 1] || "splice",
             message: message || "splice",
-            values: <any[]>undefined,
+            values: undefined,
             meta: meta
         };
 
         //var p = isarray ? itemX.slice(0, itemX.length) : Array.prototype.slice.call(arguments, 3, arguments.length - 1);
-        var p = itemX.slice(0, itemX.length);
+        const p: any = itemX.slice(0, itemX.length);
         p.unshift(index, howmany);
         action.values = Array.prototype.splice.apply(obj, p);
 
@@ -215,7 +241,7 @@ export class Undo {
     }
 
     private _pushAction(action: IUndoAction): void {
-        if (this._group) {
+        if (this._group?.type === ACTION.GROUP) {
             this._group.stack.push(action);
         } else {
             this._head++;
@@ -226,7 +252,7 @@ export class Undo {
 
     newGroup(message: string, fnGroup?: () => boolean, meta?: any): void {
         if (this._group) {
-            throw "Cannot imbricate group";
+            throw new Error( "Cannot imbricate group");
         }
         this._group = {
             type: ACTION.GROUP,
@@ -244,17 +270,17 @@ export class Undo {
     }
     endGroup(): void {
         if (!this._group) {
-            throw "No group defined";
+            throw new Error( "No group defined");
         }
-        var g = this._group;
+        var g = this._group as IUndoActionGroup;
         this._group = null;
-        if (g.stack.length) {
+        if (g.stack?.length) {
             this._pushAction(g);
         }
     }
     cancelGroup(): void {
         if (!this._group) {
-            throw "No group defined";
+            throw new Error( "No group defined");
         }
         this._do(this._group, true);
         this._group = null;
@@ -290,7 +316,7 @@ export class Undo {
             return temp;
 
         } else if (action.type === ACTION.UPDATE_PROPERTIES) {
-            let temp = {};
+            let temp: any = {};
             for( let prop in action.values) {
                 if( 'undefined' !== typeof action.obj[prop]) {
                     temp[prop] = action.obj[prop];
@@ -331,7 +357,7 @@ export class Undo {
 
     undo(): any {
         if (!this.canUndo) {
-            throw "Can't undo";
+            throw new Error( "Can't undo");
         }
         var r = this._do(this._stack[this._head], true);
         this._head--;
@@ -340,7 +366,7 @@ export class Undo {
 
     redo(): any {
         if (!this.canRedo) {
-            throw "Can't redo";
+            throw new Error( "Can't redo");
         }
         this._head++;
         return this._do(this._stack[this._head], false);
@@ -366,7 +392,7 @@ export class Undo {
 
     setMaxUndo(v: number): void {
         if ("number" !== typeof v) {
-            throw "Invalid maxUndo value";
+            throw new Error( "Invalid maxUndo value");
         }
         this._maxUndo = v;
         this._maxUndoOverflow();
