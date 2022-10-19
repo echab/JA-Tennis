@@ -140,4 +140,78 @@ describe("commandManager", () => {
         };
         expect(t).toThrow("Nothing to redo");
     });
+
+    it("should manage transaction", () => {
+        const counter: Counter = { count: 0 };
+        const cmdManager = createCommandManager(5);
+
+        cmdManager.transaction('transac1');
+
+        cmdManager.add(increment(counter, 1));
+        cmdManager.add(increment(counter, 10));
+        expect(counter.count).toBe(11);
+        expect(cmdManager.canUndo).toBe(false);
+
+        cmdManager.commit();
+
+        expect(cmdManager.canUndo).toBe(true);
+        expect(cmdManager.undoNames(2)).toStrictEqual(["transac1"]);
+        cmdManager.undo();
+        expect(counter.count).toBe(0);
+
+        expect(cmdManager.canRedo).toBe(true);
+        cmdManager.redo();
+        expect(counter.count).toBe(11);
+    });
+
+    it("should ignore empty transaction", () => {
+        const counter: Counter = { count: 0 };
+        const cmdManager = createCommandManager(5);
+
+        cmdManager.transaction('transac2');
+        cmdManager.commit();
+
+        expect(cmdManager.canUndo).toBe(false);
+    });
+
+    it("should abort transaction", () => {
+        const counter: Counter = { count: 0 };
+        const cmdManager = createCommandManager(5);
+
+        cmdManager.transaction('transac3');
+
+        cmdManager.add(increment(counter, 1));
+
+        cmdManager.rollback();
+
+        expect(cmdManager.canUndo).toBe(false);
+        expect(counter.count).toBe(0); // undone
+    });
+
+    it("should abort empty transaction", () => {
+        const cmdManager = createCommandManager(5);
+
+        cmdManager.transaction('transac4');
+        cmdManager.rollback();
+
+        expect(cmdManager.canUndo).toBe(false);
+    });
+
+    it("should throw if end without transaction", () => {
+        const cmdManager = createCommandManager(5);
+
+        const t = () => {
+            cmdManager.commit();
+        };
+        expect(t).toThrow("no transaction to end");
+    });
+
+    it("should throw to abort without transaction", () => {
+        const cmdManager = createCommandManager(5);
+
+        const t = () => {
+            cmdManager.rollback();
+        };
+        expect(t).toThrow("no transaction to abort");
+    });
 });

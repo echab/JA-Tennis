@@ -7,6 +7,10 @@ export interface Command {
   toString?: () => string; // for debug purpose
 }
 
+interface Transaction extends Command {
+  commands: Command[];
+}
+
 /*
 commandManager.add(incrementCounter(quinnCounter, "inc1"));
 
@@ -18,6 +22,8 @@ export const commandManager = createCommandManager(100);
 export function createCommandManager(maxHistory = 100) {
   const history: Command[] = [];
   const [position, setPosition] = createSignal(-1);
+  let currentTransaction: Transaction | undefined;
+  let nTransaction = 0;
   return {
     /**
      * Add a command to be undone on the stack. Act is already called into the command
@@ -41,31 +47,39 @@ export function createCommandManager(maxHistory = 100) {
      * ```
      */
     add(action: Command) {
-      if (position() < history.length - 1) {
-        history.splice(position() + 1);
-      } else if (history.length + 1 > maxHistory) {
-        // console.log("too many", history.length + 1, maxHistory);
-        history.splice(0, history.length + 1 - maxHistory);
-        setPosition((pos) => history.length + 1 - maxHistory);
-      }
+      if (currentTransaction) {
+        currentTransaction.commands.push(action);
+      } else {
+        if (position() < history.length - 1) {
+          history.splice(position() + 1);
+        } else if (history.length + 1 > maxHistory) {
+          // console.log("too many", history.length + 1, maxHistory);
+          history.splice(0, history.length + 1 - maxHistory);
+          setPosition((pos) => history.length + 1 - maxHistory);
+        }
 
-      history.push(action);
-      setPosition((pos) => pos + 1);
+        history.push(action);
+        setPosition((pos) => pos + 1);
+      }
     },
+
     /** */
     do(command: Command) {
       this.add(command);
       command.act();
     },
+
     get canUndo() {
       return position() >= 0;
     },
+
     undoNames(nb = 1): string[] {
       return history.slice(Math.max(0, position() + 1 - nb), position() + 1)
         .map((
           { name },
         ) => name).reverse();
     },
+
     undo(nb = 1) {
       if (position() < 0) {
         throw new Error("Nothing to undo");
@@ -75,14 +89,17 @@ export function createCommandManager(maxHistory = 100) {
         setPosition((pos) => pos - 1);
       }
     },
+
     get canRedo() {
       return position() < history.length - 1;
     },
+
     redoNames(nb = 1): string[] {
       return history.slice(position() + 1, position() + nb + 1).map((
         { name },
       ) => name).reverse();
     },
+
     redo(nb = 1) {
       if (position() >= history.length - 1) {
         throw new Error("Nothing to redo");
@@ -92,9 +109,56 @@ export function createCommandManager(maxHistory = 100) {
         history[position()].act();
       }
     },
+
     clear() {
       history.splice(0);
       setPosition(-1);
     },
+
+    /** Begin a new transaction. Could have imbricated transactions. */
+    transaction(name: string) {
+      if (!currentTransaction) {
+        currentTransaction = {
+          name,
+          commands:[],
+          act() {
+            for (const command of this.commands) {
+              command.act();
+            }
+          },
+          undo() {
+            for (let i=this.commands.length-1; i>=0; i--) {
+              this.commands[i].undo();
+            }
+          }
+        };
+      }
+      nTransaction++
+    },
+
+    /** Commit and keep the commands of the transactions */
+    commit() {
+      if (!currentTransaction || nTransaction <= 0) {
+        throw new Error('no transaction to end');
+      }
+      nTransaction--;
+      if (nTransaction === 0) {
+        const t = currentTransaction;
+        currentTransaction = undefined;
+        if (t.commands.length) {
+          this.add(t);
+        }
+      }
+    },
+
+    /** Abort and rollback all the ongoing transations */
+    rollback() {
+      if (!currentTransaction || nTransaction <= 0) {
+        throw new Error('no transaction to abort');
+      }
+      currentTransaction.undo();
+      currentTransaction = undefined;
+      nTransaction = 0;
+    }
   };
 }
