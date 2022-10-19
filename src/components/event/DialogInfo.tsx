@@ -1,14 +1,12 @@
 import { Component, JSX, onMount, onCleanup, Show } from 'solid-js';
-import { Coordinates, TournamentInfo } from '../../domain/tournament';
-import { RankString, CategoryString } from '../../domain/types';
-import { rank, category } from '../../services/types';
-import { cleanupUndefined } from '../../services/util/object';
+import { TournamentInfo } from '../../domain/tournament';
 import { useForm } from '../util/useForm';
 
 const EMPTY: TournamentInfo = { name: '', slotLength: 90 };
 
 type Props = {
    info: TournamentInfo;
+   // eslint-disable-next-line no-unused-vars
    onOk: (info: TournamentInfo) => void;
    onClose: () => void;
 }
@@ -28,9 +26,6 @@ export const DialogInfo: Component<Props> = (props) => {
    const info: TournamentInfo | undefined = props.info && { ...props.info }; // clone, without reactivity
 
    const { form, updateField, updateSubField } = useForm<TournamentInfo>(info ?? EMPTY);
-
-   const ranks: RankString[] = rank.list();
-   const categories: CategoryString[] = category.list();
 
    const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
       evt.preventDefault();
