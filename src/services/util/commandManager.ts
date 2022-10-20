@@ -2,9 +2,9 @@ import { createSignal } from "solid-js";
 
 export interface Command {
   name: string;
-  act: () => void;
-  undo: () => void;
-  toString?: () => string; // for debug purpose
+  act(): void;
+  undo(): void;
+  toString?(): string; // for debug purpose
 }
 
 interface Transaction extends Command {
@@ -39,7 +39,7 @@ export function createCommandManager(maxHistory = 100) {
      *     return {
      *        name: "increment",
      *        act,
-     *        undo:() => { counter.count = prevCount; }
+     *        undo() { counter.count = prevCount; }
      *     };
      *   };
      *   // ...
@@ -75,9 +75,8 @@ export function createCommandManager(maxHistory = 100) {
 
     undoNames(nb = 1): string[] {
       return history.slice(Math.max(0, position() + 1 - nb), position() + 1)
-        .map((
-          { name },
-        ) => name).reverse();
+        .map(({ name }) => name)
+        .reverse();
     },
 
     undo(nb = 1) {
@@ -95,9 +94,9 @@ export function createCommandManager(maxHistory = 100) {
     },
 
     redoNames(nb = 1): string[] {
-      return history.slice(position() + 1, position() + nb + 1).map((
-        { name },
-      ) => name).reverse();
+      return history.slice(position() + 1, position() + nb + 1)
+        .map(({ name }) => name)
+        .reverse();
     },
 
     redo(nb = 1) {
@@ -120,26 +119,26 @@ export function createCommandManager(maxHistory = 100) {
       if (!currentTransaction) {
         currentTransaction = {
           name,
-          commands:[],
+          commands: [],
           act() {
             for (const command of this.commands) {
               command.act();
             }
           },
           undo() {
-            for (let i=this.commands.length-1; i>=0; i--) {
+            for (let i = this.commands.length - 1; i >= 0; i--) {
               this.commands[i].undo();
             }
-          }
+          },
         };
       }
-      nTransaction++
+      nTransaction++;
     },
 
     /** Commit and keep the commands of the transactions */
     commit() {
       if (!currentTransaction || nTransaction <= 0) {
-        throw new Error('no transaction to end');
+        throw new Error("no transaction to end");
       }
       nTransaction--;
       if (nTransaction === 0) {
@@ -154,11 +153,11 @@ export function createCommandManager(maxHistory = 100) {
     /** Abort and rollback all the ongoing transations */
     rollback() {
       if (!currentTransaction || nTransaction <= 0) {
-        throw new Error('no transaction to abort');
+        throw new Error("no transaction to abort");
       }
       currentTransaction.undo();
       currentTransaction = undefined;
       nTransaction = 0;
-    }
+    },
   };
 }

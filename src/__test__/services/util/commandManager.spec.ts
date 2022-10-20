@@ -33,7 +33,7 @@ describe("commandManager", () => {
         expect(counter.count).toBe(10);
     });
 
-    it("should undo/redo the increment", () => {
+    it("should undo/redo the increment add", () => {
         const counter: Counter = { count: 0 };
         const cmdManager = createCommandManager(5);
 
@@ -49,6 +49,25 @@ describe("commandManager", () => {
         expect(cmdManager.redoNames()).toStrictEqual(["increment"]);
         cmdManager.redo();
         expect(counter.count).toBe(1);
+    });
+
+    it("should undo/redo two commands", () => {
+        const counter: Counter = { count: 0 };
+        const cmdManager = createCommandManager(5);
+
+        cmdManager.add(increment(counter, 1));
+        cmdManager.add(increment(counter, 10));
+        expect(counter.count).toBe(11);
+
+        expect(cmdManager.canUndo).toBe(true);
+        expect(cmdManager.undoNames(2)).toStrictEqual(["increment","increment"]);
+        cmdManager.undo(2);
+        expect(counter.count).toBe(0);
+
+        expect(cmdManager.canRedo).toBe(true);
+        expect(cmdManager.redoNames(2)).toStrictEqual(["increment","increment"]);
+        cmdManager.redo(2);
+        expect(counter.count).toBe(11);
     });
 
     it("should override old undo", () => {
