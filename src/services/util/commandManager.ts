@@ -161,3 +161,51 @@ export function createCommandManager(maxHistory = 100) {
     },
   };
 }
+
+
+export function setValue<T extends Record<string, any>>(obj: T, field: keyof T, value: any): Command {
+  const prev = (obj as any)[field];
+  const act = () => {
+    if (value === undefined) {
+      delete (obj as any)[field];
+    } else {
+      (obj as any)[field] = value;
+    }
+  }
+  act();
+  const undo = () => {
+    if (prev === undefined) {
+      delete (obj as any)[field];
+    } else {
+      (obj as any)[field] = prev;
+    }
+  }
+  return { name: `Set ${String(field)}`, act, undo };
+}
+
+export function setItem<T>(array: any[], pos: number, item: T): Command {
+  return setValue(array, pos, item);
+}
+
+export function insertItem<T>(obj: Array<any>, pos: number, item: T): Command {
+  const act = () => {
+    obj.splice(pos, 0, item);
+  }
+  act();
+  const undo = () => {
+    obj.splice(pos, 1);
+  }
+  return {name:`Insert`, act, undo};
+}
+
+export function removeItem(obj: Array<any>, pos: number): Command {
+  const prev = obj[pos];
+  const act = () => {
+    obj.splice(pos, 1);
+  }
+  act();
+  const undo = () => {
+    obj.splice(pos, 0, prev);
+  }
+  return {name:`Remove`, act, undo};
+}
