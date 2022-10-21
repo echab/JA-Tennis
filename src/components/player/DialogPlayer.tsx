@@ -3,7 +3,9 @@ import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
+import { removePlayer } from '../../services/playerService';
 import { rank, category } from '../../services/types';
+import { commandManager } from '../../services/util/commandManager';
 import { useForm } from '../util/useForm';
 
 const EMPTY: OptionalId<Player> = { name: '', sexe: 'H', rank: 'NC', registration: [] };
@@ -34,10 +36,10 @@ export const DialogPlayer: Component<Props> = (props) => {
   const ranks: RankString[] = rank.list();
   const categories: CategoryString[] = category.list();
 
-  const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (event) => {
-    event.preventDefault();
+  const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
+    evt.preventDefault();
 
-    const formElems = (event.target as HTMLFormElement).elements as unknown as Record<keyof Player, RadioNodeList>;
+    const formElems = (evt.target as HTMLFormElement).elements as unknown as Record<keyof Player, RadioNodeList>;
 
     const result: OptionalId<Player> = {
       id: form.id || undefined,
@@ -59,11 +61,22 @@ export const DialogPlayer: Component<Props> = (props) => {
       comment: form.comment?.trim() || undefined,
     };
 
+    // if ((evt.submitter as HTMLButtonElement).value === 'Delete') {
+    //   if (form.id) {
+    //     commandManager.add(removePlayer(form.id));
+    //   }
+    // } else
     props.onOk(result);
-    // refDlg.returnValue = player;
+
     refDlg.close();
     // props.onClose();
   };
+
+  const deleteAndClose = () => {
+    commandManager.add(removePlayer(form.id!));
+    refDlg.close();
+    // props.onClose();
+  }
 
   return (
     <dialog ref={refDlg!} class="p-0">
@@ -178,16 +191,11 @@ export const DialogPlayer: Component<Props> = (props) => {
           >OK
           </button>
 
-          {/* <button
-            disabled={!player?.id}
-            onclick={() => {
-              if (player?.id) {
-                commandManager.add(removePlayer(player.id));
-                refDlg.returnValue = 'Delete'
-                refDlg.close();
-              }
-            }}
-          >✖ Delete</button> */}
+          <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
+            value="Delete" disabled={!form.id}
+            onclick={deleteAndClose}
+            >✖ Delete
+          </button>
 
           <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
             data-dismiss="modal" aria-hidden="true"

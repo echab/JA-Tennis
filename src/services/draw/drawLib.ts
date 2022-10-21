@@ -1,6 +1,7 @@
 import { Box, Draw, DrawType, Match } from "../../domain/draw";
 import { Player, PlayerIn } from "../../domain/player";
 import { TEvent } from "../../domain/tournament";
+import { DrawLibBase } from "./drawLibBase";
 import { Knockout } from "./knockout";
 import { Roundrobin } from "./roundrobin";
 
@@ -31,7 +32,7 @@ export interface IDrawLib {
   isJoueurNouveau(box: Box): boolean;
 }
 
-export function drawLib(event: TEvent, draw: Draw) : IDrawLib {
+export function drawLib(event: TEvent, draw: Draw) : IDrawLib & DrawLibBase {
   // TODO cache result WeakMap
   if (draw.type === DrawType.Normal ||draw.type === DrawType.Final) {
     return new Knockout(event, draw);

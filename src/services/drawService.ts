@@ -73,13 +73,15 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
   const i = indexOf(draw.boxes, "position", match.position);
   const prev = {...match};
   // TODO boxIn of next draw/group
+  const lib = drawLib(event, draw);
 
   const act = () => {
     update(({ event, draw, box }) => {
       if (!event || !draw) {
         throw new Error("updateMatch without event or draw");
       }
-      draw.boxes[i] = match;
+      // draw.boxes[i] = match;
+      lib.putResult(draw.boxes[i] as Match, match);
     });
   };
   act();
@@ -89,7 +91,8 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
       if (!event || !draw) {
         throw new Error("updateMatch without event or draw");
       }
-      draw.boxes[i] = prev;
+      // draw.boxes[i] = prev;
+      lib.putResult(draw.boxes[i] as Match, prev);
     });
   };
 

@@ -36,13 +36,13 @@ export const Events: Component<Props> = (props) => {
   return <>
     <Show when={isDlgEvent()}>
       <DialogEvent event={selection.event}
-        onOk={(event) => commandManager.add(updateEvent(event))}
+        onOk={commandManager.wrap(updateEvent)}
         onClose={() => showDlgEvent(false)}
       />
     </Show>
     <Show when={selection.event && isDlgDraw()}>
       <DialogDraw event={selection.event!} draw={selection.draw} allPlayers={players}
-        onOk={(event, draws) => commandManager.add(updateDraws(event, draws))}
+        onOk={commandManager.wrap(updateDraws)}
         onClose={() => showDlgDraw(false)}
       />
     </Show>

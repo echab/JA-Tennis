@@ -19,7 +19,7 @@ export const App: Component = () => {
   return <>
     <Show when={isDlgInfo()}>
       <DialogInfo info={selection.tournament.info}
-        onOk={(info) => commandManager.add(updateInfo(info))}
+        onOk={commandManager.wrap(updateInfo)}
         onClose={() => showDlgInfo(false)}
       />
     </Show>
@@ -51,7 +51,7 @@ export const LeftPane: Component = () => {
   selectTournament(mockTournament);
 
   return <div>
-    {JSON.stringify(selection.tournament.info)}
+    {/* {JSON.stringify(selection.tournament.info)} */}
     <Players
       players={selection.tournament?.players ?? []}
       events={selection.tournament?.events ?? []}

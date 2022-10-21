@@ -12,6 +12,8 @@ export const mockTournament: Tournament = {
     { id: "J0", name: "Albert", sexe: "H", rank: "NC", registration: ["E0"], club:'TROC' },
     { id: "J1", name: "Bernard", sexe: "H", rank: "NC", registration: ["E0"] },
     { id: "J2", name: "Claude", sexe: "H", rank: "30/4", registration: [] },
+    { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: ["E0"] },
+    { id: "J5", name: "Etienne", sexe: "H", rank: "30/2", registration: ["E0"] },
   ],
   events: [
     {
@@ -32,16 +34,30 @@ export const mockTournament: Tournament = {
           boxes: [
             { playerId: "J0", position: 6, qualifIn:1, order:2 },
             {
-              playerId: "J0",
-              date: new Date("2022-10-09T16:29:00"),
-              score: "6/4 6/1",
+              date: new Date("2022-10-09T16:30"),
               qualifOut: 1,
               position: 2,
+              // playerId: "J0",
+              // score: "6/4 6/1",
             },
             { playerId: "J1", position: 5, order:3 },
             { position: 4, qualifIn:2, order:3 },
             { position: 1, qualifOut:2 },
             { playerId: "J2", seeded:1, position: 3, order:1 },
+          ],
+        },
+        {
+          id: "T01",
+          name: "4e série",
+          minRank: "40",
+          maxRank: "30/1",
+          type: DrawType.Final,
+          nbColumn: 3,
+          nbOut: 1,
+          boxes: [
+            { position: 6, qualifIn:1, order:2 },
+            { position: 5, playerId: "J4", order:3 },
+            { playerId: "J5", seeded:1, position: 3, order:1 },
           ],
         },
       ],

@@ -25,6 +25,10 @@ export function createCommandManager(maxHistory = 100) {
   let currentTransaction: Transaction | undefined;
   let nTransaction = 0;
   return {
+    wrap<T extends any[]>(fn: (...args: T) => Command) {
+      return (...args: T) => this.add(fn.call(null, ...args));
+    },
+
     /**
      * Add a command to be undone on the stack. Act is already called into the command
      *

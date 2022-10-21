@@ -1,4 +1,4 @@
-import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
+import { Component, For, JSX, onMount, onCleanup, from } from 'solid-js';
 import { Draw, Match } from '../../domain/draw';
 import { drawLib } from '../../services/draw/drawLib';
 import { Player } from '../../domain/player';
@@ -93,8 +93,8 @@ export const DialogMatch: Component<Props> = (props) => {
       matchFormat: form.matchFormat,
       note: form.note?.trim(),
 
-      _player1: byId(props.players, form.player1),
-      _player2: byId(props.players, form.player2),
+      _player1: player1,
+      _player2: player2,
     };
 
     // TODO aware1, aware2, receive1, receive2 on opponents boxes
@@ -121,18 +121,18 @@ export const DialogMatch: Component<Props> = (props) => {
           <div class="mb-1">
             <span class="inline-block w-3/12 text-right pr-3">Winner:</span>
             <label><input type="radio" class="p-1 mr-1"
-              value={form.playerId} onChange={updateField("playerId")} />
+              checked={form.playerId == form.player1} value={player1?.id} onChange={updateField("playerId")} />
               {player1?.name} {player1?.rank}</label>
             <br/>
             <span class="inline-block w-3/12 text-right pr-3"></span>
-            <input id="winner2" type="radio" class="p-1 mr-1"
-              value={form.playerId} onChange={updateField("playerId")} />
-            <label for="winner2" >{player2?.name} {player2?.rank}</label>
+            <label><input type="radio" class="p-1 mr-1"
+              checked={form.playerId == form.player2} value={player2?.id} onChange={updateField("playerId")} />
+            {player2?.name} {player2?.rank}</label>
           </div>
           
           <div class="mb-1">
             <label for="score" class="inline-block w-3/12 text-right pr-3">Score:</label>
-            <input id="score" type="text" value={form.score} onChange={updateField("score")} class="w-4/12 p-1"/>
+            <input id="score" type="text" value={form.score ?? ''} onChange={updateField("score")} class="w-4/12 p-1"/>
 
             <label class="ml-2"><input id="wo" type="checkbox" checked={form.wo} onChange={updateField("wo")} /> WO</label>
           </div>

@@ -1,7 +1,7 @@
 import { Component, createSignal, For, Show } from 'solid-js';
 import { selection, selectPlayer } from '../util/selection';
-import { Player } from '../../domain/player';
-import { TEvent } from '../../domain/tournament';
+import type { Player } from '../../domain/player';
+import type { TEvent } from '../../domain/tournament';
 import { updatePlayer, removePlayer } from '../../services/playerService';
 import { commandManager } from '../../services/util/commandManager';
 import { DialogPlayer } from './DialogPlayer';
@@ -18,11 +18,13 @@ export const Players: Component<Props> = (props) => {
 
   const [isDlgPlayer, showDlgPlayer] = createSignal(false);
 
+  const editPlayer = (player?: Player) => { selectPlayer(player); showDlgPlayer(true); };
+
   return (
     <>
       <Show when={isDlgPlayer()}>
         <DialogPlayer events={props.events} player={selection.player}
-          onOk={(player) => commandManager.add(updatePlayer(player))}
+          onOk={commandManager.wrap(updatePlayer)}
           onClose={() => showDlgPlayer(false)}
         />
       </Show>
@@ -35,12 +37,7 @@ export const Players: Component<Props> = (props) => {
             <th class="text-left">Rank</th>
             <th class="text-left">Registrations</th>
             <td>
-              <button type="button"
-                onclick={() => {
-                  selectPlayer(undefined);
-                  showDlgPlayer(true);
-                }}
-              >➕ Add player</button>
+              <button type="button" onclick={[editPlayer,null]}>➕ Add player</button>
             </td>
           </tr>
         </thead>
@@ -58,20 +55,14 @@ export const Players: Component<Props> = (props) => {
                 <small>{player.id}</small>
               </td>
               <td class="text-left">
-                <i class="icon2-info hover"
-                  onclick={() => {
-                    selectPlayer(player);
-                    showDlgPlayer(true);
-                  }}
-                ></i>
+                <i class="icon2-info hover" onclick={[editPlayer,player]}></i>
                 <span>
                 <i classList={{
                   'icon2-male': player.sexe === 'H',
                   'icon2-female': player.sexe === 'F',
                   'icon2-mixte': player.sexe === 'M',
                 }}></i>
-                {player.name}
-                {player.firstname}
+                {player.name} {player.firstname}
                 </span>
               </td>
               <td class="text-left">{player.rank}</td>
@@ -81,10 +72,7 @@ export const Players: Component<Props> = (props) => {
                 }</For>
               </td>
               <td class="hover">
-                <button type="button"
-                  onclick={() => commandManager.add(removePlayer(player.id))}
-                  title={`Delete the player ${player.id}`}
-                >✖</button>
+                <button type="button" onclick={[commandManager.wrap(removePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
               </td>
             </tr>
           }</For>

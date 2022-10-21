@@ -27,7 +27,7 @@ export const DrawDraw: Component<Props> = (props) => {
       <DialogMatch event={props.event} draw={props.draw}
         players={props.players} places={places}
         match={selection.box as Match}
-        onOk={(event, draw, match) => commandManager.add(updateMatch(event, draw, match))}
+        onOk={commandManager.wrap(updateMatch)}
         onClose={() => showDlgMatch(false)}
       />
     </Show>

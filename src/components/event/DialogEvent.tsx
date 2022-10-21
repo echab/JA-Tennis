@@ -55,6 +55,9 @@ export const DialogEvent: Component<Props> = (props) => {
          draws: event?.draws ?? [],
       };
 
+      // if ((evt.submitter as HTMLButtonElement).value === 'delete') {
+      // }
+   
       props.onOk(result);
       // refDlg.returnValue = event;
       refDlg.close();
@@ -150,7 +153,7 @@ export const DialogEvent: Component<Props> = (props) => {
             disabled={!event?.id}
             onclick={() => {
               if (event?.id) {
-                commandManager.add(removePlayer(event.id));
+                commandManager.add(removeEvent(event.id));
                 refDlg.returnValue = 'Delete'
                 refDlg.close();
               }
