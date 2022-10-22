@@ -46,6 +46,10 @@ export function useForm<FormFields extends object = {}>(
     const inputElement = event.currentTarget as HTMLInputElement;
     if (inputElement.type === "checkbox") {
       setForm({ [fieldName]: !!inputElement.checked } as any);
+    } else if (inputElement.type === "radio") {
+      if (inputElement.checked) {
+        setForm({ [fieldName]: inputElement.value } as any);
+      }
     } else if (inputElement.type === "number") {
       setForm({ [fieldName]: inputElement.valueAsNumber } as any);
     } else if (inputElement.type === "date") {
@@ -68,7 +72,7 @@ export function useForm<FormFields extends object = {}>(
   ) =>
   (event: Event) => {
     const inputElement = event.currentTarget as HTMLInputElement;
-    if (inputElement.type === "checkbox") {
+    if (inputElement.type === "checkbox" || inputElement.type === "radio") {
       setForm(fieldName, {[subFieldName]: !!inputElement.checked} as any);
     } else if (inputElement.type === "number") {
       setForm(fieldName, {[subFieldName]:  inputElement.valueAsNumber} as any);
@@ -79,7 +83,7 @@ export function useForm<FormFields extends object = {}>(
     }
   };
 
-  const getRadio = (radio: RadioNodeList): string[] => {
+  const getCheckboxes = (radio: RadioNodeList): string[] => {
     const radios =
       (radio.length
         ? Array.from(radio)
@@ -87,5 +91,5 @@ export function useForm<FormFields extends object = {}>(
     return radios.map((e) => e.checked ? e.value : undefined).filter(defined);
   };
 
-  return { form, updateField, updateSubField, clearField, getRadio };
+  return { form, updateField, updateSubField, clearField, getCheckboxes };
 }

@@ -2,7 +2,7 @@ export class KnockoutLib {
 
     static column(pos: number): number {    //iCol
         //TODO, use a table
-        var col = -1;
+        let col = -1;
         for (pos++; pos; pos >>= 1, col++) { }
         return col;
     }

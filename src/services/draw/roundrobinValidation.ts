@@ -18,7 +18,7 @@ export class RoundrobinValidation implements IValidation {
 
     /** @override */
     validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
-        var bRes = true;
+        let bRes = true;
 
         if (draw.type === DrawType.PouleSimple
             || draw.type === DrawType.PouleAR) {
@@ -33,12 +33,12 @@ export class RoundrobinValidation implements IValidation {
     }
 
     validatePoule(draw: Draw): boolean {
-        var bRes = true;
+        let bRes = true;
 
         //TODOjs
         ////Compte le nombre de Qs de la poule (et pas dans suite)
-        //var e = 0;
-        //for (var i = draw.nbColumn - 1; i >= 0; i--) {
+        //let e = 0;
+        //for (let i = draw.nbColumn - 1; i >= 0; i--) {
         //    if (boxes[iDiagonale(i)].isQualifieSortant())
         //        e++;
         //}
@@ -80,13 +80,13 @@ export class RoundrobinValidation implements IValidation {
     }
 
     validateMatches(draw: Draw): boolean {
-        var bRes = true;
+        let bRes = true;
 
         //Match avec deux joueurs gagné par un des deux joueurs
-        for (var i = 0; i < draw.boxes.length; i++) {
-            var box = draw.boxes[i];
-            var boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
-            var match = isMatch(box) ? <Match>box : undefined;
+        for (let i = 0; i < draw.boxes.length; i++) {
+            const box = draw.boxes[i];
+            const boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
+            const match = isMatch(box) ? <Match>box : undefined;
 
             //ASSERT(-1 <= box.playerId && box.playerId < pDoc.m_nJoueur);
             //Joueur inscrit au tableau ?
@@ -100,8 +100,8 @@ export class RoundrobinValidation implements IValidation {
                 //if (i >= iBasColQ(m_nColonne)) {	//Colonne joueurs
                 //} else {
 
-                //    var box1 = draw.boxes[ADVERSAIRE1(i)];
-                //    var box2 = draw.boxes[ADVERSAIRE2(i)];
+                //    const box1 = draw.boxes[ADVERSAIRE1(i)];
+                //    const box2 = draw.boxes[ADVERSAIRE2(i)];
 
                 //    if (!box1.playerId || !box2.playerId) {
                 //        this.validation.errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, box);

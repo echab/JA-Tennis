@@ -62,7 +62,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        var prevGroup = previousGroup(draw);
+        const prevGroup = previousGroup(draw);
         if (prevGroup) {
             if (prevGroup[0].type !== DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
                 if (rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
@@ -72,7 +72,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        var nextGrp = nextGroup(draw);
+        const nextGrp = nextGroup(draw);
         if (nextGrp) {
             if (draw.type !== DrawType.Final && draw.maxRank && nextGrp[0].minRank) {
                 if (rank.compare(nextGrp[0].minRank, draw.maxRank) < 0) {
@@ -82,7 +82,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        var e = MAX_QUALIF;
+        let e = MAX_QUALIF;
         if (!draw.suite) {
             //Trouve le plus grand Qsortant
             const group = groupDraw(draw);
@@ -92,7 +92,7 @@ export class KnockoutValidation implements IValidation {
                     break;
                 }
             }
-            for (var e2 = 1; e2 <= e; e2++) {
+            for (let e2 = 1; e2 <= e; e2++) {
                 const [,m] = groupFindPlayerOut(event, group, e2);
                 if (!m) {
                     validation.errorDraw('IDS_ERR_TAB_SORTANT_NO', draw, undefined, undefined, 'Q' + e2);
@@ -105,7 +105,7 @@ export class KnockoutValidation implements IValidation {
     }
 
     validateMatches(draw: Draw): boolean {
-        var bRes = true;
+        let bRes = true;
 
 
         return bRes;
@@ -113,11 +113,11 @@ export class KnockoutValidation implements IValidation {
 
     /** @override */
     validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
-        var bRes = true;
-        var nqe = 0;
-        var nqs = 0;
-        var isTypePoule = draw.type >= 2;
-        var lib = drawLib(event,draw);
+        let bRes = true;
+        let nqe = 0;
+        let nqs = 0;
+        const isTypePoule = draw.type >= 2;
+        const lib = drawLib(event,draw);
 
         if (draw.type !== DrawType.Normal
             && draw.type !== DrawType.Final) {
@@ -138,7 +138,7 @@ export class KnockoutValidation implements IValidation {
         // - Ecart maximal souhaité DEUX échelons
 
         const isMatchJoue = (match: Match): boolean => {
-            var opponent = lib.boxesOpponents(match);
+            const opponent = lib.boxesOpponents(match);
             return !!match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
         };
         
@@ -146,7 +146,7 @@ export class KnockoutValidation implements IValidation {
             if (!isMatch(match)) {
                 return false;
             }
-            var opponent = lib.boxesOpponents(<Match> match);
+            const opponent = lib.boxesOpponents(<Match> match);
             return !match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
         };
     
@@ -165,27 +165,29 @@ export class KnockoutValidation implements IValidation {
 
         bRes = bRes && this.validateMatches(draw);
 
-        var colMax = k.columnMax(draw.nbColumn, draw.nbOut);
-        var pClastMaxCol: RankString[] = new Array(colMax + 1);
+        const colMax = k.columnMax(draw.nbColumn, draw.nbOut);
+        const pClastMaxCol: RankString[] = new Array(colMax + 1);
         pClastMaxCol[colMax] = 'NC';    //pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();
 
         //Match avec deux joueurs gagné par un des deux joueurs
-        for (var i = 0; i < draw.boxes.length; i++) {
-            var box = draw.boxes[i];
-            var boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
-            var match = isMatch(box) ? <Match>box : undefined;
-            var b = box.position;
+        for (let i = 0; i < draw.boxes.length; i++) {
+            const box = draw.boxes[i];
+            const boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
+            const match = isMatch(box) ? <Match>box : undefined;
+            const b = box.position;
 
             //ASSERT(-1 <= box.playerId && box.playerId < tournament.players.length);
             //Joueur inscrit au tableau ?
 
-            var c = k.column(b);
+            const c = k.column(b);
             if (b === k.positionTopCol(c)) {
                 if (c < colMax) {
                     pClastMaxCol[c] = pClastMaxCol[c + 1];
                     //pClastMinCol[ c] = pClastMinCol[ c+1];
                 }
             }
+
+            const player = byId(players, box.playerId);
 
             if (boxIn
                 && boxIn.order !== undefined
@@ -196,8 +198,6 @@ export class KnockoutValidation implements IValidation {
                 validation.errorDraw('IDS_ERR_TAB_DUPLI', draw, boxIn, player);
                 bRes = false;
             }
-
-            var player = byId(players, box.playerId);
 
             //if( boxes[ i].order >= 0 && player) 
             if (player && boxIn && lib.isJoueurNouveau(boxIn) && !boxIn.qualifIn) {
@@ -267,7 +267,7 @@ export class KnockoutValidation implements IValidation {
                 ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
 
                 //TODO boxesOpponents(match)
-                var opponent = lib.boxesOpponents(match);
+                const opponent = lib.boxesOpponents(match);
 
                 ASSERT(!!opponent.box1 && !!opponent.box2);
 
@@ -307,8 +307,8 @@ export class KnockoutValidation implements IValidation {
                 if (!isMatchJoue(match)) {
 
                     //match before opponent 2
-                    var opponent1 = lib.boxesOpponents(<Match>opponent.box1);
-                    var opponent2 = lib.boxesOpponents(<Match>opponent.box2);
+                    const opponent1 = lib.boxesOpponents(<Match>opponent.box1);
+                    const opponent2 = lib.boxesOpponents(<Match>opponent.box2);
 
                     const player1 = byId(players, opponent.box1.playerId); // opponent.box1._player
                     const player2 = byId(players, opponent.box2.playerId); // opponent.box2._player
@@ -379,14 +379,14 @@ export class KnockoutValidation implements IValidation {
                         tournament._dayCount = dateDiff(tournament.info.start, tournament.info.end, UnitDate.Day) + 1;
 
                         if (tournament._dayCount) {
-                            var iDay = dateDiff(match.date, tournament.info.start, UnitDate.Day);
+                            const iDay = dateDiff(match.date, tournament.info.start, UnitDate.Day);
                             if (0 <= iDay && iDay < tournament._dayCount) {	//v0998
 
-                                var dayMatches = tournament._day[iDay];
+                                const dayMatches = tournament._day[iDay];
                                 ASSERT(dayMatches.length <= MAX_MATCHJOUR);
 
-                                for (var m = dayMatches.length - 1; m >= 0; m--) {
-                                    var match2 = dayMatches[m];
+                                for (let m = dayMatches.length - 1; m >= 0; m--) {
+                                    const match2 = dayMatches[m];
 
                                     if (match2.position != match.position
                                         && match2.place == match.place
@@ -413,8 +413,8 @@ export class KnockoutValidation implements IValidation {
                     if (match.date) {
 
                         //if (!isTypePoule) {
-                        var match1 = opponent.box1 as Match;
-                        var match2 = opponent.box2 as Match;
+                        const match1 = opponent.box1 as Match;
+                        const match2 = opponent.box2 as Match;
 
                         if (isMatch(opponent.box1)
                             && match1.date) {
@@ -456,13 +456,13 @@ export class KnockoutValidation implements IValidation {
             }
 
             if (boxIn) {
-                var e = boxIn.qualifIn;
+                const e = boxIn.qualifIn;
                 if (e && e != QEMPTY) {
                     nqe++;
 
                     ASSERT(!isTypePoule || (b >= k.positionBottomCol(draw.nbColumn, draw.nbOut)));	//Qe que dans colonne de gauche
 
-                    var iTableau = indexOf(event.draws, 'id', draw.id);
+                    const iTableau = indexOf(event.draws, 'id', draw.id);
                     if (iTableau == 0) {
                         validation.errorDraw('IDS_ERR_TAB_ENTRANT_TAB1', draw, boxIn, player);
                         bRes = false;
@@ -492,7 +492,7 @@ export class KnockoutValidation implements IValidation {
             }
 
             if (match) {
-                var e = match.qualifOut;
+                const e = match.qualifOut;
                 if (e) {
                     nqs++;
 
@@ -530,19 +530,19 @@ export class KnockoutValidation implements IValidation {
                 const [d,boxIn] = findSeeded(draw, e);
                 if (boxIn && d) {
                     if (e > e2 + 1) {
-                        validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', d, boxIn, player, 'Seeded ' + e);
+                        validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', d, boxIn, undefined, 'Seeded ' + e);
                         bRes = false;
                     }
 
                     if (isMatch(boxIn)) {
-                        validation.errorDraw('IDS_ERR_TAB_TETESERIE_ENTRANT', d, boxIn, player, 'Seeded ' + e);
+                        validation.errorDraw('IDS_ERR_TAB_TETESERIE_ENTRANT', d, boxIn, undefined, 'Seeded ' + e);
                         bRes = false;
                     }
 
-                    for (var i = 0; i < draw.boxes.length; i++) {
-                        var boxIn2 = <PlayerIn>draw.boxes[i];
+                    for (let i = 0; i < draw.boxes.length; i++) {
+                        const boxIn2 = <PlayerIn>draw.boxes[i];
                         if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
-                            validation.errorDraw('IDS_ERR_TAB_TETESERIE_DUP', d, boxIn, player, 'Seeded ' + e);
+                            validation.errorDraw('IDS_ERR_TAB_TETESERIE_DUP', d, boxIn, undefined, 'Seeded ' + e);
                             bRes = false;
                         }
                     }
@@ -558,9 +558,9 @@ export class KnockoutValidation implements IValidation {
             if (pT && pT.length) {
                 for (let e = 1; e <= MAX_QUALIF; e++) {
                     const [d,boxOut] = groupFindPlayerOut(event, pT, e);
-                    boxIn = lib.findPlayerIn(e);
+                    const boxIn = lib.findPlayerIn(e);
                     if (boxOut && !boxIn) {
-                        validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, player, 'Q' + boxOut.qualifOut);
+                        validation.errorDraw('IDS_ERR_TAB_SORTANT_PREC_NO', draw, undefined, undefined, 'Q' + boxOut.qualifOut);
                         bRes = false;
                     }
                 }
@@ -616,7 +616,7 @@ function CompString(a?: string, b?: string): number {
         return -1;
     }
     //upper case comparison
-    var u = a.toUpperCase(), v = b.toUpperCase();
+    const u = a.toUpperCase(), v = b.toUpperCase();
     return u == v ? 0 : u < v ? -1 : 1;
 }
 
@@ -628,8 +628,8 @@ enum UnitDate {
 function dateDiff(first: Date, second: Date, unit: UnitDate) {
 
     // Copy date parts of the timestamps, discarding the time parts.
-    var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
-    var two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
+    const one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
+    const two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
 
     return Math.floor((two.getTime() - one.getTime()) / unit);
 }

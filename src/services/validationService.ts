@@ -19,8 +19,8 @@ export class ValidationService implements IValidation {
 
   /** @override */
   validatePlayer(player: Player): boolean {
-    var res = true;
-    for (var i = 0; i < this._validLibs.length; i++) {
+    let res = true;
+    for (let i = 0; i < this._validLibs.length; i++) {
       res = res && this._validLibs[i].validatePlayer(player);
     }
     return res;
@@ -28,15 +28,15 @@ export class ValidationService implements IValidation {
 
   /** @override */
   validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
-    var res = true;
-    for (var i = 0; i < this._validLibs.length; i++) {
+    let res = true;
+    for (let i = 0; i < this._validLibs.length; i++) {
       res = res && this._validLibs[i].validateDraw(tournament, event, draw, players);
     }
     return res;
   }
 
   errorPlayer(message: string, player: Player, detail?: string): void {
-    var a: string[] = [];
+    const a: string[] = [];
     a.push("Validation error on", player.name);
     if (detail) {
       a.push("(" + detail + ")");
@@ -44,7 +44,7 @@ export class ValidationService implements IValidation {
     a.push(":", message);
     console.warn(a.join(" "));
 
-    var c = this._errorsPlayer[player.id];
+    let c = this._errorsPlayer[player.id];
     if (!c) {
       c = this._errorsPlayer[player.id] = [];
     }
@@ -52,7 +52,7 @@ export class ValidationService implements IValidation {
   }
 
   errorDraw(message: string, draw: Draw, box?: Box, player?: Player, detail?: string) {
-    var a: string[] = [];
+    const a: string[] = [];
     a.push("Validation error on", draw.name);
     if (box && player) {
       a.push("for", player.name);
@@ -63,7 +63,7 @@ export class ValidationService implements IValidation {
     a.push(":", message);
     console.warn(a.join(" "));
 
-    var c = this._errorsDraw[draw.id];
+    let c = this._errorsDraw[draw.id];
     if (!c) {
       c = this._errorsDraw[draw.id] = [];
     }
@@ -76,7 +76,7 @@ export class ValidationService implements IValidation {
   }
 
   hasErrorDraw(draw: Draw): boolean {
-    var c = draw && this._errorsDraw[draw.id];
+    const c = draw && this._errorsDraw[draw.id];
     return c && c.length > 0;
   }
 
@@ -91,7 +91,7 @@ export class ValidationService implements IValidation {
   }
 
   getErrorBox(box: Box, drawId: string): IError | undefined {
-    var c = box && this._errorsDraw[drawId];
+    const c = box && this._errorsDraw[drawId];
     if (c) {
       return by(c, "position", box.position);
     }

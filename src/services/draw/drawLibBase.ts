@@ -5,7 +5,7 @@ import { Player, PlayerIn } from '../../domain/player';
 import { drawLib, GenerateType } from './drawLib';
 import { TEvent } from '../../domain/tournament';
 
-var MAX_TETESERIE = 32,
+const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1;
 
@@ -19,14 +19,14 @@ export abstract class DrawLibBase {
 
     resetDraw( nPlayer: number): void {
         //remove qualif out
-        var next = nextGroup(this.draw);
+        const next = nextGroup(this.draw);
         if (next && this.draw.boxes) {
-            for (var i = 0; i < next.length; i++) {
-                var boxes = next[i].boxes;
+            for (let i = 0; i < next.length; i++) {
+                const boxes = next[i].boxes;
                 if (boxes) {
-                    var drawLibNext = drawLib(this.event, next[i]);
-                    for (var b = 0; b < boxes.length; b++) {
-                        var box = <Match> boxes[b];
+                    const drawLibNext = drawLib(this.event, next[i]);
+                    for (let b = 0; b < boxes.length; b++) {
+                        const box = <Match> boxes[b];
                         if (box && box.qualifOut) {
                             drawLibNext.setPlayerOut(box);
                         }
@@ -36,7 +36,7 @@ export abstract class DrawLibBase {
         }
 
         //reset boxes
-        // var lib = drawLib(this.event, this.draw); // TODO lib === this
+        // const lib = drawLib(this.event, this.draw); // TODO lib === this
         this.draw.boxes = [];
         this.draw.nbColumn = this.nbColumnForPlayers(nPlayer);
     }
@@ -67,11 +67,11 @@ export abstract class DrawLibBase {
 
     findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn | undefined {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-        var group = isArray(origin) ? origin : groupDraw(origin);
-        for (var i = 0; i < group.length; i++) {
-            var boxes = group[i].boxes;
-            for (var j = 0; j < boxes.length; j++) {
-                var boxIn: PlayerIn = boxes[j];
+        const group = isArray(origin) ? origin : groupDraw(origin);
+        for (let i = 0; i < group.length; i++) {
+            const boxes = group[i].boxes;
+            for (let j = 0; j < boxes.length; j++) {
+                const boxIn: PlayerIn = boxes[j];
                 if (boxIn.seeded === iTeteSerie) {
                     return boxIn;
                 }
@@ -114,7 +114,7 @@ export abstract class DrawLibBase {
         }
 
         const boxIn = box as PlayerIn;
-        var match = isMatch(box) ? box as Match : undefined;
+        const match = isMatch(box) ? box as Match : undefined;
         box.playerId = playerId;
         // box._player = player;
         //boxIn.order = 0;
@@ -127,9 +127,9 @@ export abstract class DrawLibBase {
             match.place = undefined;
         }
 
-        var boxOut = box as Match;
+        const boxOut = box as Match;
         if (boxOut.qualifOut) {
-            var next = nextGroup(this.draw);
+            const next = nextGroup(this.draw);
             if (next) {
                 const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
                 if (boxIn && d) {
@@ -357,11 +357,11 @@ export abstract class DrawLibBase {
 
         box.locked = true;
 
-        var prev = previousGroup(this.draw);
+        const prev = previousGroup(this.draw);
         if (prev) {
-            var boxIn = box as PlayerIn;
+            const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                var [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
+                const [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -380,11 +380,11 @@ export abstract class DrawLibBase {
 
         delete box.locked;
 
-        var prev = previousGroup(this.draw);
+        const prev = previousGroup(this.draw);
         if (prev) {
-            var boxIn = box as PlayerIn;
+            const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                var [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
+                const [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }
@@ -398,12 +398,12 @@ export abstract class DrawLibBase {
     fillBox(box: Box, source: Box): boolean {   //RempliBoite
         //ASSERT(RempliBoiteOk(box, boite));
 
-        var lib = drawLib(this.event, this.draw);
+        const lib = drawLib(this.event, this.draw);
 
-        var boxIn = box as PlayerIn;
-        var sourceIn = source as PlayerIn;
-        var match = isMatch(box) ? box as Match : undefined;
-        var sourceMatch = isMatch(source) ? source as Match : undefined;
+        const boxIn = box as PlayerIn;
+        const sourceIn = source as PlayerIn;
+        const match = isMatch(box) ? box as Match : undefined;
+        const sourceMatch = isMatch(source) ? source as Match : undefined;
 
         if (boxIn.qualifIn
             && boxIn.qualifIn !== sourceIn.qualifIn) {
@@ -458,7 +458,7 @@ export abstract class DrawLibBase {
 
                 //if( isCreneau( box))
                 //v0998
-                var opponents = lib.boxesOpponents(match);
+                const opponents = lib.boxesOpponents(match);
                 if (opponents.box1 && opponents.box2
                     && (sourceMatch.place || sourceMatch.date)
                     ) {
@@ -506,7 +506,7 @@ export abstract class DrawLibBase {
     }
     
     iDiagonale(box: Box): number {
-        var draw = this.draw;
+        const draw = this.draw;
         return this.isTypePoule() ? (box.position % this.draw.nbColumn) * (this.draw.nbColumn + 1) : box.position;
     }
     isGauchePoule(box: Box): boolean {
@@ -515,7 +515,7 @@ export abstract class DrawLibBase {
     
     ADVERSAIRE1(box: Box): number {
         if (this.isTypePoule()) {
-            var n = this.draw.nbColumn;
+            const n = this.draw.nbColumn;
             return box.position % n + n * n;
         } else {
             return (box.position << 1) + 2;
@@ -523,7 +523,7 @@ export abstract class DrawLibBase {
     }
     ADVERSAIRE2(box: Box): number {
         if (this.isTypePoule()) {
-            var n = this.draw.nbColumn;
+            const n = this.draw.nbColumn;
             return Math.floor(box.position / n) + n * n;
         } else {
             return (box.position << 1) + 1;
@@ -531,6 +531,7 @@ export abstract class DrawLibBase {
     }
 }
 
+/** A match, with a score field */
 function isMatch(box: Box): boolean {
     return box && ('undefined' !== typeof (box as Match).score);
 }

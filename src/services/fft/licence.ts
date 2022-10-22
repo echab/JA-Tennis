@@ -7,15 +7,15 @@ export class LicenceFFT implements Licence {
 
     isValid(licence: string): boolean {
 
-        var a = LicenceFFT.reLicence.exec(licence + " ");
+        const a = LicenceFFT.reLicence.exec(licence + " ");
 
         if (a === null) {
             return false;
         }
 
         //check licence key
-        var v = parseInt(a[1]);
-        var k = LicenceFFT.keys.charAt(v % 23);
+        const v = parseInt(a[1]);
+        const k = LicenceFFT.keys.charAt(v % 23);
 
         return k == a[2];
     }

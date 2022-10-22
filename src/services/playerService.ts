@@ -49,7 +49,7 @@ export function removePlayer(
 ): Command {
   const tournament = selection.tournament;
 
-  var i = indexOf(
+  const i = indexOf(
     tournament.players,
     "id",
     playerId,
@@ -128,8 +128,8 @@ export function registerPlayer(
 }
 
 // export function remove(player: Player) {
-//     var c = player._tournament.players;
-//     var i = indexOf(c, "id", player.id, "Player to remove not found");
+//     const c = player._tournament.players;
+//     const i = indexOf(c, "id", player.id, "Player to remove not found");
 //     // this.undo.remove(c, i, "Delete " + player.name + " " + i, ModelType.Player);   //c.splice( i, 1);
 //   // if (this.selection.player === player) {
 //   //     this.selection.select(c[i] || c[i - 1], ModelType.Player); //select next or previous

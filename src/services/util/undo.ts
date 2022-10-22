@@ -66,13 +66,13 @@ export class Undo {
         if ("function" !== typeof fnAction) {
             throw new Error( "Undo action: invalid fnAction");
         }
-        var action: IUndoAction = {
+        const action: IUndoAction = {
             type: ACTION.ACTION,
             fnAction,
             message: message || "",
             meta: meta
         };
-        var r = fnAction(false);
+        const r = fnAction(false);
         this._pushAction(action);
         return r;
     }
@@ -98,7 +98,7 @@ export class Undo {
         if ("undefined" === typeof value) {
             throw new Error( "Undo update: invalid value");
         }
-        var action: IUndoAction = {
+        const action: IUndoAction = {
             type: ACTION.UPDATE,
             obj: obj,
             member: member,
@@ -161,7 +161,7 @@ export class Undo {
                 member = obj.length;
             }
         }
-        var action : IUndoAction = {
+        const action : IUndoAction = {
             type: ACTION.INSERT,
             obj: obj,
             member: member,
@@ -184,7 +184,7 @@ export class Undo {
         if ("undefined" === typeof member) {
             throw new Error("Undo remove: invalid member");
         }
-        var action: IUndoAction = {
+        const action: IUndoAction = {
             type: ACTION.REMOVE,
             obj: obj,
             member: member,
@@ -218,7 +218,7 @@ export class Undo {
             throw new Error("Undo splice: bad array position to remove");
         }
 
-        //var isarray = isArray(itemX);
+        //const isarray = isArray(itemX);
 
         const action: IUndoAction = {
             type: ACTION.SPLICE,
@@ -232,7 +232,7 @@ export class Undo {
             meta: meta
         };
 
-        //var p = isarray ? itemX.slice(0, itemX.length) : Array.prototype.slice.call(arguments, 3, arguments.length - 1);
+        //const p = isarray ? itemX.slice(0, itemX.length) : Array.prototype.slice.call(arguments, 3, arguments.length - 1);
         const p: any = itemX.slice(0, itemX.length);
         p.unshift(index, howmany);
         action.values = Array.prototype.splice.apply(obj, p);
@@ -272,7 +272,7 @@ export class Undo {
         if (!this._group) {
             throw new Error( "No group defined");
         }
-        var g = this._group as IUndoActionGroup;
+        const g = this._group as IUndoActionGroup;
         this._group = null;
         if (g.stack?.length) {
             this._pushAction(g);
@@ -289,13 +289,13 @@ export class Undo {
     private _do(action: IUndoAction, bUndo: boolean): any {
         this._meta = action.meta;
         if (action.type === ACTION.GROUP) {
-            var r: any;
+            let r: any;
             if (bUndo) {
-                for (var i = action.stack.length - 1; i >= 0; i--) {
+                for (let i = action.stack.length - 1; i >= 0; i--) {
                     r = this._do(action.stack[i], true);
                 }
             } else {
-                for (i = 0; i < action.stack.length; i++) {
+                for (let i = 0; i < action.stack.length; i++) {
                     r = this._do(action.stack[i], false);
                 }
             }
@@ -306,7 +306,7 @@ export class Undo {
             return action.fnAction(bUndo);
 
         } else if (action.type === ACTION.UPDATE) {
-            var temp = action.obj[action.member];
+            const temp = action.obj[action.member];
             if( action.obj.splice) {
                 action.obj.splice(action.member, 1, action.value);   //to allow aurelia to observe
             } else {
@@ -331,7 +331,7 @@ export class Undo {
             return action.obj;  //temp;
 
         } else if (action.type === ACTION.SPLICE) {
-            var p = action.values.slice(0, action.values.length);   //copy array
+            const p = action.values.slice(0, action.values.length);   //copy array
             p.unshift(action.index, action.howmany);
             action.howmany = action.values.length;
             action.values = Array.prototype.splice.apply(action.obj, p);
@@ -359,7 +359,7 @@ export class Undo {
         if (!this.canUndo) {
             throw new Error( "Can't undo");
         }
-        var r = this._do(this._stack[this._head], true);
+        const r = this._do(this._stack[this._head], true);
         this._head--;
         return r;
     }
@@ -400,7 +400,7 @@ export class Undo {
 
     private _maxUndoOverflow(): void {
         if (this._stack.length > this._maxUndo) {
-            var nOverflow = this._stack.length - this._maxUndo;
+            const nOverflow = this._stack.length - this._maxUndo;
             this._head -= nOverflow;
             this._stack.splice(0, nOverflow);
         }

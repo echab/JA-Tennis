@@ -35,7 +35,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
   const draw: OptionalId<Draw> | undefined = props.draw && { ...props.draw }; // clone, without reactivity
 
-  const { form, updateField, getRadio } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
+  const { form, updateField } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
 
   const ranks: RankString[] = rank.list();
 
@@ -52,9 +52,9 @@ export const DialogDraw: Component<Props> = (props) => {
     const players: (Player|number)[] = getRegisteredPlayers(props.allPlayers, props.event, form.minRank, form.maxRank);
     const d = (draw ?? props.event.draws.at(-1)) as Draw | undefined;
     if (d) {
-      var previous = previousGroup(d);
+      const previous = previousGroup(d);
       if (previous) {
-          var qualifs = groupFindAllPlayerOut(props.event, previous);
+          const qualifs = groupFindAllPlayerOut(props.event, previous);
           if (qualifs.length) {
             return players.concat(qualifs);
           }

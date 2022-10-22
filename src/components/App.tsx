@@ -10,7 +10,7 @@ import { Events } from './event/Events';
 import styles from './App.module.css';
 import '../assets/icons.css';
 import { DialogInfo } from './event/DialogInfo';
-import { updateInfo } from '../services/tournamentService';
+import { initTournament, updateInfo } from '../services/tournamentService';
 
 export const App: Component = () => {
 
@@ -48,7 +48,7 @@ export const App: Component = () => {
 
 export const LeftPane: Component = () => {
   // const { selection, selectTournament, selectPlayer } = useSelection();
-  selectTournament(mockTournament);
+  selectTournament(initTournament(mockTournament));
 
   return <div>
     {/* {JSON.stringify(selection.tournament.info)} */}

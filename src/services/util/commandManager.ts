@@ -177,6 +177,7 @@ export function createCommandManager(maxHistory = 100) {
   };
 }
 
+/** same as `keyof T` but without symbol */
 type KeyOf<T> = Extract<keyof T, string|number>
 
 export function setItem<T extends Record<string, any>>(obj: T, field: KeyOf<T>, value: any): Command {

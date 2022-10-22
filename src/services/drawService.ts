@@ -71,7 +71,7 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
   //   match.id = Guid.create("b");
   // }
   const i = indexOf(draw.boxes, "position", match.position);
-  const prev = {...match};
+  const prev = {...draw.boxes[i]} as Match;
   // TODO boxIn of next draw/group
   const lib = drawLib(event, draw);
 
@@ -137,13 +137,13 @@ export function newBox(
   source?: string | Box,
   position?: number,
 ): Box {
-  var box: Box = <any> {};
+  const box: Box = <any> {};
   if (isObject(source)) {
     extend(box, source);
     //box.id = undefined;
     //box.position= undefined;
   } else if ("string" === typeof source) { //matchFormat
-    var match: Match = <Match> box;
+    const match: Match = <Match> box;
     match.score = ""; // delete match.score
     match.matchFormat = source;
   }
@@ -166,12 +166,12 @@ export function isMatch(box: Box): boolean {
 }
 
 export function _updateQualif(event: TEvent, draw: Draw): void {
-  var lib = drawLib(event, draw);
+  const lib = drawLib(event, draw);
 
   //retreive qualifIn box
-  var qualifs: PlayerIn[] = [];
-  for (var i = draw.boxes.length - 1; i >= 0; i--) {
-    var boxIn = <PlayerIn> draw.boxes[i];
+  const qualifs: PlayerIn[] = [];
+  for (let i = draw.boxes.length - 1; i >= 0; i--) {
+    const boxIn = <PlayerIn> draw.boxes[i];
     if (boxIn.qualifIn) {
       qualifs.push(boxIn);
     }
@@ -180,12 +180,12 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
   shuffle(qualifs);
 
   //remove old qualif numbers
-  for (i = qualifs.length - 1; i >= 0; i--) {
+  for (let i = qualifs.length - 1; i >= 0; i--) {
     lib.setPlayerIn(qualifs[i], 0);
   }
 
   //assign new qualif number
-  for (i = qualifs.length - 1; i >= 0; i--) {
+  for (let i = qualifs.length - 1; i >= 0; i--) {
     lib.setPlayerIn(qualifs[i], i + 1);
   }
 }
@@ -196,7 +196,7 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
 
 function groupBegin(draw: Draw): Draw { //getDebut
   //return the first Draw of the suite
-  var p = draw;
+  let p = draw;
   while (p && p.suite) {
     if (!p._previous) {
       break;
@@ -208,7 +208,7 @@ function groupBegin(draw: Draw): Draw { //getDebut
 
 function groupEnd(draw: Draw): Draw { //getFin
   //return the last Draw of the suite
-  var p = groupBegin(draw);
+  let p = groupBegin(draw);
   while (p && p._next && p._next.suite) {
     p = p._next;
   }
@@ -217,7 +217,7 @@ function groupEnd(draw: Draw): Draw { //getFin
 
 //** return the group of draw of the given draw (mainly for group of round robin). */
 export function groupDraw(draw: Draw): Draw[] {
-  var draws: Draw[] = [];
+  const draws: Draw[] = [];
   let d: Draw | undefined = groupBegin(draw);
   while (d) {
     draws.push(d);
@@ -231,13 +231,13 @@ export function groupDraw(draw: Draw): Draw[] {
 
 //** return the draws of the previous group. */
 export function previousGroup(draw: Draw): Draw[] | undefined { //getPrecedent
-  var p = groupBegin(draw);
+  const p = groupBegin(draw);
   return p?._previous ? groupDraw(p._previous) : undefined;
 }
 
 //** return the draws of the next group. */
 export function nextGroup(draw: Draw): Draw[] | undefined { //getSuivant
-  var p = groupEnd(draw);
+  const p = groupEnd(draw);
   return p && p._next ? groupDraw(p._next) : undefined;
 }
 
@@ -266,11 +266,11 @@ export function findSeeded(
   iTeteSerie: number,
 ): [Draw, PlayerIn] | [] { //FindTeteSerie
   ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-  var group = isArray(origin) ? origin : groupDraw(origin);
-  for (var i = 0; i < group.length; i++) {
-    var boxes = group[i].boxes;
-    for (var j = 0; j < boxes.length; j++) {
-      var boxIn: PlayerIn = boxes[j];
+  const group = isArray(origin) ? origin : groupDraw(origin);
+  for (let i = 0; i < group.length; i++) {
+    const boxes = group[i].boxes;
+    for (let j = 0; j < boxes.length; j++) {
+      const boxIn: PlayerIn = boxes[j];
       if (boxIn.seeded === iTeteSerie) {
         return [group[i], boxIn];
       }
@@ -285,11 +285,11 @@ export function groupFindPlayerIn(
   iQualifie: number,
 ): [Draw, PlayerIn] | [] {
   ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
-  //var group = isArray(group) ? group : groupDraw(group);
-  for (var i = 0; i < group.length; i++) {
-    var d = group[i];
-    var lib = drawLib(event, d);
-    var playerIn = lib.findPlayerIn(iQualifie);
+  //const group = isArray(group) ? group : groupDraw(group);
+  for (let i = 0; i < group.length; i++) {
+    const d = group[i];
+    const lib = drawLib(event, d);
+    const playerIn = lib.findPlayerIn(iQualifie);
     if (playerIn) {
       return [d, playerIn];
     }
@@ -303,20 +303,20 @@ export function groupFindPlayerOut(
   iQualifie: number,
 ): [Draw, Match] | [] {
   ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
-  //var group = isArray(origin) ? origin : groupDraw(origin);
-  for (var i = 0; i < group.length; i++) {
-    var d = group[i];
-    var lib = drawLib(event, d);
-    var boxOut = lib.findPlayerOut(iQualifie);
+  //const group = isArray(origin) ? origin : groupDraw(origin);
+  for (let i = 0; i < group.length; i++) {
+    const d = group[i];
+    const lib = drawLib(event, d);
+    const boxOut = lib.findPlayerOut(iQualifie);
     if (boxOut) {
       return [d, boxOut];
     }
   }
 
   //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
-  var outCount = 0;
-  for (var i = 0; i < group.length; i++) {
-    var d = group[i];
+  let outCount = 0;
+  for (let i = 0; i < group.length; i++) {
+    const d = group[i];
     if (d.type >= 2) {
       outCount += d.nbOut;
     }
@@ -333,12 +333,12 @@ export function groupFindAllPlayerOut(
   hideNumbers?: boolean,
 ): number[] { //FindAllQualifieSortant
   //Récupère les qualifiés sortants du tableau
-  var group = isArray(origin) ? origin : groupDraw(origin);
+  const group = isArray(origin) ? origin : groupDraw(origin);
   if (!group) {
     return [];
   }
-  var a: number[] = [];
-  for (var i = 1; i <= MAX_QUALIF; i++) {
+  const a: number[] = [];
+  for (let i = 1; i <= MAX_QUALIF; i++) {
     const [, m] = groupFindPlayerOut(event, group, i);
     if (m) {
       a.push(hideNumbers ? QEMPTY : i);
@@ -353,12 +353,12 @@ export function findAllPlayerOutBox(
   origin: Draw | Draw[],
 ): Match[] { //FindAllQualifieSortantBox
   //Récupère les qualifiés sortants du tableau
-  var group = isArray(origin) ? origin : groupDraw(origin);
+  const group = isArray(origin) ? origin : groupDraw(origin);
   if (!group) {
     return [];
   }
-  var a: Match[] = [];
-  for (var i = 1; i <= MAX_QUALIF; i++) {
+  const a: Match[] = [];
+  for (let i = 1; i <= MAX_QUALIF; i++) {
     const [, m] = groupFindPlayerOut(event, group, i);
     if (m) {
       a.push(m);

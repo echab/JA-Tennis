@@ -6,20 +6,20 @@ export class ScoreFFT implements Score {
 
     isValid(score: string): boolean {
 
-        var a = ScoreFFT.reScore.exec(score + " ");
+        const a = ScoreFFT.reScore.exec(score + " ");
 
         if (a === null) {
             return false;
         }
 
         //check score
-        var sets = score.split(/\s+/);
-        var nSet1 = 0, nSet2 = 0;
-        for (var i = 0; i < sets.length; i++) {
-            var games = sets[i].split("/");
+        const sets = score.split(/\s+/);
+        let nSet1 = 0, nSet2 = 0;
+        for (let i = 0; i < sets.length; i++) {
+            const games = sets[i].split("/");
 
-            var j1 = parseInt(games[0]);
-            var j2 = parseInt(games[1]);
+            const j1 = parseInt(games[0]);
+            const j2 = parseInt(games[1]);
 
             if (j1 > j2 && j1 >= 6) {
                 if (j1 >= 7 && j2 < 5) {
@@ -43,7 +43,7 @@ export class ScoreFFT implements Score {
 
 }
 
-var MAX_SET = 5;
+const MAX_SET = 5;
 
 export class ScoreDeltaFFT {
     m_Jeu: { j1: number; j2: number; }[];
@@ -55,7 +55,7 @@ export class ScoreDeltaFFT {
     }
 
     getnSet(): number {
-        var i = 0;
+        let i = 0;
         while (i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2)) {
             i++;
         }
@@ -64,11 +64,11 @@ export class ScoreDeltaFFT {
 
     deltaSet(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
-        // var n = 0;
-        // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
+        // let n = 0;
+        // for (let i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
         //     n += (this.m_Jeu[i].j1 > this.m_Jeu[i].j2) ? 1 : this.m_Jeu[i].j1 < this.m_Jeu[i].j2 ? -1 : 0;
         // }
-        // var dSet: number;
+        // let dSet: number;
 
         //        if (isWO())
         //            return bVainqueur ? 3 : -3;	//dSet2
@@ -83,7 +83,7 @@ export class ScoreDeltaFFT {
         //            score.Abandon = FALSE;
 
         //	//Passe les sets joués
-        //	var set;
+        //	let set;
         //            for (set = 0; set < MAX_SET; set++) {
 
         //		if( ((const CFormatMatch&)fm).isJeuDecisifDernierSet()
@@ -150,12 +150,12 @@ export class ScoreDeltaFFT {
     deltaJeu(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
 
-        // var n = 0;
-        // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
+        // let n = 0;
+        // for (let i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
         //     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
         // }
 
-        // var dJeu: number;
+        // let dJeu: number;
 
         //    if (isWO())
         //        return bVainqueur ? 5 : -5;
@@ -236,12 +236,12 @@ export class ScoreDeltaFFT {
     deltaPoint(bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw "Not implemented";
 
-        // var n = 0;
-        // for (var i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
+        // let n = 0;
+        // for (let i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
         //     n += (this.m_Jeu[i].j1 - this.m_Jeu[i].j2);
         // }
 
-        // var dSet: number, dJeu: number;
+        // let dSet: number, dJeu: number;
 
         //    if (isWO())
         //        return bVainqueur ? 2 : 0;

@@ -17,7 +17,7 @@ export class FFTValidation extends ValidationService {
 
     /** @override */
     validatePlayer(player: Player): boolean {
-        var bRes = super.validatePlayer(player);
+        let bRes = super.validatePlayer(player);
 
         //if (player.sexe == 'F'
         //    && player.rank
@@ -37,11 +37,11 @@ export class FFTValidation extends ValidationService {
 
         let lib = drawLib(event, draw);
 
-        var isTypePoule = draw.type >= 2;
+        const isTypePoule = draw.type >= 2;
 
-        var pColClast: { [rank: string]: number } = {};
+        const pColClast: { [rank: string]: number } = {};
 
-        var nqe = 0;
+        let nqe = 0;
 
         //TODOjs
         for (let i = 0; i < draw.boxes.length; i++) {
@@ -54,9 +54,9 @@ export class FFTValidation extends ValidationService {
             //VERIFIE //1   //progression des classements
             //rank progress, no more than two ranks difference into a column
             if (player && !isTypePoule) {
-                var c = column(box.position);
+                const c = column(box.position);
 
-                var colRank = pColClast[player.rank];
+                const colRank = pColClast[player.rank];
                 if (!colRank) {
                     pColClast[player.rank] = c;
                 } else if (Math.abs(colRank - c) > 1) {
@@ -99,7 +99,7 @@ export class FFTValidation extends ValidationService {
             //DONE 00/03/04: CTableau, Deux qualifiés entrants se rencontrent
 
             if (!isTypePoule && match) {
-                var opponent = lib.boxesOpponents(match);
+                const opponent = lib.boxesOpponents(match);
                 if ((<PlayerIn> opponent.box1).qualifIn
                     && (<PlayerIn> opponent.box2).qualifIn) {
                     const player1 = byId(players, opponent.box1.playerId);
@@ -123,9 +123,9 @@ export class FFTValidation extends ValidationService {
         if (draw.type === DrawType.Final) {
 
             //VERIFIE	//5
-            var [, boxT] = findSeeded(draw, 1);
+            const [, boxT] = findSeeded(draw, 1);
             if (!boxT) {
-                var boxMax = by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
+                const boxMax = by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
                 this.errorDraw('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);
                 bRes = false;
             }
@@ -392,7 +392,7 @@ function isMatch(box: Box): boolean {
 
 function column(pos: number): number {    //iCol
     //TODO, use a table
-    var col = -1;
+    let col = -1;
     for (pos++; pos; pos >>= 1, col++) { }
     return col;
 }

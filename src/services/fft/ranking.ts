@@ -54,7 +54,7 @@ export class RankingFFT implements Ranking {
     AddResultat(bVictoire: number, score: string, fm: string): boolean {	//-1=défaite, 0=nul, 1=victoire
         //bVictoire: -1=défaite, 0=nul, 1=victoire
 
-        var sc = new ScoreDeltaFFT(score, fm);
+        const sc = new ScoreDeltaFFT(score, fm);
 
         //Compte la différence de Set
         this.dPoint += sc.deltaPoint(bVictoire > 0);	//TODO bEquipe ???

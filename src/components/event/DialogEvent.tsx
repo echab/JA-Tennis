@@ -27,7 +27,7 @@ export const DialogEvent: Component<Props> = (props) => {
 
    const event: OptionalId<TEvent> | undefined = props.event && { ...props.event }; // clone, without reactivity
 
-   const { form, updateField, getRadio } = useForm<OptionalId<TEvent>>(event ?? EMPTY);
+   const { form, updateField } = useForm<OptionalId<TEvent>>(event ?? EMPTY);
 
    const ranks: RankString[] = rank.list();
    const categories: CategoryString[] = category.list();

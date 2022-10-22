@@ -45,7 +45,7 @@ export function updateEvent(
 }
 
 export function newEvent(parent: Tournament, source?: TEvent): TEvent {
-  var event: TEvent = <any> {};
+  const event: TEvent = <any> {};
   if (isObject(source)) {
     extend(event, source);
   }
@@ -58,10 +58,10 @@ export function newEvent(parent: Tournament, source?: TEvent): TEvent {
 export function initEvent(event: TEvent, parent: Tournament): void {
   // event._tournament = parent;
 
-  var c = event.draws = event.draws || [];
+  const c = event.draws = event.draws || [];
   if (c) {
-    for (var i = c.length - 1; i >= 0; i--) {
-      var draw = c[i];
+    for (let i = c.length - 1; i >= 0; i--) {
+      const draw = c[i];
       initDraw(draw, event);
 
       //init draws linked list
@@ -72,8 +72,8 @@ export function initEvent(event: TEvent, parent: Tournament): void {
 }
 
 export function removeEvent(tournament: Tournament, event: TEvent): void {
-  var c = tournament.events;
-  var i = indexOf(c, "id", event.id, "TEvent to remove not found");
+  const c = tournament.events;
+  const i = indexOf(c, "id", event.id, "TEvent to remove not found");
   // this.undo.remove(c, i, "Delete " + c[i].name + " " + i, ModelType.TEvent); //c.splice( i, 1);
   // if (this.selection.event === event) {
   //     this.selection.select(c[i] || c[i - 1], ModelType.TEvent);

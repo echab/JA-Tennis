@@ -39,9 +39,9 @@ export const DialogMatch: Component<Props> = (props) => {
   })
 
 
-  var lib = drawLib(props.event, props.draw);
+  const lib = drawLib(props.event, props.draw);
 
-  var {box1, box2} = lib.boxesOpponents(props.match);
+  const {box1, box2} = lib.boxesOpponents(props.match);
 
   const player1 = byId(props.players, box1.playerId);
   const player2 = byId(props.players, box2.playerId);
@@ -56,8 +56,9 @@ export const DialogMatch: Component<Props> = (props) => {
   };
 
   const match: Match & Opponents = { ...props.match, ...opponents }; // clone, without reactivity
+  match.score ??= '';
 
-  const { form, updateField, getRadio } = useForm(match);
+  const { form, updateField } = useForm(match);
 
   const matchFormats = matchFormat.list();
 
@@ -120,19 +121,26 @@ export const DialogMatch: Component<Props> = (props) => {
 
           <div class="mb-1">
             <span class="inline-block w-3/12 text-right pr-3">Winner:</span>
-            <label><input type="radio" class="p-1 mr-1"
-              checked={form.playerId == form.player1} value={player1?.id} onChange={updateField("playerId")} />
+            <label><input type="radio" name="winner" class="p-1 mr-1" autofocus
+              checked={form.playerId == player1?.id} value={player1?.id} onChange={updateField("playerId")}
+            />
               {player1?.name} {player1?.rank}</label>
             <br/>
-            <span class="inline-block w-3/12 text-right pr-3"></span>
-            <label><input type="radio" class="p-1 mr-1"
-              checked={form.playerId == form.player2} value={player2?.id} onChange={updateField("playerId")} />
+            <span class="inline-block w-3/12 text-right pr-3">
+              {/* <label><input type="radio" name="winner"
+                checked={!form.playerId} value={undefined} onChange={updateField("playerId")}
+              />None</label> */}
+            </span>
+            <label><input type="radio" name="winner" class="p-1 mr-1"
+              checked={form.playerId == player2?.id} value={player2?.id} onChange={updateField("playerId")} 
+               />
             {player2?.name} {player2?.rank}</label>
           </div>
           
           <div class="mb-1">
             <label for="score" class="inline-block w-3/12 text-right pr-3">Score:</label>
-            <input id="score" type="text" value={form.score ?? ''} onChange={updateField("score")} class="w-4/12 p-1"/>
+            <input id="score" type="text" class="w-4/12 p-1"
+              value={form.score} onChange={updateField("score")}/>
 
             <label class="ml-2"><input id="wo" type="checkbox" checked={form.wo} onChange={updateField("wo")} /> WO</label>
           </div>

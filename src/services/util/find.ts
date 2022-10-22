@@ -49,7 +49,7 @@ export function indexOf<T>(array: T[], member: StringKey<T>, value: any, error?:
  * Returns an object in the array by member. Or undefined if not found.
  */
 export function by<T>(array: T[], member: StringKey<T>, value: any, error?: string): T | undefined {
-    var i = indexOf(array, member, value, error);
+    const i = indexOf(array, member, value, error);
     return array[i];
 }
 
@@ -58,7 +58,7 @@ export function mapBy<T,K = number>(array: T[], member: StringKey<T>): Map<K,T> 
 }
 
 export function byId<T extends {id: string}>(array: T[], value: any, error?: string): T | undefined {
-    var i = indexOf(array, "id" as any, value, error);
+    const i = indexOf(array, "id" as any, value, error);
     return array[i];
 }
 

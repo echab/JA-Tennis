@@ -4,14 +4,14 @@ import { by, byId } from '../util/find';
 import { isObject } from '../util/object'
 import { shuffle, filledArray } from '../../utils/tool';
 import { rank } from '../types';
-import { DrawType, Draw, Box, Match } from '../../domain/draw';
+import { DrawType, Draw, Box, Match, BoxIn } from '../../domain/draw';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { Player, PlayerIn } from '../../domain/player';
 import { groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { TEvent } from '../../domain/tournament';
 
-var MIN_COL = 0,
+const MIN_COL = 0,
     MAX_COL = 9,
     MAX_QUALIF = 32,
     QEMPTY = - 1,
@@ -39,7 +39,7 @@ var MIN_COL = 0,
 export class Knockout extends DrawLibBase implements IDrawLib {
 
     private findBox( position: number, create?: boolean): Box | undefined {
-        var box = by(this.draw.boxes, 'position', position);
+        let box = by(this.draw.boxes, 'position', position);
         if (!box && create) {
             box = newBox(this.draw, undefined, position);
         }
@@ -50,9 +50,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     nbColumnForPlayers( nJoueur: number): number {
 
         
-        var colMin = k.columnMin(this.draw.nbOut);
+        const colMin = k.columnMin(this.draw.nbOut);
 
-        for (var c = colMin + 1; k.countInCol(c, this.draw.nbOut) < nJoueur && c < MAX_COL; c++) {
+        let c = colMin + 1
+        for (; k.countInCol(c, this.draw.nbOut) < nJoueur && c < MAX_COL; c++) {
         }
 
         if (MAX_COL <= c) {
@@ -76,11 +77,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
         //Shift the boxes
         if (oldDraw && this.draw.nbOut !== oldDraw.nbOut) {
-            var n = k.columnMax(this.draw.nbColumn, this.draw.nbOut) - k.columnMax(oldDraw.nbColumn, oldDraw.nbOut);
+            const n = k.columnMax(this.draw.nbColumn, this.draw.nbOut) - k.columnMax(oldDraw.nbColumn, oldDraw.nbOut);
             if (n != 0) {
-                var top = k.positionTopCol(n);
-                for (var i = this.draw.boxes.length - 1; i >= 0; i--) {
-                    var box = this.draw.boxes[i];
+                const top = k.positionTopCol(n);
+                for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
+                    const box = this.draw.boxes[i];
                     box.position = this.positionPivotLeft(box.position, top);
                 }
             }
@@ -90,10 +91,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     /** @override */
     generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[] {
         let playersOrQ : Array<Player|number> = [];
+        let m_nMatchCol;
         if (generate === GenerateType.Create) {   //from registred players
-            var m_nMatchCol = Array(MAX_COL).fill(0);
+            m_nMatchCol = Array(MAX_COL).fill(0);
 
-            // var players: Array<Player|number> = getRegisteredPlayers(this.event, this.draw);
+            // const players: Array<Player|number> = getRegisteredPlayers(this.event, this.draw);
 
             playersOrQ = registeredPlayersOrQ;
 
@@ -125,17 +127,17 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private RempliMatchs( m_nMatchCol: number[], nMatchRestant: number, colGauche?: number): void {
 
         
-        var colMin = k.columnMin(this.draw.nbOut);
+        const colMin = k.columnMin(this.draw.nbOut);
 
         colGauche = colGauche || colMin;
 
-        for (var i = colGauche; i <= MAX_COL; i++) {
+        for (let i = colGauche; i <= MAX_COL; i++) {
             m_nMatchCol[i] = 0;
         }
 
         //Rempli les autres matches de gauche normalement
-        for (var c = Math.max(colGauche, colMin); nMatchRestant && c < MAX_COL; c++) {
-            var iMax = Math.min(nMatchRestant, k.countInCol(c, this.draw.nbOut));
+        for (let c = Math.max(colGauche, colMin); nMatchRestant && c < MAX_COL; c++) {
+            let iMax = Math.min(nMatchRestant, k.countInCol(c, this.draw.nbOut));
             if (colMin < c) {
                 iMax = Math.min(iMax, 2 * m_nMatchCol[c - 1]);
             }
@@ -149,22 +151,22 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private CompteMatchs(): number[] {
 
         
-        var b: number, c2: number | undefined, n: number, bColSansMatch: boolean;
+        let b: number, c2: number | undefined, n: number, bColSansMatch: boolean;
 
-        var m_nMatchCol: number[] = new Array(MAX_COL);
+        const m_nMatchCol: number[] = new Array(MAX_COL);
 
         //Compte le nombre de joueurs entrants ou qualifié de la colonne
-        var colMin = k.columnMin(this.draw.nbOut);
-        var c = colMin;
+        const colMin = k.columnMin(this.draw.nbOut);
+        let c = colMin;
         m_nMatchCol[c] = this.draw.nbOut;
-        var nMatchRestant = -m_nMatchCol[c];
-        var colMax = k.columnMax(this.draw.nbColumn, this.draw.nbOut);
+        let nMatchRestant = -m_nMatchCol[c];
+        const colMax = k.columnMax(this.draw.nbColumn, this.draw.nbOut);
         for (c++; c <= colMax; c++) {
             n = 0;
-            var bottom = k.positionBottomCol(c),
+            const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
             for (b = bottom; b <= top; b++) {
-                var box = <PlayerIn>this.findBox(b);
+                const box = <PlayerIn>this.findBox(b);
                 if (box && (this.isJoueurNouveau(box) || box.qualifIn)) {
                     n++;
                 }
@@ -186,10 +188,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //Contrôle si il n'y a pas d'autres joueurs plus à gauche
         for (c++; c <= colMax; c++) {
             n = 0;
-            var bottom = k.positionBottomCol(c),
+            const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
             for (b = bottom; b <= top; b++) {
-                var box = <PlayerIn>this.findBox(b);
+                const box = <PlayerIn>this.findBox(b);
                 if (box && (this.isJoueurNouveau(box) || box.qualifIn)) {
                     n++;
                 }
@@ -217,10 +219,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         nMatchRestant = -m_nMatchCol[c];
         for (; c <= colMax; c++) {
             n = 0;
-            var bottom = k.positionBottomCol(c),
+            const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
             for (b = bottom; b <= top; b++) {
-                var box = <PlayerIn>this.findBox(b);
+                const box = <PlayerIn>this.findBox(b);
                 if (box && (this.isJoueurNouveau(box) || box.qualifIn)) {
                     n++;
                 }
@@ -275,11 +277,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private TirageEchelonne( m_nMatchCol: number[]): boolean {		//Suivant
 
         
-        var colMin = k.columnMin(this.draw.nbOut);
-        var colMax = k.columnMax(this.draw.nbColumn, this.draw.nbOut);
+        const colMin = k.columnMin(this.draw.nbOut);
+        const colMax = k.columnMax(this.draw.nbColumn, this.draw.nbOut);
 
         //Enlève le premier match possible en partant de la gauche
-        for (var c = MAX_COL - 1; c > colMin; c--) {
+        for (let c = MAX_COL - 1; c > colMin; c--) {
             if (undefined === m_nMatchCol[c]) {
                 continue;
             }
@@ -304,15 +306,15 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private TirageEnLigne( m_nMatchCol: number[]): boolean {	//Precedent
 
         
-        var colMin = k.columnMin(this.draw.nbOut);
+        const colMin = k.columnMin(this.draw.nbOut);
 
         //Cherche où est-ce qu'on peut ajouter un match en partant de la gauche
-        var nMatchRestant = 0;
-        for (var c = MAX_COL - 1; c > colMin; c--) {
+        let nMatchRestant = 0;
+        for (let c = MAX_COL - 1; c > colMin; c--) {
             if (undefined === m_nMatchCol[c]) {
                 continue;
             }
-            var iMax = Math.min(nMatchRestant + m_nMatchCol[c], k.countInCol(c, this.draw.nbOut));
+            let iMax = Math.min(nMatchRestant + m_nMatchCol[c], k.countInCol(c, this.draw.nbOut));
             if (c > colMin) {
                 iMax = Math.min(iMax, 2 * m_nMatchCol[c - 1]);
             }
@@ -334,10 +336,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     private GetJoueursTableau(): Array<string|number> {
 
         //Récupère les joueurs du tableau
-        var ppJoueur: Array<string|number> = [];
-        for (var i = 0; i < this.draw.boxes.length; i++) {
+        const ppJoueur: Array<string|number> = [];
+        for (let i = 0; i < this.draw.boxes.length; i++) {
 
-            var boxIn = this.draw.boxes[i] as PlayerIn;
+            const boxIn = this.draw.boxes[i] as PlayerIn;
             if (!boxIn) {
                 continue;
             }
@@ -355,19 +357,19 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Place les matches dans l'ordre
     private ConstruitMatch(oldDraw: Draw, m_nMatchCol: number[], players: Array<Player|number>): Draw {
 
-        
-        var draw = this.draw = newDraw(this.event, oldDraw);
+        const draw = this.draw = newDraw(this.event, oldDraw);
         draw.boxes = [];
 
-        var colMin = k.columnMin(draw.nbOut),
+        const colMin = k.columnMin(draw.nbOut),
             colMax = k.columnMax(draw.nbColumn, draw.nbOut);
 
         //Calcule OrdreInv
-        var pOrdreInv: number[] = [];
-        for (var c = colMin; c <= colMax; c++) {
-            var bottom = k.positionBottomCol(c),
+        const pOrdreInv: number[] = [];
+        let c = colMin;
+        for (; c <= colMax; c++) {
+            const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
-            for (var i = bottom; i <= top; i++) {
+            for (let i = bottom; i <= top; i++) {
                 if (WITH_TDS_HAUTBAS) {
                     pOrdreInv[this.iOrdreQhb(i, draw.nbOut)] = i;
                 } else {
@@ -377,20 +379,21 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         //Nombre de Tête de série
-        var nTeteSerie = draw.nbOut;
+        let nTeteSerie = draw.nbOut;
         if (nTeteSerie == 1) {
             nTeteSerie = k.countInCol((colMax - colMin) >> 1);
         }
 
-        var max = k.positionMax(draw.nbColumn, draw.nbOut);
-        var pbMatch: boolean[] = new Array(max + 1);
+        const max = k.positionMax(draw.nbColumn, draw.nbOut);
+        const pbMatch: boolean[] = new Array(max + 1);
 
-        var iJoueur = 0,
+        let iJoueur = 0,
             m = 0,
             nj = 0;
         c = -1;
-        for (var o = 0; o <= max; o++) {
-            var b = pOrdreInv[o];
+        let o = 0
+        for (; o <= max; o++) {
+            const b = pOrdreInv[o];
             if (b === -1) {
                 continue;
             }
@@ -402,13 +405,13 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             }
 
             //fou les joueurs
-            var posMatch = k.positionMatch(b);
+            const posMatch = k.positionMatch(b);
             if (nj > 0) {
                 if (pbMatch[posMatch]) {
                     iJoueur++;
                     nj--;
 
-                    var box = newBox(draw, this.event.matchFormat, b);
+                    const box = newBox(draw, this.event.matchFormat, b);
                     draw.boxes.push(box);
                 }
             } else {
@@ -417,7 +420,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     pbMatch[b] = true;
                     m--;
 
-                    var match = <Match> newBox(draw, this.event.matchFormat, b);
+                    const match = <Match> newBox(draw, this.event.matchFormat, b);
                     match.score = '';
                     draw.boxes.push(match);
                 }
@@ -431,7 +434,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //fou les joueurs en commençant par les qualifiés entrants
         iJoueur = 0;    //players.length - 1;
         for (; o > 0; o--) {
-            b = pOrdreInv[o];
+            let b = pOrdreInv[o];
             if (b === -1) {
                 continue;
             }
@@ -440,15 +443,15 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             if (!pbMatch[b] && pbMatch[k.positionMatch(b)]) {
 
                 //Qualifiés entrants se rencontrent
-                var qualif: number = 'number' === typeof players[iJoueur] ? <number>players[iJoueur] : 0;
+                let qualif: number = 'number' === typeof players[iJoueur] ? <number>players[iJoueur] : 0;
                 if (qualif) {
-                    var boxIn2 = <PlayerIn>this.findBox(k.positionOpponent(b));
+                    const boxIn2 = <PlayerIn>this.findBox(k.positionOpponent(b));
                     if (boxIn2 && boxIn2.qualifIn) {
                         //2 Qualifiés entrants se rencontrent
-                        for (var t = iJoueur + 1; t >= nTeteSerie; t--) {
+                        for (let t = iJoueur + 1; t >= nTeteSerie; t--) {
                             if (isObject(players[t])) {
                                 //switch
-                                var p = players[t];
+                                const p = players[t];
                                 players[t] = qualif;
                                 players[iJoueur] = p;
                                 qualif = 0;
@@ -458,7 +461,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     }
                 }
 
-                var boxIn = <PlayerIn>this.findBox(b);
+                const boxIn = <PlayerIn>this.findBox(b);
                 if (boxIn) {
                     delete (boxIn as any).score; //not a match
                     if (qualif) {	//Qualifié entrant
@@ -469,6 +472,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                         if ((!draw.minRank || !rank.isNC(draw.minRank))
                             || (!draw.maxRank || !rank.isNC(draw.maxRank))) {
                             //Mets les têtes de série (sauf tableau NC)
+                            let t;
                             if (WITH_TDS_HAUTBAS) {
                                 t = this.iTeteSerieQhb(b, draw.nbOut);
                             } else {
@@ -496,6 +500,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             //Find the first unused qualif number
             const group = groupDraw(draw);
+            let i;
             if (group) {
                 for (i = 1; i <= MAX_QUALIF; i++) {
                     const [,m] = groupFindPlayerOut(this.event, group, i);
@@ -507,10 +512,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 i = 1;
             }
 
-            bottom = k.positionBottomCol(colMin);
-            top = k.positionTopCol(colMin);
-            for (var b = top; b >= bottom && i <= MAX_QUALIF; b-- , i++) {
-                var boxOut = <Match> this.findBox(b);
+            const bottom = k.positionBottomCol(colMin);
+            const top = k.positionTopCol(colMin);
+            for (let b = top; b >= bottom && i <= MAX_QUALIF; b-- , i++) {
+                const boxOut = <Match> this.findBox(b);
                 if (boxOut) {
                     this.setPlayerOut(boxOut, i);
                 }
@@ -523,7 +528,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     /** @override */
     boxesOpponents(match: Match): { box1: Box; box2: Box } {
         
-        var pos1 = k.positionOpponent1(match.position),
+        const pos1 = k.positionOpponent1(match.position),
             pos2 = k.positionOpponent2(match.position);
         return {
             box1: < Box > by(this.draw.boxes, 'position', pos1),
@@ -540,8 +545,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (!box) {
             return false;
         }
-        var boxIn = box as PlayerIn;
-        var opponents = this.boxesOpponents(box as Match);
+        const boxIn = box as PlayerIn;
+        const opponents = this.boxesOpponents(box as Match);
         return !!box.playerId
             &&
             (
@@ -562,7 +567,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            var prev = previousGroup(this.draw);
+            const prev = previousGroup(this.draw);
             if (!playerId && prev && prev.length && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
                 const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
@@ -615,15 +620,16 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
-        var next = nextGroup(this.draw);
+        const next = nextGroup(this.draw);
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
         if (outNumber) {	//Ajoute un qualifié sortant
 
             //Met à jour le tableau suivant
+            let d: Draw | undefined, boxIn: PlayerIn | undefined;
             if (next && box.playerId && box.qualifOut) {
-                var [d,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
+                [d,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
                 if (boxIn && d) {
                     ASSERT(boxIn.playerId === box.playerId);
                     const lib = drawLib(this.event, d);
@@ -676,12 +682,12 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             return;
         }
 
-        for (var i = this.draw.boxes.length - 1; i >= 0; i--) {
-            var boxIn = <PlayerIn>this.draw.boxes[i];
+        for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
+            const boxIn = <PlayerIn>this.draw.boxes[i];
             if (!boxIn) {
                 continue;
             }
-            var e = boxIn.qualifIn;
+            const e = boxIn.qualifIn;
             if (e === iQualifie || (!iQualifie && e)) {
                 return boxIn;
             }
@@ -701,11 +707,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //private box1(match: Match): Box {
-    //    var pos = k.positionOpponent1(match.position);
+    //    const pos = k.positionOpponent1(match.position);
     //    return <Box> by(match._draw.boxes, 'position', pos);
     //}
     //private box2(match: Match): Box {
-    //    var pos = k.positionOpponent2(match.position);
+    //    const pos = k.positionOpponent2(match.position);
     //    return <Box> by(match._draw.boxes, 'position', pos);
     //}
 
@@ -727,18 +733,19 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     private iBoiteDeGauche(iBoite: number,  bToutesBoites: boolean, callback: (box: Box) => void): void {
 
-        var b: number;
-        var bOk: boolean = false;
+        let b: number;
+        let bOk: boolean = false;
 
         //ASSERT_VALID(pTableau);
 
-        for (var iBoiteCourante = iBoite; ;) {
-            var j = iBoiteCourante - iBoite * exp2(log2(iBoiteCourante + 1) - log2(iBoite + 1));
+        for (let iBoiteCourante = iBoite; ;) {
+            let box: Box | undefined;
+            let j = iBoiteCourante - iBoite * exp2(log2(iBoiteCourante + 1) - log2(iBoite + 1));
             do {
                 j++;
                 b = j + iBoite * exp2(log2(j + 1));
 
-                var box = this.findBox(b);
+                box = this.findBox(b);
                 if (!box) {
                     return;
                 }
@@ -773,8 +780,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             }
         } else {
             //Tête de série précédente (de droite)
-            var t = this.iTeteSerieQ(k.positionMatch(i), nQualifie),
-                v: boolean,
+            const t = this.iTeteSerieQ(k.positionMatch(i), nQualifie);
+            let v: boolean,
                 d: number,
                 c: number;
 
@@ -814,7 +821,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
-        var c = k.column(i);
+        const c = k.column(i);
         return Math.floor((i - k.positionBottomCol(c, nQualifie)) / k.countInCol(c - k.columnMin(nQualifie)));
         // 	return MulDiv( i - k.positionBottomCol(c, nQualifie), 1, k.countInCol(c - k.columnMin( nQualifie)) );
         //TODOjs? pb division entière
@@ -825,7 +832,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
-        var c: number = k.column(i);
+        const c: number = k.column(i);
         return i
             - this.iPartieQ(i, nQualifie) * k.countInCol(c - k.columnMin(nQualifie))
             - k.positionBottomCol(c, nQualifie)
@@ -849,8 +856,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 return 1 + this.iPartieQhb(i, nQualifie);
         } else {
             //Tête de série précédente (de droite)
-            var t: number = this.iTeteSerieQhb(k.positionMatch(i), nQualifie),
-                v: boolean,
+            const t: number = this.iTeteSerieQhb(k.positionMatch(i), nQualifie);
+            let v: boolean,
                 d: number,
                 c: number;
 
@@ -888,7 +895,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
-        var c: number = k.column(i);
+        const c: number = k.column(i);
         //	return (i - k.positionBottomCol(c, nQualifie) ) / k.countInCol(c - k.columnMin( nQualifie) );  
         return (nQualifie - 1) - Math.floor((i - k.positionBottomCol(c, nQualifie)) / k.countInCol(c - k.columnMin(nQualifie)));
         // 	return MulDiv( i - k.positionBottomCol(c, nQualifie), 1, k.countInCol(c - k.columnMin( nQualifie)) );
@@ -899,7 +906,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= k.countInCol(k.column(i)));
-        var c: number = k.column(i);
+        const c: number = k.column(i);
         return i
             - (nQualifie - 1 - this.iPartieQhb(i, nQualifie)) * k.countInCol(c - k.columnMin(nQualifie))
             - k.positionBottomCol(c, nQualifie)
@@ -916,8 +923,9 @@ function ASSERT(b: boolean, message?: string): void {
 
 function log2(x: number): number {
     ASSERT(x > 0);
-    var sh = x;
-    for (var i = -1; sh; sh >>= 1, i++);
+    let sh = x;
+    let i = -1
+    for (; sh; sh >>= 1, i++);
     return i;
 }
 

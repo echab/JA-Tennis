@@ -16,11 +16,11 @@ export function copy(source: any, destination?: any) {
         if (source === destination) throw Error("Can't copy equivalent objects or arrays");
         if (isArray(source)) {
             destination.length = 0;
-            for (var i = 0; i < source.length; i++) {
+            for (let i = 0; i < source.length; i++) {
                 destination.push(copy(source[i]));
             }
         } else {
-            for (var key in source) {
+            for (let key in source) {
                 if (source.hasOwnProperty(key) && "_$".indexOf(key.charAt(0)) == -1) {  //ignore prefixes _ and $
                     destination[key] = copy(source[key]);
                 }
@@ -31,18 +31,18 @@ export function copy(source: any, destination?: any) {
 }
 
 export function shuffle<T>(array: T[], from = 0, toExlusive = array.length): T[] {
-    var n = toExlusive - from;
+    const n = toExlusive - from;
     if (n == 2) {
         //if only two elements, swap them
         [array[0],array[1]] = [array[1],array[0]];
-        // var tmp = array[0];
+        // const tmp = array[0];
         // array[0] = array[1];
         // array[1] = tmp;
     } else {
-        for (var i = toExlusive - 1; i > from; i--) {
-            var t = from + Math.floor(n * Math.random());
+        for (let i = toExlusive - 1; i > from; i--) {
+            const t = from + Math.floor(n * Math.random());
             [array[t],array[i]] = [array[i],array[t]];
-            // var tmp = array[t];
+            // const tmp = array[t];
             // array[t] = array[i];
             // array[i] = tmp;
         }
@@ -58,9 +58,9 @@ export function hashById<T extends { id: string }>(array: T[]): { [id: string]: 
     if (!array) {
         return {};
     }
-    var a: { [id: string]: T } = {};
-    for (var i = array.length - 1; i >= 0; i--) {
-        var elem = array[i];
+    const a: { [id: string]: T } = {};
+    for (let i = array.length - 1; i >= 0; i--) {
+        const elem = array[i];
         if (elem.id) {
             a[<string>elem.id] = elem;
         }

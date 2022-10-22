@@ -16,16 +16,16 @@ export class RankFFT implements Rank {
     private _index: { [rank: string]: number } = {};
 
     constructor() {
-        var i: string;
+        let i: string;
         for (i in this._group) {
             this._groups.push(i);
-            var g: string[] = this._group[i].split(",");
+            const g: string[] = this._group[i].split(",");
             this._ranks = this._ranks.concat(g);
-            for (var j = g.length - 1; j >= 0; j--) {
+            for (let j = g.length - 1; j >= 0; j--) {
                 this._groupOf[g[j]] = i;
             }
         }
-        for (var j = this._ranks.length - 1; j >= 0; j--) {
+        for (let j = this._ranks.length - 1; j >= 0; j--) {
             this._index[this._ranks[j]] = j;
         }
     }
@@ -46,17 +46,17 @@ export class RankFFT implements Rank {
     }
 
     next(rank: RankString): RankString {
-        var i = this._index[<string>rank];
+        const i = this._index[<string>rank];
         return this._ranks[i + 1];
     }
 
     previous(rank: RankString): RankString {
-        var i = this._index[<string>rank];
+        const i = this._index[<string>rank];
         return this._ranks[i - 1];
     }
 
     compare(rank1: RankString, rank2: RankString): number {
-        var i = this._index[<string>rank1],
+        const i = this._index[<string>rank1],
             j = this._index[<string>rank2];
         return i - j;
     }

@@ -13,9 +13,9 @@ import { selection, update } from "../components/util/selection";
 /** This function load tournament data from an url. */
 export async function load(file_url?: Blob | string): Promise<Tournament> {
   if (!file_url) {
-    var data = window.localStorage["tournament"];
+    const data = window.localStorage["tournament"];
     if (data) {
-      var tournament: Tournament = JSON.parse(data);
+      const tournament: Tournament = JSON.parse(data);
       initTournament(tournament);
       //this.selection.select(tournament, ModelType.Tournament);
       return tournament;
@@ -36,10 +36,10 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
   } else { //if (file_url instanceof Blob) {
     throw Error('Not supported');
 //     return new Promise((resolve, reject) => {
-//       var reader = new FileReader();
+//       const reader = new FileReader();
 //       reader.addEventListener("loadend", () => {
 //         try {
-//           var tournament: Tournament = JSON.parse(reader.result);
+//           const tournament: Tournament = JSON.parse(reader.result);
 //           tournament._url = (<File> file_url).name; //TODO missing path
 //           initTournament(tournament);
 //           //this.selection.select(tournament, ModelType.Tournament);
@@ -60,7 +60,7 @@ export async function save(tournament: Tournament, url?: string) {
   //     tournament = selection.tournament;
   //   }
 
-  var data = {};
+  const data = {};
   copy(tournament, data);
   if (!url) {
     //this.$log.info(JSON.stringify(data));
@@ -75,7 +75,7 @@ export async function save(tournament: Tournament, url?: string) {
 // =====
 
 export function newTournament(source?: Tournament): Tournament {
-  var tournament: Tournament = source ? { ...source } : {
+  const tournament: Tournament = source ? { ...source } : {
     id: Guid.create("T"),
     info: { name: "", slotLength: DEFAULT_SLOT_LENGTH },
     players: [],
@@ -109,7 +109,7 @@ export function updateInfo(info: TournamentInfo) : Command {
 
 export function initTournament(tournament: Tournament): Tournament {
   if (tournament.events) {
-    for (var i = tournament.events.length - 1; i >= 0; i--) {
+    for (let i = tournament.events.length - 1; i >= 0; i--) {
       //tournament.events[i] = new TEvent(tournament, tournament.events[i]);
       initEvent(tournament.events[i], tournament);
     }
@@ -142,7 +142,7 @@ export function getRegisteredPlayers(allPlayers: Player[], event: TEvent, drawMi
   let ppJoueur: Player[] = [], //new short[nPlayer],
     nPlayer = 0;
   for (let i = 0; i < allPlayers.length; i++) {
-    var pJ = allPlayers[i];
+    const pJ = allPlayers[i];
     if (isRegistred(event, pJ)) {
       if (
         !pJ.rank ||
@@ -158,12 +158,12 @@ export function getRegisteredPlayers(allPlayers: Player[], event: TEvent, drawMi
 
 export function sortPlayers(players: Array<Player | number>): void {
   //Tri les joueurs par classement
-  var comparePlayersByRank = (
+  const comparePlayersByRank = (
     p1: Player | number,
     p2: Player | number,
   ): number => {
     //if numbers, p1 or p2 are PlayerIn
-    var isNumber1 = "number" === typeof p1,
+    const isNumber1 = "number" === typeof p1,
       isNumber2 = "number" === typeof p2;
     if (isNumber1 && isNumber2) {
       return 0;
@@ -179,7 +179,7 @@ export function sortPlayers(players: Array<Player | number>): void {
   players.sort(comparePlayersByRank);
 
   //Mélange les joueurs de même classement
-  for (var r0 = 0, r1 = 1; r0 < players.length; r1++) {
+  for (let r0 = 0, r1 = 1; r0 < players.length; r1++) {
     if (
       r1 === players.length || comparePlayersByRank(players[r0], players[r1])
     ) {
