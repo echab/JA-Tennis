@@ -118,8 +118,19 @@ export function createCommandManager(maxHistory = 100) {
       setPosition(-1);
     },
 
-    /** Begin a new transaction. Could have imbricated transactions. */
-    transaction(name: string) {
+    transaction(name: string, fn: () => void) {
+      this.beginTransaction(name);
+      try {
+        fn();
+        this.commit();
+      } catch (ex) {
+        this.rollback();
+        throw ex;
+      }
+    },
+
+    /** Begin a new transaction. Could have inner transactions. */
+    beginTransaction(name: string) {
       if (!currentTransaction) {
         currentTransaction = {
           name,
@@ -166,8 +177,12 @@ export function createCommandManager(maxHistory = 100) {
   };
 }
 
+type KeyOf<T> = Extract<keyof T, string|number>
 
-export function setValue<T extends Record<string, any>>(obj: T, field: keyof T, value: any): Command {
+export function setItem<T extends Record<string, any>>(obj: T, field: KeyOf<T>, value: any): Command {
+  if (typeof field === "number" && field < 0) {
+    throw new Error('Index out of range');
+  }
   const prev = (obj as any)[field];
   const act = () => {
     if (value === undefined) {
@@ -187,29 +202,31 @@ export function setValue<T extends Record<string, any>>(obj: T, field: keyof T, 
   return { name: `Set ${String(field)}`, act, undo };
 }
 
-export function setItem<T>(array: any[], pos: number, item: T): Command {
-  return setValue(array, pos, item);
-}
-
 export function insertItem<T>(obj: Array<any>, pos: number, item: T): Command {
+  if (pos > obj.length || pos < -obj.length) {
+    throw new Error("Index out of range");
+  }
   const act = () => {
     obj.splice(pos, 0, item);
   }
   act();
   const undo = () => {
-    obj.splice(pos, 1);
+    obj.splice(pos < 0 ? pos - 1 : pos, 1);
   }
-  return {name:`Insert`, act, undo};
+  return { name: `Insert`, act, undo };
 }
 
 export function removeItem(obj: Array<any>, pos: number): Command {
-  const prev = obj[pos];
+  if (pos >= obj.length || pos < -obj.length) {
+    throw new Error("Index out of range");
+  }
+  const prev = obj.at(pos);
   const act = () => {
     obj.splice(pos, 1);
   }
   act();
   const undo = () => {
-    obj.splice(pos, 0, prev);
+    obj.splice(pos < 0 ? pos + 1 : pos, 0, prev);
   }
-  return {name:`Remove`, act, undo};
+  return { name: `Remove`, act, undo };
 }
