@@ -52,7 +52,7 @@ export const DialogDraw: Component<Props> = (props) => {
     const players: (Player|number)[] = getRegisteredPlayers(props.allPlayers, props.event, form.minRank, form.maxRank);
     const d = (draw ?? props.event.draws.at(-1)) as Draw | undefined;
     if (d) {
-      const previous = previousGroup(d);
+      const previous = previousGroup(props.event, d);
       if (previous) {
           const qualifs = groupFindAllPlayerOut(props.event, previous);
           if (qualifs.length) {

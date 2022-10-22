@@ -254,7 +254,7 @@ export class DrawLibBaseOk {
 // 					return false;
 // 				}
 // 
-// 				const prev = drawLib.previousGroup(draw);
+// 				const prev = drawLib.previousGroup(event, draw);
 // 				if (!player && prev && prev.length && inNumber !== QEMPTY) {
 // 					//Va chercher le joueur dans le tableau précédent
 // 					const boxOut = drawLib.groupFindPlayerOut(prev, inNumber);
@@ -293,7 +293,7 @@ export class DrawLibBaseOk {
 // 		
 // 				ASSERT(boxIn.qualifIn);
 // 
-// 				if (box._draw.locked || (drawLib.previousGroup(draw) && !this.EnleveJoueurOk(box, true))) {
+// 				if (box._draw.locked || (drawLib.previousGroup(event, draw) && !this.EnleveJoueurOk(box, true))) {
 // 					return false;
 // 				}
 // 			}

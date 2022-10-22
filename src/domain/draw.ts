@@ -37,10 +37,6 @@ export interface Draw {
 
   mode?: Mode;
 
-  //group/suite
-  _previous?: Draw;
-  _next?: Draw;
-
   //_refresh?: Date; //force refresh //TODO?
 }
 

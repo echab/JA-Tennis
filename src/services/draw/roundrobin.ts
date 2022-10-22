@@ -155,7 +155,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            const prev = previousGroup(this.draw);
+            const prev = previousGroup(this.event, this.draw);
             if (!playerId && prev && inNumber != QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
                 const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
@@ -186,7 +186,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
             box.qualifIn = 0;
 
-            if (previousGroup(this.draw) && !this.removePlayer(box)) {
+            if (previousGroup(this.event, this.draw) && !this.removePlayer(box)) {
                 ASSERT(false);
             }
         }
@@ -200,7 +200,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
-        const next = nextGroup(this.draw);
+        const next = nextGroup(this.event, this.draw);
 
         //TODOjs findBox()
         const diag = this.draw.boxes[this.iDiagonale(box)];
@@ -271,7 +271,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         //Récupère les joueurs du tableau
         const ppJoueur: Array<string|number> = []; // playerId or Q
-        const draws = groupDraw(this.draw);
+        const draws = groupDraw(this.event, this.draw);
         for (let j = 0; j < draws.length; j++) {
             const d = draws[j];
             const first = positionFirstIn(d.nbColumn),
@@ -297,7 +297,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     generateDraw(generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[] {
         const refDraw = this.draw;
 
-        const oldDraws = groupDraw(refDraw);
+        const oldDraws = groupDraw(this.event, refDraw);
         let iTableau = indexOf(this.event.draws, 'id', oldDraws[0].id);
         if (iTableau === -1) {
             iTableau = this.event.draws.length;  //append the draws at the end of the event

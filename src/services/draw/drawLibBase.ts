@@ -19,7 +19,7 @@ export abstract class DrawLibBase {
 
     resetDraw( nPlayer: number): void {
         //remove qualif out
-        const next = nextGroup(this.draw);
+        const next = nextGroup(this.event, this.draw);
         if (next && this.draw.boxes) {
             for (let i = 0; i < next.length; i++) {
                 const boxes = next[i].boxes;
@@ -65,9 +65,10 @@ export abstract class DrawLibBase {
         return isMatch(box) && (!!box.place || !!box.date);
     }
 
+    /** @deprecated duplicated into drawService */
     findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn | undefined {    //FindTeteSerie
         ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-        const group = isArray(origin) ? origin : groupDraw(origin);
+        const group = isArray(origin) ? origin : groupDraw(this.event, origin);
         for (let i = 0; i < group.length; i++) {
             const boxes = group[i].boxes;
             for (let j = 0; j < boxes.length; j++) {
@@ -129,7 +130,7 @@ export abstract class DrawLibBase {
 
         const boxOut = box as Match;
         if (boxOut.qualifOut) {
-            const next = nextGroup(this.draw);
+            const next = nextGroup(this.event, this.draw);
             if (next) {
                 const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
                 if (boxIn && d) {
@@ -254,7 +255,7 @@ export abstract class DrawLibBase {
 
         //ASSERT(EnleveJoueurOk(box, bForce));
 
-        const next = nextGroup(this.draw);
+        const next = nextGroup(this.event, this.draw);
         const boxOut = box as Match;
         if (boxOut.qualifOut && next) {
             const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
@@ -357,7 +358,7 @@ export abstract class DrawLibBase {
 
         box.locked = true;
 
-        const prev = previousGroup(this.draw);
+        const prev = previousGroup(this.event, this.draw);
         if (prev) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
@@ -380,7 +381,7 @@ export abstract class DrawLibBase {
 
         delete box.locked;
 
-        const prev = previousGroup(this.draw);
+        const prev = previousGroup(this.event, this.draw);
         if (prev) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {

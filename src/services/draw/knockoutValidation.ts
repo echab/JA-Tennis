@@ -40,12 +40,12 @@ export class KnockoutValidation implements IValidation {
 
         if (draw.suite) {
             const iTableau = indexOf(event.draws, 'id', draw.id);
-            if (iTableau === 0 || !draw._previous) {
+            if (iTableau === 0 /* || !draw._previous */) {
                 validation.errorDraw('IDS_ERR_TAB_SUITE_PREMIER', draw);
                 bRes = false;
             }
 
-            const group = groupDraw(draw);
+            const group = groupDraw(event, draw);
             if (group) {
                 if (draw.type !== group[0].type) {
                     validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
@@ -62,7 +62,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        const prevGroup = previousGroup(draw);
+        const prevGroup = previousGroup(event, draw);
         if (prevGroup) {
             if (prevGroup[0].type !== DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
                 if (rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
@@ -72,7 +72,7 @@ export class KnockoutValidation implements IValidation {
             }
         }
 
-        const nextGrp = nextGroup(draw);
+        const nextGrp = nextGroup(event, draw);
         if (nextGrp) {
             if (draw.type !== DrawType.Final && draw.maxRank && nextGrp[0].minRank) {
                 if (rank.compare(nextGrp[0].minRank, draw.maxRank) < 0) {
@@ -85,7 +85,7 @@ export class KnockoutValidation implements IValidation {
         let e = MAX_QUALIF;
         if (!draw.suite) {
             //Trouve le plus grand Qsortant
-            const group = groupDraw(draw);
+            const group = groupDraw(event, draw);
             for (e = MAX_QUALIF; e >= 1; e--) {
                 const [,m] = groupFindPlayerOut(event, group, e);
                 if (m) {
@@ -476,7 +476,7 @@ export class KnockoutValidation implements IValidation {
                         bRes = false;
                     }
 
-                    const group = previousGroup(draw);
+                    const group = previousGroup(event, draw);
                     if (group) {
                         //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
                         const [d,m] = groupFindPlayerOut(event, group, e);
@@ -527,7 +527,7 @@ export class KnockoutValidation implements IValidation {
         //	if( !isTypePoule)
         if (!draw.suite) {
             for (let e2 = 0, e = 1; e <= MAX_TETESERIE; e++) {
-                const [d,boxIn] = findSeeded(draw, e);
+                const [d,boxIn] = findSeeded(event, draw, e);
                 if (boxIn && d) {
                     if (e > e2 + 1) {
                         validation.errorDraw('IDS_ERR_TAB_TETESERIE_NO', d, boxIn, undefined, 'Seeded ' + e);
@@ -554,7 +554,7 @@ export class KnockoutValidation implements IValidation {
 
         //Tous les qualifiés sortants du tableau précédent sont utilisés
         if (!draw.suite) {
-            const pT = previousGroup(draw);
+            const pT = previousGroup(event, draw);
             if (pT && pT.length) {
                 for (let e = 1; e <= MAX_QUALIF; e++) {
                     const [d,boxOut] = groupFindPlayerOut(event, pT, e);
@@ -573,7 +573,7 @@ export class KnockoutValidation implements IValidation {
         }
 
         if (draw.type === DrawType.Final) {
-            const group = groupDraw(draw);
+            const group = groupDraw(event, draw);
             if (draw.suite || group.at(-1)?.id !== draw.id) {
                 validation.errorDraw('IDS_ERR_TAB_SUITE_FINAL', draw);
                 bRes = false;

@@ -63,10 +63,6 @@ export function initEvent(event: TEvent, parent: Tournament): void {
     for (let i = c.length - 1; i >= 0; i--) {
       const draw = c[i];
       initDraw(draw, event);
-
-      //init draws linked list
-      draw._previous = c[i - 1];
-      draw._next = c[i + 1];
     }
   }
 }

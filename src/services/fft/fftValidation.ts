@@ -123,7 +123,7 @@ export class FFTValidation extends ValidationService {
         if (draw.type === DrawType.Final) {
 
             //VERIFIE	//5
-            const [, boxT] = findSeeded(draw, 1);
+            const [, boxT] = findSeeded(event, draw, 1);
             if (!boxT) {
                 const boxMax = by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
                 this.errorDraw('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);

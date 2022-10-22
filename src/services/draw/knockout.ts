@@ -499,7 +499,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (draw.type !== DrawType.Final) {
 
             //Find the first unused qualif number
-            const group = groupDraw(draw);
+            const group = groupDraw(this.event, draw);
             let i;
             if (group) {
                 for (i = 1; i <= MAX_QUALIF; i++) {
@@ -567,7 +567,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            const prev = previousGroup(this.draw);
+            const prev = previousGroup(this.event, this.draw);
             if (!playerId && prev && prev.length && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
                 const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
@@ -603,7 +603,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             box.qualifIn = 0;
 
-            if (previousGroup(this.draw) && !this.removePlayer(box)) {
+            if (previousGroup(this.event, this.draw) && !this.removePlayer(box)) {
                 ASSERT(false);
             }
 
@@ -620,7 +620,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
-        const next = nextGroup(this.draw);
+        const next = nextGroup(this.event, this.draw);
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 

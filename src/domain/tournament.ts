@@ -74,6 +74,4 @@ export interface TEvent {
     color ?: string;
 
     draws: Draw[];
-
-    // _tournament?: Tournament;
 }

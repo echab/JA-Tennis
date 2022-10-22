@@ -1,5 +1,5 @@
 ﻿import { Box } from "./draw";
-import { Coordinates, Tournament } from "./tournament";
+import { Coordinates } from "./tournament";
 
 export type Id = string;
 
@@ -33,8 +33,6 @@ export type Player = {
     //Availability
     comment?: string;
 
-    /** @deprecated */
-    _tournament?: Tournament;
 } & Coordinates;
 
 export interface PlayerIn extends Box {
