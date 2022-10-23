@@ -250,6 +250,9 @@ export function groups(event:TEvent): number[] {
 export function groupDraw(event: TEvent, draw: Draw): [number,number] {
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
+  if (i === -1) {
+    return [0, 0];
+  }
   let iStart = i, iNext = i + 1;
   for (; iStart > 0 && draws[iStart].suite; iStart--) {
   }
@@ -274,11 +277,13 @@ export function previousGroup(event: TEvent, draw: Draw): [number,number] | unde
 export function nextGroup(event: TEvent, draw: Draw): [number,number] | undefined { //getSuivant
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
-  let iNext = i + 1;
-  for (; iNext < draws.length && draws[iNext].suite; iNext++) {
-  }
-  if (iNext < draws.length) {
-    return groupDraw(event, draws[iNext]);
+  if (i >= 0) {
+    let iNext = i + 1;
+    for (; iNext < draws.length && draws[iNext].suite; iNext++) {
+    }
+    if (iNext < draws.length) {
+      return groupDraw(event, draws[iNext]);
+    }
   }
 }
 
@@ -302,7 +307,6 @@ export function isSlot(box: Match): boolean { //isCreneau
   return isMatch(box) && (!!box.place || !!box.date);
 }
 
-// TODO duplicated in drawLibBase
 export function findSeeded(
   event: TEvent,
   origin: Draw | [number,number],

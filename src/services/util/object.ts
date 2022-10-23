@@ -126,21 +126,14 @@ export function defined<T extends {}>(obj: T | undefined): obj is T {
   return { ...obj };
 }
 
-export function cleanupUndefined<T extends {}>(obj: T) : T | undefined {
-  if (isObject(obj)) {
-    const o = obj as any;
-    let n = 0, t = 0;
-    for (let f in o) {
-      n++;
-      const v = cleanupUndefined(o[f]);
+export function onlyDefined<T extends {}>(obj: T) : T | undefined {
+  if (obj && typeof obj === "object") {
+    Object.entries(obj).forEach(([f,v]) => {
+      v = onlyDefined(v as any);
       if (v === null || v === undefined) {
-        t++;
-        delete o[f];
+        delete (obj as any)[f];
       }
-    }
-    if (n === t) {
-      return;
-    }
+    });
   }
   return obj;
 }

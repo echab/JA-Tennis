@@ -455,6 +455,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 const boxIn = this.findBox<PlayerIn>(b);
                 if (boxIn) {
                     delete (boxIn as any).score; //not a match
+                    boxIn.order = iJoueur + 1; // TODO test
                     if (qualif) {	//Qualifié entrant
                         this.setPlayerIn(boxIn, qualif);
                     } else {	//Joueur
@@ -469,7 +470,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                             } else {
                                 t = this.iTeteSerieQ(b, draw.nbOut);
                             }
-                            if (t <= nTeteSerie && !findSeeded(this.event, draw, t)) {
+                            if (t <= nTeteSerie && !findSeeded(this.event, draw, t).length) {
                                 boxIn.seeded = t;
                             }
                         }
