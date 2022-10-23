@@ -1,4 +1,4 @@
-﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot } from '../drawService';
+﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
 import { isArray } from '../util/object';
 import { Draw, Box, DrawType, Match, PlayerIn } from '../../domain/draw';
 import { Player } from '../../domain/player';
@@ -95,7 +95,7 @@ export abstract class DrawLibBase {
     // }
 
     //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
-    putPlayer(box: Box, playerId: string, bForce?: boolean): boolean {   //MetJoueur
+    putPlayer(box: Box, playerId: string, boxQ?: Box, bForce?: boolean): boolean {   //MetJoueur
 
         //ASSERT(MetJoueurOk(box, iJoueur, bForce));
 
@@ -105,7 +105,7 @@ export abstract class DrawLibBase {
             }
         }
 
-        const boxIn = box as PlayerIn;
+        const boxIn = isPlayerIn(box) ? box : undefined;
         const match = isMatch(box) ? box : undefined;
         box.playerId = playerId;
         // box._player = player;
@@ -119,19 +119,22 @@ export abstract class DrawLibBase {
             match.place = undefined;
         }
 
-        const boxOut = box as Match;
-        if (boxOut.qualifOut) {
-            const next = nextGroup(this.event, this.draw);
-            if (next) {
-                const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
-                if (boxIn && d) {
-                    const lib = drawLib(this.event, d);
-                    if (!boxIn.playerId
-                        && !lib.putPlayer(boxIn, playerId, true)) {
-                        throw new Error('error');
-                    }
-                }
-            }
+        // const boxOut = box as Match;
+        // if (boxOut.qualifOut) {
+        //     const next = nextGroup(this.event, this.draw);
+        //     if (next) {
+        //         const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+        //         if (boxIn && d) {
+        //             const lib = drawLib(this.event, d);
+        //             if (!boxIn.playerId
+        //                 && !lib.putPlayer(boxIn, playerId, true)) {
+        //                 throw new Error('error');
+        //             }
+        //         }
+        //     }
+        // }
+        if (boxQ) {
+            boxQ.playerId = playerId;
         }
 
         ////Lock les adversaires (+ tableau précédent si qualifié entrant)
@@ -176,7 +179,7 @@ export abstract class DrawLibBase {
     }
 
     //Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la boite
-    putResult(box: Match, result: Match): boolean {   //SetResultat
+    putResult(box: Match, result: Match, boxQ?: Box): boolean {   //SetResultat
         //ASSERT(SetResultatOk(box, result));
 
         //v0998
@@ -194,7 +197,7 @@ export abstract class DrawLibBase {
         // const [nextDraw,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
 
         if (result.playerId) {
-            if (!this.putPlayer(box, result.playerId)) {
+            if (!this.putPlayer(box, result.playerId, boxQ)) {
                 throw new Error('error');
             }
         } else if (!this.removePlayer(box)) {

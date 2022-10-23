@@ -33,7 +33,7 @@ table.tableau tr:last-child>td
     position: relative;
 }
 
-.tableau td.pair::before {
+.tableau td.even::before {
     content: '-';
     color: transparent;
     background-color: transparent;
@@ -45,12 +45,12 @@ table.tableau tr:last-child>td
     z-index: -1;
 }
 
-.tableau td.pair:not(.qs)::before {
+.tableau td.even:not(.qs)::before {
     border-right: var(--boite-border);
     border-top-right-radius: var(--boite-corner);
 }
 
-.tableau td.impair::before {
+.tableau td.odd::before {
     content: '-';
     color: transparent;
     background-color: transparent;
@@ -62,7 +62,7 @@ table.tableau tr:last-child>td
     z-index: -1;
 }
 
-.tableau td.impair:not(.qs)::before {
+.tableau td.odd:not(.qs)::before {
     border-right: var(--boite-border);
     border-bottom-right-radius: var(--boite-corner);
 }

@@ -15,24 +15,29 @@ type Props = {
 }
 
 export const DrawKnockout: Component<Props> = (props) => {
-  const oT = props.draw;
-  const boxes = mapBy<PlayerIn & Match>(oT.boxes as Match[], 'position');
+  const draw = props.draw;
+  const boxes = mapBy<PlayerIn & Match>(draw.boxes as Match[], 'position');
 
-  const nLigne = countInCol(columnMax(oT.nbColumn, oT.nbOut), oT.nbOut);
+  const nLigne = countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut);
   const lignes = Array(nLigne).fill(0).map((_, i) => i);
-  const cMax = columnMax(oT.nbColumn, oT.nbOut);
-  const cMin = columnMin(oT.nbOut);
+  const cMax = columnMax(draw.nbColumn, draw.nbOut);
+  const cMin = columnMin(draw.nbOut);
 
   const cols = (l: number) => {
     const result = [];
     for (let c = cMax; c >= cMin; c--) {
       const ic = cMax - c;
-      const colR = c === cMin;
-      const i = positionTopCol(c) - (l >> ic);
-      const b = boxes.get(i);
-      const j = b?.playerId ? byId(props.players, b.playerId) : undefined;
-      result.push({ i, rs: 1 << ic, ...b, position: i, ...j, colR });
-      if (i & 1) {
+      const pos = positionTopCol(c) - (l >> ic);
+      const box = boxes.get(pos);
+      result.push({
+        box,
+        player: byId(props.players, box?.playerId),
+        even: (pos & 1) === 0,
+        odd: (pos & 1) !== 0,
+        rowspan: 1 << ic,
+        isRight: c === cMin,
+      });
+      if (pos & 1) {
         break;
       }
     }
@@ -43,33 +48,31 @@ export const DrawKnockout: Component<Props> = (props) => {
     <tbody>
       <For each={lignes}>{(l) =>
         <tr>
-          <For each={cols(l)}>{(b) =>
-            <td rowspan={b.rs} classList={{
-              pair: b.i % 2 === 0,
-              impair: b.i % 2 === 1,
-              qs: b.colR
+          <For each={cols(l)}>{({odd, even, rowspan, box, player, isRight}) =>
+            <td rowspan={rowspan} classList={{
+              even, odd, qs: isRight
             }}>
               {/* TODO <DrawBox box={b} players={props.players} /> */}
               <div class="boite joueur">
-                <Show when={b.qualifIn}><span class="qe">Q{b.qualifIn}</span></Show>
-                <Show when={b.seeded}><span class="ts">{b.seeded}</span></Show>
-                <span class="nom">{b.name}</span>
-                <Show when={b.order && b.rank}><span class="classement">{b.rank}</span></Show>
-                <Show when={b.qualifOut}><span class="qs">Q{b.qualifOut}</span></Show>
+                <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
+                <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
+                <span class="nom">{player?.name}</span>
+                <Show when={box?.order && player?.rank}><span class="classement">{player!.rank}</span></Show>
+                <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                 <br />
-                <Show when={b.order} fallback={
+                <Show when={box?.order} fallback={
                   <>
                     <i class="icon2-match hover"
                       onclick={() => {
-                        selectBox(props.event!, props.draw, b);
+                        selectBox(props.event, props.draw, box);
                         props.showDlgMatch(true);
                       }}
                     ></i>
-                    <Show when={b.score} fallback={
-                      <Show when={b.date}><span class="date">{b.date?.toLocaleString()}</span></Show>
-                    }><span class="score">{b.score}</span></Show>
+                    <Show when={box?.score} fallback={
+                      <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
+                    }><span class="score">{box!.score}</span></Show>
                   </>
-                }><span class="club">{b.club}</span></Show>
+                }><span class="club">{player?.club}</span></Show>
               </div>
             </td>
           }</For>

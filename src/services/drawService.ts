@@ -72,27 +72,31 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
   // }
   const i = indexOf(draw.boxes, "position", match.position);
   const prev = { ...draw.boxes[i] } as Match;
-  // TODO boxIn of next draw/group
   const lib = drawLib(event, draw);
 
+  // TODO boxIn of next draw/group
+  const qualifOut = (draw.boxes[i] as Match).qualifOut;
+  const nextGrp = nextGroup(event, draw);
+  const [nextDraw, nextBoxIn] = nextGrp && qualifOut ? groupFindPlayerIn(event, nextGrp, qualifOut) : [];
+  const prevBoxIn = {...nextBoxIn};
+
   const act = () => {
-    update(({ event, draw, box }) => {
-      if (!event || !draw) {
-        throw new Error("updateMatch without event or draw");
+    update(({ event, draw, box, boxQ }) => {
+      if (!event || !draw || !box || !isMatch(box)) {
+        throw new Error("updateMatch without selected event, draw or match");
       }
-      // draw.boxes[i] = match;
-      lib.putResult(draw.boxes[i] as Match, match);
+      lib.putResult(box, match, boxQ);
     });
   };
   act();
 
   const undo = () => {
-    update(({ event, draw }) => {
-      if (!event || !draw) {
+    update(({ event, draw, box, boxQ }) => {
+      if (!event || !draw || !box || !isMatch(box)) {
         throw new Error("updateMatch without event or draw");
       }
       // draw.boxes[i] = prev;
-      lib.putResult(draw.boxes[i] as Match, prev);
+      lib.putResult(box, prev, boxQ);
     });
   };
 
@@ -296,6 +300,31 @@ export function findSeeded(
   return [];
 }
 
+export function groupFindQ(event: TEvent, draw: Draw, box: Box): Box | undefined {
+  const qualifOut = (box as Match).qualifOut;
+  const qualifIn = (box as PlayerIn).qualifIn;
+  if (qualifOut !== undefined) {
+    const nextGrp = nextGroup(event, draw);
+    if (nextGrp) {
+      const [, nextPlayerIn] = groupFindPlayerIn(event, nextGrp, qualifOut);
+      return nextPlayerIn;
+    }
+  } else if (qualifIn !== undefined) {
+    const prevGrp = previousGroup(event, draw);
+    if (prevGrp) {
+      const [, prevPlayerOut] = groupFindPlayerOut(event, prevGrp, qualifIn);
+      return prevPlayerOut;
+    }
+  }
+}
+
+/**
+ * 
+ * @param event 
+ * @param group 
+ * @param iQualifie 
+ * @returns draw and box
+ */
 export function groupFindPlayerIn(
   event: TEvent,
   [groupStart, groupEnd]: [number,number],

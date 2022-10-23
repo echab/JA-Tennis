@@ -2,6 +2,7 @@ import { createStore, produce } from "solid-js/store";
 import { Box, Draw } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, TEvent, Tournament } from "../../domain/tournament";
+import { groupFindQ } from "../../services/drawService";
 
 // export interface Selection extends SelectionActions {
 //     selection: SelectionItems,
@@ -12,6 +13,7 @@ export interface SelectionItems {
     event?: TEvent;
     draw?: Draw;
     box?: Box;
+    boxQ?: Box;
     player?: Player;
 }
 
@@ -22,6 +24,11 @@ export const [selection, setSelection] = createStore<SelectionItems>({ tournamen
 export function selectTournament(tournament: Tournament) {
     update((sel) => {
         sel.tournament = tournament;
+        sel.player = undefined;
+        sel.event = undefined;
+        sel.draw = undefined;
+        sel.box = undefined;
+        sel.boxQ = undefined;
     });
 }
 
@@ -40,6 +47,9 @@ export function selectPlayer(player?: Player): void {
 export function selectEvent(event?: TEvent): void {
     update((sel) => {
         sel.event = event;
+        sel.draw = undefined;
+        sel.box = undefined;
+        sel.boxQ = undefined;
     });
 }
 
@@ -47,6 +57,8 @@ export function selectDraw(event: TEvent, draw?: Draw): void {
     update((sel) => {
         sel.event = event;
         sel.draw = draw;
+        sel.box = undefined;
+        sel.boxQ = undefined;
     });
 }
 
@@ -55,6 +67,7 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
         sel.event = event;
         sel.draw = draw;
         sel.box = box;
+        sel.boxQ = box ? groupFindQ(event, draw, box) : undefined;
     });
 }
 

@@ -1,5 +1,6 @@
 const slice = [].slice;
 
+/** @deprecated use destructuring instead: `dst = {...dst, ...src}` */
 export function extend(dst: any, src?: any) {
   return baseExtend(dst, slice.call(arguments, 1), false);
 }
@@ -41,6 +42,7 @@ function baseExtend(dst: any, objs: any[], deep: boolean) {
  *
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is an `Object` but not `null`.
+ * @deprecated
  */
 export function isObject(value: any): value is {} {
   // http://jsperf.com/isobject4
