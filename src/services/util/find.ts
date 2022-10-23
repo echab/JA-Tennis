@@ -85,3 +85,7 @@ function _reindex<T>(array: T[], member: StringKey<T>): IIndex {
 
     return idx;
 }
+
+export function getId({id}: {id:string}) {
+    return id;
+}

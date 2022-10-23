@@ -53,10 +53,14 @@ export const DrawKnockout: Component<Props> = (props) => {
               even, odd, qs: isRight
             }}>
               {/* TODO <DrawBox box={b} players={props.players} /> */}
-              <div class="boite joueur">
+              <div class="boite joueur"
+                onclick={(evt) => {selectBox(props.event, draw, box); evt.cancelBubble = true; }}
+              >
                 <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
-                <span class="nom">{player?.name}</span>
+                <span class="nom">{player?.name}
+                  <Show when={box?.order}> {player?.firstname}</Show>
+                </span>
                 <Show when={box?.order && player?.rank}><span class="classement">{player!.rank}</span></Show>
                 <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                 <br />

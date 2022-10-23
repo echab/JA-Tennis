@@ -7,8 +7,8 @@ import { rank } from "./types";
 import { Box, Draw, DrawType, Match, Mode, PlayerIn } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
-import { Command } from "./util/commandManager";
-import { update } from "../components/util/selection";
+import { Command, removeItemById } from "./util/commandManager";
+import { selectDraw, selectEvent, selection, update } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
 import { DrawLibBase } from "./draw/drawLibBase";
 
@@ -132,6 +132,36 @@ export function initDraw(draw: Draw, parent: TEvent): void {
   draw.mode = draw.mode || Mode.Build;
 }
 
+export function deleteDraw(drawId: string): Command {
+  const event = selection.event;
+  if (!event) {
+    throw new Error('No selected event');
+  }
+  const i = indexOf(
+    event.draws,
+    "id",
+    drawId,
+    "Player to remove not found",
+  );
+  const prevDraw = event.draws[i];
+
+  const act = () => {
+    selectEvent(event);
+    update(({ event }) => event?.draws.splice(i, 1));
+  };
+  act();
+
+  const undo = () => {
+    selectEvent(event);
+    update(({ event }) => {
+      event?.draws.splice(i, 0, prevDraw);
+    });
+    selectDraw(event!, prevDraw);
+  };
+
+  return { name: `Remove draw ${prevDraw.name}`, act, undo };
+}
+  
 //newBox(parent: Draw, matchFormat?: string, position?: number): Box
 //newBox(parent: Draw, source?: Box, position?: number): Box
 export function newBox<T extends Box = Box>(
@@ -202,24 +232,16 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
 //   return byId(box._draw._event._tournament.players, box.playerId);
 // }
 
-// function groupStartIndex({draws}: TEvent, draw: Draw): number { //getDebut
-//   //return the first Draw of the suite
-//   let i = draws.findIndex(({id}) => id === draw.id);
-//   for (;i>0 && draws[i].suite; i--) {
-//   }
-//   return i;
-// }
-
-// function groupEndIndex({draws}: TEvent, draw: Draw): number { //getFin
-//   //return the last Draw of the suite
-//   let i = draws.findIndex(({id}) => id === draw.id);
-//   for (;i<draws.length; i++) {
-//     if (!draws[i].suite) {
-
-//     }
-//   }
-//   return i-1;
-// }
+export function groups(event:TEvent): number[] {
+  const result: number[] = [];
+  event.draws.forEach((d, i) => {
+    if (!d.suite) {
+      result.push(i);
+    }
+  });
+  // result.push(event.draws.length);
+  return result;
+}
 
 /**
  * Return the first and last indexes (exclusive) of the draws in the same group as given draw

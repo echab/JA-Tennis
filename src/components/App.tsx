@@ -36,6 +36,9 @@ export const App: Component = () => {
           &nbsp;
           <button type="button" disabled={!commandManager.canRedo} onclick={() => commandManager.redo()} title={`Redo ${commandManager.redoNames(1)?.[0] ?? ''}`}>↷ Redo</button>
         </div>
+        <div>
+          selection: player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position}
+        </div>
       </header>
       <div class="flex">
         <LeftPane />

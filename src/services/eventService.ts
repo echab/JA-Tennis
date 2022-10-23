@@ -1,11 +1,12 @@
-import { indexOf } from "./util/find";
+import { getId, indexOf } from "./util/find";
 import { Guid } from "./util/guid";
 import { initDraw } from "./drawService";
 import { extend, isObject } from "./util/object";
 import { Tournament, TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
-import { Command } from "./util/commandManager";
-import { selection, update } from "../components/util/selection";
+import { Command, removeItemById } from "./util/commandManager";
+import { selectEvent, selection, update } from "../components/util/selection";
+import { removeValue } from "./util/array";
 
 /** Add a new event or update an existing event (with id) */
 export function updateEvent(
@@ -67,11 +68,41 @@ export function initEvent(event: TEvent, parent: Tournament): void {
   }
 }
 
-export function removeEvent(tournament: Tournament, event: TEvent): void {
-  const c = tournament.events;
-  const i = indexOf(c, "id", event.id, "TEvent to remove not found");
-  // this.undo.remove(c, i, "Delete " + c[i].name + " " + i, ModelType.TEvent); //c.splice( i, 1);
-  // if (this.selection.event === event) {
-  //     this.selection.select(c[i] || c[i - 1], ModelType.TEvent);
-  // }
+export function deleteEvent(eventId: string): Command {
+  const { events, players } = selection.tournament;
+  const i = indexOf(
+    events,
+    "id",
+    eventId,
+    "Player to remove not found",
+  );
+  const prevEvent = events[i];
+  const registeredPlayers = new Set(
+    players.filter((player, j) => player.registration.includes(eventId)).map(getId)
+  );
+  const byRegistered = ({id}:{id:string}) => registeredPlayers.has(id);
+
+  const act = () => {
+    update(({ tournament }) => {
+      tournament.events.splice(i, 1);
+      tournament.players
+        // .filter(({id}) => registeredPlayers.has(id))
+        .filter(byRegistered)
+        .forEach(({registration}) => removeValue(registration, eventId))
+    });
+    selectEvent(undefined);
+  };
+  act();
+
+  const undo = () => {
+    update(({ tournament }) => {
+      tournament.events.splice(i, 0, prevEvent);
+      tournament.players
+        .filter(byRegistered)
+        .forEach(({registration}) => registration.push(eventId))
+    });
+    selectEvent(prevEvent);
+  };
+
+  return { name: `Remove event ${prevEvent.name}`, act, undo };
 }

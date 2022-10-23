@@ -1,6 +1,5 @@
 import { DrawType } from "../domain/draw";
 import { Tournament } from "../domain/tournament";
-import { MINUTES } from "../utils/date";
 
 export const mockTournament: Tournament = {
   id: "1",
@@ -9,9 +8,9 @@ export const mockTournament: Tournament = {
     slotLength: 90 // minutes
   },
   players: [
-    { id: "J0", name: "Albert", sexe: "H", rank: "NC", registration: ["E0"], club:'TROC' },
-    { id: "J1", name: "Bernard", sexe: "H", rank: "NC", registration: ["E0"] },
-    { id: "J2", name: "Claude", sexe: "H", rank: "30/4", registration: [] },
+    { id: "J0", name: "Albert", firstname:"René", sexe: "H", rank: "NC", registration: ["E0"], club:'TROC' },
+    { id: "J1", name: "Bernard", firstname:"et Bianca", sexe: "H", rank: "NC", registration: ["E0"] },
+    { id: "J2", name: "Claude", firstname:"Mickaël", sexe: "H", rank: "30/4", registration: [] },
     { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: ["E0"] },
     { id: "J5", name: "Etienne", sexe: "H", rank: "30/2", registration: ["E0"] },
   ],
@@ -22,6 +21,7 @@ export const mockTournament: Tournament = {
       sexe: "H",
       category: "Senior",
       maxRank: "30/1",
+      color: "#dadaf9",
       draws: [
         {
           id: "T00",
@@ -58,5 +58,15 @@ export const mockTournament: Tournament = {
         },
       ],
     },
+    {
+      id: "E1",
+      name: "Dames",
+      sexe: "F",
+      category: "Senior",
+      maxRank: "30/1",
+      color: "#f9dada",
+      draws: [
+      ]
+    }
   ],
 };

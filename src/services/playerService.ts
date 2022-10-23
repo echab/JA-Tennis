@@ -1,4 +1,4 @@
-import { selection, update } from "../components/util/selection";
+import { selection, selectPlayer, update } from "../components/util/selection";
 import type { OptionalId } from "../domain/object";
 import type { Player } from "../domain/player";
 import { TEvent } from "../domain/tournament";
@@ -55,8 +55,8 @@ export function deletePlayer(
     playerId,
     "Player to remove not found",
   );
-  const player = tournament.players[i];
-  const boxes = tournament.events.flatMap((event, e) =>
+  const prevPlayer = tournament.players[i];
+  const prevBoxes = tournament.events.flatMap((event, e) =>
     event.draws.flatMap((draw, d) =>
       draw.boxes.filter((box) => box.playerId === playerId)
         .map((_, b) => ({ e, d, b }))
@@ -66,7 +66,7 @@ export function deletePlayer(
   const act = () => {
     update(({ tournament }) => {
       tournament.players.splice(i, 1);
-      for (const { e, d, b } of boxes) {
+      for (const { e, d, b } of prevBoxes) {
         tournament.events[e].draws[d].boxes[b].playerId = "";
       }
     });
@@ -75,14 +75,15 @@ export function deletePlayer(
 
   const undo = () => {
     update(({ tournament }) => {
-      tournament.players.splice(i, 0, player);
-      for (const { e, d, b } of boxes) {
+      tournament.players.splice(i, 0, prevPlayer);
+      for (const { e, d, b } of prevBoxes) {
         tournament.events[e].draws[d].boxes[b].playerId = playerId;
       }
     });
+    selectPlayer(prevPlayer);
   };
 
-  return { name: `Remove player ${player.name}`, act, undo };
+  return { name: `Remove player ${prevPlayer.name}`, act, undo };
 }
 
 export function registerPlayer(

@@ -35,6 +35,7 @@ export const Players: Component<Props> = (props) => {
             <th class="span1"><input type="checkbox" disabled /></th>
             <th class="text-left">Player name</th>
             <th class="text-left">Rank</th>
+            <th class="text-left">Reg</th>
             <th class="text-left">Registrations</th>
             <td>
               <button type="button" onclick={[editPlayer,null]}>➕ Add player</button>
@@ -44,6 +45,7 @@ export const Players: Component<Props> = (props) => {
         <tbody ondragstart={dragStart}>
           <For each={props.players} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
             <tr classList={{ info: player.id === selection.player?.id }}
+              onclick={() => selectPlayer(player)}
               draggable={true} data-type="player" data-id={player.id}
             >
               <td>
@@ -66,14 +68,17 @@ export const Players: Component<Props> = (props) => {
                 </span>
               </td>
               <td class="text-left">{player.rank}</td>
+              <td class="text-left">
+                <Show when={selection.event && player.registration.includes(selection.event.id)}><i class="icon2-checkmark"></i></Show>
+              </td>
               <td>
                 <For each={player.registration}>{(eventId, i) =>
                   <span>{(i() ? ', ' : '') + eventById[eventId].name}</span>
                 }</For>
               </td>
-              <td class="hover">
+              {/* <td class="hover">
                 <button type="button" onclick={[commandManager.wrap(deletePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
-              </td>
+              </td> */}
             </tr>
           }</For>
           <tr>

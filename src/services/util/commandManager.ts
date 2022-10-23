@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { byId, indexOf } from "./find";
 
 export interface Command {
   name: string;
@@ -217,11 +218,11 @@ export function insertItem<T>(obj: Array<any>, pos: number, item: T): Command {
   return { name: `Insert`, act, undo };
 }
 
-export function removeItem(obj: Array<any>, pos: number): Command {
+export function removeItem<T>(obj: T[], pos: number, name = 'Remove'): Command {
   if (pos >= obj.length || pos < -obj.length) {
     throw new Error("Index out of range");
   }
-  const prev = obj.at(pos);
+  const prev = obj.at(pos)!;
   const act = () => {
     obj.splice(pos, 1);
   }
@@ -229,5 +230,10 @@ export function removeItem(obj: Array<any>, pos: number): Command {
   const undo = () => {
     obj.splice(pos < 0 ? pos + 1 : pos, 0, prev);
   }
-  return { name: `Remove`, act, undo };
+  return { name, act, undo };
+}
+
+export function removeItemById<T extends {id:string}>(obj: T[], id: string, name = 'Remove'): Command {
+  const i = indexOf(obj, "id" as any, id, 'Item id not found');
+  return removeItem(obj, i, name);
 }

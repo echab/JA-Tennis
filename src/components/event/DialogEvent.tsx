@@ -2,7 +2,10 @@ import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
 import { OptionalId } from '../../domain/object';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
+import { deleteEvent } from '../../services/eventService';
 import { rank, category } from '../../services/types';
+import { commandManager } from '../../services/util/commandManager';
+import { selection } from '../util/selection';
 import { useForm } from '../util/useForm';
 
 const EMPTY: OptionalId<TEvent> = { name: '', sexe: 'H', category: '', maxRank: 'NC', draws: [] };
@@ -64,6 +67,14 @@ export const DialogEvent: Component<Props> = (props) => {
       // props.onClose();
    };
 
+   const deleteAndClose = () => {
+      if (event?.id) {
+         commandManager.add(deleteEvent(event.id));
+         refDlg.close();
+         // props.onClose();
+      }
+   }
+  
    return (
       <dialog ref={refDlg!} class="p-0">
          <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
@@ -150,15 +161,21 @@ export const DialogEvent: Component<Props> = (props) => {
                </button>
 
                {/* <button
-            disabled={!event?.id}
-            onclick={() => {
-              if (event?.id) {
-                commandManager.add(removeEvent(event.id));
-                refDlg.returnValue = 'Delete'
-                refDlg.close();
-              }
-            }}
-          >✖ Delete</button> */}
+                  disabled={!event?.id}
+                  onclick={() => {
+                  if (event?.id) {
+                     commandManager.add(deleteEvent(event.id));
+                     refDlg.returnValue = 'Delete'
+                     refDlg.close();
+                  }
+                  }}
+               >✖ Delete</button> */}
+               <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
+                  value="Delete" disabled={!form.id}
+                  onclick={deleteAndClose}
+                  >✖ Delete
+               </button>
+
 
                <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                   data-dismiss="modal" aria-hidden="true"

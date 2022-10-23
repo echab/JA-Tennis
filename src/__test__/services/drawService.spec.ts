@@ -5,8 +5,6 @@ import { TEvent } from "../../domain/tournament";
 const EVENT: TEvent = {id:'E0', name:'event1', sexe:'H', category:'Senior', maxRank:'NC', draws:[]};
 const DRAW: Draw = { id:'D0', name:'draw1', type:DrawType.Normal, minRank:'NC', maxRank:'NC', nbColumn:3, nbOut:2, boxes:[]};
 
-const ids = ({id}: {id:string}) => id;
-
 describe("drawService", () =>{
 
     describe("groupDrawIndex", () => {

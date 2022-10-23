@@ -5,11 +5,12 @@ import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
-import { groupFindAllPlayerOut, previousGroup } from '../../services/drawService';
+import { deleteDraw, groupFindAllPlayerOut, previousGroup } from '../../services/drawService';
 import { getRegisteredPlayers } from '../../services/tournamentService';
 import { rank, category } from '../../services/types';
 import { columnMax, countInCol } from '../../utils/drawUtil';
 import { useForm } from '../util/useForm';
+import { commandManager } from '../../services/util/commandManager';
 
 const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Normal, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
@@ -34,6 +35,8 @@ export const DialogDraw: Component<Props> = (props) => {
   })
 
   const draw: OptionalId<Draw> | undefined = props.draw && { ...props.draw }; // clone, without reactivity
+
+  const isFirstDraw = props.event.draws.length == 0 || draw?.id === props.event.draws[0].id;
 
   const { form, updateField } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
 
@@ -104,6 +107,14 @@ export const DialogDraw: Component<Props> = (props) => {
     // props.onClose();
   };
 
+  const deleteAndClose = () => {
+    if (draw?.id) {
+      commandManager.add(deleteDraw(draw.id));
+      refDlg.close();
+      // props.onClose();
+    }
+  }
+
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
@@ -123,12 +134,6 @@ export const DialogDraw: Component<Props> = (props) => {
               value={form.name} onChange={updateField("name")} />
             {/*<span class="error" show.bind="eventForm.name.$error.required">Required!</span> */}
           </div>
-
-          {/* 
-          TODO suite
-          TODO entries count computed?
-          TODO paper orientation
-          */}
 
           <div class="mb-1">
             <label for="type" class="inline-block w-3/12 text-right pr-3">Type:</label>
@@ -150,11 +155,18 @@ export const DialogDraw: Component<Props> = (props) => {
             <label class="pl-3">{registeredPlayersOrQ().length} registered</label>
           </div>
 
+          <div class="mb-1">
+            <span class="inline-block w-3/12 text-right pr-3"></span>
+            <label><input type="checkbox" checked={form.suite} onchange={updateField('suite')}
+              disabled={isFirstDraw}
+              /> Same group as previous draw</label>
+          </div>
+
           <fieldset>
             <legend>Dimensions:</legend>
             <div class="mb-1">
               <label for="nbIn" class="inline-block w-3/12 text-right pr-3">Entries:</label>
-              <input id="nbIn" type="number" readonly value={getNbEntry()} class="w-3/12"/>
+              <input id="nbIn" type="number" readonly value={getNbEntry()} class="w-3/12 p-1"/>
             </div>
             <div class="mb-1">
               <label for="nbColumn" class="inline-block w-3/12 text-right pr-3">Columns:</label>
@@ -165,6 +177,10 @@ export const DialogDraw: Component<Props> = (props) => {
               <input id="nbOut" type="number" value={form.nbOut} onChange={updateField('nbOut')} min="1" max="16" required class="w-3/12 p-1" />
             </div>
           </fieldset>
+
+          {/* 
+          TODO paper orientation
+          */}
 
         </div>
         <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pb-4 pr-4 bg-gray-50 bg-opacity-60'>
@@ -177,6 +193,12 @@ export const DialogDraw: Component<Props> = (props) => {
             //  disabled.bind="!!eventForm.$error.required"
             class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
           >OK
+          </button>
+
+          <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
+            value="Delete" disabled={!form.id}
+            onclick={deleteAndClose}
+            >✖ Delete
           </button>
 
           <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
