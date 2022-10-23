@@ -209,7 +209,7 @@ export const DialogInfo: Component<Props> = (props) => {
             disabled={!event?.id}
             onclick={() => {
               if (event?.id) {
-                commandManager.add(removePlayer(event.id));
+                commandManager.add(deleteEvent(event.id));
                 refDlg.returnValue = 'Delete'
                 refDlg.close();
               }

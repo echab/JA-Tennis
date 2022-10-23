@@ -1,6 +1,6 @@
 import { Box, Draw, DrawType, Match, PlayerIn } from "../../domain/draw";
-import { Player } from "../../domain/player";
-import { TEvent } from "../../domain/tournament";
+import type { Player } from "../../domain/player";
+import type { TEvent } from "../../domain/tournament";
 import { DrawLibBase } from "./drawLibBase";
 import { Knockout } from "./knockout";
 import { Roundrobin } from "./roundrobin";
@@ -18,9 +18,6 @@ export interface IDrawLib {
   nbColumnForPlayers(nJoueur: number): number;
 
   generateDraw(generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
-
-  putPlayer(box: Box, playerId: string, bForce?: boolean): boolean;
-  removePlayer(box: Box, bForce?: boolean): boolean;
 
   setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean; //SetQualifieEntrant
   setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant

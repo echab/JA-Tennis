@@ -44,7 +44,7 @@ export function updatePlayer(
   return { name: `Add player ${player.name}`, act, undo };
 }
 
-export function removePlayer(
+export function deletePlayer(
   playerId: string,
 ): Command {
   const tournament = selection.tournament;

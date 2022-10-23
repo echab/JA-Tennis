@@ -75,10 +75,11 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
   const lib = drawLib(event, draw);
 
   // TODO boxIn of next draw/group
-  const qualifOut = (draw.boxes[i] as Match).qualifOut;
-  const nextGrp = nextGroup(event, draw);
-  const [nextDraw, nextBoxIn] = nextGrp && qualifOut ? groupFindPlayerIn(event, nextGrp, qualifOut) : [];
-  const prevBoxIn = {...nextBoxIn};
+  // const qualifOut = (draw.boxes[i] as Match).qualifOut;
+  // const nextGrp = nextGroup(event, draw);
+  // const [nextDraw, nextBoxIn] = nextGrp && qualifOut ? groupFindPlayerIn(event, nextGrp, qualifOut) : [];
+  // const prevBoxIn = {...nextBoxIn};
+  const prevBoxQ = {...groupFindQ(event, draw, match)};
 
   const act = () => {
     update(({ event, draw, box, boxQ }) => {
@@ -93,9 +94,8 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
   const undo = () => {
     update(({ event, draw, box, boxQ }) => {
       if (!event || !draw || !box || !isMatch(box)) {
-        throw new Error("updateMatch without event or draw");
+        throw new Error("updateMatch without selected event, draw or match");
       }
-      // draw.boxes[i] = prev;
       lib.putResult(box, prev, boxQ);
     });
   };

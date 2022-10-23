@@ -2,7 +2,7 @@ import { Component, createSignal, For, Show } from 'solid-js';
 import { selection, selectPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
-import { updatePlayer, removePlayer } from '../../services/playerService';
+import { updatePlayer, deletePlayer } from '../../services/playerService';
 import { commandManager } from '../../services/util/commandManager';
 import { DialogPlayer } from './DialogPlayer';
 import { dragStart } from '../../services/util/dragdrop';
@@ -72,7 +72,7 @@ export const Players: Component<Props> = (props) => {
                 }</For>
               </td>
               <td class="hover">
-                <button type="button" onclick={[commandManager.wrap(removePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
+                <button type="button" onclick={[commandManager.wrap(deletePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
               </td>
             </tr>
           }</For>

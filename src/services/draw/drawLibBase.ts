@@ -1,16 +1,15 @@
-﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
-import { isArray } from '../util/object';
-import { Draw, Box, DrawType, Match, PlayerIn } from '../../domain/draw';
-import { Player } from '../../domain/player';
-import { drawLib, GenerateType } from './drawLib';
-import { TEvent } from '../../domain/tournament';
+﻿import { Draw, Box, DrawType, Match, PlayerIn } from '../../domain/draw';
+import type { Player } from '../../domain/player';
+import type { TEvent } from '../../domain/tournament';
+import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
+import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1;
 
-export abstract class DrawLibBase {
+export abstract class DrawLibBase implements IDrawLib {
 
     constructor(public event: TEvent, public draw: Draw) {}
 
@@ -18,6 +17,13 @@ export abstract class DrawLibBase {
     abstract resize( oldDraw?: Draw, nJoueur?: number): void;
     abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
 
+    abstract setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
+    abstract findPlayerIn(inNumber: number): PlayerIn | undefined; //FindQualifieEntrant
+    abstract findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
+    abstract computeScore(): boolean; //CalculeScore
+    abstract boxesOpponents(match: Match): { box1: Box; box2: Box };
+    abstract isJoueurNouveau(box: Box): boolean;
+  
     protected findBox<T extends Box = Box>(position: number, create?: boolean): T | undefined {
         let box = by(this.draw.boxes, 'position', position);
         if (!box && create) {
@@ -123,11 +129,10 @@ export abstract class DrawLibBase {
         // if (boxOut.qualifOut) {
         //     const next = nextGroup(this.event, this.draw);
         //     if (next) {
-        //         const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
-        //         if (boxIn && d) {
-        //             const lib = drawLib(this.event, d);
+        //         const [,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+        //         if (boxIn) {
         //             if (!boxIn.playerId
-        //                 && !lib.putPlayer(boxIn, playerId, true)) {
+        //                 && !this.putPlayer(boxIn, playerId, true)) {
         //                 throw new Error('error');
         //             }
         //         }
@@ -178,6 +183,53 @@ export abstract class DrawLibBase {
         return true;
     }
 
+    setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
+        // inNumber=0 => enlève qualifié
+
+        //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
+
+        if (inNumber) {	//Ajoute un qualifié entrant
+            const prev = previousGroup(this.event, this.draw);
+            if (!playerId && prev && inNumber != QEMPTY) {
+                //Va chercher le joueur dans le tableau précédent
+                const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
+                if (boxOut) {	//V0997
+                    playerId = boxOut.playerId;
+                }
+            }
+
+            if (box.qualifIn) {
+                if (!this.setPlayerIn(box)) {	//Enlève le précédent qualifié
+                    ASSERT(false);
+                }
+            }
+
+            if (playerId) {
+                if (!this.putPlayer(box, playerId)) {
+                    ASSERT(false);
+                }
+            }
+
+            //Qualifié entrant pas déjà pris
+            if (inNumber == QEMPTY ||
+                !this.findPlayerIn(inNumber)) {
+
+                this.setPlayerIn(box, inNumber);
+            }
+        } else {	// Enlève un qualifié entrant
+
+            box.qualifIn = 0;
+
+            if (previousGroup(this.event, this.draw) && !this.removePlayer(box)) {
+                ASSERT(false);
+            }
+        }
+
+        return true;
+    }
+
+    // TODO? move base setPlayerOut here
+
     //Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la boite
     putResult(box: Match, result: Match, boxQ?: Box): boolean {   //SetResultat
         //ASSERT(SetResultatOk(box, result));
@@ -200,7 +252,7 @@ export abstract class DrawLibBase {
             if (!this.putPlayer(box, result.playerId, boxQ)) {
                 throw new Error('error');
             }
-        } else if (!this.removePlayer(box)) {
+        } else if (!this.removePlayer(box, boxQ)) {
             throw new Error('error');
         }
 
@@ -244,97 +296,100 @@ export abstract class DrawLibBase {
     }
 
     //Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
-    removePlayer(box: Box, bForce?: boolean): boolean {   //EnleveJoueur
+    removePlayer(box: Box, boxQ?: Box, bForce?: boolean): boolean {   //EnleveJoueur
 
-        const match = box as Match;
-        if (!match.playerId && !match.score) {
-            return true;
+        if (isMatch(box)) {
+            if (!box.playerId && !box.score) {
+                return true;
+            }
+            box.score = '';
         }
 
         //ASSERT(EnleveJoueurOk(box, bForce));
 
-        const next = nextGroup(this.event, this.draw);
-        const boxOut = box as Match;
-        if (boxOut.qualifOut && next) {
-            const [d,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
-            if (boxIn && d) {
-                const lib = drawLib(this.event, d);
-                if (!lib.removePlayer(boxIn, true)) {
-                    throw new Error('error');
-                }
-            }
+        // const next = nextGroup(this.event, this.draw);
+        // const boxOut = box as Match;
+        // if (boxOut.qualifOut && next) {
+        //     const [,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+        //     if (boxIn) {
+        //         if (!this.removePlayer(boxIn, true)) {
+        //             throw new Error('error');
+        //         }
+        //     }
+        // }
+        if (boxQ) {
+            // this.removePlayer(boxQ);
+            boxQ.playerId = undefined;
         }
 
         box.playerId = undefined;
-        if (isMatch(box)) {
-            match.score = '';
-        }
 
+        /*
         const boxIn = box as PlayerIn;
         //delete boxIn.order;
-        /*
-            //Delock les adversaires
-            if( this.isTypePoule()) {
-                if( isMatch( box)) {
-                    //Si pas d'autre matches dans la ligne, ni dans la colonne
-                    BOOL bMatch = false;
+    
+        //Delock les adversaires
+        if( this.isTypePoule()) {
+            if( isMatch( box)) {
+                //Si pas d'autre matches dans la ligne, ni dans la colonne
+                BOOL bMatch = false;
 
-                    //matches de la ligne
-                    for( i=this.ADVERSAIRE1( box) - GetnColonne(); 
-                        i>= iBoiteMin() && !bMatch; 
-                        i -= GetnColonne()) 
-                    {
-                        if( i != box && boxes[ i]->isLock()) {
-                            bMatch = true;
-                            break;
-                        }
+                //matches de la ligne
+                for( i=this.ADVERSAIRE1( box) - GetnColonne(); 
+                    i>= iBoiteMin() && !bMatch; 
+                    i -= GetnColonne()) 
+                {
+                    if( i != box && boxes[ i]->isLock()) {
+                        bMatch = true;
+                        break;
                     }
-                    //matches de la colonne
-                    for( i=iHautCol( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())); 
-                        i>= iBasColQ( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
-                        i --) 
-                    {
-                        if( i != box && boxes[ i]->isLock()) {
-                            bMatch = true;
-                            break;
-                        }
-                    }
-                    if( !bMatch)
-                        unlockBox( this.ADVERSAIRE1(box));
-
-                    bMatch = false;
-                    //matches de la ligne
-                    for( i=this.ADVERSAIRE2( box) - GetnColonne(); 
-                        i>= iBoiteMin() && !bMatch; 
-                        i -= GetnColonne())
-                    {
-                        if( i != box && boxes[ i]->isLock()) {
-                            bMatch = true;
-                            break;
-                        }
-                    }
-                    //matches de la colonne
-                    for( i=iHautCol( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())); 
-                        i>= iBasColQ( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
-                        i --) 
-                    {
-                        if( i != box && boxes[ i]->isLock()) {
-                            bMatch = true;
-                            break;
-                        }
-                    }
-                    if( !bMatch)
-                        unlockBox( this.ADVERSAIRE2(box));
-        
                 }
+                //matches de la colonne
+                for( i=iHautCol( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())); 
+                    i>= iBasColQ( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
+                    i --) 
+                {
+                    if( i != box && boxes[ i]->isLock()) {
+                        bMatch = true;
+                        break;
+                    }
+                }
+                if( !bMatch)
+                    unlockBox( this.ADVERSAIRE1(box));
 
-                this.computeScore(box._draw);
-                //TODO Poule, Unlock
-            } else
-            if(  this.ADVERSAIRE1(box) <= iBoiteMax()) {
-                unlockBox( this.ADVERSAIRE1(box));
-                unlockBox( this.ADVERSAIRE2(box));
+                bMatch = false;
+                //matches de la ligne
+                for( i=this.ADVERSAIRE2( box) - GetnColonne(); 
+                    i>= iBoiteMin() && !bMatch; 
+                    i -= GetnColonne())
+                {
+                    if( i != box && boxes[ i]->isLock()) {
+                        bMatch = true;
+                        break;
+                    }
+                }
+                //matches de la colonne
+                for( i=iHautCol( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())); 
+                    i>= iBasColQ( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
+                    i --) 
+                {
+                    if( i != box && boxes[ i]->isLock()) {
+                        bMatch = true;
+                        break;
+                    }
+                }
+                if( !bMatch)
+                    unlockBox( this.ADVERSAIRE2(box));
+    
             }
+
+            this.computeScore(box._draw);
+            //TODO Poule, Unlock
+        } else
+        if(  this.ADVERSAIRE1(box) <= iBoiteMax()) {
+            unlockBox( this.ADVERSAIRE1(box));
+            unlockBox( this.ADVERSAIRE2(box));
+        }
         */
         return true;
     }

@@ -1,14 +1,10 @@
+import type { GenerateType, IDrawLib } from './drawLib';
+import type { Player } from '../../domain/player';
+import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
 import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
-import { shuffle,filledArray } from '../../utils/tool';
-import { rank, ranking } from '../types'
-import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
-import { drawLib, GenerateType, IDrawLib } from './drawLib';
-import { Player } from '../../domain/player';
-import { Ranking } from '../../domain/types';
-import { groupDraw, groupFindAllPlayerOut, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
+import { groupDraw, groupFindPlayerIn, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
-import { TEvent } from '../../domain/tournament';
 
 const MIN_COL = 0,
     MAX_COL_POULE = 22,
@@ -140,53 +136,6 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
-        // inNumber=0 => enlève qualifié
-
-        // const draw = box._draw;
-        //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
-
-        if (inNumber) {	//Ajoute un qualifié entrant
-            const prev = previousGroup(this.event, this.draw);
-            if (!playerId && prev && inNumber != QEMPTY) {
-                //Va chercher le joueur dans le tableau précédent
-                const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
-                if (boxOut) {	//V0997
-                    playerId = boxOut.playerId;
-                }
-            }
-
-            if (box.qualifIn) {
-                if (!this.setPlayerIn(box)) {	//Enlève le précédent qualifié
-                    ASSERT(false);
-                }
-            }
-
-            if (playerId) {
-                if (!this.putPlayer(box, playerId)) {
-                    ASSERT(false);
-                }
-            }
-
-            //Qualifié entrant pas déjà pris
-            if (inNumber == QEMPTY ||
-                !this.findPlayerIn(inNumber)) {
-
-                this.setPlayerIn(box, inNumber);
-            }
-        } else {	// Enlève un qualifié entrant
-
-            box.qualifIn = 0;
-
-            if (previousGroup(this.event, this.draw) && !this.removePlayer(box)) {
-                ASSERT(false);
-            }
-        }
-
-        return true;
-    }
-
-    /** @override */
     setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
@@ -199,16 +148,16 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         const box1 = this.draw.boxes[ADVERSAIRE1(this.draw, box.position)];
 
         if (outNumber) {	//Ajoute un qualifié sortant
-            //Met à jour le tableau suivant
-            if (next && box.playerId && box.qualifOut) {
-                const boxIn = this.findPlayerIn(outNumber);
-                if (boxIn) {
-                    ASSERT(boxIn.playerId === box.playerId);
-                    if (!this.removePlayer(boxIn)) {
-                        ASSERT(false);
-                    }
-                }
-            }
+            // //Met à jour le tableau suivant
+            // if (next && box.playerId && box.qualifOut) {
+            //     const boxIn = this.findPlayerIn(outNumber);
+            //     if (boxIn) {
+            //         ASSERT(boxIn.playerId === box.playerId);
+            //         if (!this.removePlayer(boxIn)) {
+            //             ASSERT(false);
+            //         }
+            //     }
+            // }
 
             //Enlève le précédent n° de qualifié sortant
             if (box.qualifOut)
@@ -222,11 +171,10 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
             if (next && box.playerId) {
                 //Met à jour le tableau suivant
-                const [d,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
-                if (boxIn && d) {
+                const [,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
+                if (boxIn) {
                     ASSERT(!boxIn.playerId);
-                    const lib = drawLib(this.event, d);
-                    if (!lib.putPlayer(boxIn, box.playerId, true)) {
+                    if (!this.putPlayer(boxIn, box.playerId, undefined, true)) {
                         ASSERT(false);
                     }
                 }
@@ -236,11 +184,10 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             const match = box as Match;
             if (next && box.playerId && match.qualifOut) {
                 //Met à jour le tableau suivant
-                const [d,boxIn] = groupFindPlayerIn(this.event, next, match.qualifOut);
-                if (boxIn && d) {
+                const [,boxIn] = groupFindPlayerIn(this.event, next, match.qualifOut);
+                if (boxIn) {
                     ASSERT(!!boxIn.playerId && boxIn.playerId === box.playerId);
-                    const lib = drawLib(this.event, d);
-                    if (!lib.removePlayer(boxIn, true)) {
+                    if (!this.removePlayer(boxIn, undefined, true)) {
                         ASSERT(false);
                     }
                 }

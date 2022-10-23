@@ -5,11 +5,10 @@ import { isObject } from '../util/object'
 import { shuffle, filledArray } from '../../utils/tool';
 import { rank } from '../types';
 import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
-import { drawLib, GenerateType, IDrawLib } from './drawLib';
-import { Player } from '../../domain/player';
+import { GenerateType, IDrawLib } from './drawLib';
+import type { Player } from '../../domain/player';
 import { findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
-import { TEvent } from '../../domain/tournament';
 
 const MIN_COL = 0,
     MAX_COL = 9,
@@ -556,56 +555,25 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
-        //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
-
-        if (inNumber) {	//Ajoute un qualifié entrant
-            const prev = previousGroup(this.event, this.draw);
-            if (!playerId && prev && prev.length && inNumber !== QEMPTY) {
-                //Va chercher le joueur dans le tableau précédent
-                const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
-                if (boxOut) {	//V0997
-                    playerId = boxOut.playerId;
+        let res = super.setPlayerIn(box, inNumber, playerId);
+        if (res) {
+            if (inNumber) {	//Ajoute un qualifié entrant
+                //Qualifié entrant pas déjà pris
+                if (inNumber === QEMPTY || !this.findPlayerIn(inNumber)) {
+                    //Cache les boites de gauche
+                    this.iBoiteDeGauche(box.position, true, (box) => {
+                        box.hidden = true;  //TODOjs delete the box from draw.boxes
+                    });
                 }
-            }
-
-            if (box.qualifIn) {
-                if (!this.setPlayerIn(box)) {	//Enlève le précédent qualifié
-                    ASSERT(false);
-                }
-            }
-
-            if (playerId) {
-                if (!this.putPlayer(box, playerId)) {
-                    ASSERT(false);
-                }
-            }
-
-            //Qualifié entrant pas déjà pris
-            if (inNumber === QEMPTY ||
-                !this.findPlayerIn(inNumber)) {
-
-                box.qualifIn = inNumber;
-
-                //Cache les boites de gauche
+            } else {
+                //Réaffiche les boites de gauche
                 this.iBoiteDeGauche(box.position, true, (box) => {
-                    box.hidden = true;  //TODOjs delete the box from draw.boxes
+                    delete box.hidden;
                 });
             }
-        } else {	// Enlève un qualifié entrant
-
-            box.qualifIn = 0;
-
-            if (previousGroup(this.event, this.draw) && !this.removePlayer(box)) {
-                ASSERT(false);
-            }
-
-            //Réaffiche les boites de gauche
-            this.iBoiteDeGauche(box.position, true, (box) => {
-                delete box.hidden;
-            });
         }
 
-        return true;
+        return res;
     }
 
     /** @override */
@@ -621,11 +589,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             //Met à jour le tableau suivant
             let d: Draw | undefined, boxIn: PlayerIn | undefined;
             if (next && box.playerId && box.qualifOut) {
-                [d,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
-                if (boxIn && d) {
+                [,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
+                if (boxIn) {
                     ASSERT(boxIn.playerId === box.playerId);
-                    const lib = drawLib(this.event, d);
-                    if (!lib.removePlayer(boxIn)) {
+                    if (!this.removePlayer(boxIn)) {
                         throw "Can not remove player";
                     }
                 }
@@ -642,18 +609,17 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             //Met à jour le tableau suivant
             if (next && box.playerId && boxIn) {
-                if (!this.putPlayer(boxIn, box.playerId, true)) {
+                if (!this.putPlayer(boxIn, box.playerId, undefined, true)) {
                 }
             }
 
         } else {	//Enlève un qualifié sortant
             if (next && box.playerId && box.qualifOut) {
                 //Met à jour le tableau suivant
-                const [d,boxIn] = groupFindPlayerIn(this.event, next, box.qualifOut);
-                if (boxIn && d) {
+                const [,boxIn] = groupFindPlayerIn(this.event, next, box.qualifOut);
+                if (boxIn) {
                     ASSERT(!!boxIn.playerId && boxIn.playerId === box.playerId);
-                    const lib = drawLib(this.event, d);
-                    if (!lib.removePlayer(boxIn, true)) {
+                    if (!this.removePlayer(boxIn, undefined, true)) {
                         throw "Can not remove player";
                     }
                 }

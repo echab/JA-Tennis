@@ -3,7 +3,7 @@ import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
-import { removePlayer } from '../../services/playerService';
+import { deletePlayer } from '../../services/playerService';
 import { rank, category } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
 import { useForm } from '../util/useForm';
@@ -63,7 +63,7 @@ export const DialogPlayer: Component<Props> = (props) => {
 
     // if ((evt.submitter as HTMLButtonElement).value === 'Delete') {
     //   if (form.id) {
-    //     commandManager.add(removePlayer(form.id));
+    //     commandManager.add(deletePlayer(form.id));
     //   }
     // } else
     props.onOk(result);
@@ -73,7 +73,7 @@ export const DialogPlayer: Component<Props> = (props) => {
   };
 
   const deleteAndClose = () => {
-    commandManager.add(removePlayer(form.id!));
+    commandManager.add(deletePlayer(form.id!));
     refDlg.close();
     // props.onClose();
   }
