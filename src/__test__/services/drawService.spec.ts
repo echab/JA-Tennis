@@ -9,7 +9,7 @@ const ids = ({id}: {id:string}) => id;
 
 describe("drawService", () =>{
 
-    describe("groupDraw", () => {
+    describe("groupDrawIndex", () => {
 
         const event1 = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
@@ -19,17 +19,17 @@ describe("drawService", () =>{
 
         it("returns the first draw alone", () => {
             const result = groupDraw(event1, event1.draws[0]);
-            expect(result.map(ids)).toStrictEqual(['D0']);
+            expect(result).toStrictEqual([0,1]);
         });
 
         it("returns the second draw alone", () => {
             const result = groupDraw(event1, event1.draws[1]);
-            expect(result.map(ids)).toStrictEqual(['D1']);
+            expect(result).toStrictEqual([1,2]);
         });
 
         it("returns the first draw", () => {
             const result = groupDraw(event1, event1.draws[2]);
-            expect(result.map(ids)).toStrictEqual(['D2']);
+            expect(result).toStrictEqual([2,3]);
         });
 
         const event2 = { ...EVENT, draws: [
@@ -45,43 +45,43 @@ describe("drawService", () =>{
 
         it("returns the group of first draw", () => {
             const result = groupDraw(event2, event2.draws[0]);
-            expect(result.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
         it("returns the group of second draw", () => {
             const result = groupDraw(event2, event2.draws[1]);
-            expect(result.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
         it("returns the group of third draw", () => {
             const result = groupDraw(event2, event2.draws[2]);
-            expect(result.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
 
         it("returns the second group of first draw", () => {
             const result = groupDraw(event2, event2.draws[3]);
-            expect(result.map(ids)).toStrictEqual(['D3','D4','D5']);
+            expect(result).toStrictEqual([3,6]);
         });
 
         it("returns the second group of second draw", () => {
             const result = groupDraw(event2, event2.draws[4]);
-            expect(result.map(ids)).toStrictEqual(['D3','D4','D5']);
+            expect(result).toStrictEqual([3,6]);
         });
 
         it("returns the second group of third draw", () => {
             const result = groupDraw(event2, event2.draws[5]);
-            expect(result.map(ids)).toStrictEqual(['D3','D4','D5']);
+            expect(result).toStrictEqual([3,6]);
         });
 
         it("returns the third group of draw alone", () => {
             const result = groupDraw(event2, event2.draws[6]);
-            expect(result.map(ids)).toStrictEqual(['D6']);
+            expect(result).toStrictEqual([6,7]);
         });
 
         it("returns the fourth group of final draw", () => {
             const result = groupDraw(event2, event2.draws[7]);
-            expect(result.map(ids)).toStrictEqual(['D7']);
+            expect(result).toStrictEqual([7,8]);
         });
 
         const event3 = { ...EVENT, draws: [
@@ -92,21 +92,21 @@ describe("drawService", () =>{
 
         it("returns the single group of first draw", () => {
             const result = groupDraw(event3, event3.draws[0]);
-            expect(result.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
         it("returns the single group of second draw", () => {
             const result = groupDraw(event3, event3.draws[1]);
-            expect(result.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
         it("returns the single group of third draw", () => {
             const result = groupDraw(event3, event3.draws[2]);
-            expect(result.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
     });
 
-    describe("previousGroup", () => {
+    describe("previousGroupIndex", () => {
 
         const event1 = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
@@ -120,7 +120,7 @@ describe("drawService", () =>{
 
         it("returns the first draw alone", () => {
             const result = previousGroup(event1, event1.draws[1]);
-            expect(result?.map(ids)).toStrictEqual(['D0']);
+            expect(result).toStrictEqual([0,1]);
         });
 
         const event2 = { ...EVENT, draws: [
@@ -141,17 +141,17 @@ describe("drawService", () =>{
 
         it("returns the first group for third draw", () => {
             const result = previousGroup(event2, event2.draws[3]);
-            expect(result?.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
         it("returns the first group for fourth draw", () => {
             const result = previousGroup(event2, event2.draws[4]);
-            expect(result?.map(ids)).toStrictEqual(['D0','D1','D2']);
+            expect(result).toStrictEqual([0,3]);
         });
 
     });
 
-    describe("nextGroup", () => {
+    describe("nextGroupIndex", () => {
 
         const event1 = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
@@ -160,7 +160,7 @@ describe("drawService", () =>{
 
         it("returns the first draw alone", () => {
             const result = nextGroup(event1, event1.draws[0]);
-            expect(result?.map(ids)).toStrictEqual(['D1']);
+            expect(result).toStrictEqual([1,2]);
         });
 
         it("returns nothing for the last draw", () => {
@@ -181,12 +181,12 @@ describe("drawService", () =>{
 
         it("returns the second group for first draw", () => {
             const result = nextGroup(event2, event2.draws[0]);
-            expect(result?.map(ids)).toStrictEqual(['D3','D4','D5']);
+            expect(result).toStrictEqual([3,6]);
         });
 
         it("returns the first group for third draw", () => {
             const result = nextGroup(event2, event2.draws[2]);
-            expect(result?.map(ids)).toStrictEqual(['D3','D4','D5']);
+            expect(result).toStrictEqual([3,6]);
         });
 
         it("returns nothing for last group", () => {

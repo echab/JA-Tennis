@@ -1,5 +1,5 @@
-import { Box, Draw, DrawType, Match } from "../../domain/draw";
-import { Player, PlayerIn } from "../../domain/player";
+import { Box, Draw, DrawType, Match, PlayerIn } from "../../domain/draw";
+import { Player } from "../../domain/player";
 import { TEvent } from "../../domain/tournament";
 import { DrawLibBase } from "./drawLibBase";
 import { Knockout } from "./knockout";

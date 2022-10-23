@@ -1,7 +1,7 @@
 ﻿import { ValidationService } from '../validationService';
 import { category, rank, score, validation } from '../types';
-import { Draw, DrawType, Box, Match } from '../../domain/draw';
-import { Player, PlayerIn } from '../../domain/player';
+import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
+import { Player } from '../../domain/player';
 import { IValidation } from '../../domain/validation';
 import { TEvent, Tournament } from '../../domain/tournament';
 import { isMatch, isPlayerIn } from '../drawService';

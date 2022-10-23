@@ -217,8 +217,11 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
 //   return i-1;
 // }
 
-//** return the group of draw of the given draw (mainly for group of round robin). */
-export function groupDraw(event: TEvent, draw: Draw): Draw[] {
+/**
+ * Return the first and last indexes (exclusive) of the draws in the same group as given draw
+ * (mainly for group of round robin).
+ */
+export function groupDraw(event: TEvent, draw: Draw): [number,number] {
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
   let iStart = i, iNext = i + 1;
@@ -226,11 +229,11 @@ export function groupDraw(event: TEvent, draw: Draw): Draw[] {
   }
   for (; iNext < draws.length && draws[iNext].suite; iNext++) {
   }
-  return draws.slice(iStart, iNext);
+  return [iStart, iNext];
 }
 
-//** return the draws of the previous group. */
-export function previousGroup(event: TEvent, draw: Draw): Draw[] | undefined { //getPrecedent
+/** return the first and last indexes (exclusive) of the draws of the previous group. */
+export function previousGroup(event: TEvent, draw: Draw): [number,number] | undefined { //getPrecedent
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
   let iStart = i;
@@ -241,8 +244,8 @@ export function previousGroup(event: TEvent, draw: Draw): Draw[] | undefined { /
   }
 }
 
-//** return the draws of the next group. */
-export function nextGroup(event: TEvent, draw: Draw): Draw[] | undefined { //getSuivant
+/** return the first and last indexes (exclusive) of the draws of the next group. */
+export function nextGroup(event: TEvent, draw: Draw): [number,number] | undefined { //getSuivant
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
   let iNext = i + 1;
@@ -276,17 +279,17 @@ export function isSlot(box: Match): boolean { //isCreneau
 // TODO duplicated in drawLibBase
 export function findSeeded(
   event: TEvent,
-  origin: Draw | Draw[],
+  origin: Draw | [number,number],
   iTeteSerie: number,
 ): [Draw, PlayerIn] | [] { //FindTeteSerie
   ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-  const group = isArray(origin) ? origin : groupDraw(event, origin);
-  for (let i = 0; i < group.length; i++) {
-    const boxes = group[i].boxes;
+  const [groupStart, groupEnd] = isArray(origin) ? origin : groupDraw(event, origin);
+  for (let i = groupStart; i < groupEnd; i++) {
+    const boxes = event.draws[i].boxes;
     for (let j = 0; j < boxes.length; j++) {
       const boxIn: PlayerIn = boxes[j];
       if (boxIn.seeded === iTeteSerie) {
-        return [group[i], boxIn];
+        return [event.draws[i], boxIn];
       }
     }
   }
@@ -295,13 +298,13 @@ export function findSeeded(
 
 export function groupFindPlayerIn(
   event: TEvent,
-  group: Draw[],
+  [groupStart, groupEnd]: [number,number],
   iQualifie: number,
 ): [Draw, PlayerIn] | [] {
   ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
   //const group = isArray(group) ? group : groupDraw(event, group);
-  for (let i = 0; i < group.length; i++) {
-    const d = group[i];
+  for (let i = groupStart; i < groupEnd; i++) {
+    const d = event.draws[i];
     const lib = drawLib(event, d);
     const playerIn = lib.findPlayerIn(iQualifie);
     if (playerIn) {
@@ -313,13 +316,13 @@ export function groupFindPlayerIn(
 
 export function groupFindPlayerOut(
   event: TEvent,
-  group: Draw[],
+  [groupStart, groupEnd]: [number,number],
   iQualifie: number,
 ): [Draw, Match] | [] {
   ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
   //const group = isArray(origin) ? origin : groupDraw(event, origin);
-  for (let i = 0; i < group.length; i++) {
-    const d = group[i];
+  for (let i = groupStart; i < groupEnd; i++) {
+    const d = event.draws[i];
     const lib = drawLib(event, d);
     const boxOut = lib.findPlayerOut(iQualifie);
     if (boxOut) {
@@ -329,8 +332,8 @@ export function groupFindPlayerOut(
 
   //Si iQualifie pas trouvé, ok si < somme des nSortant du groupe
   let outCount = 0;
-  for (let i = 0; i < group.length; i++) {
-    const d = group[i];
+  for (let i = groupStart; i < groupEnd; i++) {
+    const d = event.draws[i];
     if (d.type >= 2) {
       outCount += d.nbOut;
     }
@@ -343,7 +346,7 @@ export function groupFindPlayerOut(
 
 export function groupFindAllPlayerOut(
   event: TEvent,
-  origin: Draw | Draw[],
+  origin: Draw | [number,number],
   hideNumbers?: boolean,
 ): number[] { //FindAllQualifieSortant
   //Récupère les qualifiés sortants du tableau
@@ -364,7 +367,7 @@ export function groupFindAllPlayerOut(
 /** @deprecated used only by aurelia draw-draw */
 export function findAllPlayerOutBox(
   event: TEvent,
-  origin: Draw | Draw[],
+  origin: Draw | [number,number],
 ): Match[] { //FindAllQualifieSortantBox
   //Récupère les qualifiés sortants du tableau
   const group = isArray(origin) ? origin : groupDraw(event, origin);

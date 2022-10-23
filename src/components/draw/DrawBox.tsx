@@ -1,13 +1,13 @@
 import { Component, Show } from 'solid-js';
 import { selection } from '../util/selection';
-import { Box, BoxIn, Match } from '../../domain/draw';
+import { Match, PlayerIn } from '../../domain/draw';
 import { byId } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import './Draw.css';
 import { isMatch } from '../../services/drawService';
 
 type BoxProps = {
-  box?: BoxIn & Match;
+  box?: PlayerIn & Match;
   players: Player[];
 }
 

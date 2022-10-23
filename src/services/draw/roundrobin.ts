@@ -263,9 +263,9 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         //Récupère les joueurs du tableau
         const ppJoueur: Array<string|number> = []; // playerId or Q
-        const draws = groupDraw(this.event, this.draw);
-        for (let j = 0; j < draws.length; j++) {
-            const d = draws[j];
+        const [groupStart, groupEnd] = groupDraw(this.event, this.draw);
+        for (let j = groupStart; j < groupEnd; j++) {
+            const d = this.event.draws[j];
             const first = positionFirstIn(d.nbColumn),
                 last = positionLastIn(d.nbColumn);
             for (let b = last; b <= first; b++) {
@@ -289,8 +289,8 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     generateDraw(generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[] {
         const refDraw = this.draw;
 
-        const oldDraws = groupDraw(this.event, refDraw);
-        let iTableau = indexOf(this.event.draws, 'id', oldDraws[0].id);
+        const [groupStart] = groupDraw(this.event, refDraw);
+        let iTableau = indexOf(this.event.draws, 'id', this.event.draws[groupStart].id);
         if (iTableau === -1) {
             iTableau = this.event.draws.length;  //append the draws at the end of the event
         }

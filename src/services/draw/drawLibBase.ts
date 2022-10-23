@@ -1,4 +1,4 @@
-﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup, isMatch } from '../drawService';
+﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot } from '../drawService';
 import { isArray } from '../util/object';
 import { Draw, Box, DrawType, Match, PlayerIn } from '../../domain/draw';
 import { Player } from '../../domain/player';
@@ -18,7 +18,7 @@ export abstract class DrawLibBase {
     abstract resize( oldDraw?: Draw, nJoueur?: number): void;
     abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
 
-    protected findBox<T extends Box = Box>( position: number, create?: boolean): T | undefined {
+    protected findBox<T extends Box = Box>(position: number, create?: boolean): T | undefined {
         let box = by(this.draw.boxes, 'position', position);
         if (!box && create) {
             box = newBox<T>(this.draw, undefined, position);
@@ -30,13 +30,15 @@ export abstract class DrawLibBase {
         //remove qualif out
         const next = nextGroup(this.event, this.draw);
         if (next && this.draw.boxes) {
-            for (let i = 0; i < next.length; i++) {
-                const boxes = next[i].boxes;
+            const [groupStart, groupEnd] = next;
+            for (let i = groupStart; i < groupEnd; i++) {
+                const d = this.event.draws[i];
+                const boxes = d.boxes;
                 if (boxes) {
-                    const drawLibNext = drawLib(this.event, next[i]);
+                    const drawLibNext = drawLib(this.event, d);
                     for (let b = 0; b < boxes.length; b++) {
-                        const box = boxes[b] as Match;
-                        if (box && box.qualifOut) {
+                        const box = boxes[b] as Match | undefined;
+                        if (box?.qualifOut) {
                             drawLibNext.setPlayerOut(box);
                         }
                     }
@@ -70,47 +72,27 @@ export abstract class DrawLibBase {
     //    m_iType = iType;
     //}
 
-    isSlot(box: Match): boolean {  //isCreneau
-        return isMatch(box) && (!!box.place || !!box.date);
-    }
+    // /**
+    //  * Fill or erase a box with qualified in and/or player
+    //  * setPlayerIn
+    //  * 
+    //  * @param box 
+    //  * @param inNumber (optional)
+    //  * @param player   (optional)
+    //  */
+    // setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
+    //     // inNumber=0 => enlève qualifié
+    //     return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
+    // }
 
-    /** @deprecated duplicated into drawService */
-    findSeeded(origin: Draw | Draw[], iTeteSerie: number): PlayerIn | undefined {    //FindTeteSerie
-        ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-        const group = isArray(origin) ? origin : groupDraw(this.event, origin);
-        for (let i = 0; i < group.length; i++) {
-            const boxes = group[i].boxes;
-            for (let j = 0; j < boxes.length; j++) {
-                const boxIn: PlayerIn = boxes[j];
-                if (boxIn.seeded === iTeteSerie) {
-                    return boxIn;
-                }
-            }
-        }
-        return undefined;
-    }
+    // setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
+    //     // iQualifie=0 => enlève qualifié
+    //     return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
+    // }
 
-    /**
-         * Fill or erase a box with qualified in and/or player
-        * setPlayerIn
-        * 
-        * @param box 
-        * @param inNumber (optional)
-        * @param player   (optional)
-        */
-//         setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
-//             // inNumber=0 => enlève qualifié
-//             return this._drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
-//         }
-// 
-//         setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
-//             // iQualifie=0 => enlève qualifié
-//             return this._drawLibs[box._draw.type].setPlayerOut(box, outNumber);
-//         }
-// 
-//         computeScore(): boolean {
-//             return this._drawLibs[this.draw.type].computeScore(this.draw);
-//         }
+    // computeScore(): boolean {
+    //     return this._drawLibs[this.draw.type].computeScore(this.draw);
+    // }
 
     //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
     putPlayer(box: Box, playerId: string, bForce?: boolean): boolean {   //MetJoueur
@@ -194,28 +176,32 @@ export abstract class DrawLibBase {
     }
 
     //Résultat d'un match : met le gagnant (ou le requalifié) et le score dans la boite
-    putResult(box: Match, boite: Match): boolean {   //SetResultat
-        //ASSERT(SetResultatOk(box, boite));
+    putResult(box: Match, result: Match): boolean {   //SetResultat
+        //ASSERT(SetResultatOk(box, result));
 
         //v0998
         //	//Check changement de vainqueur par vainqueur défaillant
         //	if( !this.isTypePoule())
-        //	if( boite.score.isVainqDef()) {
-        //		if( boite.m_iJoueur == boxes[ this.ADVERSAIRE1(box)]->m_iJoueur)
-        //			boite.m_iJoueur = boxes[ this.ADVERSAIRE2(box)]->m_iJoueur;
+        //	if( result.score.isVainqDef()) {
+        //		if( result.m_iJoueur == boxes[ this.ADVERSAIRE1(box)]->m_iJoueur)
+        //			result.m_iJoueur = boxes[ this.ADVERSAIRE2(box)]->m_iJoueur;
         //		else
-        //			boite.m_iJoueur = boxes[ this.ADVERSAIRE1(box)]->m_iJoueur;
+        //			result.m_iJoueur = boxes[ this.ADVERSAIRE1(box)]->m_iJoueur;
         //	}
 
-        if (boite.playerId) {
-            if (!this.putPlayer(box, boite.playerId)) {
+        // TODO simplify: if qualifOut, find the qualifIn matching box in next draw group
+        // const boxOut = box as Match;
+        // const [nextDraw,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+
+        if (result.playerId) {
+            if (!this.putPlayer(box, result.playerId)) {
                 throw new Error('error');
             }
         } else if (!this.removePlayer(box)) {
             throw new Error('error');
         }
 
-        box.score = boite.score;
+        box.score = result.score;
 
         drawLib(this.event, this.draw).computeScore();
 
@@ -223,12 +209,12 @@ export abstract class DrawLibBase {
     }
 
     //Planification d'un match : met le court, la date et l'heure
-    putSlot(box: Match, boite: Match): boolean {    //MetCreneau
+    putSlot(box: Match, slot: Match): boolean {    //MetCreneau
         ASSERT(isMatch(box));
-        //ASSERT(MetCreneauOk(box, boite));
+        //ASSERT(MetCreneauOk(box, slot));
 
-        box.place = boite.place;
-        box.date = boite.date;
+        box.place = slot.place;
+        box.date = slot.date;
 
         return true;
     }
@@ -243,13 +229,13 @@ export abstract class DrawLibBase {
         return true;
     }
 
-    putTick(box: Box, boite: Box): boolean {   //MetPointage
-        //ASSERT(MetPointageOk(box, boite));
+    putTick(box: Box, tick: Box): boolean {   //MetPointage
+        //ASSERT(MetPointageOk(box, tick));
 
         //TODO
-        //box.setPrevenu(box, boite.isPrevenu(box));
-        //box.setPrevenu(box + 1, boite.isPrevenu(box + 1));
-        //box.setRecoit(box, boite.isRecoit(box));
+        //box.setPrevenu(box, tick.isPrevenu(box));
+        //box.setPrevenu(box + 1, tick.isPrevenu(box + 1));
+        //box.setRecoit(box, tick.isRecoit(box));
 
         return true;
     }
@@ -406,7 +392,7 @@ export abstract class DrawLibBase {
 
     //Rempli une boite proprement
     fillBox(box: Box, source: Box): boolean {   //RempliBoite
-        //ASSERT(RempliBoiteOk(box, boite));
+        //ASSERT(RempliBoiteOk(box, source));
 
         const lib = drawLib(this.event, this.draw);
 
@@ -432,7 +418,7 @@ export abstract class DrawLibBase {
             if (match) {
                 delete match.qualifOut;
 
-                if (this.isSlot(match)) {
+                if (isSlot(match)) {
                     if (!this.removeSlot(match)) {
                         throw new Error('error');
                     }

@@ -1,6 +1,6 @@
 import { Component, For, Setter, Show } from 'solid-js';
 import { selection } from '../util/selection';
-import { Box, BoxIn, Draw, DrawType, Match } from '../../domain/draw';
+import { Box, PlayerIn, Draw, DrawType, Match } from '../../domain/draw';
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
@@ -16,7 +16,7 @@ type Props = {
 
 export const DrawRoundRobin: Component<Props> = (props) => {
   const oT = props.draw;
-  const boxes = mapBy<BoxIn & Match>(oT.boxes as Match[], 'position');
+  const boxes = mapBy<PlayerIn & Match>(oT.boxes as Match[], 'position');
 
   const simple = oT.type === DrawType.PouleSimple
 
@@ -76,6 +76,6 @@ export const DrawRoundRobin: Component<Props> = (props) => {
 }
 
 type BoxProps = {
-  box?: BoxIn & Match;
+  box?: PlayerIn & Match;
   players: Player[];
 }

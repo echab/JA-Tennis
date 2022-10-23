@@ -7,7 +7,7 @@ import { rank } from '../types';
 import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { Player } from '../../domain/player';
-import { groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
+import { findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { TEvent } from '../../domain/tournament';
 
@@ -470,7 +470,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                             } else {
                                 t = this.iTeteSerieQ(b, draw.nbOut);
                             }
-                            if (t <= nTeteSerie && !this.findSeeded(draw, t)) {
+                            if (t <= nTeteSerie && !findSeeded(this.event, draw, t)) {
                                 boxIn.seeded = t;
                             }
                         }

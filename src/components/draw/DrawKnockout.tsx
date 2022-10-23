@@ -1,6 +1,6 @@
 import { Component, For, Setter, Show } from 'solid-js';
 import { selectBox } from '../util/selection';
-import { BoxIn, Draw, Match } from '../../domain/draw';
+import { PlayerIn, Draw, Match } from '../../domain/draw';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/drawUtil';
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
@@ -16,7 +16,7 @@ type Props = {
 
 export const DrawKnockout: Component<Props> = (props) => {
   const oT = props.draw;
-  const boxes = mapBy<BoxIn & Match>(oT.boxes as Match[], 'position');
+  const boxes = mapBy<PlayerIn & Match>(oT.boxes as Match[], 'position');
 
   const nLigne = countInCol(columnMax(oT.nbColumn, oT.nbOut), oT.nbOut);
   const lignes = Array(nLigne).fill(0).map((_, i) => i);

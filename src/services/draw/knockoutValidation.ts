@@ -7,8 +7,8 @@ import { Guid } from '../util/guid';
 import { isObject,isArray,extend } from '../util/object';
 import { shuffle,filledArray } from '../../utils/tool';
 import { category, rank, score, validation } from '../types';
-import { DrawType, Draw, Box, Match } from '../../domain/draw';
-import { Player, PlayerIn } from '../../domain/player';
+import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
+import { Player } from '../../domain/player';
 import { RankString } from '../../domain/types';
 import { IValidation } from '../../domain/validation';
 import { TEvent, Tournament } from '../../domain/tournament';
@@ -45,27 +45,27 @@ export class KnockoutValidation implements IValidation {
                 bRes = false;
             }
 
-            const group = groupDraw(event, draw);
-            if (group) {
-                if (draw.type !== group[0].type) {
-                    validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
-                    bRes = false;
-                }
-                if (draw.minRank != group[0].minRank) {
-                    validation.errorDraw('IDS_ERR_TAB_SUITE_MIN', draw);
-                    bRes = false;
-                }
-                if (draw.maxRank != group[0].maxRank) {
-                    validation.errorDraw('IDS_ERR_TAB_SUITE_MAX', draw);
-                    bRes = false;
-                }
+            const [groupStart] = groupDraw(event, draw);
+            const firstDraw = event.draws[groupStart];
+            if (draw.type !== firstDraw.type) {
+                validation.errorDraw('IDS_ERR_TAB_SUITE_TYPE', draw);
+                bRes = false;
+            }
+            if (draw.minRank != firstDraw.minRank) {
+                validation.errorDraw('IDS_ERR_TAB_SUITE_MIN', draw);
+                bRes = false;
+            }
+            if (draw.maxRank != firstDraw.maxRank) {
+                validation.errorDraw('IDS_ERR_TAB_SUITE_MAX', draw);
+                bRes = false;
             }
         }
 
         const prevGroup = previousGroup(event, draw);
         if (prevGroup) {
-            if (prevGroup[0].type !== DrawType.Final && draw.minRank && prevGroup[0].maxRank) {
-                if (rank.compare(draw.minRank, prevGroup[0].maxRank) < 0) {
+            const firstDraw = event.draws[prevGroup[0]];
+            if (firstDraw.type !== DrawType.Final && draw.minRank && firstDraw.maxRank) {
+                if (rank.compare(draw.minRank, firstDraw.maxRank) < 0) {
                     validation.errorDraw('IDS_ERR_TAB_CLASSMAX_OVR', draw);
                     bRes = false;
                 }
@@ -74,8 +74,9 @@ export class KnockoutValidation implements IValidation {
 
         const nextGrp = nextGroup(event, draw);
         if (nextGrp) {
-            if (draw.type !== DrawType.Final && draw.maxRank && nextGrp[0].minRank) {
-                if (rank.compare(nextGrp[0].minRank, draw.maxRank) < 0) {
+            const firstDraw = event.draws[nextGrp[0]];
+            if (draw.type !== DrawType.Final && draw.maxRank && firstDraw.minRank) {
+                if (rank.compare(firstDraw.minRank, draw.maxRank) < 0) {
                     validation.errorDraw('IDS_ERR_TAB_CLASSMAX_NEXT_OVR', draw);
                     bRes = false;
                 }
@@ -573,8 +574,8 @@ export class KnockoutValidation implements IValidation {
         }
 
         if (draw.type === DrawType.Final) {
-            const group = groupDraw(event, draw);
-            if (draw.suite || group.at(-1)?.id !== draw.id) {
+            const [,groupEnd] = groupDraw(event, draw);
+            if (draw.suite || event.draws[groupEnd-1]?.id !== draw.id) {
                 validation.errorDraw('IDS_ERR_TAB_SUITE_FINAL', draw);
                 bRes = false;
             }
