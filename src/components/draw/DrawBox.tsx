@@ -4,6 +4,7 @@ import { Box, BoxIn, Match } from '../../domain/draw';
 import { byId } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import './Draw.css';
+import { isMatch } from '../../services/drawService';
 
 type BoxProps = {
   box?: BoxIn & Match;
@@ -45,8 +46,4 @@ export const DrawBox: Component<BoxProps> = (props) => {
       }><span class="score">{b.score}</span></Show>
     }><span class="club">{p?.club ?? ''}</span></Show>
   </div>
-}
-
-function isMatch(box: Box): boolean {
-  return box && ('undefined' !== typeof (box as Match).score);
 }

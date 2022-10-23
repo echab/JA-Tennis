@@ -4,9 +4,9 @@ import { by, byId } from '../util/find';
 import { isObject } from '../util/object'
 import { shuffle, filledArray } from '../../utils/tool';
 import { rank } from '../types';
-import { DrawType, Draw, Box, Match, BoxIn } from '../../domain/draw';
+import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
-import { Player, PlayerIn } from '../../domain/player';
+import { Player } from '../../domain/player';
 import { groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { TEvent } from '../../domain/tournament';
@@ -37,14 +37,6 @@ const MIN_COL = 0,
 */
 
 export class Knockout extends DrawLibBase implements IDrawLib {
-
-    private findBox( position: number, create?: boolean): Box | undefined {
-        let box = by(this.draw.boxes, 'position', position);
-        if (!box && create) {
-            box = newBox(this.draw, undefined, position);
-        }
-        return box;
-    }
 
     /** @override */
     nbColumnForPlayers( nJoueur: number): number {
@@ -166,7 +158,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
             for (b = bottom; b <= top; b++) {
-                const box = <PlayerIn>this.findBox(b);
+                const box = this.findBox<PlayerIn>(b);
                 if (box && (this.isJoueurNouveau(box) || box.qualifIn)) {
                     n++;
                 }
@@ -191,7 +183,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
             for (b = bottom; b <= top; b++) {
-                const box = <PlayerIn>this.findBox(b);
+                const box = this.findBox<PlayerIn>(b);
                 if (box && (this.isJoueurNouveau(box) || box.qualifIn)) {
                     n++;
                 }
@@ -222,7 +214,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             const bottom = k.positionBottomCol(c),
                 top = k.positionTopCol(c);
             for (b = bottom; b <= top; b++) {
-                const box = <PlayerIn>this.findBox(b);
+                const box = this.findBox<PlayerIn>(b);
                 if (box && (this.isJoueurNouveau(box) || box.qualifIn)) {
                     n++;
                 }
@@ -420,7 +412,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     pbMatch[b] = true;
                     m--;
 
-                    const match = <Match> newBox(draw, this.event.matchFormat, b);
+                    const match = newBox<Match>(draw, this.event.matchFormat, b);
                     match.score = '';
                     draw.boxes.push(match);
                 }
@@ -443,9 +435,9 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             if (!pbMatch[b] && pbMatch[k.positionMatch(b)]) {
 
                 //Qualifiés entrants se rencontrent
-                let qualif: number = 'number' === typeof players[iJoueur] ? <number>players[iJoueur] : 0;
+                let qualif: number = 'number' === typeof players[iJoueur] ? players[iJoueur] as number : 0;
                 if (qualif) {
-                    const boxIn2 = <PlayerIn>this.findBox(k.positionOpponent(b));
+                    const boxIn2 = this.findBox<PlayerIn>(k.positionOpponent(b));
                     if (boxIn2 && boxIn2.qualifIn) {
                         //2 Qualifiés entrants se rencontrent
                         for (let t = iJoueur + 1; t >= nTeteSerie; t--) {
@@ -461,7 +453,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     }
                 }
 
-                const boxIn = <PlayerIn>this.findBox(b);
+                const boxIn = this.findBox<PlayerIn>(b);
                 if (boxIn) {
                     delete (boxIn as any).score; //not a match
                     if (qualif) {	//Qualifié entrant
@@ -515,7 +507,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             const bottom = k.positionBottomCol(colMin);
             const top = k.positionTopCol(colMin);
             for (let b = top; b >= bottom && i <= MAX_QUALIF; b-- , i++) {
-                const boxOut = <Match> this.findBox(b);
+                const boxOut = this.findBox<Match>(b);
                 if (boxOut) {
                     this.setPlayerOut(boxOut, i);
                 }
@@ -526,13 +518,13 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    boxesOpponents(match: Match): { box1: Box; box2: Box } {
+    boxesOpponents(match: Match): { box1: PlayerIn|Match; box2: PlayerIn|Match } {
         
         const pos1 = k.positionOpponent1(match.position),
             pos2 = k.positionOpponent2(match.position);
         return {
-            box1: < Box > by(this.draw.boxes, 'position', pos1),
-            box2: <Box> by(this.draw.boxes, 'position', pos2)
+            box1: by(this.draw.boxes, 'position', pos1) as PlayerIn|Match,
+            box2: by(this.draw.boxes, 'position', pos2) as PlayerIn|Match
         };
     }
 
@@ -683,7 +675,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
-            const boxIn = <PlayerIn>this.draw.boxes[i];
+            const boxIn = this.draw.boxes[i] as PlayerIn;
             if (!boxIn) {
                 continue;
             }
@@ -708,11 +700,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //private box1(match: Match): Box {
     //    const pos = k.positionOpponent1(match.position);
-    //    return <Box> by(match._draw.boxes, 'position', pos);
+    //    return by(match._draw.boxes, 'position', pos) as Box;
     //}
     //private box2(match: Match): Box {
     //    const pos = k.positionOpponent2(match.position);
-    //    return <Box> by(match._draw.boxes, 'position', pos);
+    //    return by(match._draw.boxes, 'position', pos) as Box;
     //}
 
     //formule de décalage à droite:

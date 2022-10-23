@@ -57,7 +57,7 @@ import { by } from "./util/find";
 //       return;
 //     }
 
-//     //if (type === ModelType.Box || ('_player' in item && (<Box>item)._draw)) { //box
+//     //if (type === ModelType.Box || ('_player' in item && (item as Box)._draw)) { //box
 //     const b = item as Box;
 //     if (type === ModelType.Box || (b._player && b._draw)) { //box
 //       this.tournament = b._draw?._event?._tournament;
@@ -67,7 +67,7 @@ import { by } from "./util/find";
 //       return b;
 //     }
 //     if (type === ModelType.Draw && "string" === typeof item) { //draw id
-//       let id = <string> item;
+//       let id = item;
 //       const d = this.event?.draws.find((draw: Draw) => draw.id === id);
 //       // this.tournament = d._event._tournament;
 //       // this.event = d._event;
@@ -76,7 +76,7 @@ import { by } from "./util/find";
 //       return d;
 //     }
 //     if (type === ModelType.Draw || (item as Draw)._event) { //draw
-//       const d = <Draw> item;
+//       const d = item as Draw;
 //       this.tournament = d._event?._tournament;
 //       this.event = d._event;
 //       this.draw = d;
@@ -84,7 +84,7 @@ import { by } from "./util/find";
 //       return d;
 //     }
 //     if (type === ModelType.TEvent && "string" === typeof item) { //event id
-//       let id = <string> item;
+//       let id = item;
 //       const e = this.tournament?.events.find((evt: TEvent) => evt.id === id);
 //       // this.tournament = e._tournament;
 //       this.event = e;
@@ -94,9 +94,9 @@ import { by } from "./util/find";
 //     }
 //     if (
 //       type === ModelType.TEvent ||
-//       ((<TEvent> item).draws && (<TEvent> item)._tournament)
+//       ((item as TEvent).draws && (item as TEvent)._tournament)
 //     ) { //event
-//       const e = <TEvent> item;
+//       const e = item as TEvent;
 //       this.tournament = e._tournament;
 //       this.event = e;
 //       this.draw = e.draws ? e.draws[0] : undefined;
@@ -104,7 +104,7 @@ import { by } from "./util/find";
 //       return e;
 //     }
 //     if (type === ModelType.Player && (typeof item === "string")) { //player id
-//       let id = <string> item;
+//       let id = item;
 //       const p = this.tournament?.players.find((player: Player) =>
 //         player.id === id
 //       );
@@ -114,18 +114,18 @@ import { by } from "./util/find";
 //     }
 //     if (
 //       type === ModelType.Player ||
-//       ((<Player> item).name && (<Player> item)._tournament)
+//       ((item as Player).name && (item as Player)._tournament)
 //     ) { //player
-//       const p = <Player> item;
+//       const p = item as Player;
 //       this.tournament = p._tournament;
 //       this.player = p;
 //       return p;
 //     }
 //     if (
 //       type === ModelType.Tournament ||
-//       ((<Tournament> item).players && (<Tournament> item).events)
+//       ((item as Tournament).players && (item as Tournament).events)
 //     ) { //tournament
-//       this.tournament = <Tournament> item;
+//       this.tournament = item as Tournament;
 //       if (this.tournament.events && this.tournament.events[0]) {
 //         this.event = this.tournament.events[0];
 //         this.draw = this.event && this.event.draws

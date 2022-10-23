@@ -165,7 +165,7 @@ export class Undo {
             type: ACTION.INSERT,
             obj: obj,
             member: member,
-            value: <any>undefined,
+            value: undefined as any,
             message: message || (member === obj.length ? "append" : "insert"),
             meta: meta
         };

@@ -2,9 +2,9 @@
 
 import { ValidationService } from '../validationService';
 import { by, byId } from '../util/find';
-import { Draw, DrawType, Box, Match } from '../../domain/draw';
-import { Player, PlayerIn } from '../../domain/player';
-import { findSeeded } from '../drawService';
+import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
+import { Player } from '../../domain/player';
+import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import { TEvent, Tournament } from '../../domain/tournament';
 import { drawLib } from '../draw/drawLib';
 
@@ -46,8 +46,8 @@ export class FFTValidation extends ValidationService {
         //TODOjs
         for (let i = 0; i < draw.boxes.length; i++) {
             const box = draw.boxes[i];
-            const boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
-            const match = isMatch(box) ? <Match>box : undefined;
+            const boxIn = isPlayerIn(box) ? box : undefined;
+            const match = isMatch(box) ? box : undefined;
 
             const player = byId(players, box.playerId);
 
@@ -100,8 +100,8 @@ export class FFTValidation extends ValidationService {
 
             if (!isTypePoule && match) {
                 const opponent = lib.boxesOpponents(match);
-                if ((<PlayerIn> opponent.box1).qualifIn
-                    && (<PlayerIn> opponent.box2).qualifIn) {
+                if ((opponent.box1 as PlayerIn).qualifIn
+                    && (opponent.box2 as PlayerIn).qualifIn) {
                     const player1 = byId(players, opponent.box1.playerId);
                     this.errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1, player1);
                     bRes = false;
@@ -384,10 +384,6 @@ export class FFTValidation extends ValidationService {
 
 
     }
-}
-
-function isMatch(box: Box): boolean {
-    return 'undefined' !== typeof (<Match>box).score;
 }
 
 function column(pos: number): number {    //iCol

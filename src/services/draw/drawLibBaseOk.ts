@@ -47,7 +47,7 @@ export class DrawLibBaseOk {
 // 				return false;
 // 			}
 // 
-// 			const boxIn = <PlayerIn>box;
+// 			const boxIn = box as PlayerIn;
 // 			if (boxIn.qualifIn && !bForce) {
 // 				validation.errorDraw('IDS_ERR_TAB_ENTRANT_LOC', box._draw, box);
 // 				return false;
@@ -70,7 +70,7 @@ export class DrawLibBaseOk {
 // 		SetResultatOk(box: Match, box: Match): boolean {
 // 
 // 			ASSERT(!box.hidden);
-// 			const boxIn = <PlayerIn>box;
+// 			const boxIn = box as PlayerIn;
 // 			ASSERT(!boxIn.qualifIn);
 // 
 // 			//Check changement de vainqueur ou enlève vainqueur et box lockée (match suivant déjà joué)
@@ -107,7 +107,7 @@ export class DrawLibBaseOk {
 // 		MetCreneauOk(box: Match, boite: Match): boolean {    //MetCreneauOk
 // 
 // 			ASSERT(!box.hidden);
-// 			const boxIn = <PlayerIn>box;
+// 			const boxIn = box as PlayerIn;
 // 			ASSERT(!boxIn.qualifIn);
 // 			ASSERT(isMatch(box));
 // 			if (isTypePoule()) {
@@ -170,14 +170,14 @@ export class DrawLibBaseOk {
 // 				return false;
 // 			}
 // 
-// 			const boxIn = <PlayerIn>box;
+// 			const boxIn = box as PlayerIn;
 // 			if (boxIn.qualifIn && !bForce) {
 // 				validation.errorDraw('IDS_ERR_DEENTRANT_LOC', box._draw, box);
 // 				return false;
 // 			}
 // 
 // 			const next = drawLib.nextGroup(box._draw);
-// 			const boxOut = <Match> box;
+// 			const boxOut = box as Match;
 // 			let i: number;
 // 			if ((i = boxOut.qualifOut) && next) {
 // 				const boxIn = drawLib.groupFindPlayerIn(next, i);
@@ -212,8 +212,8 @@ export class DrawLibBaseOk {
 // 				}
 // 
 // 				//Un qualifié ne peut pas être Tête de série
-// 				const boxIn = <PlayerIn>box;
-// 				const boxOut = <Match> box;
+// 				const boxIn = box as PlayerIn;
+// 				const boxOut = box as Match;
 // 				ASSERT(!(boxIn.qualifIn || boxOut.qualifOut));
 // 			}
 // 			else {
@@ -248,7 +248,7 @@ export class DrawLibBaseOk {
 // 		
 // 				const draw = box._draw;
 // 
-// 				const boxOut = <Match> box;
+// 				const boxOut = box as Match;
 // 				if (box.isTeteSerie() || boxOut.qualifOut) {
 // 					validation.errorDraw('IDS_ERR_ENTRANT_TDS_S', box._draw, box);
 // 					return false;
@@ -338,7 +338,7 @@ export class DrawLibBaseOk {
 // 					//Met à jour le tableau suivant
 // 					const next = drawLib.nextGroup(box._draw);
 // 					if (next) {
-// 						const boxOut = <Match> box;
+// 						const boxOut = box as Match;
 // 						if (box.isJoueur() && boxOut.qualifOut) {
 // 							if ((i = pSuite.FindQualifieEntrant(outNumber, &pSuite)) !== -1) {
 // 								ASSERT(pSuite.m_pBoite[i].playerId === box.playerId);
@@ -356,7 +356,7 @@ export class DrawLibBaseOk {
 // 					}
 // 
 // 					//Enlève le précédent n° de qualifié sortant
-// 					const boxOut = <Match> box;
+// 					const boxOut = box as Match;
 // 					if (boxOut.qualifOut)
 // 						if (!this.SetQualifieSortantOk(box))	//Enlève le qualifié
 // 							return false;
@@ -374,7 +374,7 @@ export class DrawLibBaseOk {
 // 				}
 // 				else	//Enlève un qualifié sortant
 // 				{
-// 					const boxOut = <Match> box;
+// 					const boxOut = box as Match;
 // 					ASSERT(boxOut.qualifOut);
 // 
 // 					pSuite = getSuivant();
@@ -406,7 +406,7 @@ export class DrawLibBaseOk {
 // 		//Rempli une box proprement
 // 		RempliBoiteOk(box: Box, source: Box): boolean {   //RempliBoiteOk
 // 
-// 			const boxIn = <PlayerIn>box;
+// 			const boxIn = box as PlayerIn;
 // 
 // 			if (boxIn.qualifIn
 // 				&& boxIn.qualifIn !== boxIn.qualifIn) {
@@ -435,7 +435,7 @@ export class DrawLibBaseOk {
 // 					if (box._draw.locked || !this.MetJoueurOk(box, box.playerId, true))
 // 						return false;
 // 
-// 				const boxOut = <Match> box;
+// 				const boxOut = box as Match;
 // 				if (boxOut.qualifOut)
 // 					if (!this.SetQualifieSortantOk(box, boxOut.qualifOut))
 // 						return false;

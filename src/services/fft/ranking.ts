@@ -3,11 +3,11 @@ import { ScoreFFT,ScoreDeltaFFT} from './score';
 
 export class RankingFFT implements Ranking {
 
-    private _serviceScore: ScoreFFT;
+    // private _serviceScore: ScoreFFT;
 
     constructor(
         score: Score) {
-        this._serviceScore = <ScoreFFT> score;
+        // this._serviceScore = score as ScoreFFT;
     }
 
     private _champs = [

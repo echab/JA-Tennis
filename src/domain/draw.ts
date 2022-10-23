@@ -33,7 +33,7 @@ export interface Draw {
   orientation?: number; //Default, Portrait, Landscape
 
   //matches: Match[];
-  boxes: (BoxIn | Match)[];
+  boxes: (PlayerIn | Match)[];
 
   mode?: Mode;
 
@@ -68,7 +68,7 @@ export interface Match extends Box {
   _player2?: Player;
 }
 
-export interface BoxIn extends Box {
+export interface PlayerIn extends Box {
   order?: number;
   qualifIn?: number;
   seeded?: number;

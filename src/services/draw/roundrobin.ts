@@ -2,9 +2,9 @@ import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
 import { shuffle,filledArray } from '../../utils/tool';
 import { rank, ranking } from '../types'
-import { DrawType, Draw, Box, Match } from '../../domain/draw';
+import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
-import { PlayerIn, Player } from '../../domain/player';
+import { Player } from '../../domain/player';
 import { Ranking } from '../../domain/types';
 import { groupDraw, groupFindAllPlayerOut, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
@@ -32,14 +32,6 @@ col: 3      2       1       0
 */
 export class Roundrobin extends DrawLibBase implements IDrawLib {
 
-    private findBox(position: number, create?: boolean): Box | undefined {
-        let box = by(this.draw.boxes, 'position', position);
-        if (!box && create) {
-            box = newBox(this.draw, undefined, position);
-        }
-        return box;
-    }
-
     /** @override */
     nbColumnForPlayers(nJoueur: number): number {
         return nJoueur;
@@ -51,8 +43,8 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         const pos1 = seedPositionOpponent1(match.position, n),
             pos2 = seedPositionOpponent2(match.position, n);
         return {
-            box1: < Box > by(this.draw.boxes, 'position', pos1),
-            box2: <Box> by(this.draw.boxes, 'position', pos2)
+            box1: by(this.draw.boxes, 'position', pos1) as Box,
+            box2: by(this.draw.boxes, 'position', pos2) as Box
         }
     }
 
@@ -90,7 +82,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                 for (let i = nCol - nOld - 1; i >= 0; i--) {
 
                     let b = ADVERSAIRE1(this.draw, i);
-                    const boxIn = <PlayerIn>newBox(this.draw, undefined, b);
+                    const boxIn = newBox<PlayerIn>(this.draw, undefined, b);
                     this.draw.boxes.push(boxIn);
 
                     //Append the matches
@@ -99,7 +91,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                         if (b === diag || (b < diag && this.draw.type === DrawType.PouleSimple)) {
                             continue;
                         }
-                        const match = <Match>newBox(this.draw, undefined, b);
+                        const match = newBox(this.draw, undefined, b) as Match;
                         match.score = '';
                         this.draw.boxes.push(match);
                     }
@@ -118,7 +110,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         }
 
         for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
-            const boxIn = <PlayerIn>this.draw.boxes[i];
+            const boxIn = this.draw.boxes[i] as PlayerIn;
             if (!boxIn) {
                 continue;
             }
@@ -140,7 +132,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         }
 
         for (let i = 0; i < this.draw.boxes.length; i++) {
-            const boxOut = <Match>this.draw.boxes[i];
+            const boxOut = this.draw.boxes[i] as Match;
             if (boxOut && boxOut.qualifOut === iQualifie) {
                 return boxOut;
             }
@@ -241,7 +233,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             }
 
         } else {	//Enlève un qualifié sortant
-            const match = <Match>box;
+            const match = box as Match;
             if (next && box.playerId && match.qualifOut) {
                 //Met à jour le tableau suivant
                 const [d,boxIn] = groupFindPlayerIn(this.event, next, match.qualifOut);
@@ -277,7 +269,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             const first = positionFirstIn(d.nbColumn),
                 last = positionLastIn(d.nbColumn);
             for (let b = last; b <= first; b++) {
-                const boxIn = <PlayerIn>this.findBox(b);
+                const boxIn = this.findBox<PlayerIn>(b);
                 if (!boxIn) {
                     continue;
                 }
@@ -337,11 +329,11 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                 let b = ADVERSAIRE1(draw, i);
                 const j = t + (draw.nbColumn - i - 1) * nDraw;
 
-                const boxIn = <PlayerIn>newBox(draw, undefined, b);
+                const boxIn = newBox<PlayerIn>(draw, undefined, b);
                 draw.boxes.push(boxIn);
 
                 if (j < players.length) {
-                    const qualif = 'number' === typeof players[j] ? <number>players[j] : 0;
+                    const qualif = 'number' === typeof players[j] ? players[j] as number : 0;
                     if (qualif) {	//Qualifié entrant
                         if (!this.setPlayerIn(boxIn, qualif)) {
                             return [];
@@ -357,15 +349,17 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                     if (b === diag || (b < diag && draw.type === DrawType.PouleSimple)) {
                         continue;
                     }
-                    const match = <Match>newBox(draw, undefined, b);
+                    const match = newBox<Match>(draw, undefined, b);
                     match.score = '';
                     draw.boxes.push(match);
                 }
             }
 
             //Ajoute 1 tête de série
-            const boxT = <PlayerIn>this.findBox(ADVERSAIRE1(draw, draw.nbColumn - 1));
-            boxT.seeded = t + 1;
+            const boxT = this.findBox<PlayerIn>(ADVERSAIRE1(draw, draw.nbColumn - 1));
+            if (boxT) {
+                boxT.seeded = t + 1;
+            }
 
             draws.push(draw);
         }

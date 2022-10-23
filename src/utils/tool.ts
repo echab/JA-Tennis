@@ -62,7 +62,7 @@ export function hashById<T extends { id: string }>(array: T[]): { [id: string]: 
     for (let i = array.length - 1; i >= 0; i--) {
         const elem = array[i];
         if (elem.id) {
-            a[<string>elem.id] = elem;
+            a[elem.id] = elem;
         }
     }
     return a;

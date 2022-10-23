@@ -1,6 +1,6 @@
 ﻿import { Knockout } from './knockout';
 import { KnockoutLib as k } from './knockoutLib';
-import { findSeeded, groupDraw, groupFindPlayerOut, nextGroup, previousGroup } from '../drawService';
+import { findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 // import { TournamentEditor } from '../tournamentService';
 import { indexOf, by, byId } from '../util/find';
 import { Guid } from '../util/guid';
@@ -146,7 +146,7 @@ export class KnockoutValidation implements IValidation {
             if (!isMatch(match)) {
                 return false;
             }
-            const opponent = lib.boxesOpponents(<Match> match);
+            const opponent = lib.boxesOpponents(match);
             return !match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
         };
     
@@ -172,8 +172,8 @@ export class KnockoutValidation implements IValidation {
         //Match avec deux joueurs gagné par un des deux joueurs
         for (let i = 0; i < draw.boxes.length; i++) {
             const box = draw.boxes[i];
-            const boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
-            const match = isMatch(box) ? <Match>box : undefined;
+            const boxIn = isPlayerIn(box) ? box : undefined;
+            const match = isMatch(box) ? box : undefined;
             const b = box.position;
 
             //ASSERT(-1 <= box.playerId && box.playerId < tournament.players.length);
@@ -287,7 +287,7 @@ export class KnockoutValidation implements IValidation {
                     }
 
                     if (!score.isValid(match.score)) {
-                        validation.errorDraw('IDS_ERR_SCORE_BAD', draw, match, player, <string>match.score);
+                        validation.errorDraw('IDS_ERR_SCORE_BAD', draw, match, player, match.score as string);
                         bRes = false;
                     }
 
@@ -307,8 +307,8 @@ export class KnockoutValidation implements IValidation {
                 if (!isMatchJoue(match)) {
 
                     //match before opponent 2
-                    const opponent1 = lib.boxesOpponents(<Match>opponent.box1);
-                    const opponent2 = lib.boxesOpponents(<Match>opponent.box2);
+                    const opponent1 = lib.boxesOpponents(opponent.box1 as Match);
+                    const opponent2 = lib.boxesOpponents(opponent.box2 as Match);
 
                     const player1 = byId(players, opponent.box1.playerId); // opponent.box1._player
                     const player2 = byId(players, opponent.box2.playerId); // opponent.box2._player
@@ -540,7 +540,7 @@ export class KnockoutValidation implements IValidation {
                     }
 
                     for (let i = 0; i < draw.boxes.length; i++) {
-                        const boxIn2 = <PlayerIn>draw.boxes[i];
+                        const boxIn2 = draw.boxes[i] as PlayerIn;
                         if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
                             validation.errorDraw('IDS_ERR_TAB_TETESERIE_DUP', d, boxIn, undefined, 'Seeded ' + e);
                             bRes = false;
@@ -601,10 +601,6 @@ function ASSERT(b: boolean, message?: string): void {
         debugger;
         throw message || 'Assertion is false';
     }
-}
-
-function isMatch(box: Box): boolean {
-    return 'undefined' !== typeof (<Match>box).score;
 }
 
 function CompString(a?: string, b?: string): number {

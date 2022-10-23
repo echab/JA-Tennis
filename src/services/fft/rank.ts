@@ -38,7 +38,7 @@ export class RankFFT implements Rank {
     }
 
     isValid(rank: RankString): boolean {
-        return this._index[<string>rank] >= 0;
+        return this._index[rank] >= 0;
     }
 
     isNC(rank: RankString): boolean {
@@ -46,18 +46,18 @@ export class RankFFT implements Rank {
     }
 
     next(rank: RankString): RankString {
-        const i = this._index[<string>rank];
+        const i = this._index[rank];
         return this._ranks[i + 1];
     }
 
     previous(rank: RankString): RankString {
-        const i = this._index[<string>rank];
+        const i = this._index[rank];
         return this._ranks[i - 1];
     }
 
     compare(rank1: RankString, rank2: RankString): number {
-        const i = this._index[<string>rank1],
-            j = this._index[<string>rank2];
+        const i = this._index[rank1],
+            j = this._index[rank2];
         return i - j;
     }
 
@@ -71,6 +71,6 @@ export class RankFFT implements Rank {
     }
 
     groupOf(rank: RankString): RankGroupString {
-        return this._groupOf[<string>rank];
+        return this._groupOf[rank];
     }
 }

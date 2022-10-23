@@ -4,8 +4,7 @@ import { extend, isArray, isObject } from "./util/object";
 import { shuffle } from "../utils/tool";
 import { rank } from "./types";
 
-import { Box, Draw, DrawType, Match, Mode } from "../domain/draw";
-import { PlayerIn } from "../domain/player";
+import { Box, Draw, DrawType, Match, Mode, PlayerIn } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
@@ -131,18 +130,18 @@ export function initDraw(draw: Draw, parent: TEvent): void {
 
 //newBox(parent: Draw, matchFormat?: string, position?: number): Box
 //newBox(parent: Draw, source?: Box, position?: number): Box
-export function newBox(
+export function newBox<T extends Box = Box>(
   parent: Draw,
   source?: string | Box,
   position?: number,
-): Box {
-  const box: Box = <any>{};
+): T {
+  const box: T = <any>{};
   if (isObject(source)) {
     extend(box, source);
     //box.id = undefined;
     //box.position= undefined;
   } else if ("string" === typeof source) { //matchFormat
-    const match: Match = <Match>box;
+    const match = box as unknown as Match;
     match.score = ""; // delete match.score
     match.matchFormat = source;
   }
@@ -160,8 +159,14 @@ export function newBox(
 //   _updateDraw(draw, undefined, generate || GenerateType.Create);
 // }
 
-export function isMatch(box: Box): boolean {
-  return box && "undefined" !== typeof (<Match>box).score;
+/** A match, with a score field */
+export function isMatch(box: Box): box is Match {
+  return box && "undefined" !== typeof (box as Match).score;
+}
+
+/** A input player, without a score field */
+export function isPlayerIn(box: Box): box is PlayerIn {
+  return box && "undefined" === typeof (box as Match).score;
 }
 
 export function _updateQualif(event: TEvent, draw: Draw): void {
@@ -170,7 +175,7 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
   //retreive qualifIn box
   const qualifs: PlayerIn[] = [];
   for (let i = draw.boxes.length - 1; i >= 0; i--) {
-    const boxIn = <PlayerIn>draw.boxes[i];
+    const boxIn = draw.boxes[i] as PlayerIn;
     if (boxIn.qualifIn) {
       qualifs.push(boxIn);
     }

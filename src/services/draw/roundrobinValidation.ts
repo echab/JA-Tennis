@@ -4,6 +4,7 @@ import { Draw, DrawType, Box, Match } from '../../domain/draw';
 import { Player, PlayerIn } from '../../domain/player';
 import { IValidation } from '../../domain/validation';
 import { TEvent, Tournament } from '../../domain/tournament';
+import { isMatch, isPlayerIn } from '../drawService';
 
 export class RoundrobinValidation implements IValidation {
 
@@ -85,8 +86,8 @@ export class RoundrobinValidation implements IValidation {
         //Match avec deux joueurs gagné par un des deux joueurs
         for (let i = 0; i < draw.boxes.length; i++) {
             const box = draw.boxes[i];
-            const boxIn = !isMatch(box) ? <PlayerIn>box : undefined;
-            const match = isMatch(box) ? <Match>box : undefined;
+            const boxIn = isPlayerIn(box) ? box : undefined;
+            const match = isMatch(box) ? box : undefined;
 
             //ASSERT(-1 <= box.playerId && box.playerId < pDoc.m_nJoueur);
             //Joueur inscrit au tableau ?
@@ -120,8 +121,4 @@ export class RoundrobinValidation implements IValidation {
 
         return bRes;
     }
-}
-
-function isMatch(box: Box): boolean {
-    return 'undefined' !== typeof (<Match>box).score;
 }

@@ -1,9 +1,10 @@
-﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup } from '../drawService';
+﻿import { nextGroup, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, previousGroup, isMatch } from '../drawService';
 import { isArray } from '../util/object';
-import { Draw, Box, DrawType, Match } from '../../domain/draw';
-import { Player, PlayerIn } from '../../domain/player';
+import { Draw, Box, DrawType, Match, PlayerIn } from '../../domain/draw';
+import { Player } from '../../domain/player';
 import { drawLib, GenerateType } from './drawLib';
 import { TEvent } from '../../domain/tournament';
+import { by } from '../util/find';
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
@@ -17,6 +18,14 @@ export abstract class DrawLibBase {
     abstract resize( oldDraw?: Draw, nJoueur?: number): void;
     abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
 
+    protected findBox<T extends Box = Box>( position: number, create?: boolean): T | undefined {
+        let box = by(this.draw.boxes, 'position', position);
+        if (!box && create) {
+            box = newBox<T>(this.draw, undefined, position);
+        }
+        return box as T;
+    }
+
     resetDraw( nPlayer: number): void {
         //remove qualif out
         const next = nextGroup(this.event, this.draw);
@@ -26,7 +35,7 @@ export abstract class DrawLibBase {
                 if (boxes) {
                     const drawLibNext = drawLib(this.event, next[i]);
                     for (let b = 0; b < boxes.length; b++) {
-                        const box = <Match> boxes[b];
+                        const box = boxes[b] as Match;
                         if (box && box.qualifOut) {
                             drawLibNext.setPlayerOut(box);
                         }
@@ -115,7 +124,7 @@ export abstract class DrawLibBase {
         }
 
         const boxIn = box as PlayerIn;
-        const match = isMatch(box) ? box as Match : undefined;
+        const match = isMatch(box) ? box : undefined;
         box.playerId = playerId;
         // box._player = player;
         //boxIn.order = 0;
@@ -403,8 +412,8 @@ export abstract class DrawLibBase {
 
         const boxIn = box as PlayerIn;
         const sourceIn = source as PlayerIn;
-        const match = isMatch(box) ? box as Match : undefined;
-        const sourceMatch = isMatch(source) ? source as Match : undefined;
+        const match = isMatch(box) ? box : undefined;
+        const sourceMatch = isMatch(source) ? source : undefined;
 
         if (boxIn.qualifIn
             && boxIn.qualifIn !== sourceIn.qualifIn) {
@@ -530,11 +539,6 @@ export abstract class DrawLibBase {
             return (box.position << 1) + 1;
         }
     }
-}
-
-/** A match, with a score field */
-function isMatch(box: Box): boolean {
-    return box && ('undefined' !== typeof (box as Match).score);
 }
 
 function ASSERT(b: boolean, message?: string): void {

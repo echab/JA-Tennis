@@ -34,12 +34,3 @@ export type Player = {
     comment?: string;
 
 } & Coordinates;
-
-export interface PlayerIn extends Box {
-
-    seeded ?: number;
-
-    qualifIn?: number;
-
-    order ?: number;
-}

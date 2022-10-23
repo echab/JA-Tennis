@@ -40,7 +40,7 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
 //       reader.addEventListener("loadend", () => {
 //         try {
 //           const tournament: Tournament = JSON.parse(reader.result);
-//           tournament._url = (<File> file_url).name; //TODO missing path
+//           tournament._url = (file_url as File).name; //TODO missing path
 //           initTournament(tournament);
 //           //this.selection.select(tournament, ModelType.Tournament);
 //           resolve(tournament);
@@ -50,7 +50,7 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
 //       });
 //       reader.addEventListener("error", () => reject(reader.error?.name));
 //       reader.addEventListener("abort", () => reject("aborted"));
-//       reader.readAsText(<Blob> file_url); //TODO remove cast
+//       reader.readAsText(file_url as Blob); //TODO remove cast
 //     });
   }
 }
@@ -174,7 +174,7 @@ export function sortPlayers(players: Array<Player | number>): void {
     if (isNumber2) {
       return 1;
     }
-    return rank.compare((<Player> p1).rank, (<Player> p2).rank);
+    return rank.compare((p1 as Player).rank, (p2 as Player).rank);
   };
   players.sort(comparePlayersByRank);
 
