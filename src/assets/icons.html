@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Icons</title>
+    <link rel="stylesheet" href="./icons.css" id="stylesheet">
+    <style>
+        body {
+            columns:auto;
+        }
+        span {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <img src="glyphicons.png">
+    <script>
+        const span = document.createElement('span');
+        // span.innerHTML = '<i></i>';
+        span.appendChild(document.createElement('i'))
+        const ss = document.styleSheets[0];
+        for( let rule of ss.cssRules) {
+            if (rule.selectorText.match(/^\.icon2-/)) {
+                const name = rule.selectorText.substring(1);
+
+                /** @type {HTMLSpanElement} */
+                const e = span.cloneNode(true);
+                const i = e.firstChild;
+                i.className = name;
+                e.appendChild(document.createTextNode(' '+name));
+                document.body.appendChild(e);
+            }
+            // console.log(rule);
+        }
+    </script>
+</body>
+</html>

@@ -127,7 +127,7 @@ export function initTournament(tournament: Tournament): Tournament {
 }
 
 export function isRegistred(event: TEvent, player: Player): boolean {
-  return player.registration?.indexOf(event.id) !== -1;
+  return player.registration.indexOf(event.id) !== -1;
 //   return player.registration?.includes(event.id);
 }
 
@@ -139,21 +139,10 @@ export function getRegistred(players: Player[], event: TEvent): Player[] {
 
 export function getRegisteredPlayers(allPlayers: Player[], event: TEvent, drawMinRank: RankString, drawMaxRank: RankString): Player[] { //GetJoueursInscrit
   //Récupère les joueurs inscrits
-  let ppJoueur: Player[] = [], //new short[nPlayer],
-    nPlayer = 0;
-  for (let i = 0; i < allPlayers.length; i++) {
-    const pJ = allPlayers[i];
-    if (isRegistred(event, pJ)) {
-      if (
-        !pJ.rank ||
-        rank.within(pJ.rank, drawMinRank, drawMaxRank)
-      ) {
-        ppJoueur.push(pJ); //no du joueur
-      }
-    }
-  }
-
-  return ppJoueur;
+  return allPlayers.filter((player) =>
+   isRegistred(event, player)
+    && (!player.rank || rank.within(player.rank, drawMinRank, drawMaxRank))
+  );
 }
 
 export function sortPlayers(players: Array<Player | number>): void {

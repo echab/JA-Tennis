@@ -435,6 +435,14 @@ export function findAllPlayerOutBox(
   return a;
 }
 
+export function findDrawPlayerIds(draw: Draw) : Set<string> {
+  return new Set(
+    draw.boxes
+      .filter(({playerId}) => playerId)
+      .map<string>(({playerId}) => playerId!)
+  );
+}
+
 /**
  * Fill or erase a box with qualified in and/or player
  * setPlayerIn

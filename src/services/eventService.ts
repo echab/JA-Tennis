@@ -77,10 +77,10 @@ export function deleteEvent(eventId: string): Command {
     "Player to remove not found",
   );
   const prevEvent = events[i];
-  const registeredPlayers = new Set(
-    players.filter((player, j) => player.registration.includes(eventId)).map(getId)
+  const registeredPlayerIds = new Set(
+    players.filter((player) => player.registration.includes(eventId)).map(getId)
   );
-  const byRegistered = ({id}:{id:string}) => registeredPlayers.has(id);
+  const byRegistered = ({id}:{id:string}) => registeredPlayerIds.has(id);
 
   const act = () => {
     update(({ tournament }) => {

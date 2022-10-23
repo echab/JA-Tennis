@@ -127,14 +127,3 @@ export function registerPlayer(
     undo,
   };
 }
-
-// export function remove(player: Player) {
-//     const c = player._tournament.players;
-//     const i = indexOf(c, "id", player.id, "Player to remove not found");
-//     // this.undo.remove(c, i, "Delete " + player.name + " " + i, ModelType.Player);   //c.splice( i, 1);
-//   // if (this.selection.player === player) {
-//   //     this.selection.select(c[i] || c[i - 1], ModelType.Player); //select next or previous
-//   // }
-//   //TODO update all _player internal references
-//   // initTournament(player._tournament);
-// }
