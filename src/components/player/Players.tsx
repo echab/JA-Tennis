@@ -6,6 +6,9 @@ import { updatePlayer, deletePlayer } from '../../services/playerService';
 import { commandManager } from '../../services/util/commandManager';
 import { DialogPlayer } from './DialogPlayer';
 import { dragStart } from '../../services/util/dragdrop';
+import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
+import { findDrawPlayerIds } from '../../services/drawService';
+import { getId } from '../../services/util/find';
 
 type Props = {
   players: Player[];
@@ -17,6 +20,14 @@ export const Players: Component<Props> = (props) => {
   const eventById = Object.fromEntries(props.events.map((e) => [e.id, e]));
 
   const [isDlgPlayer, showDlgPlayer] = createSignal(false);
+
+  const drawPlayerIds = () => selection.draw ? findDrawPlayerIds(selection.draw) : new Set<string>();
+
+  const drawRegisteredPlayerIds = () => new Set(
+    selection.event && selection.draw
+    ? getRegisteredPlayers(props.players, selection.event, selection.draw.minRank, selection.draw.maxRank).map(getId)
+    : []
+  );
 
   const editPlayer = (player?: Player) => { selectPlayer(player); showDlgPlayer(true); };
 
@@ -69,7 +80,12 @@ export const Players: Component<Props> = (props) => {
               </td>
               <td class="text-left">{player.rank}</td>
               <td class="text-left">
-                <Show when={selection.event && player.registration.includes(selection.event.id)}><i class="icon2-checkmark"></i></Show>
+                <Show when={selection.event}><i
+                   classList={{
+                    "icon2-checkmark": (!selection.draw && isRegistred(selection.event!, player)) || drawPlayerIds().has(player.id),
+                    "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
+                   }}
+                   ></i></Show>
               </td>
               <td>
                 <For each={player.registration}>{(eventId, i) =>
