@@ -173,6 +173,14 @@
     background-position: -192px -72px;
 }
 
+.icon2-left-arrow {
+    background-position: -432px -72px;
+}
+.icon2-right-arrow {
+    background-position: -456px -72px;
+}
+
+
 .icon2-player {
     background-position: -0px -96px;
 }

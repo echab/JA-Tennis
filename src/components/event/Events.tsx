@@ -59,10 +59,7 @@ export const Events: Component<Props> = (props) => {
               <h5 class="[&[aria-selected=true]]:bg-blue-200"
                 classList={{"mt-2": !draw.suite }}
                 aria-selected={selection.draw?.id === draw.id}
-                onclick={(evt) => {
-                  selectDraw(event, undefined);
-                  selectDraw(event, draw);
-                }}                
+                onclick={(evt) =>                   selectDraw(event, draw)}
               >
                 <i class="icon2-info hover"
                   onclick={() => {

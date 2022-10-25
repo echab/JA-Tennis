@@ -54,6 +54,15 @@ export function selectEvent(event?: TEvent): void {
 }
 
 export function selectDraw(event: TEvent, draw?: Draw): void {
+    if (draw) {
+        // first unselect the previous one // TODO: should not be necessary
+        update((sel) => {
+            sel.event = event;
+            sel.draw = undefined;
+            sel.box = undefined;
+            sel.boxQ = undefined;
+        });
+    }
     update((sel) => {
         sel.event = event;
         sel.draw = draw;
