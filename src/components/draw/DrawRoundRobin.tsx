@@ -11,7 +11,6 @@ type Props = {
   event: TEvent,
   draw: Draw,
   players: Player[],
-  showDlgMatch: Setter<boolean>,
 }
 
 export const DrawRoundRobin: Component<Props> = (props) => {

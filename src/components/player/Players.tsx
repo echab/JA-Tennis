@@ -1,14 +1,12 @@
-import { Component, createSignal, For, Show } from 'solid-js';
+import { Component, For, Show } from 'solid-js';
 import { selection, selectPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
-import { updatePlayer, deletePlayer } from '../../services/playerService';
-import { commandManager } from '../../services/util/commandManager';
-import { DialogPlayer } from './DialogPlayer';
 import { dragStart } from '../../services/util/dragdrop';
 import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
 import { findDrawPlayerIds } from '../../services/drawService';
 import { getId } from '../../services/util/find';
+import { showDialog } from '../Dialogs';
 
 type Props = {
   players: Player[];
@@ -19,8 +17,6 @@ export const Players: Component<Props> = (props) => {
   
   const eventById = Object.fromEntries(props.events.map((e) => [e.id, e]));
 
-  const [isDlgPlayer, showDlgPlayer] = createSignal(false);
-
   const drawPlayerIds = () => selection.draw ? findDrawPlayerIds(selection.draw) : new Set<string>();
 
   const drawRegisteredPlayerIds = () => new Set(
@@ -29,17 +25,16 @@ export const Players: Component<Props> = (props) => {
     : []
   );
 
-  const editPlayer = (player?: Player) => { selectPlayer(player); showDlgPlayer(true); };
+  const editPlayer = (player?: Player) => { selectPlayer(player); showDialog("player"); };
 
   return (
     <>
-      <Show when={isDlgPlayer()}>
-        <DialogPlayer events={props.events} player={selection.player}
-          onOk={commandManager.wrap(updatePlayer)}
-          onClose={() => showDlgPlayer(false)}
-        />
-      </Show>
-      <table class="table table-hover table-condensed" style="width:auto;">
+      <div class="flex justify-between items-center">
+        <h3>Players</h3>
+        <button type="button" onclick={[editPlayer,null]}  class="p-2 rounded-full">➕ Add player</button>
+        <button type="button" class="p-2 rounded-full">&Gt;</button>
+      </div>
+      <table class="table table-hover table-condensed w-auto">
         {/* <caption>Players</caption> */}
         <thead>
           <tr>
@@ -47,10 +42,7 @@ export const Players: Component<Props> = (props) => {
             <th class="text-left">Player name</th>
             <th class="text-left">Rank</th>
             <th class="text-left">Reg</th>
-            <th class="text-left">Registrations</th>
-            <td>
-              <button type="button" onclick={[editPlayer,null]}>➕ Add player</button>
-            </td>
+            {/* <th class="text-left">Registrations</th> */}
           </tr>
         </thead>
         <tbody ondragstart={dragStart}>
@@ -87,11 +79,11 @@ export const Players: Component<Props> = (props) => {
                    }}
                    ></i></Show>
               </td>
-              <td>
+              {/* <td>
                 <For each={player.registration}>{(eventId, i) =>
                   <span>{(i() ? ', ' : '') + eventById[eventId].name}</span>
                 }</For>
-              </td>
+              </td> */}
               {/* <td class="hover">
                 <button type="button" onclick={[commandManager.wrap(deletePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
               </td> */}

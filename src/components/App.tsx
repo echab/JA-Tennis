@@ -1,36 +1,30 @@
-import { Component, createSignal, Show } from 'solid-js';
+import { Component, createSignal, Match, Show, Switch } from 'solid-js';
 import { mockTournament } from '../assets/data';
 import { commandManager } from '../services/util/commandManager';
 
 // import logo from './logo.svg';
 import { Players } from './player/Players';
 import { selection, selectTournament } from './util/selection';
-// import { SelectionProvider, useSelection } from './util/selection';
 import { Events } from './event/Events';
 import styles from './App.module.css';
 import '../assets/icons.css';
-import { DialogInfo } from './event/DialogInfo';
+// import { DialogInfo } from './tournament/DialogInfo';
 import { initTournament, updateInfo } from '../services/tournamentService';
+import { SidePanel } from './SidePanel';
+import { DrawDraw } from './draw/DrawDraw';
+import { Dialogs, showDialog } from './Dialogs';
 
 export const App: Component = () => {
+
+  selectTournament(initTournament(mockTournament));
 
   const [isDlgInfo, showDlgInfo] = createSignal(false);
 
   return <>
-    <Show when={isDlgInfo()}>
-      <DialogInfo info={selection.tournament.info}
-        onOk={commandManager.wrap(updateInfo)}
-        onClose={() => showDlgInfo(false)}
-      />
-    </Show>
-    {/* <SelectionProvider> */}
+    <Dialogs />
     <div class={styles.App}>
       <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800">
         {/* <i class="icon2-ball"></i> JA-Tennis */}
-        <span>
-          <button type="button" onclick={() => showDlgInfo(true)}>Info</button>
-          <span> - </span>{selection.tournament.info.name}
-        </span>
         <div>
           <button type="button" class="border-2 border-zinc-500" disabled={!commandManager.canUndo} onclick={() => commandManager.undo()} title={`Undo ${commandManager.undoNames(1)?.[0] ?? ''}`}>↶ Undo</button>
           &nbsp;
@@ -41,31 +35,28 @@ export const App: Component = () => {
         </div>
       </header>
       <div class="flex">
-        <LeftPane />
-        <RightPane />
+        <SidePanel />
+        <Main />
       </div>
     </div>
-    {/* </SelectionProvider> */}
   </>
 };
 
-export const LeftPane: Component = () => {
-  // const { selection, selectTournament, selectPlayer } = useSelection();
-  selectTournament(initTournament(mockTournament));
-
+export const Main: Component = () => {
   return <div>
-    {/* {JSON.stringify(selection.tournament.info)} */}
-    <Players
-      players={selection.tournament?.players ?? []}
-      events={selection.tournament?.events ?? []}
-    />
-  </div>
-}
-
-export const RightPane: Component = () => {
-  return <div>
-    <Events
-      events={selection.tournament?.events ?? []}
-    />
+    {/* <Events events={selection.tournament?.events ?? []} /> */}
+    <Switch fallback={<div>...</div>}>
+      <Match when={selection.event && !selection.draw}>
+        <h4>{selection.event!.name}</h4>
+      </Match>
+      <Match when={selection.event && selection.draw}>
+        <h4>{selection.event!.name} - {selection.draw!.name}</h4>
+        <DrawDraw
+          event={selection.event!}
+          draw={selection.draw!}
+          players={selection.tournament.players}
+        />
+      </Match>
+    </Switch>
   </div>
 }

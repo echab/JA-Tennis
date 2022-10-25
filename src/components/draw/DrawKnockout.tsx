@@ -6,12 +6,12 @@ import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import './Draw.css';
+import { showDialog } from '../Dialogs';
 
 type Props = {
   event: TEvent,
   draw: Draw,
   players: Player[],
-  showDlgMatch: Setter<boolean>,
 }
 
 export const DrawKnockout: Component<Props> = (props) => {
@@ -69,7 +69,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                     <i class="icon2-match hover"
                       onclick={() => {
                         selectBox(props.event, props.draw, box);
-                        props.showDlgMatch(true);
+                        showDialog("match");
                       }}
                     ></i>
                     <Show when={box?.score} fallback={
