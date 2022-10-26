@@ -78,6 +78,7 @@ export const SidePanel: Component<Props> = () => {
                         <Players
                             players={selection.tournament?.players ?? []}
                             events={selection.tournament?.events ?? []}
+                            short={true}
                         />
                     </Match>
                     <Match when={pane() === 2}>

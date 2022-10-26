@@ -1,27 +1,23 @@
-import { Component, createSignal, Match, Show, Switch } from 'solid-js';
+import { Component } from 'solid-js';
+import { Route, Router, Routes } from '@solidjs/router';
 import { mockTournament } from '../assets/data';
 import { commandManager } from '../services/util/commandManager';
 
 // import logo from './logo.svg';
-import { Players } from './player/Players';
-import { selectDraw, selection, selectTournament } from './util/selection';
-import { Events } from './event/Events';
+import { selection, selectTournament } from './util/selection';
 import styles from './App.module.css';
 import '../assets/icons.css';
-// import { DialogInfo } from './tournament/DialogInfo';
-import { initTournament, updateInfo } from '../services/tournamentService';
+import { initTournament } from '../services/tournamentService';
 import { SidePanel } from './SidePanel';
-import { DrawDraw } from './draw/DrawDraw';
-import { Dialogs, showDialog } from './Dialogs';
-import { indexOf } from '../services/util/find';
+import { Dialogs } from './Dialogs';
+import { PaneDraw } from './draw/PaneDraw';
+import { Players } from './player/Players';
 
 export const App: Component = () => {
 
   selectTournament(initTournament(mockTournament));
 
-  const [isDlgInfo, showDlgInfo] = createSignal(false);
-
-  return <>
+  return <Router>
     <Dialogs />
     <div class={styles.App}>
       <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800">
@@ -40,43 +36,31 @@ export const App: Component = () => {
         <Main />
       </div>
     </div>
-  </>
+  </Router>
 };
 
 export const Main: Component = () => {
-
-  const drawIndex = ()=> selection.event && selection.draw 
-   ? indexOf(selection.event.draws, 'id', selection.draw.id)
-   : -2;
-  const prevDraw = ()=> selection.event?.draws[drawIndex()-1];
-  const nextDraw = ()=> selection.event?.draws[drawIndex()+1];
-
-  return <div>
-    {/* <Events events={selection.tournament?.events ?? []} /> */}
-    <Switch fallback={<div>...</div>}>
-      <Match when={selection.event && !selection.draw}>
-        <h4>{selection.event!.name}</h4>
-      </Match>
-      <Match when={selection.event && selection.draw}>
-        <h4>{selection.event!.name} - {selection.draw!.name}</h4>
-        <DrawDraw
-          event={selection.event!}
-          draw={selection.draw!}
-          players={selection.tournament.players}
-        />
-        <Show when={selection.event}>
-          <button class="p-2 rounded-full"
-           onclick={() => selectDraw(selection.event!, prevDraw())}
-             disabled={!prevDraw()}
-             ><i class="icon2-left-arrow"></i></button>
-        </Show>
-        <Show when={selection.event}>
-          <button class="p-2 rounded-full"
-          onclick={() => selectDraw(selection.event!, nextDraw())} 
-          disabled={!nextDraw()}
-          ><i class="icon2-right-arrow"></i></button>
-        </Show>
-      </Match>
-    </Switch>
-  </div>
+  return (
+    <div class="grow">
+      <Routes>
+        <Route path="/event/:eventId/:drawId?" element={
+          <PaneDraw />
+        } />
+        <Route path="/players" element={
+          <Players
+            events={selection.tournament.events}
+            players={selection.tournament.players}
+          />
+        } />
+      </Routes>
+    </div>
+  );
+  // return <Switch fallback={<div>...</div>}>
+  //   <Match when={selection.event && !selection.draw}>
+  //     <h4>{selection.event!.name}</h4>
+  //   </Match>
+  //   <Match when={selection.event && selection.draw}>
+  //     <PaneDraw />
+  //   </Match>
+  // </Switch>
 }

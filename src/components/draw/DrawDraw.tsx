@@ -1,5 +1,4 @@
 import { Component, Show } from 'solid-js';
-import { selection } from '../util/selection';
 import { Draw, DrawType } from '../../domain/draw';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
@@ -14,11 +13,9 @@ type Props = {
 }
 
 export const DrawDraw: Component<Props> = (props) => {
-  return <>
-    <Show when={props.draw.type & DrawType.PouleSimple} fallback={
-      <DrawKnockout event={props.event} draw={props.draw} players={props.players} />
-    }>
-      <DrawRoundRobin event={props.event} draw={props.draw} players={props.players} />
-    </Show>
-  </>
+  return <Show when={props.draw.type & DrawType.PouleSimple} fallback={
+    <DrawKnockout event={props.event} draw={props.draw} players={props.players} />
+  }>
+    <DrawRoundRobin event={props.event} draw={props.draw} players={props.players} />
+  </Show>
 }

@@ -16,7 +16,7 @@ export function indexOf<T>(array: T[], member: StringKey<T>, value: any, error?:
 
     let i: number, a: T;
 
-    if (value === null || value === undefined) {
+    if (value === null || value === undefined || !array.length) {
         return -1;
     }
 

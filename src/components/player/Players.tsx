@@ -1,4 +1,5 @@
 import { Component, For, Show } from 'solid-js';
+import { A } from '@solidjs/router';
 import { selection, selectPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
@@ -11,6 +12,7 @@ import { showDialog } from '../Dialogs';
 type Props = {
   players: Player[];
   events: TEvent[];
+  short?: boolean;
 }
 
 export const Players: Component<Props> = (props) => {
@@ -29,10 +31,13 @@ export const Players: Component<Props> = (props) => {
 
   return (
     <>
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center px-2">
         <h3>Players</h3>
         <button type="button" onclick={[editPlayer,null]}  class="p-2 rounded-full">➕ Add player</button>
-        <button type="button" class="p-2 rounded-full">&Gt;</button>
+        {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
+        <Show when={props.short}>
+          <A href="/players" class="p-2 rounded-full">&Gt;</A>
+        </Show>
       </div>
       <table class="table table-hover table-condensed w-auto">
         {/* <caption>Players</caption> */}
@@ -41,8 +46,15 @@ export const Players: Component<Props> = (props) => {
             <th class="span1"><input type="checkbox" disabled /></th>
             <th class="text-left">Player name</th>
             <th class="text-left">Rank</th>
-            <th class="text-left">Reg</th>
-            {/* <th class="text-left">Registrations</th> */}
+            <Show when={props.short}>
+              <th class="text-left">Reg</th>
+            </Show>
+            <Show when={!props.short}>
+              <th class="text-left">Club</th>
+              <th class="text-left">Registrations</th>
+              <th class="text-left">Phone</th>
+              <th class="text-left">Email</th>
+            </Show>
           </tr>
         </thead>
         <tbody ondragstart={dragStart}>
@@ -71,19 +83,32 @@ export const Players: Component<Props> = (props) => {
                 </span>
               </td>
               <td class="text-left">{player.rank}</td>
-              <td class="text-left">
-                <Show when={selection.event}><i
-                   classList={{
-                    "icon2-checkmark": (!selection.draw && isRegistred(selection.event!, player)) || drawPlayerIds().has(player.id),
-                    "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
-                   }}
-                   ></i></Show>
-              </td>
-              {/* <td>
-                <For each={player.registration}>{(eventId, i) =>
-                  <span>{(i() ? ', ' : '') + eventById[eventId].name}</span>
-                }</For>
-              </td> */}
+              <Show when={props.short}>
+                <td class="text-left">
+                  <Show when={selection.event}><i
+                    classList={{
+                      "icon2-checkmark": (!selection.draw && isRegistred(selection.event!, player)) || drawPlayerIds().has(player.id),
+                      "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
+                    }}
+                    ></i></Show>
+                </td>
+              </Show>
+              <Show when={!props.short}>
+                <td>
+                  {player.club}
+                </td>
+                <td>
+                  <For each={player.registration}>{(eventId, i) =>
+                    <span>{(i() ? ', ' : '') + eventById[eventId].name}</span>
+                  }</For>
+                </td>
+                <td>
+                  {player.phone1} {player.phone2}
+                </td>
+                <td>
+                  {player.email}
+                </td>
+              </Show>
               {/* <td class="hover">
                 <button type="button" onclick={[commandManager.wrap(deletePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
               </td> */}

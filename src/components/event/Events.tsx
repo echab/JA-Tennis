@@ -1,4 +1,5 @@
 import { Component, For, JSX } from 'solid-js';
+import { A, useNavigate } from '@solidjs/router';
 import { selectDraw, selectEvent, selection } from '../util/selection';
 import { TEvent } from '../../domain/tournament';
 import { commandManager } from '../../services/util/commandManager';
@@ -13,7 +14,7 @@ type Props = {
 
 export const Events: Component<Props> = (props) => {
 
-  const players = selection.tournament.players;
+  const navigate = useNavigate();
 
   const drop_handler: JSX.EventHandlerUnion<HTMLDivElement, DragEvent> = (evt) => {
     evt.preventDefault();
@@ -35,10 +36,12 @@ export const Events: Component<Props> = (props) => {
         ondrop={drop_handler} ondragover={dragOver} data-type='event' data-id={event.id}
       >
         {/* <input type="checkbox" /> */}
-        <h4 class="[&[aria-selected=true]]:bg-blue-200"
+        <A class="[&[aria-selected=true]]:bg-blue-200 block"
           aria-selected={selection.event === event}
-          onclick={(evt) => { selectEvent(event); }}
-         >
+          // onclick={() => { selectEvent(event); }}
+          // onclick={() => navigate(`/event/${event.id}`, {scroll:true})}
+          href={`/event/${event.id}`}
+        >
           <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
           {/* <small>{event.id} </small> */}
           <i classList={{
@@ -48,18 +51,20 @@ export const Events: Component<Props> = (props) => {
           }}></i>
           <span>{event.name}</span>
           {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
-        </h4>
+        </A>
 
         <div>
           <For each={event.draws}>{(draw) =>
             <div class="draws px-1"
               aria-selected={draw.id === selection.draw?.id}
-              // classList={{ error: validation.hasErrorDraw(draw) }}
+            // classList={{ error: validation.hasErrorDraw(draw) }}
             >
-              <h5 class="[&[aria-selected=true]]:bg-blue-200"
-                classList={{"mt-2": !draw.suite }}
+              <A class="[&[aria-selected=true]]:bg-blue-200 block"
+                classList={{ "mt-2": !draw.suite }}
                 aria-selected={selection.draw?.id === draw.id}
-                onclick={(evt) =>                   selectDraw(event, draw)}
+                // onclick={() => selectDraw(event, draw)}
+                // onclick={() => navigate(`/event/${event.id}/${draw.id}`, {scroll:true})}
+                href={`/event/${event.id}/${draw.id}`}
               >
                 <i class="icon2-info hover"
                   onclick={() => {
@@ -70,8 +75,8 @@ export const Events: Component<Props> = (props) => {
                 <i class="icon2-draw"></i>
                 {draw.name} {draw.suite ? '(c)' : ''}
                 {/* <i class="glyphicon glyphicon-trash" click.trigger="drawEditor.remove(draw)">X</i> */}
-                <span class="float-right">&Gt;</span>
-              </h5>
+                <span class="float-right hover">&Gt;</span>
+              </A>
             </div>
           }</For>
         </div>

@@ -12,7 +12,9 @@ import { DialogDraw } from "./draw/DialogDraw";
 import { DialogMatch } from "./draw/DialogMatch";
 import { Match as MatchBox } from "../domain/draw";
 
-export const [dialog, showDialog] = createSignal<string>();
+export type DialogName = 'info' | 'player' | 'event' | 'draw' | 'match';
+
+export const [dialog, showDialog] = createSignal<DialogName>();
 
 export const Dialogs: Component = () => {
     return <Switch>

@@ -1,4 +1,4 @@
-import { Component, For, Setter, Show } from 'solid-js';
+import { Component, For, Show } from 'solid-js';
 import { selectBox } from '../util/selection';
 import { PlayerIn, Draw, Match } from '../../domain/draw';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/drawUtil';
@@ -15,16 +15,17 @@ type Props = {
 }
 
 export const DrawKnockout: Component<Props> = (props) => {
-  const draw = props.draw;
-  const boxes = mapBy<PlayerIn & Match>(draw.boxes as Match[], 'position');
 
-  const nLigne = countInCol(columnMax(draw.nbColumn, draw.nbOut), draw.nbOut);
-  const lignes = Array(nLigne).fill(0).map((_, i) => i);
-  const cMax = columnMax(draw.nbColumn, draw.nbOut);
-  const cMin = columnMin(draw.nbOut);
+  const lignes = () => {
+    const nLigne = countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
+    return Array(nLigne).fill(0).map((_, i) => i);
+  } 
 
   const cols = (l: number) => {
     const result = [];
+    const cMax = columnMax(props.draw.nbColumn, props.draw.nbOut);
+    const cMin = columnMin(props.draw.nbOut);
+    const boxes = mapBy<PlayerIn & Match>(props.draw.boxes as Match[], 'position');
     for (let c = cMax; c >= cMin; c--) {
       const ic = cMax - c;
       const pos = positionTopCol(c) - (l >> ic);
@@ -46,7 +47,7 @@ export const DrawKnockout: Component<Props> = (props) => {
 
   return <table class="tableau">
     <tbody>
-      <For each={lignes}>{(l) =>
+      <For each={lignes()}>{(l) =>
         <tr>
           <For each={cols(l)}>{({odd, even, rowspan, box, player, isRight}) =>
             <td rowspan={rowspan} classList={{
@@ -54,7 +55,7 @@ export const DrawKnockout: Component<Props> = (props) => {
             }}>
               {/* TODO <DrawBox box={b} players={props.players} /> */}
               <div class="boite joueur"
-                onclick={(evt) => {selectBox(props.event, draw, box); evt.cancelBubble = true; }}
+                onclick={(evt) => {selectBox(props.event, props.draw, box); evt.cancelBubble = true; }}
               >
                 <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
