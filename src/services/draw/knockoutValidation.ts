@@ -294,11 +294,11 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
                 const opponent1 = lib.boxesOpponents(opponent.box1 as Match);
                 const opponent2 = lib.boxesOpponents(opponent.box2 as Match);
 
-                const player21 = byId(players, opponent2.box1?.playerId)!; // opponent2.box1._player
-                const player22 = byId(players, opponent2.box2?.playerId)!; // opponent2.box2._player
+                const player21 = byId(players, opponent2.box1?.playerId); // opponent2.box1._player
+                const player22 = byId(players, opponent2.box2?.playerId); // opponent2.box2._player
 
-                const player11 = byId(players, opponent1.box1?.playerId)!; // opponent1.box1._player
-                const player12 = byId(players, opponent1.box2?.playerId)!; // opponent1.box2._player
+                const player11 = byId(players, opponent1.box1?.playerId); // opponent1.box1._player
+                const player12 = byId(players, opponent1.box2?.playerId); // opponent1.box2._player
 
                 if (player1) {
                     if (player2) {
@@ -308,10 +308,10 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
                         }
                     } else if (isMatchJouable(opponent.box2)) { //!isTypePoule &&
 
-                        if (!CompString(player1.club, player21.club)) {
+                        if (!CompString(player1.club, player21?.club)) {
                             errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player1.club);
                             bRes = false;
-                        } else if (!CompString(player1.club, player22.club)) {
+                        } else if (!CompString(player1.club, player22?.club)) {
                             errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player1.club);
                             bRes = false;
                         }
@@ -320,23 +320,23 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
                     //TODO Poule
                 } else if (player2) {
                     if (isMatchJouable(opponent.box1)) {
-                        if (!CompString(player2.club, player11.club)) {
+                        if (!CompString(player2.club, player11?.club)) {
                             errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player2.club);
                             bRes = false;
-                        } else if (!CompString(player2.club, player12.club)) {
+                        } else if (!CompString(player2.club, player12?.club)) {
                             errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player2.club);
                             bRes = false;
                         }
                     }
                 } else if (isMatchJouable(opponent.box1) && isMatchJouable(opponent.box2)) {
-                    if (!CompString(player11.club, player21.club)
-                        || !CompString(player11.club, player22.club)) {
-                        errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player11.club);
+                    if (!CompString(player11?.club, player21?.club)
+                        || !CompString(player11?.club, player22?.club)) {
+                        errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player11?.club);
                         bRes = false;
                     }
-                    if (!CompString(player12.club, player21.club)
-                        || !CompString(player12.club, player22.club)) {
-                        errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player12.club);
+                    if (!CompString(player12?.club, player21?.club)
+                        || !CompString(player12?.club, player22?.club)) {
+                        errorDraw('IDS_ERR_MEME_CLUB2', draw, match, player, player12?.club);
                         bRes = false;
                     }
                 }
