@@ -1,4 +1,6 @@
 import { Component, createSignal, Match, Show, Switch } from "solid-js";
+import { errorCount } from "../services/validationService";
+import { Errors } from "./Errors";
 import { Events } from "./event/Events";
 import { Players } from "./player/Players";
 import { Tournament } from "./tournament/Tournament";
@@ -48,7 +50,7 @@ export const SidePanel: Component<Props> = () => {
                 <button title="Errors" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200 relative"
                     aria-selected={pane() === 4}
                 ><i class="icon2-bug"></i>
-                    <span class="absolute top-1 right-2 text-xs text-white bg-red-600 rounded-full border-[1px] border-white px-1 py-0">3</span>
+                    <span class="absolute top-1 right-2 text-xs text-white bg-red-600 rounded-full border-[1px] border-white px-1 py-0">{errorCount(selection)}</span>
                 </button>
                 <br /><small>Errors</small>
             </li>
@@ -88,7 +90,7 @@ export const SidePanel: Component<Props> = () => {
                         <div>Planning...</div>
                     </Match>
                     <Match when={pane() === 4}>
-                        <div>Errors...</div>
+                        <Errors />
                     </Match>
                     <Match when={pane() === 5}>
                         <div>Settings...</div>

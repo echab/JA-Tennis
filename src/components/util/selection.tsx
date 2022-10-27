@@ -2,6 +2,7 @@ import { createStore, produce } from "solid-js/store";
 import { Box, Draw } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, TEvent, Tournament } from "../../domain/tournament";
+import { IError } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 
 // export interface Selection extends SelectionActions {
@@ -15,6 +16,9 @@ export interface SelectionItems {
     box?: Box;
     boxQ?: Box;
     player?: Player;
+
+    playerErrors?: Record<string,IError[]>;
+    drawErrors?: Record<string,IError[]>;
 }
 
 const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
@@ -29,6 +33,9 @@ export function selectTournament(tournament: Tournament) {
         sel.draw = undefined;
         sel.box = undefined;
         sel.boxQ = undefined;
+
+        sel.playerErrors = undefined;
+        sel.drawErrors = undefined;
     });
 }
 
@@ -81,6 +88,18 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
         sel.draw = draw;
         sel.box = box;
         sel.boxQ = box ? groupFindQ(event, draw, box) : undefined;
+    });
+}
+
+export function setPlayerErrors(playerErrors?: Record<string, IError[]>): void {
+    update((sel) => {
+        sel.playerErrors = playerErrors;
+    });
+}
+
+export function setDrawErrors(drawErrors?: Record<string, IError[]>): void {
+    update((sel) => {
+        sel.drawErrors = drawErrors;
     });
 }
 

@@ -3,8 +3,8 @@ import { Player } from "./player";
 import { TEvent, Tournament } from "./tournament";
 
 export interface IValidation {
-    validatePlayer(player: Player): boolean;
-    validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean;
+    validatePlayer?(player: Player): boolean;
+    validateDraw?(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean;
     //validateDay(): boolean;   //VerifieJour
 }
 
@@ -13,4 +13,6 @@ export interface IError {
     player?: Player;
     position?: number;
     detail?: string;
+
+    // TODO ignore?: boolean;
 }

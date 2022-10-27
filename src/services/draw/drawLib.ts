@@ -1,9 +1,12 @@
 import { Box, Draw, DrawType, Match, PlayerIn } from "../../domain/draw";
 import type { Player } from "../../domain/player";
 import type { TEvent } from "../../domain/tournament";
+import { addValidator } from "../validationService";
 import { DrawLibBase } from "./drawLibBase";
 import { Knockout } from "./knockout";
+import { knockoutValidation } from "./knockoutValidation";
 import { Roundrobin } from "./roundrobin";
+import { roundrobinValidation } from "./roundrobinValidation";
 
 export const enum GenerateType {
   None,
@@ -36,3 +39,6 @@ export function drawLib(event: TEvent, draw: Draw) : IDrawLib & DrawLibBase {
   }
   return new Roundrobin(event, draw);
 }
+
+addValidator(knockoutValidation);
+addValidator(roundrobinValidation);
