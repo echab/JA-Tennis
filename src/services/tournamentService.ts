@@ -9,6 +9,7 @@ import { DAYS } from "../utils/date";
 import { RankString } from "../domain/types";
 import { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
+import { resetErrors, validateDraw, validatePlayer } from "./validationService";
 
 /** This function load tournament data from an url. */
 export async function load(file_url?: Blob | string): Promise<Tournament> {
@@ -108,6 +109,7 @@ export function updateInfo(info: TournamentInfo) : Command {
 }
 
 export function initTournament(tournament: Tournament): Tournament {
+
   if (tournament.events) {
     for (let i = tournament.events.length - 1; i >= 0; i--) {
       //tournament.events[i] = new TEvent(tournament, tournament.events[i]);
@@ -123,7 +125,20 @@ export function initTournament(tournament: Tournament): Tournament {
         1,
     );
   }
+
+  validateTournament(tournament);
+  
   return tournament;
+}
+
+export function validateTournament(tournament: Tournament) {
+  resetErrors();
+  tournament.players.forEach((player) => {
+    validatePlayer(player);
+  })
+  tournament.events.forEach((event) => event.draws.forEach((draw) => {
+    validateDraw(tournament, event, draw, tournament.players);
+  }))
 }
 
 export function isRegistred(event: TEvent, player: Player): boolean {
