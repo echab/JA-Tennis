@@ -1,31 +1,32 @@
 ﻿// FFT validation services
 
-import { addValidator, errorDraw } from '../validationService';
 import { by, byId } from '../util/find';
 import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { drawLib } from '../draw/drawLib';
-import { IValidation } from '../../domain/validation';
+import { DrawError, IValidation, PlayerError } from '../../domain/validation';
 
-function validatePlayer(player: Player): boolean {
-    let bRes = true;
+function validatePlayer(player: Player): PlayerError[] {
+    const result : PlayerError[] = [];
 
     //if (player.sexe == 'F'
     //    && player.rank
     //    && !player.rank.Division()
     //    //&& ((CClassement( N50) <= player.rank) && (player.rank < CClassement( N35)))
     //    ) {
-    //    errorDraw('IDS_ERR_CLAST_1SERIE', player);
+    //    result.push({message:'ERR_CLAST_1SERIE', player});
     //    bRes = false;
     //}
 
-    return bRes;
+    return result;
 }
 
-function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
-    let bRes = true;
+function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawError[] {
+    const result: DrawError[] = [];
+
+    const players = tournament.players;
 
     let lib = drawLib(event, draw);
 
@@ -52,8 +53,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
             if (!colRank) {
                 pColClast[player.rank] = c;
             } else if (Math.abs(colRank - c) > 1) {
-                errorDraw('IDS_ERR_CLAST_PROGR2', draw, box, player, player.rank);
-                bRes = false;
+                result.push({message:'ERR_CLAST_PROGR2', draw, box, player, detail: player.rank});
             }
         }
 
@@ -67,7 +67,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
 
             //    if (isMatch(j) && !boxes[j].m_Date.isVide()
             //        && boxes[i].m_Date == boxes[j].m_Date) {
-            //        errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i)].m_iJoueur, iEpreuve, iTableau, i);
+            //        result.push({message:'ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i})].m_iJoueur, iEpreuve, iTableau, i);
             //        bRes = false;
             //        break;
             //    }
@@ -78,7 +78,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
 
             //        if (isMatch(j) && !boxes[j].m_Date.isVide()
             //            && boxes[i].m_Date == boxes[j].m_Date) {
-            //            errorDraw('IDS_ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i)].m_iJoueur, iEpreuve, iTableau, i);
+            //            result.push({message:'ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i})].m_iJoueur, iEpreuve, iTableau, i);
             //            bRes = false;
             //            break;
             //        }
@@ -95,8 +95,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
             if ((opponent.box1 as PlayerIn).qualifIn
                 && (opponent.box2 as PlayerIn).qualifIn) {
                 const player1 = byId(players, opponent.box1.playerId);
-                errorDraw('IDS_ERR_ENTRANT_MATCH', draw, opponent.box1, player1);
-                bRes = false;
+                result.push({message:'ERR_ENTRANT_MATCH', draw, box: opponent.box1, player: player1});
             }
         }
 
@@ -107,8 +106,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
         }
 
         if (isTypePoule && nqe > 1) {
-            errorDraw('IDS_ERR_POULE_ENTRANT_OVR', draw, box);
-            bRes = false;
+            result.push({message:'ERR_POULE_ENTRANT_OVR', draw, box});
         }
     }
 
@@ -118,8 +116,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
         const [, boxT] = findSeeded(event, draw, 1);
         if (!boxT) {
             const boxMax = by(draw.boxes, 'position', positionMax(draw.nbColumn, draw.nbOut));
-            errorDraw('IDS_ERR_TAB_TETESERIE_FINAL_NO', draw, boxMax);
-            bRes = false;
+            result.push({message:'ERR_TAB_TETESERIE_FINAL_NO', draw, box: boxMax});
         }
     }
 
@@ -180,7 +177,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //				if (tableau.Type == 1) {	//Tableau Final(bonus)
 
     //                            if (epreuve.Consolante) {
-    //                                LOADSTRING(IDS_ERR_TAB_FINAL_CONSOLATION, gszBuf, sizeof(gszBuf));
+    //                                LOADSTRING(ERR_TAB_FINAL_CONSOLATION, gszBuf, sizeof(gszBuf));
     //                                glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                bRes = -1;
     //                            }
@@ -222,7 +219,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //                                        ) {
     //                                        if (glpfn.GetBoite(pDoc, e, t, ADVERSAIRE2_POULE(b, (ICOL) tableau.nColonne), &boite2))
     //                                            sel.iJoueur = boite2.idJoueur;
-    //                                        LOADSTRING(IDS_ERR_POULE_DATE_MATCH, gszBuf, sizeof(gszBuf));
+    //                                        LOADSTRING(ERR_POULE_DATE_MATCH, gszBuf, sizeof(gszBuf));
     //                                        glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                        sel.iJoueur = -1;
     //                                        bRes = -1;
@@ -243,7 +240,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //                                            ) {
     //                                            if (glpfn.GetBoite(pDoc, e, t, ADVERSAIRE1_POULE(b, (ICOL) tableau.nColonne), &boite2))
     //                                                sel.iJoueur = boite2.idJoueur;
-    //                                            LOADSTRING(IDS_ERR_POULE_DATE_MATCH, gszBuf, sizeof(gszBuf));
+    //                                            LOADSTRING(ERR_POULE_DATE_MATCH, gszBuf, sizeof(gszBuf));
     //                                            glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                            sel.iJoueur = -1;
     //                                            bRes = -1;
@@ -257,7 +254,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //                            //Poule
     //                            //4================
     //                            if (nqe > 1) {
-    //                                LOADSTRING(IDS_ERR_POULE_ENTRANT_OVR, gszBuf, sizeof(gszBuf));
+    //                                LOADSTRING(ERR_POULE_ENTRANT_OVR, gszBuf, sizeof(gszBuf));
     //                                glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                bRes = -1;
     //					}
@@ -295,7 +292,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
 
     //                                    if (boite1.QualifieEntrant
     //                                        && boite2.QualifieEntrant) {
-    //                                        LOADSTRING(IDS_ERR_ENTRANT_MATCH, gszBuf, sizeof(gszBuf));
+    //                                        LOADSTRING(ERR_ENTRANT_MATCH, gszBuf, sizeof(gszBuf));
     //                                        sel.iBoite = ADVERSAIRE1(b);
     //                                        glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                        sel.iBoite = -1;
@@ -334,7 +331,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //                                            pColClast[m] = c;
     //								else if (abs( ((short)(long) cc) - c) > 1)
     //								{
-    //                                            LOADSTRING(IDS_ERR_CLAST_PROGR2, gszBuf, sizeof(gszBuf));
+    //                                            LOADSTRING(ERR_CLAST_PROGR2, gszBuf, sizeof(gszBuf));
     //                                            sel.iBoite = b;
     //                                            glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                            bRes = -1;
@@ -352,7 +349,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //                                //Tableau final
     //                                //5================
     //                                if (nTeteDeSerie == 0) {
-    //                                    LOADSTRING(IDS_ERR_TAB_TETESERIE_FINAL_NO, gszBuf, sizeof(gszBuf));
+    //                                    LOADSTRING(ERR_TAB_TETESERIE_FINAL_NO, gszBuf, sizeof(gszBuf));
     //                                    sel.iBoite = bMax;
     //                                    glpfn.AddMessage(pDoc, gszBuf, &sel);
     //                                    sel.iBoite = -1;
@@ -372,7 +369,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players
     //                }
     //            }
 
-    return bRes;
+    return result;
 
 
 }

@@ -1,18 +1,27 @@
-import { Draw } from "./draw";
+import { Box, Draw } from "./draw";
 import { Player } from "./player";
 import { TEvent, Tournament } from "./tournament";
 
 export interface IValidation {
-    validatePlayer?(player: Player): boolean;
-    validateDraw?(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean;
+    validatePlayer?(player: Player): PlayerError[];
+    validateDraw?(tournament: Tournament, event: TEvent, draw: Draw): DrawError[];
     //validateDay(): boolean;   //VerifieJour
 }
 
-export interface IError {
+export type PlayerError = {
     message: string;
-    player?: Player;
-    position?: number;
+    player: Player;
     detail?: string;
 
     // TODO ignore?: boolean;
-}
+};
+
+export type DrawError = {
+    message: string;
+    draw: Draw;
+    box?: Box;
+    player?: Player;
+    detail?: string;
+
+    // TODO ignore?: boolean;
+};

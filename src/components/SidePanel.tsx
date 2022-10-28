@@ -4,6 +4,7 @@ import { Errors } from "./Errors";
 import { Events } from "./event/Events";
 import { Players } from "./player/Players";
 import { Tournament } from "./tournament/Tournament";
+import { Badge } from "./misc/Badge";
 import { selection } from "./util/selection";
 
 type Props = {
@@ -50,7 +51,7 @@ export const SidePanel: Component<Props> = () => {
                 <button title="Errors" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200 relative"
                     aria-selected={pane() === 4}
                 ><i class="icon2-bug"></i>
-                    <span class="absolute top-1 right-2 text-xs text-white bg-red-600 rounded-full border-[1px] border-white px-1 py-0">{errorCount(selection)}</span>
+                    <Badge count={errorCount(selection)} minDisplay={1}/>
                 </button>
                 <br /><small>Errors</small>
             </li>

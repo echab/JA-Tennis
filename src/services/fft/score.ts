@@ -115,7 +115,7 @@ export class ScoreDeltaFFT {
 
         //                if ((nSetGagne <= nSetV && nSetD < nSetV) || (nSetGagne <= nSetD && nSetV < nSetD)) {	//Victoire acquise
         //                    //ASSERT( FALSE);	//TODO
-        //                    //pDoc->Erreur( IDS_ERR_SCORE_BAD, -1, e, pDoc->FindTableau( this), b);
+        //                    //pDoc->Erreur( ERR_SCORE_BAD, -1, e, pDoc->FindTableau( this), b);
         //                    break;
         //                }
         //            }
@@ -202,7 +202,7 @@ export class ScoreDeltaFFT {
 
         //            if ((nSetGagne <= nSetV && nSetD < nSetV) || (nSetGagne <= nSetD && nSetV < nSetD)) {	//Victoire acquise
         //                //ASSERT( FALSE);	//TODO
-        //                //pDoc->Erreur( IDS_ERR_SCORE_BAD, -1, e, pDoc->FindTableau( this), b);
+        //                //pDoc->Erreur( ERR_SCORE_BAD, -1, e, pDoc->FindTableau( this), b);
         //                break;
         //            }
         //        }

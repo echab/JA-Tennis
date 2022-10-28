@@ -1,5 +1,5 @@
 import { Component, For } from "solid-js";
-import { validateTournament } from "../services/tournamentService";
+import { validateTournament } from "../services/validationService";
 import { selection } from "./util/selection";
 
 export const Errors: Component = () => {
@@ -13,8 +13,8 @@ export const Errors: Component = () => {
                 <li>
                     <div>{id}</div>
                     <ul>
-                        <For each={errors}>{({message, detail, player, position}) => (
-                            <li title={`player: ${player?.name} position: ${position}`}>
+                        <For each={errors}>{({message, detail, player}) => (
+                            <li title={`player: ${player?.name}`}>
                                 {message}: {detail}
                             </li>
                         )}</For>
@@ -27,9 +27,9 @@ export const Errors: Component = () => {
                 <li>
                     <div>{id}</div>
                     <ul>
-                        <For each={errors}>{({message, detail, player, position}) => (
-                            <li title={`player: ${player?.name} position: ${position}`}>
-                                {message}: {detail}
+                        <For each={errors}>{({message, detail, player, box}) => (
+                            <li title={`player: ${player?.name} position: ${box?.position}`}>
+                                {message}: {player ? `${player.name} ` : ''}{detail}
                             </li>
                         )}</For>
                     </ul>

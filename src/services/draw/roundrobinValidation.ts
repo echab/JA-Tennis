@@ -1,25 +1,26 @@
 ﻿import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
+import { DrawError } from '../../domain/validation';
 import { isMatch, isPlayerIn } from '../drawService';
 
-function validateDraw(tournament: Tournament, event: TEvent, draw: Draw, players: Player[]): boolean {
-    let bRes = true;
+function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawError[] {
+    const result: DrawError[] = [];
 
     if (draw.type === DrawType.PouleSimple
         || draw.type === DrawType.PouleAR) {
 
-        bRes = bRes && validatePoule(draw);
+        result.splice(-1,0,...validatePoule(draw));
 
-        bRes = bRes && validateMatches(draw);
+        result.splice(-1,0,...validateMatches(draw));
     }
 
 
-    return bRes;
+    return result;
 }
 
-function validatePoule(draw: Draw): boolean {
-    let bRes = true;
+function validatePoule(draw: Draw): DrawError[] {
+    const result: DrawError[] = [];
 
     //TODOjs
     ////Compte le nombre de Qs de la poule (et pas dans suite)
@@ -38,8 +39,7 @@ function validatePoule(draw: Draw): boolean {
     //            && boxes[iDiagonale(j)].isQualifieSortant()) {
 
     //		if(boxes[j].m_iClassement > (char)e) {
-    //                errorDraw('IDS_ERR_POU_QSORTANT', draw, j);
-    //                bRes = false;
+    //                result.push({message:'ERR_POU_QSORTANT', draw, box:boxes[j]});
     //            }
     //        }
     //    }
@@ -52,8 +52,7 @@ function validatePoule(draw: Draw): boolean {
     //    if (boxes[j].playerId == -1
     //        && !boxes[j].isQualifieEntrant()) {
 
-    //        errorDraw('IDS_ERR_POU_JOUEUR_NO', draw, j);
-    //        bRes = false;
+    //        result.push({message:'ERR_POU_JOUEUR_NO', draw, box:boxes[j]});
     //        break;
     //    }
     //}
@@ -62,11 +61,11 @@ function validatePoule(draw: Draw): boolean {
 
     //TODO Poule, isValide
 
-    return bRes;
+    return result;
 }
 
-function validateMatches(draw: Draw): boolean {
-    let bRes = true;
+function validateMatches(draw: Draw): DrawError[] {
+    const result: DrawError[] = [];
 
     //Match avec deux joueurs gagné par un des deux joueurs
     for (let i = 0; i < draw.boxes.length; i++) {
@@ -90,12 +89,10 @@ function validateMatches(draw: Draw): boolean {
             //    const box2 = draw.boxes[ADVERSAIRE2(i)];
 
             //    if (!box1.playerId || !box2.playerId) {
-            //        errorDraw('IDS_ERR_MATCH_JOUEUR_NO', draw, box);
-            //        bRes = false;
+            //        result.push({message:'ERR_MATCH_JOUEUR_NO', draw, box});
             //    } else {
             //        if (box.playerId != box1.playerId && box.playerId != box2.playerId) {
-            //            errorDraw('IDS_ERR_VAINQUEUR_MIS', draw, box);
-            //            bRes = false;
+            //            result.push({message:'ERR_VAINQUEUR_MIS', draw, box});
             //        }
             //    }
             //}
@@ -104,7 +101,7 @@ function validateMatches(draw: Draw): boolean {
 
     }
 
-    return bRes;
+    return result;
 }
 
 export const roundrobinValidation = { validateDraw };

@@ -2,7 +2,7 @@ import { createStore, produce } from "solid-js/store";
 import { Box, Draw } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, TEvent, Tournament } from "../../domain/tournament";
-import { IError } from "../../domain/validation";
+import { DrawError, PlayerError } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 
 // export interface Selection extends SelectionActions {
@@ -17,8 +17,8 @@ export interface SelectionItems {
     boxQ?: Box;
     player?: Player;
 
-    playerErrors?: Record<string,IError[]>;
-    drawErrors?: Record<string,IError[]>;
+    playerErrors?: Record<string, PlayerError[]>;
+    drawErrors?: Record<string, DrawError[]>;
 }
 
 const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
@@ -91,69 +91,36 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
     });
 }
 
-export function setPlayerErrors(playerErrors?: Record<string, IError[]>): void {
+// export function setPlayerErrors(playerErrors?: Record<string, PlayerError[]>): void {
+//     update((sel) => {
+//         sel.playerErrors = playerErrors;
+//     });
+// }
+
+// export function setDrawErrors(drawErrors?: Record<string, DrawError[]>): void {
+//     update((sel) => {
+//         sel.drawErrors = drawErrors;
+//     });
+// }
+
+export function selectByError(error: PlayerError | DrawError) {
     update((sel) => {
-        sel.playerErrors = playerErrors;
+        if (isDrawError(error)) {
+            sel.event = sel.tournament.events.find(({ draws }) => draws.find(({ id }) => id === error.draw.id));
+            sel.draw = error.draw;
+            sel.box = error.box;
+        }
+        sel.player = error.player;
     });
 }
 
-export function setDrawErrors(drawErrors?: Record<string, IError[]>): void {
-    update((sel) => {
-        sel.drawErrors = drawErrors;
-    });
+export function isPlayerError(error: PlayerError | DrawError  ): error is PlayerError {
+    return !!error.player;
+}
+export function isDrawError(error: PlayerError | DrawError  ): error is DrawError {
+    return !!(error as DrawError).draw;
 }
 
 export function update(fn: (original: SelectionItems) => void) {
     setSelection(produce(fn));
 }
-
-// export interface SelectionActions {
-//     selectTournament(tournament?: Tournament): void;
-//     selectPlayer(player?: Player) : void;
-//     // selectTournament(tournament?: Signal<Tournament>): void;
-//     // selectPlayer(player?: Signal<Player>) : void;
-// };
-
-// const SelectionContext = createContext<Selection>();
-
-// export interface SelectionContextProps {
-//     children: JSX.Element;
-// }
-
-// export function SelectionProvider(props: SelectionContextProps) {
-//     const [selection, setSelection] = createStore<SelectionItems>({}); // TODO?
-//     // const selection: SelectionItems = {};
-//     // const setSelection = <T,>(member: keyof SelectionItems, value: () => T) => {
-//     //     (selection[member] as any) = value();
-//     // };
-
-//     const value = {
-//         selection,
-//         selectTournament(tournament?: Tournament) {
-//             // setSelection('tournament', (t) => tournament);
-//             update((sel) => {
-//                 sel.tournament = tournament;
-//             });
-//         },
-//         selectPlayer(player?: Player) : void {
-//             // setSelection('player', () => player);
-//             update((sel) => {
-//                 sel.player = player;
-//             });
-//         }
-//     };
-
-//     return (
-//         <SelectionContext.Provider value={value}>
-//             {props.children}
-//         </SelectionContext.Provider>
-//     );
-// }
-
-// export function useSelection(): Selection {
-//     const context = useContext(SelectionContext)
-//     if (!context) {
-//         throw new Error('useSelection should be used into a <SelectionProvider> component');
-//     }
-//     return context;
-// }
