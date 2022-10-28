@@ -57,7 +57,7 @@ export const Events: Component<Props> = (props) => {
           <For each={event.draws}>{(draw) =>
             <div class="draws px-1"
               aria-selected={draw.id === selection.draw?.id}
-              classList={{ error: !!selection.drawErrors?.[draw.id].length }}
+              classList={{ error: !!selection.drawErrors[draw.id].length }}
             >
               <A class="[&[aria-selected=true]]:bg-blue-200 block"
                 classList={{ "mt-2": !draw.suite }}

@@ -17,13 +17,13 @@ export interface SelectionItems {
     boxQ?: Box;
     player?: Player;
 
-    playerErrors?: Record<string, PlayerError[]>;
-    drawErrors?: Record<string, DrawError[]>;
+    playerErrors: { [playerId: string]: PlayerError[] };
+    drawErrors: { [drawId: string]: DrawError[] };
 }
 
 const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
 
-export const [selection, setSelection] = createStore<SelectionItems>({ tournament: emptyTournament });
+export const [selection, setSelection] = createStore<SelectionItems>({ tournament: emptyTournament, playerErrors:{}, drawErrors:{} });
 
 export function selectTournament(tournament: Tournament) {
     update((sel) => {
@@ -34,16 +34,10 @@ export function selectTournament(tournament: Tournament) {
         sel.box = undefined;
         sel.boxQ = undefined;
 
-        sel.playerErrors = undefined;
-        sel.drawErrors = undefined;
+        sel.playerErrors = {};
+        sel.drawErrors = {};
     });
 }
-
-// export function setTournament(tournamentSetter: (pred?: Tournament) => Tournament) {
-//     update((sel) => {
-//         sel.tournament = tournamentSetter(sel.tournament);
-//     });
-// }
 
 export function selectPlayer(player?: Player): void {
     update((sel) => {

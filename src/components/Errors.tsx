@@ -9,7 +9,7 @@ export const Errors: Component = () => {
             <button onClick={() => validateTournament(selection.tournament)}><i class="icon2-refresh"></i></button>
         </div>
         <ul>
-            <For each={Object.entries(selection.playerErrors ?? {})}>{([id, errors]) => (
+            <For each={Object.entries(selection.playerErrors)}>{([id, errors]) => (
                 <li>
                     <div>{id}</div>
                     <ul>
@@ -21,7 +21,7 @@ export const Errors: Component = () => {
                     </ul>
                 </li>
             )}</For>
-            <For each={Object.entries(selection.drawErrors ?? {})} fallback={
+            <For each={Object.entries(selection.drawErrors)} fallback={
                 <div>No draw error.</div>
             }>{([id, errors]) => (
                 <li>

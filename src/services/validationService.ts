@@ -18,28 +18,18 @@ export function validateTournament(tournament: Tournament) {
     tournament.players.forEach((player) => {
       const errors = validatePlayer(player);
       if (errors.length) {
-        if (!sel.playerErrors) {
-          sel.playerErrors = {};
-        }
         sel.playerErrors[player.id] = errors;
       } else {
-        if (sel.playerErrors) {
-          delete sel.playerErrors[player.id];
-        }
+        delete sel.playerErrors[player.id];
       }
     })
   
     tournament.events.forEach((event) => event.draws.forEach((draw) => {
       const errors = validateDraw(tournament, event, draw);
       if (errors.length) {
-        if (!sel.drawErrors) {
-          sel.drawErrors = {};
-        }
         sel.drawErrors[draw.id] = errors;
       } else {
-        if (sel.drawErrors) {
-          delete sel.drawErrors[draw.id];
-        }
+        delete sel.drawErrors[draw.id];
       }
     }));
   
@@ -87,7 +77,9 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
 //   }
 // }
 
-export function errorCount({ playerErrors, drawErrors }: Pick<SelectionItems, 'playerErrors' | 'drawErrors'>): number {
-  return Object.values(playerErrors ?? {}).reduce((sum, errors) => sum + errors.length, 0)
-    + Object.values(drawErrors ?? {}).reduce((sum, errors) => sum + errors.length, 0);
+export function errorCount(
+  { playerErrors, drawErrors }: Pick<SelectionItems, 'playerErrors' | 'drawErrors'>
+): number {
+  return Object.values(playerErrors).reduce((sum, errors) => sum + errors.length, 0)
+    + Object.values(drawErrors).reduce((sum, errors) => sum + errors.length, 0);
 }

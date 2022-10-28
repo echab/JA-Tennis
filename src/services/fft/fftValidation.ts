@@ -6,7 +6,7 @@ import type { Player } from '../../domain/player';
 import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { drawLib } from '../draw/drawLib';
-import { DrawError, IValidation, PlayerError } from '../../domain/validation';
+import type { DrawError, IValidation, PlayerError } from '../../domain/validation';
 
 function validatePlayer(player: Player): PlayerError[] {
     const result : PlayerError[] = [];

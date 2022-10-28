@@ -7,7 +7,7 @@ interface IIndex {
     _length: number
 }
 
-const indexes = new WeakMap<Array<any>,Map<string,IIndex>>();
+const indexes = new WeakMap<any[],Map<string,IIndex>>();
 
 /**
  * Returns the index of an object in the array. Or -1 if not found.
