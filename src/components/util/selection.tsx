@@ -4,6 +4,7 @@ import { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, TEvent, Tournament } from "../../domain/tournament";
 import { DrawError, PlayerError } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
+import { validateDraw, validatePlayer } from "../../services/validationService";
 
 // export interface Selection extends SelectionActions {
 //     selection: SelectionItems,
@@ -18,12 +19,16 @@ export interface SelectionItems {
     player?: Player;
 
     playerErrors: { [playerId: string]: PlayerError[] };
-    drawErrors: { [drawId: string]: DrawError[] };
+    drawErrors: Map<string, DrawError[]>;
 }
 
 const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
 
-export const [selection, setSelection] = createStore<SelectionItems>({ tournament: emptyTournament, playerErrors:{}, drawErrors:{} });
+export const [selection, setSelection] = createStore<SelectionItems>({
+    tournament: emptyTournament,
+    playerErrors:{},
+    drawErrors: new Map(),
+ });
 
 export function selectTournament(tournament: Tournament) {
     update((sel) => {
@@ -34,8 +39,17 @@ export function selectTournament(tournament: Tournament) {
         sel.box = undefined;
         sel.boxQ = undefined;
 
-        sel.playerErrors = {};
-        sel.drawErrors = {};
+        sel.playerErrors = Object.fromEntries(
+            tournament.players.map((player) => [player.id, validatePlayer(player)])
+            .filter(([_,err]) => err.length)
+        );
+        // sel.drawErrors.clear();
+        sel.drawErrors = new Map(
+            tournament.events.flatMap((event) => event.draws
+                .map((draw) => [`${event.id}-${draw.id}`, validateDraw(tournament, event, draw)])
+                // .filter(([_,err]) => err.length)
+            )
+        );
     });
 }
 
@@ -100,7 +114,7 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
 export function selectByError(error: PlayerError | DrawError) {
     update((sel) => {
         if (isDrawError(error)) {
-            sel.event = sel.tournament.events.find(({ draws }) => draws.find(({ id }) => id === error.draw.id));
+            sel.event = eventOfDraw(sel.tournament.events, error.draw);
             sel.draw = error.draw;
             sel.box = error.box;
         }
@@ -117,4 +131,19 @@ export function isDrawError(error: PlayerError | DrawError  ): error is DrawErro
 
 export function update(fn: (original: SelectionItems) => void) {
     setSelection(produce(fn));
+}
+
+export function eventOfDraw(events: TEvent[], draw: Draw) : TEvent | undefined {
+    const drawId = draw.id;
+    return events
+        .find(({ draws }) => draws.find(({ id }) => id === drawId));
+}
+
+export function drawById(events: TEvent[], drawId: string) : Draw | undefined {
+    for (const event of events) {
+        const draw = event.draws.find(({ id }) => id === drawId);
+        if (draw) {
+            return draw;
+        }
+    }
 }

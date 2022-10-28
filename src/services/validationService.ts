@@ -26,10 +26,11 @@ export function validateTournament(tournament: Tournament) {
   
     tournament.events.forEach((event) => event.draws.forEach((draw) => {
       const errors = validateDraw(tournament, event, draw);
+      const key = `${event.id}-${draw.id}`;
       if (errors.length) {
-        sel.drawErrors[draw.id] = errors;
+        sel.drawErrors.set(key, errors);
       } else {
-        delete sel.drawErrors[draw.id];
+        sel.drawErrors.delete(key);
       }
     }));
   
@@ -81,5 +82,5 @@ export function errorCount(
   { playerErrors, drawErrors }: Pick<SelectionItems, 'playerErrors' | 'drawErrors'>
 ): number {
   return Object.values(playerErrors).reduce((sum, errors) => sum + errors.length, 0)
-    + Object.values(drawErrors).reduce((sum, errors) => sum + errors.length, 0);
+    + [...drawErrors.values()].reduce((sum, errors) => sum + errors.length, 0);
 }

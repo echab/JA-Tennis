@@ -11,6 +11,9 @@ import type { DrawError, IValidation, PlayerError } from '../../domain/validatio
 function validatePlayer(player: Player): PlayerError[] {
     const result : PlayerError[] = [];
 
+    if (player.sexe === 'F') {
+        result.push({message:'Test error player', player, detail: 'some details'})
+    }
     //if (player.sexe == 'F'
     //    && player.rank
     //    && !player.rank.Division()

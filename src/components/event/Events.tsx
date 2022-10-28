@@ -1,5 +1,5 @@
 import { Component, For, JSX } from 'solid-js';
-import { A, useNavigate } from '@solidjs/router';
+import { A } from '@solidjs/router';
 import { selectDraw, selectEvent, selection } from '../util/selection';
 import { TEvent } from '../../domain/tournament';
 import { commandManager } from '../../services/util/commandManager';
@@ -13,8 +13,6 @@ type Props = {
 }
 
 export const Events: Component<Props> = (props) => {
-
-  const navigate = useNavigate();
 
   const drop_handler: JSX.EventHandlerUnion<HTMLDivElement, DragEvent> = (evt) => {
     evt.preventDefault();
@@ -57,7 +55,7 @@ export const Events: Component<Props> = (props) => {
           <For each={event.draws}>{(draw) =>
             <div class="draws px-1"
               aria-selected={draw.id === selection.draw?.id}
-              classList={{ error: !!selection.drawErrors[draw.id].length }}
+              classList={{ error: selection.drawErrors.has(`${event.id}-${draw.id}`) }}
             >
               <A class="[&[aria-selected=true]]:bg-blue-200 block"
                 classList={{ "mt-2": !draw.suite }}

@@ -13,6 +13,13 @@ import { Dialogs } from './Dialogs';
 import { PaneDraw } from './draw/PaneDraw';
 import { Players } from './player/Players';
 
+export type Params = {
+  playerId?: string;
+  eventId?: string;
+  drawId?: string;
+  boxPos?: string;
+}
+
 export const App: Component = () => {
 
   selectTournament(initTournament(mockTournament));
@@ -43,10 +50,10 @@ export const Main: Component = () => {
   return (
     <div class="grow">
       <Routes>
-        <Route path="/event/:eventId/:drawId?" element={
+        <Route path="/event/:eventId/:drawId?/:boxPos?" element={
           <PaneDraw />
         } />
-        <Route path="/players" element={
+        <Route path="/players/:playerId?" element={
           <Players
             events={selection.tournament.events}
             players={selection.tournament.players}

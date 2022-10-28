@@ -5,8 +5,10 @@ import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/dr
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
-import './Draw.css';
 import { showDialog } from '../Dialogs';
+import { useNavigate, useParams } from '@solidjs/router';
+import { Params } from '../App';
+import './Draw.css';
 
 type Props = {
   event: TEvent,
@@ -16,10 +18,13 @@ type Props = {
 
 export const DrawKnockout: Component<Props> = (props) => {
 
+  const navigate = useNavigate();
+  const params = useParams<Params>();
+
   const lignes = () => {
     const nLigne = countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
     return Array(nLigne).fill(0).map((_, i) => i);
-  } 
+  }
 
   const cols = (l: number) => {
     const result = [];
@@ -49,13 +54,15 @@ export const DrawKnockout: Component<Props> = (props) => {
     <tbody>
       <For each={lignes()}>{(l) =>
         <tr>
-          <For each={cols(l)}>{({odd, even, rowspan, box, player, isRight}) =>
+          <For each={cols(l)}>{({ odd, even, rowspan, box, player, isRight }) =>
             <td rowspan={rowspan} classList={{
               even, odd, qs: isRight
             }}>
               {/* TODO <DrawBox box={b} players={props.players} /> */}
               <div class="boite joueur"
-                onclick={(evt) => {selectBox(props.event, props.draw, box); evt.cancelBubble = true; }}
+                classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
+                // onclick={(evt) => {selectBox(props.event, props.draw, box); evt.cancelBubble = true; }}
+                onclick={(evt) => { navigate(`/event/${props.event.id}/${props.draw.id}/${box?.position ?? ''}`); evt.preventDefault(); }}
               >
                 <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>

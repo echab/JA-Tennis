@@ -75,7 +75,7 @@ table.tableau tr:last-child>td
     transition: .3s;
 }
 
-.tableau .joueur:hover {
+.tableau .joueur:hover, .tableau .joueur.selected {
     border-color: var(--front2);
     background-color: var(--back2);
     cursor: pointer;

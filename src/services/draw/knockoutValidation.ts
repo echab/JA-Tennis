@@ -205,7 +205,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawEr
 
             //Check inscriptions
             if (!isSexeCompatible(event, player.sexe)) {
-                result.push({ message: 'ERR_EPR_SEXE', draw, box: boxIn, player });
+                result.push({ message: 'ERR_EPR_SEXE', draw, box: boxIn, player, detail: player.sexe });
 
             } else if (!isRegistred(event, player)) {
                 result.push({ message: 'ERR_INSCR_NO', draw, box: boxIn, player });
@@ -214,7 +214,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawEr
             //DONE 00/05/11: CTableau, check categorie
             //Check Categorie
             if (player.category && !category.isCompatible(event.category, player.category)) {
-                result.push({ message: 'ERR_CATEG_MIS', draw, box: boxIn, player });
+                result.push({ message: 'ERR_CATEG_MIS', draw, box: boxIn, player, detail:player.category });
             }
         }
 
@@ -448,7 +448,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawEr
                 }
 
                 if (draw.type === DrawType.Final) {
-                    result.push({ message: 'ERR_TAB_SORTANT_FINAL', draw, box, player, detail:`Q${e}` });
+                    result.push({ message: 'ERR_TAB_SORTANT_FINAL', draw, box, player, detail: `Q${e}` });
                 }
                 /*			
                 pSuite = getSuivant();
