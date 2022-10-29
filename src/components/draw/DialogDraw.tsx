@@ -5,7 +5,7 @@ import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
-import { deleteDraw, groupFindAllPlayerOut, previousGroup } from '../../services/drawService';
+import { deleteDraw, groupDraw, groupFindAllPlayerOut } from '../../services/drawService';
 import { getRegisteredPlayers } from '../../services/tournamentService';
 import { rank, category } from '../../services/types';
 import { columnMax, countInCol } from '../../utils/drawUtil';
@@ -62,11 +62,11 @@ export const DialogDraw: Component<Props> = (props) => {
   /** @returns registered players and entries numbers from previous draw */
   const registeredPlayersOrQ = (): (Player|number)[] => {
     const players: (Player|number)[] = getRegisteredPlayers(props.allPlayers, props.event, form.minRank, form.maxRank);
-    const d = (draw ?? props.event.draws.at(-1)) as Draw | undefined;
-    if (d) {
-      const previous = previousGroup(props.event, d);
-      if (previous) {
-          const qualifs = groupFindAllPlayerOut(props.event, previous);
+    const prevDraw = props.event.draws.at(-1) as Draw | undefined;
+    if (prevDraw) {
+      const [iStart, iNext] = groupDraw(props.event, prevDraw);
+      if (iStart < iNext) {
+          const qualifs = groupFindAllPlayerOut(props.event, [iStart, iNext]);
           if (qualifs.length) {
             return players.concat(qualifs);
           }

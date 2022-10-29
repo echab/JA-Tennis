@@ -55,7 +55,7 @@ export const PaneDraw: Component = () => {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
             const newDraws = lib.generateDraw(GenerateType.Mix, drawPlayers);
-            return commandManager.wrap(() => updateDraws(evt, newDraws));
+            commandManager.add(updateDraws(evt, newDraws));
         }
     };
 
@@ -65,7 +65,7 @@ export const PaneDraw: Component = () => {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
             const newDraws = lib.generateDraw(GenerateType.PlusEchelonne, drawPlayers);
-            return commandManager.wrap(() => updateDraws(evt, newDraws));
+            commandManager.add(updateDraws(evt, newDraws));
         }
     }
 
@@ -75,7 +75,7 @@ export const PaneDraw: Component = () => {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
             const newDraws = lib.generateDraw(GenerateType.PlusEnLigne, drawPlayers);
-            return commandManager.wrap(() => updateDraws(evt, newDraws));
+            commandManager.add(updateDraws(evt, newDraws));
         }
     }
 

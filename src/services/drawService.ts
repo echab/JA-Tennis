@@ -431,23 +431,21 @@ export function findAllPlayerOutBox(
   return a;
 }
 
-export function findDrawPlayerIds(draw: Draw): Set<string> {
+export function findDrawPlayerIds(draw: Draw, withQualifIn = true): Set<string> {
   return new Set(
-    draw.boxes
-      .filter(({ playerId }) => playerId)
+    (draw.boxes as PlayerIn[])
+      .filter(({ playerId, qualifIn }) => playerId && (withQualifIn || !qualifIn))
       .map<string>(({ playerId }) => playerId!)
   );
 }
 
-export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player|number)[] {
-  const playerIds = findDrawPlayerIds(draw);
-  const result : (Player|number)[] = [...playerIds]
-    .map((playerId) => byId(players, playerId))
-    .filter((p) : p is Player => !!p);
-  const qualifsIn =     (draw.boxes as PlayerIn[])
-    .map(({qualifIn}) => qualifIn)
-    .filter((qualifIn) : qualifIn is number => typeof qualifIn === 'number');
-  return result.concat(...qualifsIn);
+/** list all input qualifies or players (exclusively) */
+export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player | number)[] {
+  return (draw.boxes as PlayerIn[])
+    .map(({ qualifIn, playerId, order }) => order
+      ? qualifIn || (playerId ? byId(players, playerId) : undefined)
+      : undefined)
+    .filter((r): r is Player | number => !!r);
 }
 
 /**
