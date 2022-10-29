@@ -5,7 +5,7 @@ import { RankString, CategoryString } from '../../domain/types';
 import { deleteEvent } from '../../services/eventService';
 import { rank, category } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
-import { selection } from '../util/selection';
+import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
 
 const EMPTY: OptionalId<TEvent> = { name: '', sexe: 'H', category: '', maxRank: 'NC', draws: [] };
@@ -78,7 +78,7 @@ export const DialogEvent: Component<Props> = (props) => {
    return (
       <dialog ref={refDlg!} class="p-0">
          <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-            <b>{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
+            <b><IconSexe sexe={props.event?.sexe} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
             <small>Id: {props.event?.id}</small>
             <button type="button" data-dismiss="modal" aria-hidden="true"
                onclick={() => refDlg.close()}

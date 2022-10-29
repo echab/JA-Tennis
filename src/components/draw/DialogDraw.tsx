@@ -12,6 +12,7 @@ import { columnMax, countInCol } from '../../utils/drawUtil';
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
 import { selectDraw } from '../util/selection';
+import { IconSexe } from '../misc/IconSexe';
 
 const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Normal, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
@@ -46,10 +47,8 @@ export const DialogDraw: Component<Props> = (props) => {
   if (!props.draw) {
     // new draw
     const prevRank = props.event.draws.at(-1)?.maxRank;
-    if (prevRank) {
-      const minRank = rank.next(prevRank);
-      setForm({ minRank: minRank, maxRank: minRank });
-    }
+    const minRank = prevRank ? rank.next(prevRank) : rank.first();
+    setForm({ minRank, maxRank: minRank });
   }
 
   const drawTypes: { value: number; label: string; }[] = [];
@@ -129,7 +128,7 @@ export const DialogDraw: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <span><i class='icon2-draw'></i> {props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
+        <span><i class='icon2-draw'></i> <IconSexe sexe={props.event.sexe} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
         <small>Id: {props.draw?.id}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}

@@ -73,9 +73,9 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
       result.splice(-1, 0, ...fn(tournament, event, draw));
     }
   }
-  result.forEach(({ message, draw, box, player, detail }) => {
-    console.warn(`Validation error on ${draw.name}${box && player ? ` for ${player.name}` : ''}${detail ? ` (${detail})` : ''} : ${message}`);
-  });
+  // result.forEach(({ message, draw, box, player, detail }) => {
+  //   console.warn(`Validation error on ${draw.name}${box && player ? ` for ${player.name}` : ''}${detail ? ` (${detail})` : ''} : ${message}`);
+  // });
   return result;
 }
 

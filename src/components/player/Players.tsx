@@ -1,5 +1,5 @@
-import { Component, For, Show } from 'solid-js';
-import { A } from '@solidjs/router';
+import { Component, createEffect, For, Show } from 'solid-js';
+import { A, useNavigate, useParams } from '@solidjs/router';
 import { selection, selectPlayer, urlPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
@@ -8,6 +8,8 @@ import { getRegisteredPlayers, isRegistred } from '../../services/tournamentServ
 import { findDrawPlayerIds } from '../../services/drawService';
 import { getId } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
+import { Params } from '../App';
+import { IconSexe } from '../misc/IconSexe';
 
 type Props = {
   players: Player[];
@@ -16,6 +18,25 @@ type Props = {
 }
 
 export const Players: Component<Props> = (props) => {
+  
+  const params = useParams<Params>();
+
+  // change selection on url change
+  createEffect(() => {
+    const player = params.playerId
+      ? selection.tournament.players.find(({id}) => id === params.playerId)
+      : undefined;
+    selectPlayer(player);
+  });
+
+  // change url on selection change
+  const navigate = useNavigate();
+  createEffect(() => {
+    const url = urlPlayer(selection.player);
+    if (location.pathname.startsWith(urlPlayer()) && location.pathname !== url) {
+      navigate(url, { replace: true });
+    }
+  });
   
   const eventById = Object.fromEntries(props.events.map((e) => [e.id, e]));
 
@@ -39,21 +60,25 @@ export const Players: Component<Props> = (props) => {
           <A href={urlPlayer()} replace={true} class="p-2 rounded-full">&Gt;</A>
         </Show>
       </div>
-      <table class="table table-hover table-condensed w-auto">
+      <table class="table table-hover table-condensed w-auto mx-2">
         {/* <caption>Players</caption> */}
         <thead>
           <tr>
-            <th class="span1"><input type="checkbox" disabled /></th>
-            <th class="text-left">Player name</th>
-            <th class="text-left">Rank</th>
+            <th class="span1 font-normal">
+              {/* <input type="checkbox" disabled title="Select all players" /> */}
+
+            </th>
+            <th class="text-left font-normal">sexe</th>
+            <th class="text-left font-normal">name</th>
+            <th class="text-left font-normal">rank</th>
             <Show when={props.short}>
-              <th class="text-left">Reg</th>
+              <th class="text-left font-normal">reg</th>
             </Show>
             <Show when={!props.short}>
-              <th class="text-left">Club</th>
-              <th class="text-left">Registrations</th>
-              <th class="text-left">Phone</th>
-              <th class="text-left">Email</th>
+              <th class="text-left font-normal">club</th>
+              <th class="text-left font-normal">registrations</th>
+              <th class="text-left font-normal">phone</th>
+              <th class="text-left font-normal">email</th>
             </Show>
           </tr>
         </thead>
@@ -66,21 +91,17 @@ export const Players: Component<Props> = (props) => {
               <td>
                 <input type="checkbox"
                   checked={selection.player?.id === player.id}
-                  disabled
+                  // disabled
                 // onChange={(event) => selectPlayer(player)}
                 />
-                <small>{player.id}</small>
+                {/* <small>{player.id}</small> */}
               </td>
               <td class="text-left">
                 <i class="icon2-info hover" onclick={[editPlayer,player]}></i>
-                <span>
-                <i classList={{
-                  'icon2-male': player.sexe === 'H',
-                  'icon2-female': player.sexe === 'F',
-                  'icon2-mixte': player.sexe === 'M',
-                }}></i>
+                <IconSexe sexe={player.sexe} />
+              </td>
+              <td class="text-left">
                 {player.name} {player.firstname}
-                </span>
               </td>
               <td class="text-left">{player.rank}</td>
               <Show when={props.short}>

@@ -90,21 +90,17 @@ export function _newInfo(source?: TournamentInfo): TournamentInfo {
 }
 
 export function updateInfo(info: TournamentInfo) : Command {
-  const prev = selection.tournament.info;
+  const prev = {...selection.tournament.info};
 
-  const act = () => {
-    update(({ tournament }) => {
-      tournament.info = info;
-    });
-  };
+  const act = () => update((sel) => {
+    sel.tournament.info = info;
+  });
   act();
 
-  const undo = () => {
-    update(({ tournament }) => {
-      tournament.info = prev;
-    });
+  const undo = () => update((sel) => {
+    sel.tournament.info = prev;
+  });
 
-  };
   return {name:'Update info', act, undo};
 }
 

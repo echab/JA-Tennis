@@ -7,10 +7,9 @@ import { rank } from "./types";
 import { Box, Draw, DrawType, Match, Mode, PlayerIn } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
-import { Command, removeItemById } from "./util/commandManager";
-import { selectDraw, selectEvent, selection, update } from "../components/util/selection";
+import { Command } from "./util/commandManager";
+import { selection, update } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
-import { DrawLibBase } from "./draw/drawLibBase";
 
 const MAX_TETESERIE = 32,
   MAX_QUALIF = 32,
@@ -35,32 +34,26 @@ export function updateDraws(
   // const prev = id ? { ...event.draws[i] } : undefined; // clone
   const prev = id ? event.draws[i] : undefined;
 
-  const act = () => {
-    update(({ event }) => {
-      if (!event) {
-        throw new Error("updateDraw without event");
-      }
-      if (!id) {
-        event.draws.push(d);
-      } else {
-        event.draws[i] = d;
-      }
-    });
-  };
+  const act = () => update((sel) => {
+    sel.event = event;
+    sel.draw = d;
+    if (!id) {
+      sel.event.draws.push(d);
+    } else {
+      sel.event.draws[i] = d;
+    }
+  });
   act();
 
-  const undo = () => {
-    update(({ event }) => {
-      if (!event) {
-        throw new Error("updateDraw without event");
-      }
-      if (prev) {
-        event.draws[i] = prev;
-      } else {
-        event.draws.pop();
-      }
-    });
-  };
+  const undo = () => update((sel) => {
+    sel.event = event;
+    sel.draw = prev;
+    if (prev) {
+      sel.event.draws[i] = prev;
+    } else {
+      sel.event.draws.pop();
+    }
+  });
 
   return { name: `Add draw ${draw.name}`, act, undo };
 }
@@ -71,34 +64,33 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
   //   match.id = Guid.create("b");
   // }
   const i = indexOf(draw.boxes, "position", match.position);
-  const prev = { ...draw.boxes[i] } as Match;
+  const prev = { ...draw.boxes[i] } as Match; // clone
   const lib = drawLib(event, draw);
 
-  // TODO boxIn of next draw/group
-  // const qualifOut = (draw.boxes[i] as Match).qualifOut;
-  // const nextGrp = nextGroup(event, draw);
-  // const [nextDraw, nextBoxIn] = nextGrp && qualifOut ? groupFindPlayerIn(event, nextGrp, qualifOut) : [];
-  // const prevBoxIn = {...nextBoxIn};
-  const prevBoxQ = {...groupFindQ(event, draw, match)};
+  const prevBoxQ = groupFindQ(event, draw, match);
 
-  const act = () => {
-    update(({ event, draw, box, boxQ }) => {
-      if (!event || !draw || !box || !isMatch(box)) {
-        throw new Error("updateMatch without selected event, draw or match");
-      }
-      lib.putResult(box, match, boxQ);
-    });
-  };
+  const act = () => update((sel) => {
+    sel.event = event;
+    sel.draw = draw;
+    sel.box = sel.draw.boxes[i];
+    sel.boxQ = prevBoxQ;
+    if (!sel.box || !isMatch(sel.box)) {
+      throw new Error("updateMatch without selected match");
+    }
+    lib.putResult(sel.box, match, sel.boxQ);
+  });
   act();
 
-  const undo = () => {
-    update(({ event, draw, box, boxQ }) => {
-      if (!event || !draw || !box || !isMatch(box)) {
-        throw new Error("updateMatch without selected event, draw or match");
-      }
-      lib.putResult(box, prev, boxQ);
-    });
-  };
+  const undo = () => update((sel) => {
+    sel.event = event;
+    sel.draw = draw;
+    sel.box = sel.draw.boxes[i];
+    sel.boxQ = prevBoxQ;
+    if (!sel.box || !isMatch(sel.box)) {
+      throw new Error("updateMatch without selected match");
+    }
+    lib.putResult(sel.box, prev, sel.boxQ);
+  });
 
   return { name: `Match result ${match.position}`, act, undo }; // TODO
 }
@@ -145,23 +137,22 @@ export function deleteDraw(drawId: string): Command {
   );
   const prevDraw = event.draws[i];
 
-  const act = () => {
-    selectEvent(event);
-    update(({ event }) => event?.draws.splice(i, 1));
-  };
+  const act = () => update((sel) => {
+    sel.event = event;
+    sel.event.draws.splice(i, 1);
+    sel.draw = event.draws.at(i);
+  });
   act();
 
-  const undo = () => {
-    selectEvent(event);
-    update(({ event }) => {
-      event?.draws.splice(i, 0, prevDraw);
-    });
-    selectDraw(event!, prevDraw);
-  };
+  const undo = () => update((sel) => {
+    sel.event = event;
+    sel.event.draws.splice(i, 0, prevDraw);
+    sel.draw = prevDraw;
+  });
 
   return { name: `Remove draw ${prevDraw.name}`, act, undo };
 }
-  
+
 //newBox(parent: Draw, matchFormat?: string, position?: number): Box
 //newBox(parent: Draw, source?: Box, position?: number): Box
 export function newBox<T extends Box = Box>(
@@ -232,7 +223,7 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
 //   return byId(box._draw._event._tournament.players, box.playerId);
 // }
 
-export function groups(event:TEvent): number[] {
+export function groups(event: TEvent): number[] {
   const result: number[] = [];
   event.draws.forEach((d, i) => {
     if (!d.suite) {
@@ -247,7 +238,7 @@ export function groups(event:TEvent): number[] {
  * Return the first and last indexes (exclusive) of the draws in the same group as given draw
  * (mainly for group of round robin).
  */
-export function groupDraw(event: TEvent, draw: Draw): [number,number] {
+export function groupDraw(event: TEvent, draw: Draw): [number, number] {
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
   if (i === -1) {
@@ -262,7 +253,7 @@ export function groupDraw(event: TEvent, draw: Draw): [number,number] {
 }
 
 /** return the first and last indexes (exclusive) of the draws of the previous group. */
-export function previousGroup(event: TEvent, draw: Draw): [number,number] | undefined { //getPrecedent
+export function previousGroup(event: TEvent, draw: Draw): [number, number] | undefined { //getPrecedent
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
   let iStart = i;
@@ -274,7 +265,7 @@ export function previousGroup(event: TEvent, draw: Draw): [number,number] | unde
 }
 
 /** return the first and last indexes (exclusive) of the draws of the next group. */
-export function nextGroup(event: TEvent, draw: Draw): [number,number] | undefined { //getSuivant
+export function nextGroup(event: TEvent, draw: Draw): [number, number] | undefined { //getSuivant
   const draws = event.draws;
   let i = draws.findIndex(({ id }) => id === draw.id);
   if (i >= 0) {
@@ -309,7 +300,7 @@ export function isSlot(box: Match): boolean { //isCreneau
 
 export function findSeeded(
   event: TEvent,
-  origin: Draw | [number,number],
+  origin: Draw | [number, number],
   iTeteSerie: number,
 ): [Draw, PlayerIn] | [] { //FindTeteSerie
   ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
@@ -353,7 +344,7 @@ export function groupFindQ(event: TEvent, draw: Draw, box: Box): Box | undefined
  */
 export function groupFindPlayerIn(
   event: TEvent,
-  [groupStart, groupEnd]: [number,number],
+  [groupStart, groupEnd]: [number, number],
   iQualifie: number,
 ): [Draw, PlayerIn] | [] {
   ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
@@ -371,7 +362,7 @@ export function groupFindPlayerIn(
 
 export function groupFindPlayerOut(
   event: TEvent,
-  [groupStart, groupEnd]: [number,number],
+  [groupStart, groupEnd]: [number, number],
   iQualifie: number,
 ): [Draw, Match] | [] {
   ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
@@ -401,7 +392,7 @@ export function groupFindPlayerOut(
 
 export function groupFindAllPlayerOut(
   event: TEvent,
-  origin: Draw | [number,number],
+  origin: Draw | [number, number],
   hideNumbers?: boolean,
 ): number[] { //FindAllQualifieSortant
   //Récupère les qualifiés sortants du tableau
@@ -422,7 +413,7 @@ export function groupFindAllPlayerOut(
 /** @deprecated used only by aurelia draw-draw */
 export function findAllPlayerOutBox(
   event: TEvent,
-  origin: Draw | [number,number],
+  origin: Draw | [number, number],
 ): Match[] { //FindAllQualifieSortantBox
   //Récupère les qualifiés sortants du tableau
   const group = isArray(origin) ? origin : groupDraw(event, origin);
@@ -439,11 +430,11 @@ export function findAllPlayerOutBox(
   return a;
 }
 
-export function findDrawPlayerIds(draw: Draw) : Set<string> {
+export function findDrawPlayerIds(draw: Draw): Set<string> {
   return new Set(
     draw.boxes
-      .filter(({playerId}) => playerId)
-      .map<string>(({playerId}) => playerId!)
+      .filter(({ playerId }) => playerId)
+      .map<string>(({ playerId }) => playerId!)
   );
 }
 

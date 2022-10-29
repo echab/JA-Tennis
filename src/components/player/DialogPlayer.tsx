@@ -1,4 +1,4 @@
-import { Component, For, JSX, onMount, onCleanup, mergeProps } from 'solid-js';
+import { Component, For, JSX, onMount, onCleanup, mergeProps, Show } from 'solid-js';
 import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
@@ -135,7 +135,7 @@ export const DialogPlayer: Component<Props> = (props) => {
             </div>
           </fieldset>
           <fieldset class="border-2"><legend>Registration</legend>
-            <div class="mb-1">
+            <div class="mb-1 flex">
               <label class="inline-block w-3/12 text-right pr-3">Events:</label>
               <div class="inline-block">
                 <For each={props.events}>{(event) =>
@@ -150,20 +150,23 @@ export const DialogPlayer: Component<Props> = (props) => {
             </div>
           </fieldset>
           <fieldset class="border-2"><legend>Coordinates</legend>
-            <div class="mb-1">
-              <label for="adress" class="inline-block w-3/12 text-right pr-3">Adress:</label>
-              <input id="adress" type="text" value={form.adress1 ?? ''} onChange={updateField('adress1')} class="w-9/12 p-1" />
-            </div>
-            <div class="mb-1">
-              <label class="inline-block w-3/12"></label>
-              <input type="text" value={form.adress2 ?? ''} onChange={updateField('adress2')} class="w-9/12 p-1" />
-            </div>
-            <div class="mb-1">
-              <label class="inline-block w-3/12"></label>
-              <input type="text" value={form.zipCode ?? ''} onChange={updateField('zipCode')} class="w-2/12 p-1" />
-              <span class="inline-block w-1/12"></span>
-              <input type="text" value={form.city ?? ''} onChange={updateField('city')} class="w-6/12 p-1" />
-            </div>
+            <details class="mb-1">
+              <summary class="w-3/12">Adress <Show when={form.adress1 || form.adress2 || form.city || form.zipCode}>*</Show></summary>
+              <div class="mb-1">
+                <label for="adress" class="inline-block w-3/12 text-right pr-3">Adress:</label>
+                <input id="adress" type="text" value={form.adress1 ?? ''} onChange={updateField('adress1')} class="w-9/12 p-1" />
+              </div>
+              <div class="mb-1">
+                <label class="inline-block w-3/12"></label>
+                <input type="text" value={form.adress2 ?? ''} onChange={updateField('adress2')} class="w-9/12 p-1" />
+              </div>
+              <div class="mb-1">
+                <label class="inline-block w-3/12"></label>
+                <input type="text" value={form.zipCode ?? ''} onChange={updateField('zipCode')} class="w-2/12 p-1" />
+                <span class="inline-block w-1/12"></span>
+                <input type="text" value={form.city ?? ''} onChange={updateField('city')} class="w-6/12 p-1" />
+              </div>
+            </details>
             <div class="mb-1">
               <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
               <input type="tel" value={form.phone1 ?? ''} onChange={updateField('phone1')} class="w-4/12 p-1" />

@@ -1,4 +1,4 @@
-import { selection, selectPlayer, update } from "../components/util/selection";
+import { selection, update } from "../components/util/selection";
 import type { OptionalId } from "../domain/object";
 import type { Player } from "../domain/player";
 import { TEvent } from "../domain/tournament";
@@ -20,26 +20,24 @@ export function updatePlayer(
   // const prev = id ? { ...selection.tournament.players[i] } : undefined; // clone
   const prev = id ? selection.tournament.players[i] : undefined;
 
-  const act = () => {
-    update(({ tournament }) => {
-      if (!id) {
-        tournament.players.push(p);
-      } else {
-        tournament.players[i] = p;
-      }
-    });
-  };
+  const act = () => update((sel) => {
+    if (!id) {
+      sel.tournament.players.push(p);
+    } else {
+      sel.tournament.players[i] = p;
+    }
+    sel.player = p;
+  });
   act();
 
-  const undo = () => {
-    update(({ tournament }) => {
-      if (prev) {
-        tournament.players[i] = prev;
-      } else {
-        tournament.players.pop();
-      }
-    });
-  };
+  const undo = () => update((sel) => {
+    if (prev) {
+      sel.tournament.players[i] = prev;
+    } else {
+      sel.tournament.players.pop();
+    }
+    sel.player = sel.tournament.players.at(i);
+  });
 
   return { name: `Add player ${player.name}`, act, undo };
 }
@@ -63,25 +61,22 @@ export function deletePlayer(
     )
   );
 
-  const act = () => {
-    update(({ tournament }) => {
-      tournament.players.splice(i, 1);
-      for (const { e, d, b } of prevBoxes) {
-        tournament.events[e].draws[d].boxes[b].playerId = "";
-      }
-    });
-  };
+  const act = () => update((sel) => {
+    sel.tournament.players.splice(i, 1);
+    for (const { e, d, b } of prevBoxes) {
+      sel.tournament.events[e].draws[d].boxes[b].playerId = "";
+    }
+    sel.player = sel.tournament.players.at(i);
+  });
   act();
 
-  const undo = () => {
-    update(({ tournament }) => {
-      tournament.players.splice(i, 0, prevPlayer);
-      for (const { e, d, b } of prevBoxes) {
-        tournament.events[e].draws[d].boxes[b].playerId = playerId;
-      }
-    });
-    selectPlayer(prevPlayer);
-  };
+  const undo = () => update((sel) => {
+    sel.tournament.players.splice(i, 0, prevPlayer);
+    for (const { e, d, b } of prevBoxes) {
+      sel.tournament.events[e].draws[d].boxes[b].playerId = playerId;
+    }
+    sel.player = prevPlayer;
+  });
 
   return { name: `Remove player ${prevPlayer.name}`, act, undo };
 }
@@ -99,25 +94,24 @@ export function registerPlayer(
   // TODO check compatibility
   // isSexeCompatible(event, player.sexe)
 
-  const act = () => {
-    update(({ tournament }) => {
-      const p = tournament.players[iPlayer];
-      if (register) {
-        if (!p.registration.includes(eventId)) {
-          p.registration.push(eventId);
-        }
-      } else {
-        removeValue(p.registration, eventId);
+  const act = () => update((sel) => {
+    const p = sel.tournament.players[iPlayer];
+    if (register) {
+      if (!p.registration.includes(eventId)) {
+        p.registration.push(eventId);
       }
-    });
-  };
+    } else {
+      removeValue(p.registration, eventId);
+    }
+    sel.player = p;
+  });
   act();
 
-  const undo = () => {
-    update(({ tournament }) => {
-      tournament.players[iPlayer].registration = [...prev]; // clone again?
-    });
-  };
+  const undo = () => update((sel) => {
+    const p = sel.tournament.players[iPlayer];
+    p.registration = [...prev]; // clone again?
+    sel.player = p;
+  });
 
   return {
     name: `${

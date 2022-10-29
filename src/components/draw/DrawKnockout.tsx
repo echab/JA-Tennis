@@ -1,6 +1,6 @@
 import { Component, For, Show } from 'solid-js';
 import { selectBox, urlBox } from '../util/selection';
-import { PlayerIn, Draw, Match } from '../../domain/draw';
+import { PlayerIn, Draw, Match, DrawType } from '../../domain/draw';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/drawUtil';
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
@@ -8,6 +8,7 @@ import { TEvent } from '../../domain/tournament';
 import { showDialog } from '../Dialogs';
 import { A, useParams } from '@solidjs/router';
 import { Params } from '../App';
+import { isMatch } from '../../services/drawService';
 import './Draw.css';
 
 type Props = {
@@ -34,11 +35,12 @@ export const DrawKnockout: Component<Props> = (props) => {
       const ic = cMax - c;
       const pos = positionTopCol(c) - (l >> ic);
       const box = boxes.get(pos);
+      const visible = !!box && (!!box.order || isMatch(box))
       result.push({
         box,
         player: byId(props.players, box?.playerId),
-        even: (pos & 1) === 0,
-        odd: (pos & 1) !== 0,
+        even: (pos & 1) === 0 && visible,
+        odd: (pos & 1) !== 0 && visible,
         rowspan: 1 << ic,
         isRight: c === cMin,
       });
@@ -66,25 +68,45 @@ export const DrawKnockout: Component<Props> = (props) => {
               >
                 <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
+
+                <Show when={box?.order}><small class="pr-1">{box!.order}</small></Show>
+                <Show when={box && isMatch(box)}><small class="pr-1">m</small></Show>
+
                 <span class="nom">{player?.name}
                   <Show when={box?.order}> {player?.firstname}</Show>
                 </span>
                 <Show when={box?.order && player?.rank}><span class="classement">{player!.rank}</span></Show>
                 <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                 <br />
-                <Show when={box?.order} fallback={
-                  <>
-                    <i class="icon2-match hover"
+                <Show when={box?.order}>
+                  {/* <i class="icon2-qualif-in hover" title="Edit qualified in"
+                    onclick={() => {
+                      selectBox(props.event, props.draw, box);
+                      // showDialog("qualif");
+                    }}
+                  ></i> */}
+                  <span class="club">{player?.club}</span>
+                </Show>
+                <Show when={box && isMatch(box)}>
+                  <i class="icon2-match hover" title="Edit the match"
+                    onclick={() => {
+                      selectBox(props.event, props.draw, box);
+                      showDialog("match");
+                    }}
+                  ></i>
+                  <Show when={box?.score} fallback={
+                    <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
+                  }><span class="score">{box!.score}</span></Show>
+
+                  <Show when={isRight && props.draw.type !== DrawType.Final}>
+                    <i class="icon2-qualif-out hover" title="Edit qualified out"
                       onclick={() => {
                         selectBox(props.event, props.draw, box);
-                        showDialog("match");
+                        // showDialog("qualif");
                       }}
                     ></i>
-                    <Show when={box?.score} fallback={
-                      <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
-                    }><span class="score">{box!.score}</span></Show>
-                  </>
-                }><span class="club">{player?.club}</span></Show>
+                  </Show>
+                </Show>
               </A>
             </td>
           }</For>

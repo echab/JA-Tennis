@@ -7,6 +7,7 @@ import { registerPlayer } from '../../services/playerService';
 import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragdrop';
 import { isSexeCompatible } from '../../services/tournamentService';
 import { showDialog } from '../Dialogs';
+import { IconSexe } from '../misc/IconSexe';
 
 type Props = {
   events: TEvent[];
@@ -41,11 +42,7 @@ export const Events: Component<Props> = (props) => {
         >
           <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
           {/* <small>{event.id} </small> */}
-          <i classList={{
-            'icon2-male': event.sexe === 'H',
-            'icon2-female': event.sexe === 'F',
-            'icon2-mixte': event.sexe === 'M',
-          }}></i>
+          <IconSexe sexe={event.sexe} />
           <span>{event.name}</span>
           {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
         </A>
@@ -70,6 +67,7 @@ export const Events: Component<Props> = (props) => {
                 ></i>
                 <i class="icon2-draw"></i>
                 {draw.name} {draw.suite ? '(c)' : ''}
+                {/* TODO list the count of registered players in this draw, by rank */}
                 {/* <i class="glyphicon glyphicon-trash" click.trigger="drawEditor.remove(draw)">X</i> */}
                 <span class="float-right hover">&Gt;</span>
               </A>
@@ -83,6 +81,8 @@ export const Events: Component<Props> = (props) => {
             showDialog("draw");
           }}
         >➕ Add draw</button>
+
+        {/* TODO list the count of registered players not in any draw, by rank */}
 
       </div>
     }</For>

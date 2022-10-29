@@ -4,8 +4,8 @@ import { initDraw } from "./drawService";
 import { extend, isObject } from "./util/object";
 import { Tournament, TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
-import { Command, removeItemById } from "./util/commandManager";
-import { selectEvent, selection, update } from "../components/util/selection";
+import { Command } from "./util/commandManager";
+import { selection, update } from "../components/util/selection";
 import { removeValue } from "./util/array";
 
 /** Add a new event or update an existing event (with id) */
@@ -21,26 +21,26 @@ export function updateEvent(
   // const prev = id ? { ...selection.tournament.events[i] } : undefined; // clone
   const prev = id ? selection.tournament.events[i] : undefined;
 
-  const act = () => {
-    update(({ tournament }) => {
-      if (!id) {
-        tournament.events.push(e);
-      } else {
-        tournament.events[i] = e;
-      }
-    });
-  };
+  const act = () => update((sel) => {
+    if (!id) {
+      sel.tournament.events.push(e);
+    } else {
+      sel.tournament.events[i] = e;
+    }
+    sel.event = e;
+    sel.draw = undefined;
+  });
   act();
 
-  const undo = () => {
-    update(({ tournament }) => {
-      if (prev) {
-        tournament.events[i] = prev;
-      } else {
-        tournament.events.pop();
-      }
-    });
-  };
+  const undo = () => update((sel) => {
+    if (prev) {
+      sel.tournament.events[i] = prev;
+    } else {
+      sel.tournament.events.pop();
+    }
+    sel.event = prev;
+    sel.draw = undefined;
+  });
 
   return { name: `Add event ${event.name}`, act, undo };
 }
@@ -82,27 +82,23 @@ export function deleteEvent(eventId: string): Command {
   );
   const byRegistered = ({id}:{id:string}) => registeredPlayerIds.has(id);
 
-  const act = () => {
-    update(({ tournament }) => {
-      tournament.events.splice(i, 1);
-      tournament.players
-        // .filter(({id}) => registeredPlayers.has(id))
-        .filter(byRegistered)
-        .forEach(({registration}) => removeValue(registration, eventId))
-    });
-    selectEvent(undefined);
-  };
+  const act = () => update((sel) => {
+    sel.tournament.events.splice(i, 1);
+    sel.tournament.players
+      // .filter(({id}) => registeredPlayers.has(id))
+      .filter(byRegistered)
+      .forEach(({registration}) => removeValue(registration, eventId))
+    sel.event = undefined;
+  });
   act();
 
-  const undo = () => {
-    update(({ tournament }) => {
-      tournament.events.splice(i, 0, prevEvent);
-      tournament.players
-        .filter(byRegistered)
-        .forEach(({registration}) => registration.push(eventId))
-    });
-    selectEvent(prevEvent);
-  };
+  const undo = () => update((sel) => {
+    sel.tournament.events.splice(i, 0, prevEvent);
+    sel.tournament.players
+      .filter(byRegistered)
+      .forEach(({registration}) => registration.push(eventId))
+    sel.event = prevEvent;
+  });
 
   return { name: `Remove event ${prevEvent.name}`, act, undo };
 }

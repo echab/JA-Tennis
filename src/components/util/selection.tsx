@@ -143,11 +143,20 @@ export function urlEvent(event?: TEvent) {
     return `/event/${event?.id ?? ''}`.replace(/\/+$/, '');
 }
 
-export function urlDraw(draw?: Draw, event = selection.event) {
+export function urlDraw(draw?: Draw, event?: TEvent) {
+    if (!event) {
+        event = selection.event; // reactive default value
+    }
     return `/event/${event?.id ?? ''}/${draw?.id ?? ''}`.replace(/\/+$/, '');
 }
 
 // TODO could return URL and preserve current search
-export function urlBox(box?: Box, draw = selection.draw, event = selection.event) {
+export function urlBox(box?: Box, draw?: Draw, event?: TEvent) {
+    if (!event) {
+        event = selection.event; // reactive default value
+    }
+    if (!draw) {
+        draw = selection.draw; // reactive default value
+    }
     return `/event/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? box.position : ''}`.replace(/\/+$/, '');
 }
