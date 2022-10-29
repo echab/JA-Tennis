@@ -214,7 +214,7 @@ export abstract class DrawLibBase implements IDrawLib {
             if (inNumber == QEMPTY ||
                 !this.findPlayerIn(inNumber)) {
 
-                this.setPlayerIn(box, inNumber);
+                box.qualifIn = inNumber;
             }
         } else {	// Enlève un qualifié entrant
 

@@ -57,8 +57,8 @@ describe("Knockout lib service", () => {
                 { position: 0, score: "", qualifOut: 1 },
                 { position: 2, playerId: "J2", order: 3, seeded: 1 },
                 { position: 1, score: "" },
-                { position: 3, qualifIn: 1, order: 2 },
-                { position: 4, playerId: "J0", order: 1 },
+                { position: 3, playerId: "J1", order: 2, seeded: 2 },
+                { position: 4, qualifIn: 1, order: 1 },
             ]);
         });
 
