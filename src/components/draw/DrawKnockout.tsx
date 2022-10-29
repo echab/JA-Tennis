@@ -1,5 +1,5 @@
 import { Component, For, Show } from 'solid-js';
-import { selectBox } from '../util/selection';
+import { selectBox, urlBox } from '../util/selection';
 import { PlayerIn, Draw, Match } from '../../domain/draw';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/drawUtil';
 import { byId, mapBy } from '../../services/util/find';
@@ -62,7 +62,8 @@ export const DrawKnockout: Component<Props> = (props) => {
               <div class="boite joueur"
                 classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
                 // onclick={(evt) => {selectBox(props.event, props.draw, box); evt.cancelBubble = true; }}
-                onclick={(evt) => { navigate(`/event/${props.event.id}/${props.draw.id}/${box?.position ?? ''}`); evt.preventDefault(); }}
+                onclick={() => navigate(urlBox(box), {replace:true})}
+                // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
               >
                 <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>

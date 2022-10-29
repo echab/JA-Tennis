@@ -1,4 +1,4 @@
-﻿import { SelectionItems, update } from "../components/util/selection";
+﻿import { drawById, SelectionItems, update } from "../components/util/selection";
 import { Draw } from "../domain/draw";
 import { Player } from "../domain/player";
 import { TEvent, Tournament } from "../domain/tournament";
@@ -15,6 +15,13 @@ export function addValidator(validator: IValidation): void {
 
 export function validateTournament(tournament: Tournament) {
   update((sel) => {
+    // cleanup errors from deleted players
+    // [...sel.playerErrors.keys()].forEach((playerId) => {
+    //   if (tournament.players.find(({id}) => id === playerId)) {
+    //     sel.playerErrors.delete(playerId);
+    //   }
+    // });
+
     tournament.players.forEach((player) => {
       const errors = validatePlayer(player);
       if (errors.length) {
@@ -22,18 +29,25 @@ export function validateTournament(tournament: Tournament) {
       } else {
         delete sel.playerErrors[player.id];
       }
-    })
-  
+    });
+
+    // cleanup errors from deleted draws
+    [...sel.drawErrors.keys()].forEach((key) => {
+      const [draw] = drawById(key, tournament);
+      if (!draw) {
+        sel.drawErrors.delete(key);
+      }
+    });
+
     tournament.events.forEach((event) => event.draws.forEach((draw) => {
       const errors = validateDraw(tournament, event, draw);
-      const key = `${event.id}-${draw.id}`;
+      const key = `${draw.id}-${event.id}`;
       if (errors.length) {
         sel.drawErrors.set(key, errors);
       } else {
         sel.drawErrors.delete(key);
       }
     }));
-  
   });
 }
 

@@ -6,10 +6,6 @@ import { DrawError, PlayerError } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
 
-// export interface Selection extends SelectionActions {
-//     selection: SelectionItems,
-// };
-
 export interface SelectionItems {
     tournament: Tournament;
     event?: TEvent;
@@ -28,7 +24,7 @@ export const [selection, setSelection] = createStore<SelectionItems>({
     tournament: emptyTournament,
     playerErrors:{},
     drawErrors: new Map(),
- });
+});
 
 export function selectTournament(tournament: Tournament) {
     update((sel) => {
@@ -46,7 +42,7 @@ export function selectTournament(tournament: Tournament) {
         // sel.drawErrors.clear();
         sel.drawErrors = new Map(
             tournament.events.flatMap((event) => event.draws
-                .map((draw) => [`${event.id}-${draw.id}`, validateDraw(tournament, event, draw)])
+                .map((draw) => [`${draw.id}-${event.id}`, validateDraw(tournament, event, draw)])
                 // .filter(([_,err]) => err.length)
             )
         );
@@ -70,7 +66,7 @@ export function selectEvent(event?: TEvent): void {
 
 export function selectDraw(event?: TEvent, draw?: Draw): void {
     if (event) {
-        if (draw) {
+        if (draw && draw.id !== selection.draw?.id) {
             // first unselect the previous one // TODO: should not be necessary
             update((sel) => {
                 sel.event = event;
@@ -91,6 +87,7 @@ export function selectDraw(event?: TEvent, draw?: Draw): void {
 }
 
 export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
+    // TODO should navigate, effect?
     update((sel) => {
         sel.event = event;
         sel.draw = draw;
@@ -99,23 +96,12 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
     });
 }
 
-// export function setPlayerErrors(playerErrors?: Record<string, PlayerError[]>): void {
-//     update((sel) => {
-//         sel.playerErrors = playerErrors;
-//     });
-// }
-
-// export function setDrawErrors(drawErrors?: Record<string, DrawError[]>): void {
-//     update((sel) => {
-//         sel.drawErrors = drawErrors;
-//     });
-// }
-
 export function selectByError(error: PlayerError | DrawError) {
     update((sel) => {
         if (isDrawError(error)) {
-            sel.event = eventOfDraw(sel.tournament.events, error.draw);
-            sel.draw = error.draw;
+            const [draw, event] = drawById(error.draw.id)
+            sel.event = event;
+            sel.draw = draw;
             sel.box = error.box;
         }
         sel.player = error.player;
@@ -133,17 +119,31 @@ export function update(fn: (original: SelectionItems) => void) {
     setSelection(produce(fn));
 }
 
-export function eventOfDraw(events: TEvent[], draw: Draw) : TEvent | undefined {
-    const drawId = draw.id;
-    return events
-        .find(({ draws }) => draws.find(({ id }) => id === drawId));
-}
-
-export function drawById(events: TEvent[], drawId: string) : Draw | undefined {
-    for (const event of events) {
-        const draw = event.draws.find(({ id }) => id === drawId);
-        if (draw) {
-            return draw;
+/** find a draw from id which could be a composed like `idDraw-idEvent` */
+export function drawById(idDraw: string, parent?: string | Tournament) : [Draw | undefined, TEvent | undefined] {
+    let [idDraw2, idEvent2 /* , idTournament */] = idDraw.split('-');
+    let tournament = selection.tournament;
+    if (parent) {
+        if (typeof parent === 'string') {
+            idEvent2 = parent;
+        } else {
+            tournament = parent;
         }
     }
+    const event = idEvent2 ? tournament.events.find(({id}) => id === idEvent2) : selection.event;
+    const draw = idDraw2 ? event?.draws.find(({id}) => id === idDraw2) : undefined;
+    return [draw, event];
+}
+
+export function urlEvent(event?: TEvent) {
+    return `/event/${event?.id ?? ''}`;
+}
+
+export function urlDraw(draw?: Draw, event = selection.event) {
+    return `/event/${event?.id ?? ''}/${draw?.id ?? ''}`;
+}
+
+// TODO could return URL and preserve current search
+export function urlBox(box?: Box, draw = selection.draw, event = selection.event) {
+    return `/event/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? box.position : ''}`;
 }

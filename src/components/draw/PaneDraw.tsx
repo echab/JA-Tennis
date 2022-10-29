@@ -1,15 +1,15 @@
 import { Component, createEffect, Show } from "solid-js";
 import { A, useParams } from "@solidjs/router";
-import { drawLib, GenerateType } from "../../services/draw/drawLib";
-import { commandManager } from "../../services/util/commandManager";
 import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
-import { selection, selectDraw } from "../util/selection";
+import { selection, selectDraw, drawById } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
 
 export const PaneDraw: Component = () => {
 
     const params = useParams();
+
+    // const [draw, event] = drawById(params.drawId, params.eventId); // TODO? reactive
 
     const event = () => selection.tournament.events.find(({ id }) => id === params.eventId);
 

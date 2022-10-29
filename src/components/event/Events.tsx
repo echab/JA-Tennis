@@ -1,6 +1,6 @@
 import { Component, For, JSX } from 'solid-js';
 import { A } from '@solidjs/router';
-import { selectDraw, selectEvent, selection } from '../util/selection';
+import { selectDraw, selectEvent, selection, urlDraw, urlEvent } from '../util/selection';
 import { TEvent } from '../../domain/tournament';
 import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
@@ -37,8 +37,7 @@ export const Events: Component<Props> = (props) => {
         <A class="[&[aria-selected=true]]:bg-blue-200 block"
           aria-selected={selection.event === event}
           // onclick={() => { selectEvent(event); }}
-          // onclick={() => navigate(`/event/${event.id}`, {scroll:true})}
-          href={`/event/${event.id}`}
+          href={urlEvent(event)} replace={true}
         >
           <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
           {/* <small>{event.id} </small> */}
@@ -55,14 +54,13 @@ export const Events: Component<Props> = (props) => {
           <For each={event.draws}>{(draw) =>
             <div class="draws px-1"
               aria-selected={draw.id === selection.draw?.id}
-              classList={{ error: selection.drawErrors.has(`${event.id}-${draw.id}`) }}
+              classList={{ error: selection.drawErrors.has(`${draw.id}-${event.id}`) }}
             >
               <A class="[&[aria-selected=true]]:bg-blue-200 block"
                 classList={{ "mt-2": !draw.suite }}
                 aria-selected={selection.draw?.id === draw.id}
                 // onclick={() => selectDraw(event, draw)}
-                // onclick={() => navigate(`/event/${event.id}/${draw.id}`, {scroll:true})}
-                href={`/event/${event.id}/${draw.id}`}
+                href={urlDraw(draw, event)} replace={true}
               >
                 <i class="icon2-info hover"
                   onclick={() => {

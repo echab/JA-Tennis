@@ -2,7 +2,7 @@ import { A } from "@solidjs/router";
 import { Component, For } from "solid-js";
 import { DrawError } from "../domain/validation";
 import { validateTournament } from "../services/validationService";
-import { selectBox, selection } from "./util/selection";
+import { drawById, selection, urlBox, urlDraw } from "./util/selection";
 
 export const Errors: Component = () => {
     return (<>
@@ -24,24 +24,20 @@ export const Errors: Component = () => {
             <For each={[...selection.drawErrors.entries()]} fallback={
                 <div>No draw error.</div>
             }>{([eventdrawId, errors]: [string, DrawError[]]) => {
-                const [eventId, drawId] = eventdrawId.split('-');
-                const event = selection.tournament.events.find(({id}) => id === eventId);
-                const draw = event?.draws.find(({id}) => id === drawId);
+                const [draw, event] = drawById(eventdrawId);
                 return (
                     <li class="p-2">
                         <h4 class="bg-slate-300 border-l-8"
                             style={{ "border-color": event?.color ?? 'transparent' }}
                         >
-                            <A href={event && draw ? `/event/${event.id}/${draw.id}` : ''}>
+                            <A href={urlDraw(draw, event)}>
                                 {event?.name} - {draw?.name}
                             </A>
                         </h4>
                         <ul>
                             <For each={errors}>{({message, detail, player, box}) => (
-                                <li title={`player: ${player?.name} position: ${box?.position}`}
-                                    onClick={() => event && draw && selectBox(event, draw, box)}
-                                >
-                                    <A href={event && draw ? `/event/${event.id}/${draw.id}/${box?.position ?? ''}` : ''}>
+                                <li>
+                                    <A href={urlBox(box, draw, event)}>
                                         {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
                                     </A>
                                 </li>

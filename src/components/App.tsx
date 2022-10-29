@@ -47,6 +47,18 @@ export const App: Component = () => {
 };
 
 export const Main: Component = () => {
+
+  // // TODO? on selection change, navigate to refresh the url
+  // const navigate = useNavigate();
+  // const location = useLocation();
+  // createEffect(() => {
+  //   const url = urlBox(selection.box, selection.draw, selection.event);
+  //   if (location.pathname !== url && `${location.pathname}/` !== url) {
+  //     console.log('effect: navigate from', location.pathname, 'to', url);
+  //     navigate(url, { replace: true });
+  //   }
+  // })
+  
   return (
     <div class="grow">
       <Routes>

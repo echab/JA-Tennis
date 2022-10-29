@@ -12,7 +12,7 @@ export const mockTournament: Tournament = {
     { id: "J1", name: "Bernard", firstname:"et Bianca", sexe: "H", rank: "NC", registration: ["E0"] },
     { id: "J2", name: "Claude", firstname:"Mickaël", sexe: "H", rank: "30/4", registration: [] },
     { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: ["E0"] },
-    { id: "J5", name: "Etienne", sexe: "H", rank: "30/2", registration: ["E0"] },
+    { id: "J5", name: "Eloïse", sexe: "F", rank: "30/2", registration: ["E0"] },
   ],
   events: [
     {
