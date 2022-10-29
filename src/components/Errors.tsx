@@ -2,7 +2,7 @@ import { A } from "@solidjs/router";
 import { Component, For } from "solid-js";
 import { DrawError } from "../domain/validation";
 import { validateTournament } from "../services/validationService";
-import { drawById, selection, urlBox, urlDraw } from "./util/selection";
+import { drawById, selection, urlBox, urlDraw, urlPlayer } from "./util/selection";
 
 export const Errors: Component = () => {
     return (<>
@@ -11,10 +11,10 @@ export const Errors: Component = () => {
             <button onClick={() => validateTournament(selection.tournament)}><i class="icon2-refresh"></i></button>
         </div>
         <ul>
-            <For each={Object.entries(selection.playerErrors)}>{([playerId, errors]) => (
+            <For each={[...selection.playerErrors.entries()]}>{([playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
-                        <A href={`/player/${player.id}`}>
+                        <A href={urlPlayer(player)}>
                             {message}: {player.name}{detail ? ` (${detail})` : ''}
                         </A>
                     </li>

@@ -16,18 +16,18 @@ export function addValidator(validator: IValidation): void {
 export function validateTournament(tournament: Tournament) {
   update((sel) => {
     // cleanup errors from deleted players
-    // [...sel.playerErrors.keys()].forEach((playerId) => {
-    //   if (tournament.players.find(({id}) => id === playerId)) {
-    //     sel.playerErrors.delete(playerId);
-    //   }
-    // });
+    [...sel.playerErrors.keys()].forEach((playerId) => {
+      if (tournament.players.find(({id}) => id === playerId)) {
+        sel.playerErrors.delete(playerId);
+      }
+    });
 
     tournament.players.forEach((player) => {
       const errors = validatePlayer(player);
       if (errors.length) {
-        sel.playerErrors[player.id] = errors;
+        sel.playerErrors.set(player.id, errors);
       } else {
-        delete sel.playerErrors[player.id];
+        sel.playerErrors.delete(player.id);
       }
     });
 
@@ -95,6 +95,6 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
 export function errorCount(
   { playerErrors, drawErrors }: Pick<SelectionItems, 'playerErrors' | 'drawErrors'>
 ): number {
-  return Object.values(playerErrors).reduce((sum, errors) => sum + errors.length, 0)
+  return [...playerErrors.values()].reduce((sum, errors) => sum + errors.length, 0)
     + [...drawErrors.values()].reduce((sum, errors) => sum + errors.length, 0);
 }

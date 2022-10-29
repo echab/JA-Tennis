@@ -14,7 +14,7 @@ export interface SelectionItems {
     boxQ?: Box;
     player?: Player;
 
-    playerErrors: { [playerId: string]: PlayerError[] };
+    playerErrors: Map<string,PlayerError[]>;
     drawErrors: Map<string, DrawError[]>;
 }
 
@@ -22,7 +22,7 @@ const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFA
 
 export const [selection, setSelection] = createStore<SelectionItems>({
     tournament: emptyTournament,
-    playerErrors:{},
+    playerErrors: new Map(),
     drawErrors: new Map(),
 });
 
@@ -35,15 +35,15 @@ export function selectTournament(tournament: Tournament) {
         sel.box = undefined;
         sel.boxQ = undefined;
 
-        sel.playerErrors = Object.fromEntries(
+        sel.playerErrors = new Map(
             tournament.players.map((player) => [player.id, validatePlayer(player)])
-            .filter(([_,err]) => err.length)
+            .filter(([,err]) => err.length) as Iterable<[string,PlayerError[]]>
         );
         // sel.drawErrors.clear();
         sel.drawErrors = new Map(
             tournament.events.flatMap((event) => event.draws
                 .map((draw) => [`${draw.id}-${event.id}`, validateDraw(tournament, event, draw)])
-                // .filter(([_,err]) => err.length)
+                .filter(([,err]) => err.length) as Array<[string,DrawError[]]>
             )
         );
     });
@@ -133,6 +133,10 @@ export function drawById(idDraw: string, parent?: string | Tournament) : [Draw |
     const event = idEvent2 ? tournament.events.find(({id}) => id === idEvent2) : selection.event;
     const draw = idDraw2 ? event?.draws.find(({id}) => id === idDraw2) : undefined;
     return [draw, event];
+}
+
+export function urlPlayer(player?: Player) {
+    return `/players/${player?.id ?? ''}`;
 }
 
 export function urlEvent(event?: TEvent) {

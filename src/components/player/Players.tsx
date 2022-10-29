@@ -1,6 +1,6 @@
 import { Component, For, Show } from 'solid-js';
 import { A } from '@solidjs/router';
-import { selection, selectPlayer } from '../util/selection';
+import { selection, selectPlayer, urlPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
 import { dragStart } from '../../services/util/dragdrop';
@@ -36,7 +36,7 @@ export const Players: Component<Props> = (props) => {
         <button type="button" onclick={[editPlayer,null]}  class="p-2 rounded-full">➕ Add player</button>
         {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
         <Show when={props.short}>
-          <A href="/players" class="p-2 rounded-full">&Gt;</A>
+          <A href={urlPlayer()} class="p-2 rounded-full">&Gt;</A>
         </Show>
       </div>
       <table class="table table-hover table-condensed w-auto">
