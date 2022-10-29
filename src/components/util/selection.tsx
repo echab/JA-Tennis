@@ -99,7 +99,7 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
 export function selectByError(error: PlayerError | DrawError) {
     update((sel) => {
         if (isDrawError(error)) {
-            const [draw, event] = drawById(error.draw.id)
+            const {draw, event} = drawById(error.draw.id)
             sel.event = event;
             sel.draw = draw;
             sel.box = error.box;
@@ -120,7 +120,7 @@ export function update(fn: (original: SelectionItems) => void) {
 }
 
 /** find a draw from id which could be a composed like `idDraw-idEvent` */
-export function drawById(idDraw: string, parent?: string | Tournament) : [Draw | undefined, TEvent | undefined] {
+export function drawById(idDraw: string, parent?: string | Tournament) : {draw?:Draw, event?:TEvent} {
     let [idDraw2, idEvent2 /* , idTournament */] = idDraw.split('-');
     let tournament = selection.tournament;
     if (parent) {
@@ -132,22 +132,22 @@ export function drawById(idDraw: string, parent?: string | Tournament) : [Draw |
     }
     const event = idEvent2 ? tournament.events.find(({id}) => id === idEvent2) : selection.event;
     const draw = idDraw2 ? event?.draws.find(({id}) => id === idDraw2) : undefined;
-    return [draw, event];
+    return {draw, event};
 }
 
 export function urlPlayer(player?: Player) {
-    return `/players/${player?.id ?? ''}`;
+    return `/players/${player?.id ?? ''}`.replace(/\/+$/, '');
 }
 
 export function urlEvent(event?: TEvent) {
-    return `/event/${event?.id ?? ''}`;
+    return `/event/${event?.id ?? ''}`.replace(/\/+$/, '');
 }
 
 export function urlDraw(draw?: Draw, event = selection.event) {
-    return `/event/${event?.id ?? ''}/${draw?.id ?? ''}`;
+    return `/event/${event?.id ?? ''}/${draw?.id ?? ''}`.replace(/\/+$/, '');
 }
 
 // TODO could return URL and preserve current search
 export function urlBox(box?: Box, draw = selection.draw, event = selection.event) {
-    return `/event/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? box.position : ''}`;
+    return `/event/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? box.position : ''}`.replace(/\/+$/, '');
 }

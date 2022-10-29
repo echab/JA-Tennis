@@ -28,7 +28,7 @@ i.glyphicon {
 .hover {
   transition: .5s;
 }
-:not(:hover) > .hover {
+:not(:hover):not(.selected) > .hover {
   opacity: .05;
   transition: .1s;
 }

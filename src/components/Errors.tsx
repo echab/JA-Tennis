@@ -14,7 +14,7 @@ export const Errors: Component = () => {
             <For each={[...selection.playerErrors.entries()]}>{([playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
-                        <A href={urlPlayer(player)}>
+                        <A href={urlPlayer(player)} replace={true}>
                             {message}: {player.name}{detail ? ` (${detail})` : ''}
                         </A>
                     </li>
@@ -24,20 +24,20 @@ export const Errors: Component = () => {
             <For each={[...selection.drawErrors.entries()]} fallback={
                 <div>No draw error.</div>
             }>{([eventdrawId, errors]: [string, DrawError[]]) => {
-                const [draw, event] = drawById(eventdrawId);
+                const {draw, event} = drawById(eventdrawId);
                 return (
                     <li class="p-2">
                         <h4 class="bg-slate-300 border-l-8"
                             style={{ "border-color": event?.color ?? 'transparent' }}
                         >
-                            <A href={urlDraw(draw, event)}>
+                            <A href={urlDraw(draw, event)} replace={true}>
                                 {event?.name} - {draw?.name}
                             </A>
                         </h4>
                         <ul>
                             <For each={errors}>{({message, detail, player, box}) => (
                                 <li>
-                                    <A href={urlBox(box, draw, event)}>
+                                    <A href={urlBox(box, draw, event)} replace={true}>
                                         {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
                                     </A>
                                 </li>

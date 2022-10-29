@@ -6,7 +6,7 @@ import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { showDialog } from '../Dialogs';
-import { useNavigate, useParams } from '@solidjs/router';
+import { A, useParams } from '@solidjs/router';
 import { Params } from '../App';
 import './Draw.css';
 
@@ -18,7 +18,6 @@ type Props = {
 
 export const DrawKnockout: Component<Props> = (props) => {
 
-  const navigate = useNavigate();
   const params = useParams<Params>();
 
   const lignes = () => {
@@ -59,11 +58,11 @@ export const DrawKnockout: Component<Props> = (props) => {
               even, odd, qs: isRight
             }}>
               {/* TODO <DrawBox box={b} players={props.players} /> */}
-              <div class="boite joueur"
+              <A class="boite joueur block"
                 classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
-                // onclick={(evt) => {selectBox(props.event, props.draw, box); evt.cancelBubble = true; }}
-                onclick={() => navigate(urlBox(box), {replace:true})}
                 // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
+                // onclick={() => navigate(urlBox(box), {replace:true})}
+                href={urlBox(box)} replace={true}
               >
                 <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
@@ -86,7 +85,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                     }><span class="score">{box!.score}</span></Show>
                   </>
                 }><span class="club">{player?.club}</span></Show>
-              </div>
+              </A>
             </td>
           }</For>
         </tr>

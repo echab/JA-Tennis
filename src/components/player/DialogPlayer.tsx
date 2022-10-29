@@ -81,7 +81,7 @@ export const DialogPlayer: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <b>{props.player ? `Edit player ${props.player?.name ?? ''}` : 'New player'}</b>
+        <b><i class='icon2-player'></i> {props.player ? `Edit player ${props.player?.name ?? ''}` : 'New player'}</b>
         <small>Id: {props.player?.id}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}

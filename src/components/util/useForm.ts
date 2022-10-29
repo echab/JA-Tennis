@@ -91,5 +91,5 @@ export function useForm<FormFields extends object = {}>(
     return radios.map((e) => e.checked ? e.value : undefined).filter(defined);
   };
 
-  return { form, updateField, updateSubField, clearField, getCheckboxes };
+  return { form, setForm, updateField, updateSubField, clearField, getCheckboxes };
 }

@@ -11,6 +11,7 @@ import { rank, category } from '../../services/types';
 import { columnMax, countInCol } from '../../utils/drawUtil';
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
+import { selectDraw } from '../util/selection';
 
 const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Normal, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
@@ -38,9 +39,18 @@ export const DialogDraw: Component<Props> = (props) => {
 
   const isFirstDraw = props.event.draws.length == 0 || draw?.id === props.event.draws[0].id;
 
-  const { form, updateField } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
+  const { form, setForm, updateField } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
 
   const ranks: RankString[] = rank.list();
+
+  if (!props.draw) {
+    // new draw
+    const prevRank = props.event.draws.at(-1)?.maxRank;
+    if (prevRank) {
+      const minRank = rank.next(prevRank);
+      setForm({ minRank: minRank, maxRank: minRank });
+    }
+  }
 
   const drawTypes: { value: number; label: string; }[] = [];
   drawTypes[DrawType.Normal] = { value: DrawType.Normal, label: "Normal" }; //TODO translate
@@ -110,6 +120,7 @@ export const DialogDraw: Component<Props> = (props) => {
   const deleteAndClose = () => {
     if (draw?.id) {
       commandManager.add(deleteDraw(draw.id));
+      selectDraw(props.event, undefined);
       refDlg.close();
       // props.onClose();
     }
@@ -118,7 +129,7 @@ export const DialogDraw: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <span>{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
+        <span><i class='icon2-draw'></i> {props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
         <small>Id: {props.draw?.id}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}

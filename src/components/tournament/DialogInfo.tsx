@@ -75,7 +75,7 @@ export const DialogInfo: Component<Props> = (props) => {
    return (
       <dialog ref={refDlg!} class="p-0">
          <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-            <b>Tournament information</b>
+            <b><i class='icon2-ball'></i> Tournament information</b>
             <button type="button" data-dismiss="modal" aria-hidden="true"
                onclick={() => refDlg.close()}
             >&times;</button>

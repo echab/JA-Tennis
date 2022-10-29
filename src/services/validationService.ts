@@ -33,7 +33,7 @@ export function validateTournament(tournament: Tournament) {
 
     // cleanup errors from deleted draws
     [...sel.drawErrors.keys()].forEach((key) => {
-      const [draw] = drawById(key, tournament);
+      const {draw} = drawById(key, tournament);
       if (!draw) {
         sel.drawErrors.delete(key);
       }

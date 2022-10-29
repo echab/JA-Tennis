@@ -109,7 +109,7 @@ export const DialogMatch: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <span>Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
+        <span><i class='icon2-match'></i> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
         <small>{props.match.position}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}
