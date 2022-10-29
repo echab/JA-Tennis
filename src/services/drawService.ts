@@ -1,4 +1,4 @@
-import { indexOf } from "./util/find";
+import { byId, indexOf } from "./util/find";
 import { Guid } from "./util/guid";
 import { extend, isArray, isObject } from "./util/object";
 import { shuffle } from "../utils/tool";
@@ -10,6 +10,7 @@ import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
+import { Player } from "../domain/player";
 
 const MAX_TETESERIE = 32,
   MAX_QUALIF = 32,
@@ -436,6 +437,17 @@ export function findDrawPlayerIds(draw: Draw): Set<string> {
       .filter(({ playerId }) => playerId)
       .map<string>(({ playerId }) => playerId!)
   );
+}
+
+export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player|number)[] {
+  const playerIds = findDrawPlayerIds(draw);
+  const result : (Player|number)[] = [...playerIds]
+    .map((playerId) => byId(players, playerId))
+    .filter((p) : p is Player => !!p);
+  const qualifsIn =     (draw.boxes as PlayerIn[])
+    .map(({qualifIn}) => qualifIn)
+    .filter((qualifIn) : qualifIn is number => typeof qualifIn === 'number');
+  return result.concat(...qualifsIn);
 }
 
 /**

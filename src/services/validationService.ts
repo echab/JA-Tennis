@@ -10,7 +10,7 @@ const validLibs: IValidation[] = [];
 // const [errorsPlayer, setErrorsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
 
 export function addValidator(validator: IValidation): void {
-  validLibs.push(validator);
+  validLibs?.push(validator); // TODO validLibs is undefined in tests?!?
 }
 
 export function validateTournament(tournament: Tournament) {

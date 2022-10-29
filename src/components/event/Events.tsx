@@ -68,8 +68,10 @@ export const Events: Component<Props> = (props) => {
                 <i class="icon2-draw"></i>
                 {draw.name} {draw.suite ? '(c)' : ''}
                 {/* TODO list the count of registered players in this draw, by rank */}
-                {/* <i class="glyphicon glyphicon-trash" click.trigger="drawEditor.remove(draw)">X</i> */}
+
                 <span class="float-right hover">&Gt;</span>
+
+                {/* <span class=" float-right hover" onClick={() => commandManager.wrap(() => deleteDraw(draw.id))}><i class="icon2-cross"></i></span> */}
               </A>
             </div>
           }</For>

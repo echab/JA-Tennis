@@ -48,7 +48,7 @@ export const DialogDraw: Component<Props> = (props) => {
     // new draw
     const prevRank = props.event.draws.at(-1)?.maxRank;
     const minRank = prevRank ? rank.next(prevRank) : rank.first();
-    setForm({ minRank, maxRank: minRank });
+    setForm({ minRank, maxRank: props.event.maxRank });
   }
 
   const drawTypes: { value: number; label: string; }[] = [];

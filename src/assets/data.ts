@@ -14,6 +14,9 @@ export const mockTournament: Tournament = {
     { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: ["E0"] },
     { id: "J5", name: "Eloïse", sexe: "F", rank: "30/2", registration: ["E0", "E1"] },
     { id: "J6", name: "Françoise", sexe: "F", rank: "NC", registration: ["E1"] },
+    { id: "J7", name: "Gérard", sexe: "H", rank: "30/3", registration: ["E0"] },
+    { id: "J8", name: "Hubert", sexe: "H", rank: "30/3", registration: ["E0"] },
+    { id: "J9", name: "Isidore", sexe: "H", rank: "30/3", registration: ["E0"] },
   ],
   events: [
     {
@@ -41,22 +44,22 @@ export const mockTournament: Tournament = {
             { position: 3, playerId: "J2", seeded:1, order:1 },
           ],
         },
-        {
-          id: "T01",
-          name: "4e série",
-          minRank: "40",
-          maxRank: "30/1",
-          type: DrawType.Final,
-          nbColumn: 3,
-          nbOut: 1,
-          boxes: [
-            { position: 6, qualifIn:1, order:2 },
-              { position: 2 , score:''},
-            { position: 5, playerId: "J4", order:3 },
-                { position: 0 , qualifOut: 1, score:''},
-              { position: 1, playerId: "J5", seeded:1, order:1 },
-          ],
-        },
+        // {
+        //   id: "T01",
+        //   name: "4e série",
+        //   minRank: "40",
+        //   maxRank: "30/1",
+        //   type: DrawType.Final,
+        //   nbColumn: 3,
+        //   nbOut: 1,
+        //   boxes: [
+        //     { position: 6, qualifIn:1, order:2 },
+        //       { position: 2 , score:''},
+        //     { position: 5, playerId: "J4", order:3 },
+        //         { position: 0 , qualifOut: 1, score:''},
+        //       { position: 1, playerId: "J5", seeded:1, order:1 },
+        //   ],
+        // },
       ],
     },
     {

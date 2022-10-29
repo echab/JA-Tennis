@@ -6,6 +6,9 @@ import { selection, drawById, selectBox, urlBox } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
 import { Params } from "../App";
 import { IconSexe } from "../misc/IconSexe";
+import { commandManager } from "../../services/util/commandManager";
+import { drawLib, GenerateType } from "../../services/draw/drawLib";
+import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
 
 export const PaneDraw: Component = () => {
 
@@ -48,11 +51,33 @@ export const PaneDraw: Component = () => {
 
     const randomize = () => {
         const evt = event(), drw = draw();
-        // if (evt && drw) {
-        //     const lib = drawLib(evt, drw);
-        //     const newDraw = lib.generateDraw(GenerateType.Create, registeredPlayersOrQ());
-        // }
+        if (evt && drw) {
+            const lib = drawLib(evt, drw);
+            const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
+            const newDraws = lib.generateDraw(GenerateType.Mix, drawPlayers);
+            return commandManager.wrap(() => updateDraws(evt, newDraws));
+        }
     };
+
+    const generateLeft = () => {
+        const evt = event(), drw = draw();
+        if (evt && drw) {
+            const lib = drawLib(evt, drw);
+            const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
+            const newDraws = lib.generateDraw(GenerateType.PlusEchelonne, drawPlayers);
+            return commandManager.wrap(() => updateDraws(evt, newDraws));
+        }
+    }
+
+    const generateDown = () => {
+        const evt = event(), drw = draw();
+        if (evt && drw) {
+            const lib = drawLib(evt, drw);
+            const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
+            const newDraws = lib.generateDraw(GenerateType.PlusEnLigne, drawPlayers);
+            return commandManager.wrap(() => updateDraws(evt, newDraws));
+        }
+    }
 
     return <div class="flex flex-col items-start">
         <div class="flex justify-between self-stretch items-center px-2">
@@ -87,27 +112,27 @@ export const PaneDraw: Component = () => {
                     ><i class="icon2-info"></i></button>
 
                     <button class="p-2 rounded-full" title="Lock/unlock draw updates"
-                    // onClick={() => commandManager.wrap()}
+                        // onClick={lockDraw}
                     ><i class="icon2-locker"></i></button>
 
                     <button class="p-2 rounded-full" title="Change the draw structure to be more progressive"
-                    // onClick={() => commandManager.wrap()}
+                        onClick={generateLeft}
                     ><i class="icon2-draw-left"></i></button>
 
                     <button class="p-2 rounded-full" title="Change the draw structure to be more direct"
-                    // onClick={() => commandManager.wrap()}
+                        onClick={generateDown}
                     ><i class="icon2-draw-bottom"></i></button>
 
                     <button class="p-2 rounded-full" title="Shuffle the players with same rank"
-                    // onClick={() => commandManager.wrap(randomize)}
+                        onClick={randomize}
                     ><i class="icon2-random"></i></button>
 
                     <button class="p-2 rounded-full" title="Place the seeded positions"
-                    // onClick={() => commandManager.wrap(randomize)}
+                        // onClick={placeSeeded}
                     ><i class="icon2-seeded"></i></button>
 
                     <button class="p-2 rounded-full" title="Place the qualified position, in or out of the draw group"
-                    // onClick={() => commandManager.wrap(randomize)}
+                        // onClick={placeQualifs}
                     ><i class="icon2-qualif-in"></i></button>
                 </div>
             </Show>

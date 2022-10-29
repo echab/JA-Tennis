@@ -1,7 +1,7 @@
 import { Draw, DrawType, Match, PlayerIn } from "../../../domain/draw";
-import { Player } from "../../../domain/player";
-import { TEvent } from "../../../domain/tournament";
-import { drawLib, GenerateType } from "../../../services/draw/drawLib";
+import type { Player } from "../../../domain/player";
+import type { TEvent } from "../../../domain/tournament";
+import { GenerateType } from "../../../services/draw/drawLib";
 import { Knockout } from "../../../services/draw/knockout";
 import { onlyDefined } from "../../../services/util/object";
 
@@ -36,7 +36,7 @@ describe("Knockout lib service", () => {
 
         const lib = new Knockout(event1, draw1);
 
-        it('should create new draw', () => {
+        it('should create new draw with players', () => {
             const draws = lib.generateDraw(GenerateType.Create, [PLAYER1, PLAYER2, PLAYER3]);
 
             expect(draws.length).toBe(1);
@@ -45,6 +45,19 @@ describe("Knockout lib service", () => {
                 { position: 2, playerId: "J2", order: 3, seeded: 1 },
                 { position: 1, score: "" },
                 { position: 3, playerId: "J1", order: 2, seeded: 2 },
+                { position: 4, playerId: "J0", order: 1 },
+            ]);
+        });
+
+        it('should create draw with Q and players', () => {
+            const draws = lib.generateDraw(GenerateType.Create, [1, PLAYER2, PLAYER3]);
+
+            expect(draws.length).toBe(1);
+            expect(draws[0].boxes /*.map(mainFields) */).toStrictEqual([
+                { position: 0, score: "", qualifOut: 1 },
+                { position: 2, playerId: "J2", order: 3, seeded: 1 },
+                { position: 1, score: "" },
+                { position: 3, qualifIn: 1, order: 2 },
                 { position: 4, playerId: "J0", order: 1 },
             ]);
         });
