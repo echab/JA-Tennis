@@ -18,8 +18,12 @@ export const Tournaments: Component = () => {
   };
 
   const selectItem = (index: number) => {
-    // TODO move to the top of the list
-    selectTournament(tournaments[index]);
+    // move the selected tournament on top of the list
+    setTournaments((ts) => {
+      const t = ts.splice(index, 1);
+      return [...t, ...ts];
+    });
+    selectTournament(tournaments[0]);
   }
 
   return <div class="p-2">
