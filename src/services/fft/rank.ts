@@ -3,11 +3,11 @@ import { Rank, RankString, RankGroupString } from "../../domain/types";
 export class RankFFT implements Rank {
 
     private _group: { [groupName: string]: string } = {
-        "4e série": "NC,40,30/5,30/4,30/3,30/2,30/1",
-        "3e série": "30,15/5,15/4,15/3,15/2,15/1",
-        "2e série": "15,5/6,4/6,3/6,2/6,1/6",
-        "1e série": "0,-1/6,-2/6,-3/6,-4/6,-5/6",
-        "promotion": "-15,-30"
+        "4e série": "NC,40,30/5,30/4,30/3,30/2,30/1", // 19 > 13
+        "3e série": "30,15/5,15/4,15/3,15/2,15/1",    // 12 > 7
+        "2e série": "15,5/6,4/6,3/6,2/6,1/6",         //  6 > 1
+        "1e série": "0,-1/6,-2/6,-3/6,-4/6,-5/6",     //  0 > -5
+        "promotion": "-15,-30"                        // -6 > -7
     };
 
     private _groups = <string[]>[];

@@ -51,6 +51,7 @@ export type Field = {
 };
 
 export type Fields = Record<string, Field>;
+// export type Fields<T> = Record<keyof T | `_${any}` | "version", Field>;
 
 export type FnTypeRead = (
     this: Serializer,

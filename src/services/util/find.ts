@@ -71,7 +71,8 @@ function _reindex<T>(array: T[], member: StringKey<T>): IIndex {
         const a = array[i], j = a[member];
         if (j !== undefined) {
             if ((idx as any)[j] !== undefined) {
-                throw new Error (`Duplicated index ${member}: ${j}`)
+                console.warn(`Duplicated index ${member}: ${j}`)
+                // throw new Error (`Duplicated index ${member}: ${j}`)
             }
             (idx as any)[j] = i;
         }

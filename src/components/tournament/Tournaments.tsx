@@ -6,6 +6,8 @@ import { showDialog } from "../Dialogs";
 import { selection, selectTournament } from "../util/selection";
 import { useTournaments } from "./TournamentsStore";
 
+const MAX_MRU = 10;
+
 export const Tournaments: Component = () => {
 
   const [tournaments, setTournaments] = useTournaments();
@@ -13,9 +15,15 @@ export const Tournaments: Component = () => {
   const newItem = () => {
     // TODO select new tournament only on dialog OK
     const t = newTournament();
-    setTournaments((ts) => [t, ...ts]);
+    setTournaments((ts) => [t, ...ts.slice(MAX_MRU)]);
     selectTournament(t);
     showDialog("info");
+  };
+
+  const loadFile = async () => {
+    const t = await openFile();
+    setTournaments((ts) => [t, ...ts.slice(MAX_MRU)]);
+    selectTournament(t);
   };
 
   const selectItem = (index: number) => {
@@ -37,7 +45,7 @@ export const Tournaments: Component = () => {
     <div>
       <button type="button" onClick={newItem} class="p-2 rounded-full">➕New tournament</button>
 
-      <button type="button" onClick={openFile} class="p-2 rounded-full">💾 Open file</button>
+      <button type="button" onClick={loadFile} class="p-2 rounded-full">💾 Open file</button>
     </div>
 
     {/* TODO New, Recent, Load, Save, etc... */}

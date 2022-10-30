@@ -1,9 +1,10 @@
-import { docFields, jatFileType } from "./jatSchema";
+import { Tournament } from "../../domain/tournament";
+import { convert, docFields, jatFileType } from "./jatSchema";
 import { createSerializer } from "./serializer";
 
 let fileName: string = '';
 
-export async function openFile() {
+export async function openFile(): Promise<Tournament> {
     // alert('hello');
     const w: any = window;
     const [fileHandle] = await w.showOpenFilePicker({
@@ -14,7 +15,7 @@ export async function openFile() {
     return readFile(fileHandle);
 }
 
-async function readFile(fileHandle: any) {
+async function readFile(fileHandle: any): Promise<Tournament> {
     console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
     const { size, lastModifiedDate, type } = file;
@@ -22,13 +23,15 @@ async function readFile(fileHandle: any) {
     // const content = await file.stream();
     // for await (const value of streamAsyncIterator(content)) {
     const buffer = await file.arrayBuffer();
-    const value = new Uint8Array(buffer); {
-        const reader = createSerializer(true, value, 0);
-        const doc = reader.deserialize(docFields, NaN, 'doc');
-        console.log(doc);
-    }
+    const value = new Uint8Array(buffer);
+
+    const reader = createSerializer(true, value, 0);
+    const doc = reader.deserialize(docFields, NaN, 'doc');
+    console.log(doc);
 
     fileName = fileHandle.name;
+
+    return convert(doc);
 }
 
 export async function saveFile() {
@@ -88,4 +91,4 @@ function streamAsyncIterator(stream: ReadableStream, flags?: { mode: "byob" }) {
             }
         }
     });
-*/    
+*/
