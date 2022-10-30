@@ -9,7 +9,6 @@ import { DAYS } from "../utils/date";
 import { RankString } from "../domain/types";
 import { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
-import { validateTournament } from "./validationService";
 
 /** This function load tournament data from an url. */
 export async function load(file_url?: Blob | string): Promise<Tournament> {
@@ -122,8 +121,6 @@ export function initTournament(tournament: Tournament): Tournament {
     );
   }
 
-  validateTournament(tournament);
-  
   return tournament;
 }
 

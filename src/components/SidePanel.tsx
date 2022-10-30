@@ -3,7 +3,7 @@ import { errorCount } from "../services/validationService";
 import { Errors } from "./Errors";
 import { Events } from "./event/Events";
 import { Players } from "./player/Players";
-import { Tournament } from "./tournament/Tournament";
+import { Tournaments } from "./tournament/Tournaments";
 import { Badge } from "./misc/Badge";
 import { selection } from "./util/selection";
 
@@ -75,7 +75,7 @@ export const SidePanel: Component<Props> = () => {
             <div class="flex-grow">
                 <Switch>
                     <Match when={pane() === 0}>
-                        <Tournament />
+                        <Tournaments />
                     </Match>
                     <Match when={pane() === 1}>
                         <Players

@@ -54,7 +54,7 @@ export const Players: Component<Props> = (props) => {
     <>
       <div class="flex justify-between items-center px-2">
         <h3>Players</h3>
-        <button type="button" onclick={[editPlayer,null]}  class="p-2 rounded-full">➕ Add player</button>
+        <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full">➕ Add player</button>
         {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
         <Show when={props.short}>
           <A href={urlPlayer()} replace={true} class="p-2 rounded-full">&Gt;</A>
@@ -85,7 +85,7 @@ export const Players: Component<Props> = (props) => {
         <tbody ondragstart={dragStart}>
           <For each={props.players} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
             <tr classList={{ info: player.id === selection.player?.id }}
-              onclick={() => selectPlayer(player)}
+              onclick={[selectPlayer,player]}
               draggable={true} data-type="player" data-id={player.id}
             >
               <td>
