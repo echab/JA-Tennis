@@ -1,4 +1,4 @@
-import { Component, createEffect, For, Show } from 'solid-js';
+import { Component, createEffect, createSignal, For, Show } from 'solid-js';
 import { A, useNavigate, useParams } from '@solidjs/router';
 import { selection, selectPlayer, urlPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
@@ -20,6 +20,8 @@ type Props = {
 export const Players: Component<Props> = (props) => {
   
   const params = useParams<Params>();
+
+  const [registred, setRegistred] = createSignal(false);
 
   // change selection on url change
   createEffect(() => {
@@ -54,10 +56,16 @@ export const Players: Component<Props> = (props) => {
     <>
       <div class="flex justify-between items-center px-2">
         <h3>Players</h3>
-        <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full">➕ Add player</button>
+
+        <label><input type="checkbox"
+                checked={registred()}
+                onChange={({target}) => setRegistred((target as HTMLInputElement).checked)}
+                /> registered</label>
+
+        <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
         {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
         <Show when={props.short}>
-          <A href={urlPlayer()} replace={true} class="p-2 rounded-full">&Gt;</A>
+          <A href={urlPlayer()} replace={true} class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
         </Show>
       </div>
       <table class="table table-hover table-condensed w-auto mx-2">
@@ -83,7 +91,7 @@ export const Players: Component<Props> = (props) => {
           </tr>
         </thead>
         <tbody ondragstart={dragStart}>
-          <For each={props.players} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
+          <For each={props.players.filter((p) => !registred() || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
             <tr classList={{ info: player.id === selection.player?.id }}
               onclick={[selectPlayer,player]}
               draggable={true} data-type="player" data-id={player.id}

@@ -148,7 +148,7 @@ const boxFields: Fields /* <PlayerIn & Match> */ = {
     _schema: { type: schema, valid: (s) => s === 'CBoite' },
     version: { type: byte, def: 4, valid: (v, p) => v <= 4 },
     playerId: {
-        type: i16, reviver: (id) => id === -1 ? undefined : id
+        type: i16, reviver: (id) => id === -1 ? undefined : String(id)
     },
     score: {
         type: scoreFields, reviver: (s, p) => {
@@ -202,7 +202,7 @@ const boxFields: Fields /* <PlayerIn & Match> */ = {
 const drawFields: Fields /* <Draw> */ = {
     _schema: { type: schema, valid: (s) => s === 'CTableau' },
     version: { type: byte, def: 10, valid: (v, p) => v <= 10 },
-    id: { version: 10, type: word, def: generateId },
+    id: { version: 10, type: word, def: generateId, reviver:(id) => String(id) },
     _name: { maxVersion: 2, type: bstr, reviver: (s, p) => { p.name = s; } },
     name: { version: 5, type: bstr },
     nbColumn: { type: byte, valid: (n) => MIN_COL <= n }, // MAX_COL depends on type
@@ -258,7 +258,7 @@ const drawFields: Fields /* <Draw> */ = {
 const eventFields: Fields /* <TEvent> */ = {
     _schema: { type: schema, valid: (s) => s === 'CEpreuve' },
     version: { type: byte, def: 10, valid: (v, p) => v <= 10 },
-    id: { version: 9, type: word, def: generateId },
+    id: { version: 9, type: word, def: generateId, reviver:(id) => String(id) },
     _name: { maxVersion: 2, type: bstr, reviver: (s, p) => { p.name = s; } },
     name: { version: 10, type: bstr },
     sexe: {
@@ -338,7 +338,7 @@ const infoFields: Fields /* <TournamentInfo> */ = {
 
 export const docFields: Fields /* <Tournament> */ = {
     version: { type: byte, def: 13, valid: (v, p) => v <= 13 },
-    id: { version: 13, type: word, def: generateId },
+    id: { version: 13, type: word, def: generateId, reviver:(id) => String(id) },
     types: {
         version: 9, type: {
             name: { version: 9, type: bstr, def: 'FFT', valid: (t) => t === 'FFT' },
@@ -381,7 +381,8 @@ export const docFields: Fields /* <Tournament> */ = {
     _: { type(_, p) {
         const doc = p as Tournament;
         //convert players registration
-        doc.players.forEach((p) => {
+        doc.players.forEach((p, i) => {
+            p.id = String(i);
             const dw = p.registration as unknown as number;
             p.registration = doc.events.map((event, i) => 
                 (dw & (1 << i)) ? event.id : undefined

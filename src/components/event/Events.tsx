@@ -34,18 +34,25 @@ export const Events: Component<Props> = (props) => {
         style={{ "border-color": event.color ?? 'transparent' }}
         ondrop={drop_handler} ondragover={dragOver} data-type='event' data-id={event.id}
       >
-        {/* <input type="checkbox" /> */}
-        <A class="[&[aria-selected=true]]:bg-blue-200 block"
+        <div class="flex justify-between items-center [&[aria-selected=true]]:bg-blue-200 bg-slate-200"
           aria-selected={selection.event === event}
-          // onclick={() => { selectEvent(event); }}
-          href={urlEvent(event)} replace={true}
         >
-          <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
-          <small>{event.id} </small>
-          <IconSexe sexe={event.sexe} />
-          <span>{event.name}</span>
-          {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
-        </A>
+          {/* <input type="checkbox" /> */}
+          <A href={urlEvent(event)} replace={true}>
+            <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
+            {/* <small>{event.id} </small> */}
+            <IconSexe sexe={event.sexe} />
+            <span>{event.name}</span>
+            {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
+          </A>
+
+          <button type="button" class="rounded-full p-[.125rem] px-1" title="Add a draw"
+            onclick={() => {
+              selectDraw(event, undefined);
+              showDialog("draw");
+            }}
+          >➕</button>
+        </div>
 
         <div>
           <For each={event.draws}>{(draw) =>
@@ -65,7 +72,7 @@ export const Events: Component<Props> = (props) => {
                     showDialog("draw");
                   }}
                 ></i>
-                <small>{draw.id} </small>
+                {/* <small>{draw.id} </small> */}
                 <i class="icon2-draw"></i>
                 {draw.name} {draw.suite ? '(c)' : ''}
                 {/* TODO list the count of registered players in this draw, by rank */}
@@ -77,13 +84,6 @@ export const Events: Component<Props> = (props) => {
             </div>
           }</For>
         </div>
-
-        <button type="button" class="rounded-full p-1"
-          onclick={() => {
-            selectDraw(event, undefined);
-            showDialog("draw");
-          }}
-        >➕ Add draw</button>
 
         {/* TODO list the count of registered players not in any draw, by rank */}
 

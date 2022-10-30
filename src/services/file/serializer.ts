@@ -238,7 +238,7 @@ export function arrayb(this: Serializer, field?: Field, doc?: FieldParent, name?
 }
 
 export function generateId() {
-    return (Math.random() * 0xffff) & 0xffff;
+    return String((Math.random() * 0xffff) & 0xffff);
 }
 
 export function customData() { }
