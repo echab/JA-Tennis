@@ -15,14 +15,14 @@ export const Tournaments: Component = () => {
   const newItem = () => {
     // TODO select new tournament only on dialog OK
     const t = newTournament();
-    setTournaments((ts) => [t, ...ts.slice(MAX_MRU)]);
+    setTournaments((ts) => [t, ...ts.slice(0,MAX_MRU)]);
     selectTournament(t);
     showDialog("info");
   };
 
   const loadFile = async () => {
     const t = await openFile();
-    setTournaments((ts) => [t, ...ts.slice(MAX_MRU)]);
+    setTournaments((ts) => [t, ...ts.slice(0,MAX_MRU)]);
     selectTournament(t);
   };
 

@@ -31,7 +31,7 @@ export const Errors: Component = () => {
                             style={{ "border-color": event?.color ?? 'transparent' }}
                         >
                             <A href={urlDraw(draw, event)} replace={true}>
-                                {event?.name} - {draw?.name}
+                                {event?.name} - {draw?.name || eventdrawId}
                             </A>
                         </h4>
                         <ul>

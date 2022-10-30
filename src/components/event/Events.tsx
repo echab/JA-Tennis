@@ -41,7 +41,7 @@ export const Events: Component<Props> = (props) => {
           href={urlEvent(event)} replace={true}
         >
           <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
-          {/* <small>{event.id} </small> */}
+          <small>{event.id} </small>
           <IconSexe sexe={event.sexe} />
           <span>{event.name}</span>
           {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
@@ -65,6 +65,7 @@ export const Events: Component<Props> = (props) => {
                     showDialog("draw");
                   }}
                 ></i>
+                <small>{draw.id} </small>
                 <i class="icon2-draw"></i>
                 {draw.name} {draw.suite ? '(c)' : ''}
                 {/* TODO list the count of registered players in this draw, by rank */}

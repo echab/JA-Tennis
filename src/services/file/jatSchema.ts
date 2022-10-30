@@ -1,4 +1,4 @@
-import { Box, Draw, Match, PlayerIn } from "../../domain/draw";
+import { Box, Draw, DrawType, Match, PlayerIn } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
 import { Rank, Score } from "../../domain/types";
@@ -237,7 +237,11 @@ const drawFields: Fields /* <Draw> */ = {
     _: {
         type(_, draw) {
             if (draw && !draw.name) {
-                draw!.name = draw.rankMin === draw.rankMax ? draw.rankMin : `${draw.rankMin} - ${draw.rankMax}`;
+                if (draw.type === DrawType.Final) {
+                    draw.name = "Final draw";
+                } else {
+                    draw.name = draw.rankMin === draw.rankMax ? draw.rankMin : `${draw.rankMin} - ${draw.rankMax}`;
+                }
             }
             // TODO init joueur QS
             // if (draw.type & TABLEAU_POULE) {
@@ -286,8 +290,10 @@ const eventFields: Fields /* <TEvent> */ = {
             // @ts-ignore
             delete this._curSexe; // clean-up
 
-            // cleanup draws.boxes
             if (event) {
+                event.sexe = ['H','F','H','F','M'][event.sexe]; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
+
+                // cleanup draws.boxes
                 event.draws.forEach((draw: Draw) => {
                     const lib = drawLib(event as TEvent, draw);
                     draw.boxes.forEach((box) => {
