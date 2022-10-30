@@ -1,5 +1,6 @@
 import { A } from "@solidjs/router";
-import { Component, For } from "solid-js";
+import { Component, For, Show } from "solid-js";
+import { openFile } from "../../services/file/file";
 import { newTournament } from "../../services/tournamentService";
 import { showDialog } from "../Dialogs";
 import { selection, selectTournament } from "../util/selection";
@@ -35,6 +36,8 @@ export const Tournaments: Component = () => {
 
     <div>
       <button type="button" onClick={newItem} class="p-2 rounded-full">➕New tournament</button>
+
+      <button type="button" onClick={openFile} class="p-2 rounded-full">💾 Open file</button>
     </div>
 
     {/* TODO New, Recent, Load, Save, etc... */}
@@ -42,10 +45,11 @@ export const Tournaments: Component = () => {
     <h3>Last tournaments:</h3>
     <ul>
       <For each={tournaments}>{(tournament, i) => (
-        <li>
-          <A href="" onClick={[selectItem, i()]}>
+        <Show when={i() > 0}>
+          <li><A href="" onClick={[selectItem, i()]}>
             {tournament.info.name}
           </A></li>
+        </Show>
       )}</For>
     </ul>
   </div>
