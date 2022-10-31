@@ -62,7 +62,7 @@ export const DrawKnockout: Component<Props> = (props) => {
             }}>
               <Show when={props.draw.lock === Mode.Build || even || odd}>
                 {/* TODO <DrawBox box={b} players={props.players} /> */}
-                <A class="boite joueur block"
+                <A class="boite joueur block print:border-none print:bg-transparent"
                   classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
                   // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                   // onclick={() => navigate(urlBox(box), {replace:true})}

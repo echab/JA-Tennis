@@ -41,7 +41,7 @@ export const Main: Component = () => {
   return <>
     <Dialogs />
     <div class={styles.App}>
-      <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800">
+      <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800 print:hidden">
         <span><i class="icon2-ball" /> JA-Tennis</span>
         <div>
           <button type="button" class="border-2 border-zinc-500" disabled={!commandManager.canUndo} onclick={() => commandManager.undo()} title={`Undo ${commandManager.undoNames(1)?.[0] ?? ''}`}>↶ Undo</button>

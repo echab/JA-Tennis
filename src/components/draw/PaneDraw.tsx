@@ -115,7 +115,7 @@ export const PaneDraw: Component = () => {
                 </Show>
             </h4>
             <Show when={event() && draw()}>
-                <div class="bg-white bg-opacity-80">
+                <div class="bg-white bg-opacity-80 print:hidden">
                     <button class="p-2 rounded-full" title="Edit draw information"
                         onClick={() => showDialog("draw")}
                     ><i class="icon2-info" /></button>

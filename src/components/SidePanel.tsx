@@ -19,7 +19,7 @@ export const SidePanel: Component<Props> = () => {
         setPane(i === pane() ? 0 : i);
     };
 
-    return <aside class="flex flex-row bg-slate-100 border-r-[1px] border-slate-300"
+    return <aside class="flex flex-row bg-slate-100 border-r-[1px] border-slate-300 print:hidden"
         classList={{
             'w-4/12': !!pane(),
         }}
