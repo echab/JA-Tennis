@@ -1,13 +1,9 @@
-﻿import { Draw, Box, DrawType, Match, PlayerIn } from '../../domain/draw';
+﻿import { Draw, Box, DrawType, Match, PlayerIn, QEMPTY } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
 import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
-
-const MAX_TETESERIE = 32,
-    MAX_QUALIF = 32,
-    QEMPTY = - 1;
 
 export abstract class DrawLibBase implements IDrawLib {
 
@@ -64,7 +60,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
     //setType(BYTE iType) {
     //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
-    //    if ((m_iType & TABLEAU_POULE ? 1 : 0) != (iType & TABLEAU_POULE ? 1 : 0)) {
+    //    if ((m_iType & TABLEAU_POULE ? 1 : 0) !== (iType & TABLEAU_POULE ? 1 : 0)) {
 
     //        //Efface les boites si poule et plus poule ou l'inverse
     //        for (; m_nBoite > 0; m_nBoite--) {
@@ -154,7 +150,7 @@ export abstract class DrawLibBase implements IDrawLib {
         //    if (this.isGauchePoule( box)) {
         //        //matches de la ligne
         //        for( i=this.ADVERSAIRE1( box) - GetnColonne(); i>= iBoiteMin(); i -= GetnColonne()) {
-        //            if( i != box && isMatchJoue( i)) {
+        //            if( i !== box && isMatchJoue( i)) {
         //                lockBox( box);
         //                lockBox( this.ADVERSAIRE1( i));
         //                lockBox( this.ADVERSAIRE2( i));
@@ -162,7 +158,7 @@ export abstract class DrawLibBase implements IDrawLib {
         //        }
         //        //matches de la colonne
         //        for( i=iHautCol( iRowPoule( box, GetnColonne())); i>= iBasColQ( iRowPoule( box, GetnColonne())); i --) {
-        //            if( i != box && isMatchJoue( i)) {
+        //            if( i !== box && isMatchJoue( i)) {
         //                lockBox( box);
         //                lockBox( this.ADVERSAIRE1( i));
         //                lockBox( this.ADVERSAIRE2( i));
@@ -190,7 +186,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
         if (inNumber) {	//Ajoute un qualifié entrant
             const prev = previousGroup(this.event, this.draw);
-            if (!playerId && prev && inNumber != QEMPTY) {
+            if (!playerId && prev && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
                 const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
                 if (boxOut) {	//V0997
@@ -211,7 +207,7 @@ export abstract class DrawLibBase implements IDrawLib {
             }
 
             //Qualifié entrant pas déjà pris
-            if (inNumber == QEMPTY ||
+            if (inNumber === QEMPTY ||
                 !this.findPlayerIn(inNumber)) {
 
                 box.qualifIn = inNumber;
@@ -238,7 +234,7 @@ export abstract class DrawLibBase implements IDrawLib {
         //	//Check changement de vainqueur par vainqueur défaillant
         //	if( !this.isTypePoule())
         //	if( result.score.isVainqDef()) {
-        //		if( result.m_iJoueur == boxes[ this.ADVERSAIRE1(box)]->m_iJoueur)
+        //		if( result.m_iJoueur === boxes[ this.ADVERSAIRE1(box)]->m_iJoueur)
         //			result.m_iJoueur = boxes[ this.ADVERSAIRE2(box)]->m_iJoueur;
         //		else
         //			result.m_iJoueur = boxes[ this.ADVERSAIRE1(box)]->m_iJoueur;
@@ -339,7 +335,7 @@ export abstract class DrawLibBase implements IDrawLib {
                     i>= iBoiteMin() && !bMatch; 
                     i -= GetnColonne()) 
                 {
-                    if( i != box && boxes[ i]->isLock()) {
+                    if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
                         break;
                     }
@@ -349,7 +345,7 @@ export abstract class DrawLibBase implements IDrawLib {
                     i>= iBasColQ( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
                     i --) 
                 {
-                    if( i != box && boxes[ i]->isLock()) {
+                    if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
                         break;
                     }
@@ -363,7 +359,7 @@ export abstract class DrawLibBase implements IDrawLib {
                     i>= iBoiteMin() && !bMatch; 
                     i -= GetnColonne())
                 {
-                    if( i != box && boxes[ i]->isLock()) {
+                    if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
                         break;
                     }
@@ -373,7 +369,7 @@ export abstract class DrawLibBase implements IDrawLib {
                     i>= iBasColQ( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
                     i --) 
                 {
-                    if( i != box && boxes[ i]->isLock()) {
+                    if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
                         break;
                     }

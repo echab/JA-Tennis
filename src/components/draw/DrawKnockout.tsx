@@ -36,7 +36,7 @@ export const DrawKnockout: Component<Props> = (props) => {
       const ic = cMax - c;
       const pos = positionTopCol(c) - (l >> ic);
       const box = boxes.get(pos);
-      const visible = !!box && (!!box.order || isMatch(box))
+      const visible = !!box && (!!box.order || box.qualifIn !== undefined || isMatch(box))
       result.push({
         box,
         player: byId(props.players, box?.playerId),
@@ -67,7 +67,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                 // onclick={() => navigate(urlBox(box), {replace:true})}
                 href={urlBox(box)} replace={true}
               >
-                <Show when={box?.qualifIn}><span class="qe">Q{box!.qualifIn}</span></Show>
+                <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
 
                 <Show when={box?.order}><small class="pr-1">{box!.order}</small></Show>

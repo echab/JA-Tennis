@@ -17,6 +17,6 @@ export class LicenceFFT implements Licence {
         const v = parseInt(a[1]);
         const k = LicenceFFT.keys.charAt(v % 23);
 
-        return k == a[2];
+        return k === a[2];
     }
 }

@@ -4,7 +4,7 @@ import { by, byId } from '../util/find';
 import { isObject } from '../util/object'
 import { shuffle, filledArray } from '../../utils/tool';
 import { rank } from '../types';
-import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
+import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
 import { findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup, previousGroup } from '../drawService';
@@ -13,7 +13,6 @@ import { sortPlayers } from '../tournamentService';
 const MIN_COL = 0,
     MAX_COL = 9,
     MAX_QUALIF = 32,
-    QEMPTY = - 1,
     WITH_TDS_HAUTBAS = true;
 
 /**
@@ -69,7 +68,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //Shift the boxes
         if (oldDraw && this.draw.nbOut !== oldDraw.nbOut) {
             const n = k.columnMax(this.draw.nbColumn, this.draw.nbOut) - k.columnMax(oldDraw.nbColumn, oldDraw.nbOut);
-            if (n != 0) {
+            if (n !== 0) {
                 const top = k.positionTopCol(n);
                 for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
                     const box = this.draw.boxes[i];
@@ -371,7 +370,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
         //Nombre de Tête de série
         let nTeteSerie = draw.nbOut;
-        if (nTeteSerie == 1) {
+        if (nTeteSerie === 1) {
             nTeteSerie = k.countInCol((colMax - colMin) >> 1);
         }
 
@@ -388,7 +387,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             if (b === -1) {
                 continue;
             }
-            if (k.column(b) != c) {
+            if (k.column(b) !== c) {
                 c = k.column(b);
 
                 m = m_nMatchCol[c] || 0;
@@ -744,7 +743,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 d: number,
                 c: number;
 
-            if (nQualifie == 1 << k.column(nQualifie - 1)) {	//Puissance de deux ?
+            if (nQualifie === 1 << k.column(nQualifie - 1)) {	//Puissance de deux ?
                 d = i;
             } else {
                 d = this.iDecaleGaucheQ(i, nQualifie);
@@ -810,7 +809,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (k.column(i) === k.columnMin(nQualifie)) {
             //Colonne de droite, numéroter 1 à n en partant du bas (OK!)
             if (nQualifie === 1 << k.column(nQualifie - 1)) 	//Puissance de deux ?
-                return i == 0 ? 1 : this.iTeteSerieQhb(i, 1);	// TODO à corriger
+                return i === 0 ? 1 : this.iTeteSerieQhb(i, 1);	// TODO à corriger
             else
                 return 1 + this.iPartieQhb(i, nQualifie);
         } else {

@@ -2,7 +2,7 @@
 import { findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 import { indexOf, byId } from '../util/find';
 import { category, rank, score } from '../types';
-import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
+import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
 import { Player } from '../../domain/player';
 import { RankString } from '../../domain/types';
 import { TEvent, Tournament } from '../../domain/tournament';
@@ -13,7 +13,6 @@ import { DrawProblem } from '../../domain/validation';
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
-    QEMPTY = - 1,
     MAX_MATCHJOUR = 16;
 
 function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
@@ -30,10 +29,10 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
         if (draw.type !== firstDraw.type) {
             result.push({ message: 'ERR_TAB_SUITE_TYPE', draw });
         }
-        if (draw.minRank != firstDraw.minRank) {
+        if (draw.minRank !== firstDraw.minRank) {
             result.push({ message: 'ERR_TAB_SUITE_MIN', draw });
         }
-        if (draw.maxRank != firstDraw.maxRank) {
+        if (draw.maxRank !== firstDraw.maxRank) {
             result.push({ message: 'ERR_TAB_SUITE_MAX', draw });
         }
     }
@@ -261,8 +260,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 if (!opponent.box1.playerId || !opponent.box2.playerId) {
                     result.push({ message: 'ERR_MATCH_JOUEUR_NO', draw, box: match });
 
-                } else if (opponent.box1.playerId != match.playerId
-                    && opponent.box2.playerId != match.playerId) {
+                } else if (opponent.box1.playerId !== match.playerId
+                    && opponent.box2.playerId !== match.playerId) {
                     result.push({ message: 'ERR_VAINQUEUR_MIS', draw, box: match, player });
                 }
             }
@@ -342,8 +341,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                             for (let m = dayMatches.length - 1; m >= 0; m--) {
                                 const match2 = dayMatches[m];
 
-                                if (match2.position != match.position
-                                    && match2.place == match.place
+                                if (match2.position !== match.position
+                                    && match2.place === match.place
                                     && match2.date
                                     && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength * MINUTES) {
                                     result.push({ message: 'ERR_PLN_OVERLAP', draw, box: match, player, detail: match.date.toDateString() });
@@ -404,20 +403,20 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
         if (boxIn) {
             const e = boxIn.qualifIn;
-            if (e && e != QEMPTY) {
+            if (e && e !== QEMPTY) {
                 nqe++;
 
                 ASSERT(!isTypePoule || (b >= k.positionBottomCol(draw.nbColumn, draw.nbOut)));	//Qe que dans colonne de gauche
 
                 const iTableau = indexOf(event.draws, 'id', draw.id);
-                if (iTableau == 0) {
+                if (iTableau === 0) {
                     result.push({ message: 'ERR_TAB_ENTRANT_TAB1', draw, box: boxIn, player, detail: `Q${e}` });
                 }
-                //ASSERT( iTableau != 0);
+                //ASSERT( iTableau !== 0);
 
                 //DONE 00/03/07: CTableau, qualifié entrant en double
                 let j: Box | undefined;
-                if (!draw.suite && (j = lib.findPlayerIn(e)) && (j.position != b)) {
+                if (!draw.suite && (j = lib.findPlayerIn(e)) && (j.position !== b)) {
                     result.push({ message: 'ERR_TAB_ENTRANT_DUP', draw, box: boxIn, player });
                 }
 
@@ -427,7 +426,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     const [d, m] = groupFindPlayerOut(event, group, e);
                     if (!m) {
                         result.push({ message: 'ERR_TAB_ENTRANT_PREC_NO', draw, box: boxIn, player });
-                    } else if (m.playerId != boxIn.playerId) {
+                    } else if (m.playerId !== boxIn.playerId) {
                         result.push({ message: 'ERR_TAB_ENTRANT_PREC_MIS', draw, box: boxIn, player });
                     }
                 }
@@ -439,11 +438,11 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             if (e) {
                 nqs++;
 
-                //ASSERT(!isTypePoule || (b == iDiagonale(b)));	//Qs que dans diagonale des poules
+                //ASSERT(!isTypePoule || (b === iDiagonale(b)));	//Qs que dans diagonale des poules
 
                 //DONE 00/03/07: CTableau, qualifié sortant en double
                 let j = lib.findPlayerOut(e);
-                if (j && (j.position != b)) {
+                if (j && (j.position !== b)) {
                     result.push({ message: 'ERR_TAB_SORTANT_DUP', draw, box: match, player });
                 }
 
@@ -452,8 +451,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 }
                 /*			
                 pSuite = getSuivant();
-                if( pSuite && (j = pSuite.findPlayerIn( e, &pSuite)) != -1) {
-                    if( boxes[ i].playerId != pSuite.boxes[ j].playerId) {
+                if( pSuite && (j = pSuite.findPlayerIn( e, &pSuite)) !== -1) {
+                    if( boxes[ i].playerId !== pSuite.boxes[ j].playerId) {
                         result.push({message:'ERR_TAB_ENTRANT_PREC_MIS', tournament.events[ iEpreuve].FindTableau( pSuite}), j);
                     }
                 }
@@ -479,7 +478,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
                 for (let i = 0; i < draw.boxes.length; i++) {
                     const boxIn2 = draw.boxes[i] as PlayerIn;
-                    if (boxIn2.seeded == e && boxIn2.position !== boxIn.position) {
+                    if (boxIn2.seeded === e && boxIn2.position !== boxIn.position) {
                         result.push({ message: 'ERR_TAB_TETESERIE_DUP', draw: d, box: boxIn, detail: 'Seeded ' + e });
                     }
                 }
@@ -513,7 +512,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             result.push({ message: 'ERR_TAB_SUITE_FINAL', draw });
         }
 
-        if (draw.nbOut != 1) {
+        if (draw.nbOut !== 1) {
             result.push({ message: 'ERR_TAB_FINAL_NQUAL', draw });
         }
     }
@@ -539,7 +538,7 @@ function CompString(a?: string, b?: string): number {
     }
     //upper case comparison
     const u = a.toUpperCase(), v = b.toUpperCase();
-    return u == v ? 0 : u < v ? -1 : 1;
+    return u === v ? 0 : u < v ? -1 : 1;
 }
 
 enum UnitDate {

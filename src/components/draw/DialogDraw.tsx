@@ -38,7 +38,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
   const draw: OptionalId<Draw> | undefined = props.draw && { ...props.draw }; // clone, without reactivity
 
-  const isFirstDraw = props.event.draws.length == 0 || draw?.id === props.event.draws[0].id;
+  const isFirstDraw = !props.event.draws.length || draw?.id === props.event.draws[0].id;
 
   const { form, setForm, updateField } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
 

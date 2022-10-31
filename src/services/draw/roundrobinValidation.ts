@@ -49,7 +49,7 @@ function validatePoule(draw: Draw): DrawProblem[] {
     //    j = ADVERSAIRE1(i);
 
     //    //Poule complète, avec assez de joueurs
-    //    if (boxes[j].playerId == -1
+    //    if (boxes[j].playerId === -1
     //        && !boxes[j].isQualifieEntrant()) {
 
     //        result.push({message:'ERR_POU_JOUEUR_NO', draw, box:boxes[j]});
@@ -91,7 +91,7 @@ function validateMatches(draw: Draw): DrawProblem[] {
             //    if (!box1.playerId || !box2.playerId) {
             //        result.push({message:'ERR_MATCH_JOUEUR_NO', draw, box});
             //    } else {
-            //        if (box.playerId != box1.playerId && box.playerId != box2.playerId) {
+            //        if (box.playerId !== box1.playerId && box.playerId !== box2.playerId) {
             //            result.push({message:'ERR_VAINQUEUR_MIS', draw, box});
             //        }
             //    }

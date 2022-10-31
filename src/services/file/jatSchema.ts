@@ -1,4 +1,4 @@
-import { Box, Draw, DrawType, Match } from "../../domain/draw";
+import { Box, Draw, DrawType, Match, QEMPTY } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { TEvent, Tournament } from "../../domain/tournament";
 import { drawLib } from "../draw/drawLib";
@@ -175,9 +175,9 @@ const boxFields: Fields /* <PlayerIn & Match> */ = {
             const qualif = (f >> 1) & 0b11; //0=no, 1=Entrant,	2=Sortant,	3=T�teS�rie
             const num = (f >> 3) & 0b11111;
             switch (qualif) {
-                case 1: p.qualifIn = num; break;
-                case 2: p.qualifOut = num; break;
-                case 3: p.seeded = num; break;
+                case 1: p.qualifIn = num || QEMPTY; break;
+                case 2: p.qualifOut = num || QEMPTY; break;
+                case 3: p.seeded = num || QEMPTY; break;
             }
             if (((f >> 8) & 0b1)) { p.receive = true; }
 

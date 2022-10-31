@@ -15,7 +15,7 @@ function validatePlayer(player: Player): PlayerProblem[] {
     //     result.push({message:'Debug error player', player, detail: 'some details'})
     // }
 
-    //if (player.sexe == 'F'
+    //if (player.sexe === 'F'
     //    && player.rank
     //    && !player.rank.Division()
     //    //&& ((CClassement( N50) <= player.rank) && (player.rank < CClassement( N35)))
@@ -70,7 +70,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             //for (let j = iHautCol(iColPoule(i, m_nColonne)); j > i; j--) {
 
             //    if (isMatch(j) && !boxes[j].m_Date.isVide()
-            //        && boxes[i].m_Date == boxes[j].m_Date) {
+            //        && boxes[i].m_Date === boxes[j].m_Date) {
             //        result.push({message:'ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE2(i})].m_iJoueur, iEpreuve, iTableau, i);
             //        bRes = false;
             //        break;
@@ -81,7 +81,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             //    for (let j = ADVERSAIRE1(i) - GetnColonne(); j > i; j -= GetnColonne()) {
 
             //        if (isMatch(j) && !boxes[j].m_Date.isVide()
-            //            && boxes[i].m_Date == boxes[j].m_Date) {
+            //            && boxes[i].m_Date === boxes[j].m_Date) {
             //            result.push({message:'ERR_POULE_DATE_MATCH', boxes[ADVERSAIRE1(i})].m_iJoueur, iEpreuve, iTableau, i);
             //            bRes = false;
             //            break;
@@ -146,14 +146,14 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     //            memset( &sel, -1, sizeof(ST_SELECTION));
     //            sel.size = PosAfter(sel, nMessage);	//sizeof( ST_SELECTION);
 
-    //            for (e = (iEpreuve != -1 ? iEpreuve : 0); e < 32; e++) {
+    //            for (e = (iEpreuve !== -1 ? iEpreuve : 0); e < 32; e++) {
     //                epreuve.size = sizeof(ST_EPREUVE);
     //                if (!glpfn.GetEpreuve(pDoc, e, &epreuve))
     //                    break;
 
     //                sel.iEpreuve = e;
 
-    //                if (iEpreuve != -1 && iTableau == -1) {
+    //                if (iEpreuve !== -1 && iTableau === -1) {
 
     //			//Check seulement l'épreuve
 
@@ -166,7 +166,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     //                    //Check les tableaux
 
-    //                    for (t = (iTableau != -1 && iEpreuve != -1 ? iTableau : 0); t < 64; t++) {
+    //                    for (t = (iTableau !== -1 && iEpreuve !== -1 ? iTableau : 0); t < 64; t++) {
     //                        tableau.size = sizeof(ST_TABLEAU);
     //                        if (!glpfn.GetTableau(pDoc, e, t, &tableau))
     //                            break;
@@ -178,7 +178,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     ////				glpfn.AddMessage( pDoc, gszBuf, &sel);
     //	#endif //_DEBUG
 
-    //				if (tableau.Type == 1) {	//Tableau Final(bonus)
+    //				if (tableau.Type === 1) {	//Tableau Final(bonus)
 
     //                            if (epreuve.Consolante) {
     //                                LOADSTRING(ERR_TAB_FINAL_CONSOLATION, gszBuf, sizeof(gszBuf));
@@ -305,7 +305,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     //                                }
 
-    //                                if (boite.idJoueur != -1) {	//un joueur
+    //                                if (boite.idJoueur !== -1) {	//un joueur
     //                                    if (!glpfn.GetJoueur(pDoc, boite.idJoueur, &joueur))
     //                                        break;
 
@@ -364,11 +364,11 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     //                        }
 
 
-    //                        if (iTableau != -1)
+    //                        if (iTableau !== -1)
     //                            break;
     //                    }
 
-    //                    if (iEpreuve != -1)
+    //                    if (iEpreuve !== -1)
     //                        break;
     //                }
     //            }

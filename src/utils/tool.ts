@@ -21,7 +21,7 @@ export function copy(source: any, destination?: any) {
             }
         } else {
             for (let key in source) {
-                if (source.hasOwnProperty(key) && "_$".indexOf(key.charAt(0)) == -1) {  //ignore prefixes _ and $
+                if (source.hasOwnProperty(key) && "_$".indexOf(key.charAt(0)) === -1) {  //ignore prefixes _ and $
                     destination[key] = copy(source[key]);
                 }
             }
@@ -32,7 +32,7 @@ export function copy(source: any, destination?: any) {
 
 export function shuffle<T>(array: T[], from = 0, toExlusive = array.length): T[] {
     const n = toExlusive - from;
-    if (n == 2) {
+    if (n === 2) {
         //if only two elements, swap them
         [array[0],array[1]] = [array[1],array[0]];
         // const tmp = array[0];

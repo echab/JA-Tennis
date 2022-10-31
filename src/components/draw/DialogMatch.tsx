@@ -120,7 +120,7 @@ export const DialogMatch: Component<Props> = (props) => {
           <div class="mb-1">
             <span class="inline-block w-3/12 text-right pr-3">Winner:</span>
             <label><input type="radio" name="winner" class="p-1 mr-1" autofocus
-              checked={form.playerId == player1?.id} value={player1?.id} onChange={updateField("playerId")}
+              checked={form.playerId === player1?.id} value={player1?.id} onChange={updateField("playerId")}
             />
               {player1?.name} {player1?.rank}</label>
             <br/>
@@ -130,7 +130,7 @@ export const DialogMatch: Component<Props> = (props) => {
               />None</label> */}
             </span>
             <label><input type="radio" name="winner" class="p-1 mr-1"
-              checked={form.playerId == player2?.id} value={player2?.id} onChange={updateField("playerId")} 
+              checked={form.playerId === player2?.id} value={player2?.id} onChange={updateField("playerId")} 
                />
             {player2?.name} {player2?.rank}</label>
           </div>

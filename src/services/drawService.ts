@@ -4,7 +4,7 @@ import { extend, isArray, isObject } from "./util/object";
 import { shuffle } from "../utils/tool";
 import { rank } from "./types";
 
-import { Box, Draw, DrawType, Match, Mode, PlayerIn } from "../domain/draw";
+import { Box, Draw, DrawType, Match, Mode, PlayerIn, QEMPTY } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
@@ -13,8 +13,7 @@ import { drawLib } from "./draw/drawLib";
 import { Player } from "../domain/player";
 
 const MAX_TETESERIE = 32,
-  MAX_QUALIF = 32,
-  QEMPTY = -1;
+  MAX_QUALIF = 32;
 
 // modeBuild = Mode.Build;
 // modePlan = Mode.Plan;
@@ -281,7 +280,7 @@ export function nextGroup(event: TEvent, draw: Draw): [number, number] | undefin
 
 //setType(BYTE iType) {
 //    //ASSERT(TABLEAU_NORMAL <= iType && iType <= TABLEAU_POULE_AR);
-//    if ((m_iType & TABLEAU_POULE ? 1 : 0) != (iType & TABLEAU_POULE ? 1 : 0)) {
+//    if ((m_iType & TABLEAU_POULE ? 1 : 0) !== (iType & TABLEAU_POULE ? 1 : 0)) {
 
 //        //Efface les boites si poule et plus poule ou l'inverse
 //        for (; m_nBoite > 0; m_nBoite--) {
@@ -321,13 +320,13 @@ export function findSeeded(
 export function groupFindQ(event: TEvent, draw: Draw, box: Box): Box | undefined {
   const qualifOut = (box as Match).qualifOut;
   const qualifIn = (box as PlayerIn).qualifIn;
-  if (qualifOut !== undefined) {
+  if (qualifOut !== undefined && qualifOut !== QEMPTY) {
     const nextGrp = nextGroup(event, draw);
     if (nextGrp) {
       const [, nextPlayerIn] = groupFindPlayerIn(event, nextGrp, qualifOut);
       return nextPlayerIn;
     }
-  } else if (qualifIn !== undefined) {
+  } else if (qualifIn !== undefined && qualifIn !== QEMPTY) {
     const prevGrp = previousGroup(event, draw);
     if (prevGrp) {
       const [, prevPlayerOut] = groupFindPlayerOut(event, prevGrp, qualifIn);

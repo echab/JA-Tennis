@@ -74,6 +74,8 @@ export interface PlayerIn extends Box {
   seeded?: number;
 }
 
+export const QEMPTY = 0;
+
 export interface Box {
   // id: string;
   position: number;

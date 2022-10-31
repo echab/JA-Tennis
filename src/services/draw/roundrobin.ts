@@ -1,6 +1,6 @@
 import type { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { DrawType, Draw, Box, Match, PlayerIn } from '../../domain/draw';
+import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
 import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
 import { groupDraw, groupFindPlayerIn, newBox, newDraw, nextGroup } from '../drawService';
@@ -9,8 +9,7 @@ import { sortPlayers } from '../tournamentService';
 const MIN_COL = 0,
     MAX_COL_POULE = 22,
     MAX_JOUEUR = 8191,
-    MAX_TABLEAU = 63,
-    QEMPTY = - 1;
+    MAX_TABLEAU = 63;
 
 /**
      box positions example for nbColumn=3:
@@ -356,7 +355,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         //        const v = ADVERSAIRE1(b);
         //        const d = ADVERSAIRE2(b);
-        //        if (boxes[b].m_iJoueur != boxes[v].m_iJoueur) {
+        //        if (boxes[b].m_iJoueur !== boxes[v].m_iJoueur) {
         //            v += d; d = v - d; v -= d;	//swap
         //        }
         //        //v: vainqueur  d:défait
