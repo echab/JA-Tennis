@@ -50,7 +50,7 @@ export const Events: Component<Props> = (props) => {
           aria-selected={selection.event === event}
         >
           {/* <input type="checkbox" /> */}
-          <A href={urlEvent(event)} replace={true}>
+          <A href={urlEvent(event)} replace>
             <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}/>
             {/* <small>{event.id} </small> */}
             <IconSexe sexe={event.sexe} double={event.typeDouble} />
@@ -76,7 +76,7 @@ export const Events: Component<Props> = (props) => {
                 classList={{ "mt-2": !draw.suite }}
                 aria-selected={selection.draw?.id === draw.id}
                 // onclick={() => selectDraw(event, draw)}
-                href={urlDraw(draw, event)} replace={true}
+                href={urlDraw(draw, event)} replace
               >
                 <i class="icon2-info hover"
                   onclick={() => {

@@ -65,7 +65,8 @@ export const DrawKnockout: Component<Props> = (props) => {
                 classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
                 // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                 // onclick={() => navigate(urlBox(box), {replace:true})}
-                href={urlBox(box)} replace={true} noScroll={true}
+                href={urlBox(box)} replace noScroll={true}
+                id={`pos${box?.position}`}
               >
                 <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>

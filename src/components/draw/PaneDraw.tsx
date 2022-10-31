@@ -100,7 +100,7 @@ export const PaneDraw: Component = () => {
                         // onclick={() => selectDraw(event()!, prevDraw())}
                         // disabled={!prevDraw()}
                         classList={{ "pointer-events-none": !prevDraw() }}
-                        href={`/draw/${params.eventId}/${prevDraw()?.id}`} replace={true}
+                        href={`/draw/${params.eventId}/${prevDraw()?.id}`} replace
                         title="View the previous draw of the event"
                     ><i class="icon2-left-arrow" /></A>
                     {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info" /></button> */}
@@ -108,7 +108,7 @@ export const PaneDraw: Component = () => {
                     <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50"
                         // onclick={() => selectDraw(event()!, nextDraw())}
                         // disabled={!nextDraw()}
-                        href={`/draw/${params.eventId}/${nextDraw()?.id}`} replace={true}
+                        href={`/draw/${params.eventId}/${nextDraw()?.id}`} replace
                         classList={{ "pointer-events-none": !nextDraw() }}
                         title="View the next draw of the event"
                     ><i class="icon2-right-arrow" /></A>

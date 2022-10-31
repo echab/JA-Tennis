@@ -41,7 +41,7 @@ export const Planning: Component<Props> = (props) => {
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
             <Show when={props.short}>
-                <A href={urlPlace()} replace={true} class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</A>
+                <A href={urlPlace()} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</A>
             </Show>
         </div>
         <ul class="pb-2">

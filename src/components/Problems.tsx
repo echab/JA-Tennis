@@ -21,7 +21,7 @@ export const Problems: Component = () => {
             <For each={[...selection.playerProblems.entries()]}>{([playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
-                        <A href={urlPlayer(player)} replace={true}>
+                        <A href={urlPlayer(player)} replace noScroll>
                             {message}: {player.name}{detail ? ` (${detail})` : ''}
                         </A>
                     </li>
@@ -39,14 +39,14 @@ export const Problems: Component = () => {
                         <h4 class="bg-slate-300 border-l-8"
                             style={{ "border-color": event?.color ?? 'transparent' }}
                         >
-                            <A href={urlDraw(draw, event)} replace={true}>
+                            <A href={urlDraw(draw, event)} replace>
                                 <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {draw?.name || eventdrawId}
                             </A>
                         </h4>
                         <ul>
                             <For each={errors}>{({message, detail, player, box}) => (
                                 <li>
-                                    <A href={urlBox(box, draw, event)} replace={true}>
+                                    <A href={urlBox(box, draw, event, true)} replace noScroll>
                                         {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
                                     </A>
                                 </li>

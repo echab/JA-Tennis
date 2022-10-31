@@ -64,7 +64,7 @@ export const Players: Component<Props> = (props) => {
 
         <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
         <Show when={props.short}>
-          <A href={urlPlayer()} replace={true} class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
+          <A href={urlPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
         </Show>
       </div>
       <table class="table table-hover table-condensed w-auto mx-2">

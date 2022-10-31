@@ -159,14 +159,14 @@ export function urlDraw(draw?: Draw, event?: TEvent) {
 }
 
 // TODO could return URL and preserve current search
-export function urlBox(box?: Box, draw?: Draw, event?: TEvent) {
+export function urlBox(box?: Box, draw?: Draw, event?: TEvent, scroll?: boolean) {
     if (!event) {
         event = selection.event; // reactive default value
     }
     if (!draw) {
         draw = selection.draw; // reactive default value
     }
-    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? box.position : ''}`.replace(/\/+$/, '');
+    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`.replace(/\/+$/, '');
 }
 
 export function urlPlace(place?: Place) {
