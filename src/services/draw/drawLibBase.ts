@@ -588,6 +588,6 @@ export abstract class DrawLibBase implements IDrawLib {
 function ASSERT(b: boolean, message?: string): void {
     if (!b) {
         debugger;
-        throw message || 'Assertion is false';
+        throw new Error(message || 'Assertion is false');
     }
 }

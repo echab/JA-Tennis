@@ -46,19 +46,19 @@ export const Events: Component<Props> = (props) => {
             {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
           </A>
 
-          <button type="button" class="rounded-full p-[.125rem] px-1" title="Add a draw"
+          <button type="button" class="rounded-full p-[.125rem] px-1 hover" title="Add a draw"
             onclick={() => {
               selectDraw(event, undefined);
               showDialog("draw");
             }}
-          >➕</button>
+          >➕ Draw</button>
         </div>
 
         <div>
           <For each={event.draws}>{(draw) =>
             <div class="draws px-1"
               aria-selected={draw.id === selection.draw?.id}
-              classList={{ error: selection.drawErrors.has(`${draw.id}-${event.id}`) }}
+              classList={{ error: selection.drawProblems.has(`${draw.id}-${event.id}`) }}
             >
               <A class="[&[aria-selected=true]]:bg-blue-200 block"
                 classList={{ "mt-2": !draw.suite }}

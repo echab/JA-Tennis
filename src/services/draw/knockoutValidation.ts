@@ -9,15 +9,15 @@ import { TEvent, Tournament } from '../../domain/tournament';
 import { isRegistred, isSexeCompatible } from '../tournamentService';
 import { MINUTES } from '../../utils/date';
 import { drawLib } from './drawLib';
-import { DrawError } from '../../domain/validation';
+import { DrawProblem } from '../../domain/validation';
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     QEMPTY = - 1,
     MAX_MATCHJOUR = 16;
 
-function validateGroup(event: TEvent, draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
 
     if (draw.suite) {
         const iTableau = indexOf(event.draws, 'id', draw.id);
@@ -79,15 +79,15 @@ function validateGroup(event: TEvent, draw: Draw): DrawError[] {
     return result;
 }
 
-function validateMatches(draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validateMatches(draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
 
 
     return result;
 }
 
-function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
     const players = tournament.players;
     let nqe = 0;
     let nqs = 0;
@@ -525,7 +525,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawEr
 function ASSERT(b: boolean, message?: string): void {
     if (!b) {
         debugger;
-        throw message || 'Assertion is false';
+        throw new Error(message || 'Assertion is false');
     }
 }
 

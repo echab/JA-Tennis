@@ -6,10 +6,10 @@ import type { Player } from '../../domain/player';
 import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { drawLib } from '../draw/drawLib';
-import type { DrawError, IValidation, PlayerError } from '../../domain/validation';
+import type { DrawProblem, IValidation, PlayerProblem } from '../../domain/validation';
 
-function validatePlayer(player: Player): PlayerError[] {
-    const result : PlayerError[] = [];
+function validatePlayer(player: Player): PlayerProblem[] {
+    const result : PlayerProblem[] = [];
 
     // if (player.sexe === 'F') {
     //     result.push({message:'Debug error player', player, detail: 'some details'})
@@ -27,8 +27,8 @@ function validatePlayer(player: Player): PlayerError[] {
     return result;
 }
 
-function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
 
     const players = tournament.players;
 

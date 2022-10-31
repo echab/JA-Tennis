@@ -2,7 +2,7 @@ import { createStore, produce } from "solid-js/store";
 import { Box, Draw } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, TEvent, Tournament } from "../../domain/tournament";
-import { DrawError, PlayerError } from "../../domain/validation";
+import { DrawProblem, PlayerProblem } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
 
@@ -14,16 +14,16 @@ export interface SelectionItems {
     boxQ?: Box;
     player?: Player;
 
-    playerErrors: Map<string,PlayerError[]>;
-    drawErrors: Map<string, DrawError[]>;
+    playerProblems: Map<string,PlayerProblem[]>;
+    drawProblems: Map<string, DrawProblem[]>;
 }
 
 const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
 
 export const [selection, setSelection] = createStore<SelectionItems>({
     tournament: emptyTournament,
-    playerErrors: new Map(),
-    drawErrors: new Map(),
+    playerProblems: new Map(),
+    drawProblems: new Map(),
 });
 
 export function selectTournament(tournament: Tournament) {
@@ -35,15 +35,15 @@ export function selectTournament(tournament: Tournament) {
         sel.box = undefined;
         sel.boxQ = undefined;
 
-        sel.playerErrors = new Map(
+        sel.playerProblems = new Map(
             tournament.players.map((player) => [player.id, validatePlayer(player)])
-            .filter(([,err]) => err.length) as Iterable<[string,PlayerError[]]>
+            .filter(([,err]) => err.length) as Iterable<[string,PlayerProblem[]]>
         );
-        // sel.drawErrors.clear();
-        sel.drawErrors = new Map(
+        // sel.drawProblems.clear();
+        sel.drawProblems = new Map(
             tournament.events.flatMap((event) => event.draws
                 .map((draw) => [`${draw.id}-${event.id}`, validateDraw(tournament, event, draw)])
-                .filter(([,err]) => err.length) as Array<[string,DrawError[]]>
+                .filter(([,err]) => err.length) as Array<[string,DrawProblem[]]>
             )
         );
     });
@@ -96,7 +96,7 @@ export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
     });
 }
 
-export function selectByError(error: PlayerError | DrawError) {
+export function selectByError(error: PlayerProblem | DrawProblem) {
     update((sel) => {
         if (isDrawError(error)) {
             const {draw, event} = drawById(error.draw.id)
@@ -108,11 +108,11 @@ export function selectByError(error: PlayerError | DrawError) {
     });
 }
 
-export function isPlayerError(error: PlayerError | DrawError  ): error is PlayerError {
+export function isPlayerError(error: PlayerProblem | DrawProblem  ): error is PlayerProblem {
     return !!error.player;
 }
-export function isDrawError(error: PlayerError | DrawError  ): error is DrawError {
-    return !!(error as DrawError).draw;
+export function isDrawError(error: PlayerProblem | DrawProblem  ): error is DrawProblem {
+    return !!(error as DrawProblem).draw;
 }
 
 export function update(fn: (original: SelectionItems) => void) {

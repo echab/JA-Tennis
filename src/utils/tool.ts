@@ -13,7 +13,7 @@ export function copy(source: any, destination?: any) {
             }
         }
     } else {
-        if (source === destination) throw Error("Can't copy equivalent objects or arrays");
+        if (source === destination) throw new Error("Can't copy equivalent objects or arrays");
         if (isArray(source)) {
             destination.length = 0;
             for (let i = 0; i < source.length; i++) {

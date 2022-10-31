@@ -1,6 +1,6 @@
 import { Component, createSignal, Match, Show, Switch } from "solid-js";
 import { errorCount } from "../services/validationService";
-import { Errors } from "./Errors";
+import { Problems } from "./Problems";
 import { Events } from "./event/Events";
 import { Players } from "./player/Players";
 import { Tournaments } from "./tournament/Tournaments";
@@ -48,12 +48,12 @@ export const SidePanel: Component<Props> = () => {
                 <br /><small>Planning</small>
             </li>
             <li aria-selected={pane() === 4} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[setPane, 4]}>
-                <button title="Errors" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200 relative"
+                <button title="Problems" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200 relative"
                     aria-selected={pane() === 4}
                 ><i class="icon2-bug"></i>
                     <Badge count={errorCount(selection)} minDisplay={1}/>
                 </button>
-                <br /><small>Errors</small>
+                <br /><small>Problems</small>
             </li>
             <li aria-selected={pane() === 5} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[setPane, 5]}>
                 <button title="Settings" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200"
@@ -91,7 +91,7 @@ export const SidePanel: Component<Props> = () => {
                         <div>Planning...</div>
                     </Match>
                     <Match when={pane() === 4}>
-                        <Errors />
+                        <Problems />
                     </Match>
                     <Match when={pane() === 5}>
                         <div>Settings...</div>

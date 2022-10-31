@@ -48,7 +48,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     resize(oldDraw?: Draw, nJoueur?: number): void {
 
         if (nJoueur) {
-            throw "Not implemnted";
+            throw new Error("Not implemnted");
         }
         
         //ASSERT( SetDimensionOk( draw, oldDraw, nPlayer));
@@ -252,7 +252,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         const nDraw = Math.floor((players.length + (refDraw.nbColumn - 1)) / refDraw.nbColumn) || 1;
 
         if ((event.draws.length + nDraw) >= MAX_TABLEAU) {
-            throw ('Maximum refDraw count is reached'); //TODOjs
+            throw new Error('Maximum refDraw count is reached'); //TODOjs
             //return;
         }
 
@@ -319,7 +319,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     computeScore(): boolean {
 
         //TODO
-        throw "Not implemented";
+        throw new Error("Not implemented");
 
         // const m_pOrdrePoule: Ranking[];    //classement de chaque joueur de la poule
 
@@ -390,7 +390,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 function ASSERT(b: boolean, message?: string): void {
     if (!b) {
         debugger;
-        throw message || 'Assertion is false';
+        throw new Error(message || 'Assertion is false');
     }
 }
 

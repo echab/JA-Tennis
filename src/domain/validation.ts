@@ -3,12 +3,12 @@ import { Player } from "./player";
 import { TEvent, Tournament } from "./tournament";
 
 export interface IValidation {
-    validatePlayer?(player: Player): PlayerError[];
-    validateDraw?(tournament: Tournament, event: TEvent, draw: Draw): DrawError[];
+    validatePlayer?(player: Player): PlayerProblem[];
+    validateDraw?(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[];
     //validateDay(): boolean;   //VerifieJour
 }
 
-export type PlayerError = {
+export type PlayerProblem = {
     message: string;
     player: Player;
     detail?: string;
@@ -16,7 +16,7 @@ export type PlayerError = {
     // TODO ignore?: boolean;
 };
 
-export type DrawError = {
+export type DrawProblem = {
     message: string;
     draw: Draw;
     box?: Box;

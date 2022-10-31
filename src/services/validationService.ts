@@ -2,12 +2,12 @@
 import { Draw } from "../domain/draw";
 import { Player } from "../domain/player";
 import { TEvent, Tournament } from "../domain/tournament";
-import { DrawError, IValidation, PlayerError } from "../domain/validation";
+import { DrawProblem, IValidation, PlayerProblem } from "../domain/validation";
 
 const validLibs: IValidation[] = [];
 
-// const [errorsDraw, setErrorsDraw] = createStore<{ [id: string]: DrawError[] }>({});
-// const [errorsPlayer, setErrorsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
+// const [errorsDraw, setProblemsDraw] = createStore<{ [id: string]: DrawError[] }>({});
+// const [errorsPlayer, setProblemsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
 
 export function addValidator(validator: IValidation): void {
   validLibs?.push(validator); // TODO validLibs is undefined in tests?!?
@@ -16,26 +16,26 @@ export function addValidator(validator: IValidation): void {
 export function validateTournament(tournament: Tournament) {
   update((sel) => {
     // cleanup errors from deleted players
-    [...sel.playerErrors.keys()].forEach((playerId) => {
+    [...sel.playerProblems.keys()].forEach((playerId) => {
       if (tournament.players.find(({id}) => id === playerId)) {
-        sel.playerErrors.delete(playerId);
+        sel.playerProblems.delete(playerId);
       }
     });
 
     tournament.players.forEach((player) => {
       const errors = validatePlayer(player);
       if (errors.length) {
-        sel.playerErrors.set(player.id, errors);
+        sel.playerProblems.set(player.id, errors);
       } else {
-        sel.playerErrors.delete(player.id);
+        sel.playerProblems.delete(player.id);
       }
     });
 
     // cleanup errors from deleted draws
-    [...sel.drawErrors.keys()].forEach((key) => {
+    [...sel.drawProblems.keys()].forEach((key) => {
       const {draw} = drawById(key, tournament);
       if (!draw) {
-        sel.drawErrors.delete(key);
+        sel.drawProblems.delete(key);
       }
     });
 
@@ -43,16 +43,16 @@ export function validateTournament(tournament: Tournament) {
       const errors = validateDraw(tournament, event, draw);
       const key = `${draw.id}-${event.id}`;
       if (errors.length) {
-        sel.drawErrors.set(key, errors);
+        sel.drawProblems.set(key, errors);
       } else {
-        sel.drawErrors.delete(key);
+        sel.drawProblems.delete(key);
       }
     }));
   });
 }
 
-export function validatePlayer(player: Player): PlayerError[] {
-  const result: PlayerError[] = [];
+export function validatePlayer(player: Player): PlayerProblem[] {
+  const result: PlayerProblem[] = [];
   for (const lib of validLibs) {
     const fn = lib.validatePlayer;
     if (fn) {
@@ -65,8 +65,8 @@ export function validatePlayer(player: Player): PlayerError[] {
   return result;
 }
 
-export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawError[] {
-  const result: DrawError[] = [];
+export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
+  const result: DrawProblem[] = [];
   for (const lib of validLibs) {
     const fn = lib.validateDraw;
     if (fn) {
@@ -93,8 +93,8 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
 // }
 
 export function errorCount(
-  { playerErrors, drawErrors }: Pick<SelectionItems, 'playerErrors' | 'drawErrors'>
+  { playerProblems: playerProblems, drawProblems: drawProblems }: Pick<SelectionItems, 'playerProblems' | 'drawProblems'>
 ): number {
-  return [...playerErrors.values()].reduce((sum, errors) => sum + errors.length, 0)
-    + [...drawErrors.values()].reduce((sum, errors) => sum + errors.length, 0);
+  return [...playerProblems.values()].reduce((sum, errors) => sum + errors.length, 0)
+    + [...drawProblems.values()].reduce((sum, errors) => sum + errors.length, 0);
 }

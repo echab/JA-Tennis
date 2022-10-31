@@ -20,7 +20,7 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
       //this.selection.select(tournament, ModelType.Tournament);
       return tournament;
     } else {
-      throw Error("nothing in storage");
+      throw new Error("nothing in storage");
     }
   } else if (typeof file_url === "string") {
     const resp = await fetch(file_url);
@@ -31,10 +31,10 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
       //this.selection.select(tournament, ModelType.Tournament);
       return tournament;
     } else {
-        throw Error(resp.statusText);
+        throw new Error(resp.statusText);
     }
   } else { //if (file_url instanceof Blob) {
-    throw Error('Not supported');
+    throw new Error('Not supported');
 //     return new Promise((resolve, reject) => {
 //       const reader = new FileReader();
 //       reader.addEventListener("loadend", () => {

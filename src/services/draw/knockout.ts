@@ -48,7 +48,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         if (MAX_COL <= c) {
-            throw 'Max_COL is reached ' + c;
+            throw new Error('Max_COL is reached ' + c);
         }
 
         return c - colMin + 1;
@@ -594,7 +594,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 if (boxIn) {
                     ASSERT(boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn)) {
-                        throw "Can not remove player";
+                        throw new Error("Can not remove player");
                     }
                 }
             }
@@ -621,7 +621,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 if (boxIn) {
                     ASSERT(!!boxIn.playerId && boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn, undefined, true)) {
-                        throw "Can not remove player";
+                        throw new Error("Can not remove player");
                     }
                 }
             }
@@ -876,7 +876,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 function ASSERT(b: boolean, message?: string): void {
     if (!b) {
         debugger;
-        throw message || 'Assertion is false';
+        throw new Error(message || 'Assertion is false');
     }
 }
 

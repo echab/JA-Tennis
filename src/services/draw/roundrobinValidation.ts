@@ -1,11 +1,11 @@
 ﻿import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
-import { DrawError } from '../../domain/validation';
+import { DrawProblem } from '../../domain/validation';
 import { isMatch, isPlayerIn } from '../drawService';
 
-function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
 
     if (draw.type === DrawType.PouleSimple
         || draw.type === DrawType.PouleAR) {
@@ -19,8 +19,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawEr
     return result;
 }
 
-function validatePoule(draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validatePoule(draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
 
     //TODOjs
     ////Compte le nombre de Qs de la poule (et pas dans suite)
@@ -64,8 +64,8 @@ function validatePoule(draw: Draw): DrawError[] {
     return result;
 }
 
-function validateMatches(draw: Draw): DrawError[] {
-    const result: DrawError[] = [];
+function validateMatches(draw: Draw): DrawProblem[] {
+    const result: DrawProblem[] = [];
 
     //Match avec deux joueurs gagné par un des deux joueurs
     for (let i = 0; i < draw.boxes.length; i++) {

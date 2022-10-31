@@ -39,7 +39,7 @@ export function indexOf<T>(array: T[], member: StringKey<T>, value: any, error?:
     }
 
     if (error && i === undefined) {
-        throw error;
+        throw new Error(error);
     }
 
     return i !== undefined ? i : -1;

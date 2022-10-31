@@ -1,15 +1,15 @@
 import { A } from "@solidjs/router";
 import { Component, createSignal, For, Show } from "solid-js";
-import { DrawError } from "../domain/validation";
+import { DrawProblem } from "../domain/validation";
 import { validateTournament } from "../services/validationService";
 import { drawById, selection, urlBox, urlDraw, urlPlayer } from "./util/selection";
 
-export const Errors: Component = () => {
+export const Problems: Component = () => {
     const [selectedDraw, setSelectedDraw] = createSignal(false);
 
     return (<>
         <div class="flex justify-between items-center px-2">
-            <h3>Errors</h3>
+            <h3>Problems</h3>
             <label><input type="checkbox"
                 checked={selectedDraw()}
                 onChange={({target}) => setSelectedDraw((target as HTMLInputElement).checked)}
@@ -17,7 +17,7 @@ export const Errors: Component = () => {
             <button onClick={() => validateTournament(selection.tournament)}><i class="icon2-refresh"></i></button>
         </div>
         <ul>
-            <For each={[...selection.playerErrors.entries()]}>{([playerId, errors]) => (
+            <For each={[...selection.playerProblems.entries()]}>{([playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
                         <A href={urlPlayer(player)} replace={true}>
@@ -26,10 +26,10 @@ export const Errors: Component = () => {
                     </li>
                 )}</For>
             )}</For>
-            {/* <For each={Object.entries(selection.drawErrors)} fallback={ */}
-            <For each={[...selection.drawErrors.entries()]} fallback={
+            {/* <For each={Object.entries(selection.drawProblems)} fallback={ */}
+            <For each={[...selection.drawProblems.entries()]} fallback={
                 <div>No draw error.</div>
-            }>{([eventdrawId, errors]: [string, DrawError[]]) => {
+            }>{([eventdrawId, errors]: [string, DrawProblem[]]) => {
                 const {draw, event} = drawById(eventdrawId);
                 return (
                     <Show when={!selectedDraw() || (draw && draw?.id === selection.draw?.id)}>
