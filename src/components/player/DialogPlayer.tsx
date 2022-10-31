@@ -177,7 +177,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                       value={event.id}
                       checked={form.registration.includes(event.id)}
                     /> <span class="border-l-8" style={{ "border-color": event.color ?? 'transparent' }}>
-                      <IconSexe sexe={event.sexe}/>{event.name}
+                      <IconSexe sexe={event.sexe} double={event.typeDouble}/>{event.name}
                     </span></label>
                   </div>
                 }</For>

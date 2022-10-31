@@ -78,7 +78,7 @@ export const DialogEvent: Component<Props> = (props) => {
    return (
       <dialog ref={refDlg!} class="p-0">
          <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-            <b><IconSexe sexe={props.event?.sexe} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
+            <b><IconSexe sexe={props.event?.sexe} double={event?.typeDouble} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
             <small>Id: {props.event?.id}</small>
             <button type="button" data-dismiss="modal" aria-hidden="true"
                onclick={() => refDlg.close()}
@@ -97,7 +97,6 @@ export const DialogEvent: Component<Props> = (props) => {
                </div>
 
                {/*
-               TODO Type: simple/double
                TODO: consolation
                TODO: matchFormat
                */}
@@ -122,14 +121,20 @@ export const DialogEvent: Component<Props> = (props) => {
                <div class="flex space-x-6 mb-1">
                   <label class="inline-block w-3/12 text-right pr-3 h-8">Sexe:</label>
                   <label>
-                     <input value='H' type="radio" required
-                        checked={form.sexe === 'H'} onChange={updateField("sexe")} /> <i class="icon2-male"></i> Male</label>
+                     <input value='H' type="radio" required class='mr-1'
+                        checked={form.sexe === 'H'} onChange={updateField("sexe")} />
+                     <i classList={{"icon2-male":!form.typeDouble, "icon2-double-male":form.typeDouble}}></i> Male
+                  </label>
                   <label>
-                     <input value='F' type="radio" required
-                        checked={form.sexe === 'F'} onChange={updateField("sexe")} /> <i class="icon2-female"></i> Female</label>
+                     <input value='F' type="radio" required class='mr-1'
+                        checked={form.sexe === 'F'} onChange={updateField("sexe")} />
+                     <i classList={{"icon2-female":!form.typeDouble, "icon2-double-female":form.typeDouble}}></i> Female
+                  </label>
                   <label>
-                     <input value='M' type="radio" required
-                        checked={form.sexe === 'M'} onChange={updateField("sexe")} /> <i class="icon2-mixte"></i> Mixte</label>
+                     <input value='M' type="radio" required class='mr-1'
+                        checked={form.sexe === 'M'} onChange={updateField("sexe")} />
+                     <i classList={{"icon2-mixte":!form.typeDouble, "icon2-double-mixte":form.typeDouble}}></i> Mixte
+                  </label>
                </div>
 
                <div class="mb-1">

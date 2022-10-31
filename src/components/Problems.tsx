@@ -40,7 +40,7 @@ export const Problems: Component = () => {
                             style={{ "border-color": event?.color ?? 'transparent' }}
                         >
                             <A href={urlDraw(draw, event)} replace={true}>
-                                <IconSexe sexe={event?.sexe}/>{event?.name} - {draw?.name || eventdrawId}
+                                <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {draw?.name || eventdrawId}
                             </A>
                         </h4>
                         <ul>

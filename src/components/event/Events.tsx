@@ -53,7 +53,7 @@ export const Events: Component<Props> = (props) => {
           <A href={urlEvent(event)} replace={true}>
             <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
             {/* <small>{event.id} </small> */}
-            <IconSexe sexe={event.sexe} />
+            <IconSexe sexe={event.sexe} double={event.typeDouble} />
             <span>{event.name}</span>
             {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
           </A>

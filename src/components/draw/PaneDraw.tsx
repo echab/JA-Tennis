@@ -84,7 +84,7 @@ export const PaneDraw: Component = () => {
             <h4 class="border-l-8"
                 style={{ "border-color": event()?.color ?? 'transparent' }}
             >
-                <IconSexe sexe={event()?.sexe} />
+                <IconSexe sexe={event()?.sexe} double={event()?.typeDouble} />
                 {event()?.name}
                 <Show when={draw()}>
                     <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 "
