@@ -29,7 +29,7 @@ export interface IDrawLib {
   computeScore(): boolean; //CalculeScore
   boxesOpponents(match: Match): { box1: Box; box2: Box };
 
-  isJoueurNouveau(box: Box): boolean;
+  isNewPlayer(box: Box): boolean;
 }
 
 export function drawLib(event: TEvent, draw: Draw) : IDrawLib & DrawLibBase {

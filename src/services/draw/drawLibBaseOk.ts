@@ -174,13 +174,13 @@ export class DrawLibBaseOk {
 // 				return false;
 // 			}
 // 
-// 			const next = drawLib.nextGroup(box._draw);
+// 			const nextgrp = drawLib.nextGroup(box._draw);
 // 			const boxOut = box as Match;
 // 			let i: number;
-// 			if ((i = boxOut.qualifOut) && next) {
-// 				const boxIn = drawLib.groupFindPlayerIn(next, i);
+// 			if ((i = boxOut.qualifOut) && nextgrp) {
+// 				const boxIn = drawLib.groupFindPlayerIn(nextgrp, i);
 // 				if (boxIn) {
-// 					if (next.locked || !next.EnleveJoueurOk(i, true))
+// 					if (nextgrp.locked || !nextgrp.EnleveJoueurOk(i, true))
 // 						return false;
 // 				}
 // 			}
@@ -252,10 +252,10 @@ export class DrawLibBaseOk {
 // 					return false;
 // 				}
 // 
-// 				const prev = drawLib.previousGroup(event, draw);
-// 				if (!player && prev && prev.length && inNumber !== QEMPTY) {
+// 				const prevgroup = drawLib.previousGroup(event, draw);
+// 				if (!player && prevgroup && inNumber !== QEMPTY) {
 // 					//Va chercher le joueur dans le tableau précédent
-// 					const boxOut = drawLib.groupFindPlayerOut(prev, inNumber);
+// 					const boxOut = drawLib.groupFindPlayerOut(prevgroup, inNumber);
 // 					if (!isObject(boxOut)) {
 // 						validation.errorDraw('ERR_ENTRANT_MIS', box._draw, box);
 // 						return false;
@@ -279,8 +279,7 @@ export class DrawLibBaseOk {
 // 
 // 					if (!isTypePoule()) {
 // 						//Cache les boites de gauche
-// 						//Cache les boites de gauche
-// 						this.iBoiteDeGauche(box.position, draw, true, (box) => {
+// 						scanLeftBoxes(this.draw, box.position, draw, true, (box) => {
 // 							if (box.playerId) {
 // 								return false;
 // 							}
@@ -334,8 +333,8 @@ export class DrawLibBaseOk {
 // 					//			}
 // 			
 // 					//Met à jour le tableau suivant
-// 					const next = drawLib.nextGroup(box._draw);
-// 					if (next) {
+// 					const nextgrp = drawLib.nextGroup(box._draw);
+// 					if (nextgrp) {
 // 						const boxOut = box as Match;
 // 						if (box.isJoueur() && boxOut.qualifOut) {
 // 							if ((i = pSuite.FindQualifieEntrant(outNumber, &pSuite)) !== -1) {
@@ -467,12 +466,4 @@ export class DrawLibBaseOk {
 // 
 // 			return true;
 // 		}
-// 	
-// function ASSERT(b: boolean, message?: string): void {
-//     if (!b) {
-//         debugger;
-//         throw new Error(message || 'Assertion is false');
-//     }
-// }
-
 }

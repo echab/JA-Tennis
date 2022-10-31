@@ -1,5 +1,5 @@
 import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
-import { Draw, DrawType } from '../../domain/draw';
+import { Draw, DrawType, Mode } from '../../domain/draw';
 import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
@@ -8,11 +8,11 @@ import { RankString, CategoryString } from '../../domain/types';
 import { deleteDraw, groupDraw, groupFindAllPlayerOut } from '../../services/drawService';
 import { getRegisteredPlayers, ranksName } from '../../services/tournamentService';
 import { rank, category } from '../../services/types';
-import { columnMax, countInCol } from '../../utils/drawUtil';
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
 import { selectDraw } from '../util/selection';
 import { IconSexe } from '../misc/IconSexe';
+import { columnMax, countInCol } from '../../services/draw/knockoutLib';
 
 const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Knockout, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
@@ -102,7 +102,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
       boxes: draw?.boxes ?? [],
 
-      mode: form.mode,
+      lock: form.lock,
     }];
 
     if ((evt.submitter as HTMLButtonElement).value === 'generate') {
@@ -128,7 +128,7 @@ export const DialogDraw: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <span><i class='icon2-draw'></i> <IconSexe sexe={props.event.sexe} double={props.event.typeDouble} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
+        <span><i class='icon2-draw' /> <IconSexe sexe={props.event.sexe} double={props.event.typeDouble} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
         <small>Id: {props.draw?.id}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}
@@ -176,8 +176,12 @@ export const DialogDraw: Component<Props> = (props) => {
           <fieldset>
             <legend>Dimensions:</legend>
             <div class="mb-1">
+              <span class="inline-block w-3/12 text-right pr-3"></span>
+              <label><input type="checkbox" checked={form.lock === Mode.Plan} value={Mode.Plan} onchange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
+            </div>
+            <div class="mb-1">
               <label for="nbIn" class="inline-block w-3/12 text-right pr-3">Entries:</label>
-              <input id="nbIn" type="number" readonly value={getNbEntry()} class="w-3/12 p-1"/>
+              <input id="nbIn" type="number" readonly value={getNbEntry()} class="w-3/12 p-1" />
             </div>
             <div class="mb-1">
               <label for="nbColumn" class="inline-block w-3/12 text-right pr-3">Columns:</label>
@@ -198,7 +202,7 @@ export const DialogDraw: Component<Props> = (props) => {
           <button type="submit" value="generate"
             //  disabled={!!drawForm.$error.required}
              class="rounded-md border border-transparent bg-indigo-200 py-2 px-4 min-w-[6rem]">
-              <i class="icon2-draw-generate"></i> Generate
+              <i class="icon2-draw-generate" /> Generate
           </button>
           <button type="submit"
             //  disabled.bind="!!eventForm.$error.required"

@@ -29,31 +29,31 @@ export const SidePanel: Component<Props> = () => {
                 <button title="Tournament" class="rounded-full w-14 h-10 -mb-3 [&[aria-selected=true]]:bg-blue-200"
                     aria-selected={pane() === 1}
 
-                ><i class="icon2-ball"></i></button>
+                ><i class="icon2-ball" /></button>
                 <br /><small>Tournament</small>
             </li>
             <li aria-selected={pane() === 2} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[togglePane, 2]}>
                 <button title="Players" class='rounded-full w-14 h-10 -mb-3 [&[aria-selected=true]]:bg-blue-200'
                     aria-selected={pane() === 2}
-                ><i class="icon2-player"></i></button>
+                ><i class="icon2-player" /></button>
                 <br /><small>Players</small>
             </li>
             <li aria-selected={pane() === 3} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[togglePane, 3]}>
                 <button title="Events &amp; Draws" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200"
                     aria-selected={pane() === 3}
-                ><i class="icon2-draw"></i></button>
+                ><i class="icon2-draw" /></button>
                 <br /><small>Draws</small>
             </li>
             <li aria-selected={pane() === 4} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[togglePane, 4]}>
                 <button title="Planning" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200"
                     aria-selected={pane() === 4}
-                ><i class="icon2-planning"></i></button>
+                ><i class="icon2-planning" /></button>
                 <br /><small>Planning</small>
             </li>
             <li aria-selected={pane() === 5} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[togglePane, 5]}>
                 <button title="Problems" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200 relative"
                     aria-selected={pane() === 5}
-                ><i class="icon2-bug"></i>
+                ><i class="icon2-bug" />
                     <Badge count={errorCount(selection)} minDisplay={1}/>
                 </button>
                 <br /><small>Problems</small>
@@ -61,7 +61,7 @@ export const SidePanel: Component<Props> = () => {
             <li aria-selected={pane() === 6} class="mt-6 [&[aria-selected=true]]:text-blue-500" onClick={[togglePane, 6]}>
                 <button title="Settings" class="rounded-full w-14 h-10 -mb-3  [&[aria-selected=true]]:bg-blue-200"
                     aria-selected={pane() === 6}
-                ><i class="icon2-gear"></i></button>
+                ><i class="icon2-gear" /></button>
                 <br /><small>Settings</small>
             </li>
         </ul>

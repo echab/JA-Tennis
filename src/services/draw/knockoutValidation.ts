@@ -1,15 +1,15 @@
-﻿import { KnockoutLib as k } from './knockoutLib';
-import { findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
+﻿import { columnMax, column, positionTopCol, positionOpponent1, positionMax, positionBottomCol } from './knockoutLib';
+import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 import { indexOf, byId } from '../util/find';
 import { category, rank, score } from '../types';
 import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
-import { Player } from '../../domain/player';
 import { RankString } from '../../domain/types';
 import { TEvent, Tournament } from '../../domain/tournament';
 import { isRegistred, isSexeCompatible } from '../tournamentService';
 import { MINUTES } from '../../utils/date';
 import { drawLib } from './drawLib';
 import { DrawProblem } from '../../domain/validation';
+import { ASSERT } from '../../utils/tool';
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
@@ -57,22 +57,34 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
         }
     }
 
-    let e = MAX_QUALIF;
     if (!draw.suite) {
-        //Trouve le plus grand Qsortant
         const group = groupDraw(event, draw);
-        for (e = MAX_QUALIF; e >= 1; e--) {
-            const [, m] = groupFindPlayerOut(event, group, e);
-            if (m) {
-                break;
+        const qualifOuts = findGroupQualifOuts(event, group).map(([_, q]) => q).sort((a, b) => a - b).filter((q) => q !== QEMPTY);
+        if (qualifOuts.length) {
+            const missing: string[] = [];
+            for (let e = 1; e <= qualifOuts.at(-1)!; e++) {
+                if (!qualifOuts.includes(e)) {
+                    missing.push(`Q${e}`);
+                }
+            }
+            if (missing.length) {
+                result.push({ message: 'ERR_TAB_SORTANT_NO', draw, detail: missing.join(' ') });
             }
         }
-        for (let e2 = 1; e2 <= e; e2++) {
-            const [, m] = groupFindPlayerOut(event, group, e2);
-            if (!m) {
-                result.push({ message: 'ERR_TAB_SORTANT_NO', draw, detail: 'Q' + e2 });
-            }
-        }
+        // //Trouve le plus grand Qsortant
+        // let e = MAX_QUALIF;
+        // for (e = MAX_QUALIF; e >= 1; e--) { // TODO get all qualifOuts then sort
+        //     const [, m] = groupFindPlayerOut(event, group, e);
+        //     if (m) {
+        //         break;
+        //     }
+        // }
+        // for (let e2 = 1; e2 <= e; e2++) {
+        //     const [, m] = groupFindPlayerOut(event, group, e2);
+        //     if (!m) {
+        //         result.push({ message: 'ERR_TAB_SORTANT_NO', draw, detail: 'Q' + e2 });
+        //     }
+        // }
     }
 
     return result;
@@ -137,7 +149,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     result.splice(-1, 0, ...validateMatches(draw));
 
-    const colMax = k.columnMax(draw.nbColumn, draw.nbOut);
+    const colMax = columnMax(draw.nbColumn, draw.nbOut);
     const pClastMaxCol: RankString[] = new Array(colMax + 1);
     pClastMaxCol[colMax] = 'NC';    //pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();
 
@@ -151,8 +163,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         //ASSERT(-1 <= box.playerId && box.playerId < tournament.players.length);
         //Joueur inscrit au tableau ?
 
-        const c = k.column(b);
-        if (b === k.positionTopCol(c)) {
+        const c = column(b);
+        if (b === positionTopCol(c)) {
             if (c < colMax) {
                 pClastMaxCol[c] = pClastMaxCol[c + 1];
                 //pClastMinCol[ c] = pClastMinCol[ c+1];
@@ -171,7 +183,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         }
 
         //if( boxes[ i].order >= 0 && player) 
-        if (player && boxIn && lib.isJoueurNouveau(boxIn) && !boxIn.qualifIn) {
+        if (player && boxIn && lib.isNewPlayer(boxIn) && !boxIn.qualifIn) {
 
             //DONE 00/03/07: Tableau, joueur sans classement
             //DONE 00/03/04: Tableau, Classement des joueurs correspond au limites du tableau
@@ -231,7 +243,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
 
 
-            ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
+            ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
 
             //TODO boxesOpponents(match)
             const opponent = lib.boxesOpponents(match);
@@ -245,7 +257,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 }
 
             } else {
-                ASSERT(b < k.positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
+                ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
 
                 if (!match.playerId) {
                     result.push({ message: 'ERR_SCORE_VAINQ_NO', draw, box: match });
@@ -256,7 +268,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 }
 
                 //ASSERT( boxes[ i].playerId==-1 || player.isInscrit( tournament.FindEpreuve( this)) );
-                ASSERT(k.column(b) < colMax);
+                ASSERT(column(b) < colMax);
                 if (!opponent.box1.playerId || !opponent.box2.playerId) {
                     result.push({ message: 'ERR_MATCH_JOUEUR_NO', draw, box: match });
 
@@ -357,7 +369,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
                 //TODO 00/07/27: Date d'un match après les matches précédents (au moins 3 heures) ça test pas bien à tous les coups
                 //TODO 00/12/20: Dans tous les tableaux où le joueur est inscrit, date des matches différentes pour un même joueur
-                ASSERT(k.positionOpponent1(b) <= k.positionMax(draw.nbColumn, draw.nbOut));
+                ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
 
                 //DONE 01/08/19 (00/12/20): Dans Poule, date des matches différentes pour un même joueur
 
@@ -406,7 +418,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             if (e && e !== QEMPTY) {
                 nqe++;
 
-                ASSERT(!isTypePoule || (b >= k.positionBottomCol(draw.nbColumn, draw.nbOut)));	//Qe que dans colonne de gauche
+                ASSERT(!isTypePoule || (b >= positionBottomCol(draw.nbColumn, draw.nbOut)));	//Qe que dans colonne de gauche
 
                 const iTableau = indexOf(event.draws, 'id', draw.id);
                 if (iTableau === 0) {
@@ -420,10 +432,10 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     result.push({ message: 'ERR_TAB_ENTRANT_DUP', draw, box: boxIn, player });
                 }
 
-                const group = previousGroup(event, draw);
-                if (group) {
+                const prevGroup = previousGroup(event, draw);
+                if (prevGroup) {
                     //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                    const [d, m] = groupFindPlayerOut(event, group, e);
+                    const [d, m] = groupFindPlayerOut(event, prevGroup, e);
                     if (!m) {
                         result.push({ message: 'ERR_TAB_ENTRANT_PREC_NO', draw, box: boxIn, player });
                     } else if (m.playerId !== boxIn.playerId) {
@@ -443,7 +455,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 //DONE 00/03/07: CTableau, qualifié sortant en double
                 let j = lib.findPlayerOut(e);
                 if (j && (j.position !== b)) {
-                    result.push({ message: 'ERR_TAB_SORTANT_DUP', draw, box: match, player });
+                    result.push({ message: 'ERR_TAB_SORTANT_DUP', draw, box: match, player, detail: `Q${e}` });
                 }
 
                 if (draw.type === DrawType.Final) {
@@ -490,14 +502,12 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     //Tous les qualifiés sortants du tableau précédent sont utilisés
     if (!draw.suite) {
-        const pT = previousGroup(event, draw);
-        if (pT && pT.length) {
-            for (let e = 1; e <= MAX_QUALIF; e++) {
-                const [d, boxOut] = groupFindPlayerOut(event, pT, e);
-                const boxIn = lib.findPlayerIn(e);
-                if (boxOut && !boxIn) {
-                    result.push({ message: 'ERR_TAB_SORTANT_PREC_NO', draw, detail: 'Q' + boxOut.qualifOut });
-                }
+        const prevGroup = previousGroup(event, draw);
+        if (prevGroup) {
+            const qualifOuts = findGroupQualifOuts(event, prevGroup).filter(([_,q]) => q !== QEMPTY);
+            const missing = qualifOuts.filter(([_, q]) => !lib.findPlayerIn(q)).map(([_,q]) => `Q${q}`);
+            if (missing.length) {
+                result.push({ message: 'ERR_TAB_SORTANT_PREC_NO', draw, detail: missing.join(' ') });
             }
         }
     }
@@ -518,14 +528,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     }
 
     return result;
-}
-
-
-function ASSERT(b: boolean, message?: string): void {
-    if (!b) {
-        debugger;
-        throw new Error(message || 'Assertion is false');
-    }
 }
 
 function CompString(a?: string, b?: string): number {

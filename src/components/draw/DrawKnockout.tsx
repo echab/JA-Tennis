@@ -1,7 +1,6 @@
 import { Component, For, Show } from 'solid-js';
 import { selectBox, urlBox } from '../util/selection';
 import { PlayerIn, Draw, Match, DrawType } from '../../domain/draw';
-import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/drawUtil';
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import { Place, TEvent } from '../../domain/tournament';
@@ -10,6 +9,7 @@ import { A, useParams } from '@solidjs/router';
 import { Params } from '../App';
 import { isMatch } from '../../services/drawService';
 import './Draw.css';
+import { columnMax, columnMin, countInCol, positionTopCol } from '../../services/draw/knockoutLib';
 
 type Props = {
   event: TEvent,
@@ -65,7 +65,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                 classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
                 // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                 // onclick={() => navigate(urlBox(box), {replace:true})}
-                href={urlBox(box)} replace={true}
+                href={urlBox(box)} replace={true} noScroll={true}
               >
                 <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
                 <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
@@ -85,7 +85,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                       selectBox(props.event, props.draw, box);
                       // showDialog("qualif");
                     }}
-                  ></i> */}
+                  /> */}
                   <span class="club">{player?.club}</span>
                 </Show>
                 <Show when={box && isMatch(box)}>
@@ -94,7 +94,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                       selectBox(props.event, props.draw, box);
                       showDialog("match");
                     }}
-                  ></i>
+                  />
                   <Show when={box?.score} fallback={
                     <>
                       <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
@@ -109,7 +109,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                         selectBox(props.event, props.draw, box);
                         // showDialog("qualif");
                       }}
-                    ></i>
+                    />
                   </Show>
                 </Show>
               </A>

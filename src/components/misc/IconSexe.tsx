@@ -13,5 +13,5 @@ export const IconSexe: Component<Props> = (props) => (
         'icon2-double-male': props.sexe === 'H' && props.double,
         'icon2-double-female': props.sexe === 'F' && props.double,
         'icon2-double-mixte': props.sexe === 'M' && props.double,
-    }}></i>
+    }}/>
 )

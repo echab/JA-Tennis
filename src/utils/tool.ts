@@ -67,3 +67,10 @@ export function hashById<T extends { id: string }>(array: T[]): { [id: string]: 
     }
     return a;
 }
+
+export function ASSERT(b: boolean, message?: string): void {
+    if (!b) {
+        debugger;
+        throw new Error(message || 'Assertion is false');
+    }
+}

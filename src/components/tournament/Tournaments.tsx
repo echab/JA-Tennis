@@ -38,7 +38,7 @@ export const Tournaments: Component = () => {
   return <div class="p-2">
     <h3>Tournmanent</h3>
     <span>
-      <button type="button" onclick={[showDialog, "info"]}><i class="icon2-info"></i></button>
+      <button type="button" onclick={[showDialog, "info"]}><i class="icon2-info" /></button>
       {selection.tournament.info.name}
     </span>
 

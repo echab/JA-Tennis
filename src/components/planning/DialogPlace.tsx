@@ -43,7 +43,7 @@ export const DialogPlace: Component<Props> = (props) => {
    return (
       <dialog ref={refDlg!} class="p-0">
          <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-            <b><i class='icon2-planning'></i> Place</b>
+            <b><i class='icon2-planning' /> Place</b>
             <button type="button" data-dismiss="modal" aria-hidden="true"
                onclick={() => refDlg.close()}
             >&times;</button>

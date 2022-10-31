@@ -2,13 +2,14 @@ import { Component, createEffect, Show } from "solid-js";
 import { A, useNavigate, useParams } from "@solidjs/router";
 import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
-import { selection, drawById, selectBox, urlBox } from "../util/selection";
+import { selection, drawById, selectBox, urlBox, update } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
 import { Params } from "../App";
 import { IconSexe } from "../misc/IconSexe";
-import { commandManager } from "../../services/util/commandManager";
+import { commandManager, setItem } from "../../services/util/commandManager";
 import { drawLib, GenerateType } from "../../services/draw/drawLib";
 import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
+import { Mode } from "../../domain/draw";
 
 export const PaneDraw: Component = () => {
 
@@ -48,6 +49,14 @@ export const PaneDraw: Component = () => {
             navigate(url, { replace: true });
         }
     });
+
+    const lockDraw = () => {
+        update((sel) => {
+            if (sel.draw) {
+                sel.draw.lock = 1 - (sel.draw.lock ?? 0);
+            }            
+        });
+    };
 
     const randomize = () => {
         const evt = event(), drw = draw();
@@ -93,8 +102,8 @@ export const PaneDraw: Component = () => {
                         classList={{ "pointer-events-none": !prevDraw() }}
                         href={`/draw/${params.eventId}/${prevDraw()?.id}`} replace={true}
                         title="View the previous draw of the event"
-                    ><i class="icon2-left-arrow"></i></A>
-                    {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info"></i></button> */}
+                    ><i class="icon2-left-arrow" /></A>
+                    {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info" /></button> */}
                     <span class="inline-block min-w-[5em]">{draw()?.name}</span>
                     <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50"
                         // onclick={() => selectDraw(event()!, nextDraw())}
@@ -102,38 +111,42 @@ export const PaneDraw: Component = () => {
                         href={`/draw/${params.eventId}/${nextDraw()?.id}`} replace={true}
                         classList={{ "pointer-events-none": !nextDraw() }}
                         title="View the next draw of the event"
-                    ><i class="icon2-right-arrow"></i></A>
+                    ><i class="icon2-right-arrow" /></A>
                 </Show>
             </h4>
             <Show when={event() && draw()}>
                 <div class="bg-white bg-opacity-80">
                     <button class="p-2 rounded-full" title="Edit draw information"
                         onClick={() => showDialog("draw")}
-                    ><i class="icon2-info"></i></button>
+                    ><i class="icon2-info" /></button>
 
-                    <button class="p-2 rounded-full" title="Lock/unlock draw updates"
-                        // onClick={lockDraw}
-                    ><i class="icon2-locker"></i></button>
+                    <button class="p-2 rounded-full [&[aria-selected=true]]:bg-blue-200" title="Lock/unlock draw updates"
+                        aria-selected={draw()?.lock === Mode.Plan}
+                        onClick={lockDraw}
+                    ><i class="icon2-locker" /></button>
 
-                    <button class="p-2 rounded-full" title="Change the draw structure to be more progressive"
-                        onClick={generateLeft}
-                    ><i class="icon2-draw-left"></i></button>
+                    <Show when={draw()?.lock === Mode.Build}>
+                        <Show when={!((draw()?.type ?? 0) & 2)}>
+                            <button class="p-2 rounded-full" title="Change the draw structure to be more progressive"
+                                onClick={generateLeft}
+                            ><i class="icon2-draw-left" /></button>
 
-                    <button class="p-2 rounded-full" title="Change the draw structure to be more direct"
-                        onClick={generateDown}
-                    ><i class="icon2-draw-bottom"></i></button>
+                            <button class="p-2 rounded-full" title="Change the draw structure to be more direct"
+                                onClick={generateDown}
+                            ><i class="icon2-draw-bottom" /></button>
+                        </Show>
 
-                    <button class="p-2 rounded-full" title="Shuffle the players with same rank"
-                        onClick={randomize}
-                    ><i class="icon2-random"></i></button>
+                        <button class="p-2 rounded-full" title="Shuffle the players with same rank"
+                            onClick={randomize}
+                        ><i class="icon2-random" /></button>
 
-                    <button class="p-2 rounded-full" title="Place the seeded positions"
-                        // onClick={placeSeeded}
-                    ><i class="icon2-seeded"></i></button>
-
+                        <button class="p-2 rounded-full" title="Place the seeded positions"
+                            // onClick={placeSeeded}
+                        ><i class="icon2-seeded" /></button>
+                    </Show>
                     <button class="p-2 rounded-full" title="Place the qualified position, in or out of the draw group"
                         // onClick={placeQualifs}
-                    ><i class="icon2-qualif-in"></i></button>
+                    ><i class="icon2-qualif-in" /></button>
                 </div>
             </Show>
         </div>

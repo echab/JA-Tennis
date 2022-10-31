@@ -5,6 +5,8 @@ import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
 import { groupDraw, groupFindPlayerIn, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
+import { ASSERT } from '../../utils/tool';
+import { ADVERSAIRE1, iDiagonalePos, positionFirstIn, positionLastIn, positionResize, seedPositionOpponent1, seedPositionOpponent2 } from './roundrobinLib';
 
 const MIN_COL = 0,
     MAX_COL_POULE = 22,
@@ -140,7 +142,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
-        const next = nextGroup(this.event, this.draw);
+        const nextGrp = nextGroup(this.event, this.draw);
 
         //TODOjs findBox()
         const diag = this.draw.boxes[this.iDiagonale(box)];
@@ -148,7 +150,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         if (outNumber) {	//Ajoute un qualifié sortant
             // //Met à jour le tableau suivant
-            // if (next && box.playerId && box.qualifOut) {
+            // if (nextgrp && box.playerId && box.qualifOut) {
             //     const boxIn = this.findPlayerIn(outNumber);
             //     if (boxIn) {
             //         ASSERT(boxIn.playerId === box.playerId);
@@ -168,9 +170,9 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
             diag.playerId = box1.playerId;
 
-            if (next && box.playerId) {
+            if (nextGrp && box.playerId) {
                 //Met à jour le tableau suivant
-                const [,boxIn] = groupFindPlayerIn(this.event, next, outNumber);
+                const [,boxIn] = groupFindPlayerIn(this.event, nextGrp, outNumber);
                 if (boxIn) {
                     ASSERT(!boxIn.playerId);
                     if (!this.putPlayer(boxIn, box.playerId, undefined, true)) {
@@ -181,9 +183,9 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         } else {	//Enlève un qualifié sortant
             const match = box as Match;
-            if (next && box.playerId && match.qualifOut) {
+            if (nextGrp && box.playerId && match.qualifOut) {
                 //Met à jour le tableau suivant
-                const [,boxIn] = groupFindPlayerIn(this.event, next, match.qualifOut);
+                const [,boxIn] = groupFindPlayerIn(this.event, nextGrp, match.qualifOut);
                 if (boxIn) {
                     ASSERT(!!boxIn.playerId && boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn, undefined, true)) {
@@ -381,61 +383,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    isJoueurNouveau(box: Box): boolean {
+    isNewPlayer(box: Box): boolean {
         throw new Error('Not implemented RoundRobin.isJoueurNouveau');
     }
 }
-
-function ASSERT(b: boolean, message?: string): void {
-    if (!b) {
-        debugger;
-        throw new Error(message || 'Assertion is false');
-    }
-}
-
-function column(pos: number, nCol: number): number { //iColPoule
-    return Math.floor(pos / nCol);
-}
-
-function row(pos: number, nCol: number): number { //iRowPoule
-    return pos % nCol;
-}
-
-function positionFirstIn(nCol: number): number {
-    return nCol * (nCol + 1);
-}
-function positionLastIn(nCol: number): number {
-    return nCol * nCol + 1;
-}
-
-function seedPositionOpponent1(pos: number, nCol: number): number {    //POULE_ADVERSAIRE1
-    return (pos % nCol) + (nCol * nCol);
-}
-
-function seedPositionOpponent2(pos: number, nCol: number): number {    //POULE_ADVERSAIRE2
-    return Math.floor(pos / nCol) + (nCol * nCol);
-}
-
-
-function positionMatchPoule(row: number, col: number, nCol: number): number { //IMATCH
-    return (col * nCol) + row;
-}
-
-function positionResize(pos: number, nColOld: number, nCol: number): number {
-    const r = row(pos, nColOld),
-        col = column(pos, nColOld);
-    return (nCol - nColOld + r) + nCol * (nCol - nColOld + col);
-}
-
-// function iDiagonale(box: Box): number {
-//     const n = box._draw.nbColumn;
-//     return (box.position % n) * (n + 1);
-// }
-function iDiagonalePos(nbColumn: number, pos: number): number {
-    return (pos % nbColumn) * (nbColumn + 1);
-}
-
-function ADVERSAIRE1(draw: Draw, pos: number): number {
-    const n = draw.nbColumn;
-    return pos % n + n * n;
-};

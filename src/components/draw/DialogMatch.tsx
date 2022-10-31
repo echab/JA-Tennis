@@ -107,7 +107,7 @@ export const DialogMatch: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <span><i class='icon2-match'></i> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
+        <span><i class='icon2-match' /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
         <small>{props.match.position}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}
@@ -167,13 +167,13 @@ export const DialogMatch: Component<Props> = (props) => {
 
             <div class="mb-1">
               <label class="inline-block w-3/12 text-right pr-3">{player1?.name}:</label>
-              <label><input type="checkbox" checked={form.aware1} onChange={updateField("aware1")} /><i class='icon2-aware'></i>Aware</label>
-              <label class="pl-5"><input type="checkbox" checked={form.receive1} onChange={updateField("receive1")} /><i class='icon2-home'></i>Receive</label>
+              <label><input type="checkbox" checked={form.aware1} onChange={updateField("aware1")} /><i class='icon2-aware' />Aware</label>
+              <label class="pl-5"><input type="checkbox" checked={form.receive1} onChange={updateField("receive1")} /><i class='icon2-home' />Receive</label>
             </div>
             <div class="mb-1">
               <label class="inline-block w-3/12 text-right pr-3">{player2?.name}:</label>
-              <label><input type="checkbox" checked={form.aware2} onChange={updateField("aware2")} /><i class='icon2-aware'></i>Aware</label>
-              <label class="pl-5"><input type="checkbox" checked={form.receive2} onChange={updateField("receive2")} /><i class='icon2-home'></i>Receive</label>
+              <label><input type="checkbox" checked={form.aware2} onChange={updateField("aware2")} /><i class='icon2-aware' />Aware</label>
+              <label class="pl-5"><input type="checkbox" checked={form.receive2} onChange={updateField("receive2")} /><i class='icon2-home' />Receive</label>
             </div>
           </fieldset>
 
@@ -187,7 +187,7 @@ export const DialogMatch: Component<Props> = (props) => {
             </div>
 
             <div class="flex mb-1">
-              <label class="inline-block w-3/12 text-right pr-3"><i class="icon2-note"></i> Note:</label>
+              <label class="inline-block w-3/12 text-right pr-3"><i class="icon2-note" /> Note:</label>
               <textarea value={form.note ?? ''} onChange={updateField('note')} class="w-9/12 p-1"></textarea>
             </div>
           </fieldset>

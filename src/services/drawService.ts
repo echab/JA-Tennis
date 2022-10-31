@@ -1,7 +1,7 @@
 import { byId, indexOf } from "./util/find";
 import { Guid } from "./util/guid";
 import { extend, isArray, isObject } from "./util/object";
-import { shuffle } from "../utils/tool";
+import { ASSERT, shuffle } from "../utils/tool";
 import { rank } from "./types";
 
 import { Box, Draw, DrawType, Match, Mode, PlayerIn, QEMPTY } from "../domain/draw";
@@ -118,10 +118,10 @@ export function newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
 }
 
 export function initDraw(draw: Draw, parent: TEvent): void {
-  draw.type = draw.type || DrawType.Knockout;
-  draw.nbColumn = draw.nbColumn || 0;
-  draw.nbOut = draw.nbOut || 0;
-  draw.mode = draw.mode || Mode.Build;
+  draw.type ||= DrawType.Knockout;
+  draw.nbColumn ||=  0;
+  draw.nbOut ||=  0;
+  draw.lock ||=  Mode.Build;
 }
 
 export function deleteDraw(drawId: string): Command {
@@ -444,7 +444,37 @@ export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player | num
     .map(({ qualifIn, playerId, order }) => order
       ? qualifIn || (playerId ? byId(players, playerId) : undefined)
       : undefined)
-    .filter((r): r is Player | number => !!r);
+    .filter((q): q is Player | number => q !== undefined);
+}
+
+/** list all output qualifies */
+export function findGroupQualifOuts(event: TEvent, [groupStart, groupEnd]: [number, number]): [Draw, number][] {
+  const result: [Draw, number][] = [];
+  for (let i = groupStart; i < groupEnd; i++) {
+    const draw = event.draws[i];
+    result.push(...
+      (draw.boxes as Match[])
+        .map(({ qualifOut }) => qualifOut)
+        .filter((q): q is number => q !== undefined)
+        .map<[Draw, number]>((q) => [draw, q])
+    );
+  }
+  return result;
+}
+
+/** list all input qualifies */
+export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [number, number]): [Draw, number][] {
+  const result: [Draw, number][] = [];
+  for (let i = groupStart; i < groupEnd; i++) {
+    const draw = event.draws[i];
+    result.push(...
+      (draw.boxes as PlayerIn[])
+        .map(({ qualifIn }) => qualifIn)
+        .filter((q): q is number => q !== undefined)
+        .map<[Draw, number]>((q) => [draw, q])
+    );
+  }
+  return result;
 }
 
 /**
@@ -472,10 +502,3 @@ export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player | num
 // static boxesOpponents(match: Match): { box1: Box; box2: Box } {
 //     return _drawLibs[match._draw.type].boxesOpponents(match);
 // }
-
-function ASSERT(b: boolean, message?: string): void {
-  if (!b) {
-    debugger;
-    throw new Error(message || "Assertion is false");
-  }
-}

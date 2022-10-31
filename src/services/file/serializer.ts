@@ -30,7 +30,7 @@ export type Serializer = {
     ) => any
 }
 
-type FieldParent = { version?: number, [k: string]: any };
+export type FieldParent = { version?: number, [k: string]: any };
 
 export type FnType = (
     this: Serializer,

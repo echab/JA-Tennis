@@ -35,7 +35,7 @@ export interface Draw {
   //matches: Match[];
   boxes: (PlayerIn | Match)[];
 
-  mode?: Mode;
+  lock?: Mode;
 
   //_refresh?: Date; //force refresh //TODO?
 }

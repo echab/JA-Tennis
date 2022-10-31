@@ -15,7 +15,7 @@ export const Problems: Component = () => {
                 checked={selectedDraw()}
                 onChange={({target}) => setSelectedDraw((target as HTMLInputElement).checked)}
                 /> selected draw</label>
-            <button onClick={() => validateTournament(selection.tournament)}><i class="icon2-refresh"></i></button>
+            <button onClick={() => validateTournament(selection.tournament)}><i class="icon2-refresh" /></button>
         </div>
         <ul>
             <For each={[...selection.playerProblems.entries()]}>{([playerId, errors]) => (
@@ -31,7 +31,7 @@ export const Problems: Component = () => {
             <For each={[...selection.drawProblems.entries()]
                 .filter(([edId]) => !selectedDraw() || (edId.startsWith(`${selection.draw?.id}-`)))    
             } fallback={
-                <div>No draw error.</div>
+                <p class="italic m-2">No problem</p>
             }>{([eventdrawId, errors]: [string, DrawProblem[]]) => {
                 const {draw, event} = drawById(eventdrawId);
                 return (

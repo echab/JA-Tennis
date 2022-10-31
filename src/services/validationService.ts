@@ -66,6 +66,7 @@ export function validatePlayer(player: Player): PlayerProblem[] {
 }
 
 export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
+  // console.log('validate draw ', event.name, ' draw:', draw.id, draw.name);
   const result: DrawProblem[] = [];
   for (const lib of validLibs) {
     const fn = lib.validateDraw;

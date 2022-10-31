@@ -123,17 +123,17 @@ export const DialogEvent: Component<Props> = (props) => {
                   <label>
                      <input value='H' type="radio" required class='mr-1'
                         checked={form.sexe === 'H'} onChange={updateField("sexe")} />
-                     <i classList={{"icon2-male":!form.typeDouble, "icon2-double-male":form.typeDouble}}></i> Male
+                     <i classList={{"icon2-male":!form.typeDouble, "icon2-double-male":form.typeDouble}}/> Male
                   </label>
                   <label>
                      <input value='F' type="radio" required class='mr-1'
                         checked={form.sexe === 'F'} onChange={updateField("sexe")} />
-                     <i classList={{"icon2-female":!form.typeDouble, "icon2-double-female":form.typeDouble}}></i> Female
+                     <i classList={{"icon2-female":!form.typeDouble, "icon2-double-female":form.typeDouble}}/> Female
                   </label>
                   <label>
                      <input value='M' type="radio" required class='mr-1'
                         checked={form.sexe === 'M'} onChange={updateField("sexe")} />
-                     <i classList={{"icon2-mixte":!form.typeDouble, "icon2-double-mixte":form.typeDouble}}></i> Mixte
+                     <i classList={{"icon2-mixte":!form.typeDouble, "icon2-double-mixte":form.typeDouble}}/> Mixte
                   </label>
                </div>
 
@@ -172,7 +172,7 @@ export const DialogEvent: Component<Props> = (props) => {
             <div class="mb-1">
                <label class="inline-block w-3/12 text-right pr-3">Draws:</label>
                <For each={event?.draws}>{(draw) =>
-                  <span><i class="icon2-draw"></i> {draw.name}</span>
+                  <span><i class="icon2-draw" /> {draw.name}</span>
                }</For>
             </div>
             <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pb-4 pr-4 bg-gray-50 bg-opacity-60'>

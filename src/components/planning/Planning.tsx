@@ -47,7 +47,7 @@ export const Planning: Component<Props> = (props) => {
         <ul class="pb-2">
             <For each={props.places}>{(place) =>
                 <li>
-                    <i class="icon2-info hover" onclick={[editPlace,place]}></i>
+                    <i class="icon2-info hover" onclick={[editPlace,place]}/>
                     {place.name}
                 </li>
             }</For>

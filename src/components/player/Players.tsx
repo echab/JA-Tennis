@@ -104,7 +104,7 @@ export const Players: Component<Props> = (props) => {
                 {/* <small>{player.id}</small> */}
               </td>
               <td class="text-left">
-                <i class="icon2-info hover" onclick={[editPlayer,player]}></i>
+                <i class="icon2-info hover" onclick={[editPlayer,player]}/>
                 <IconSexe sexe={player.sexe} />
               </td>
               <td class="text-left">
@@ -118,7 +118,7 @@ export const Players: Component<Props> = (props) => {
                       "icon2-checkmark": (!selection.draw && isRegistred(selection.event!, player)) || drawPlayerIds().has(player.id),
                       "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
                     }}
-                    ></i></Show>
+                    /></Show>
                 </td>
               </Show>
               <Show when={!props.short}>

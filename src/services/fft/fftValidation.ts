@@ -7,6 +7,7 @@ import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { drawLib } from '../draw/drawLib';
 import type { DrawProblem, IValidation, PlayerProblem } from '../../domain/validation';
+import { column, positionMax } from '../draw/knockoutLib';
 
 function validatePlayer(player: Player): PlayerProblem[] {
     const result : PlayerProblem[] = [];
@@ -376,30 +377,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     return result;
 
 
-}
-
-
-function column(pos: number): number {    //iCol
-    //TODO, use a table
-    let col = -1;
-    for (pos++; pos; pos >>= 1, col++) { }
-    return col;
-}
-
-function columnMax(nCol: number, nQ?: number): number { //iColMaxQ
-    return !nQ || nQ === 1
-        ? nCol - 1
-        : column(nQ - 2) + nCol;
-}
-
-function positionTopCol(col: number): number { // iHautCol
-    return (1 << (col + 1)) - 2;
-}
-
-function positionMax(nCol: number, nQ?: number): number {   //iBoiteMaxQ
-    return !nQ || nQ === 1
-        ? (1 << nCol) - 2  //iHautCol
-        : positionTopCol(columnMax(nCol, nQ));
 }
 
 export const FFTValidation: IValidation = { validatePlayer, validateDraw };

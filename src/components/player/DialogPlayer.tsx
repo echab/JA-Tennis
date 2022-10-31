@@ -87,7 +87,7 @@ export const DialogPlayer: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <b><i class='icon2-player'></i> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
+        <b><i class='icon2-player' /> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
         <small>Id: {props.player?.id}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}
@@ -100,13 +100,13 @@ export const DialogPlayer: Component<Props> = (props) => {
             <label class="inline-block w-3/12 text-right pr-3 h-8">Sexe:</label>
             <label class="px-1">
               <input value='H' type="radio" required
-                checked={form.sexe === 'H'} onChange={updateField("sexe")} /> <i class="icon2-male"></i></label>
+                checked={form.sexe === 'H'} onChange={updateField("sexe")} /> <i class="icon2-male" /></label>
             <label class="px-1">
               <input value='F' type="radio" required
-                checked={form.sexe === 'F'} onChange={updateField("sexe")} /> <i class="icon2-female"></i></label>
+                checked={form.sexe === 'F'} onChange={updateField("sexe")} /> <i class="icon2-female" /></label>
             <label class="px-1">
               <input value='M' type="radio" required
-                checked={form.sexe === 'M'} onChange={updateField("sexe")} /> <i class="icon2-mixte"></i></label>
+                checked={form.sexe === 'M'} onChange={updateField("sexe")} /> <i class="icon2-mixte" /></label>
           </div>
           <div class="mb-1">
             <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
@@ -132,7 +132,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                   return <li>{
                     teamPlayer
                       ? <span>
-                        <A href={urlPlayer(teamPlayer)}><i class="icon2-info"/></A>
+                        <A href={urlPlayer(teamPlayer)}><i class="icon2-info" /></A>
                         <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname?.[0] ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
                       </span>
                       : `#${playerId}`                    

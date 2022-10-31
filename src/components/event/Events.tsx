@@ -1,4 +1,4 @@
-import { Component, For, JSX } from 'solid-js';
+import { Component, For, JSX, Show } from 'solid-js';
 import { A } from '@solidjs/router';
 import { selectDraw, selectEvent, selection, urlDraw, urlEvent } from '../util/selection';
 import { TEvent } from '../../domain/tournament';
@@ -51,7 +51,7 @@ export const Events: Component<Props> = (props) => {
         >
           {/* <input type="checkbox" /> */}
           <A href={urlEvent(event)} replace={true}>
-            <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}></i>
+            <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}/>
             {/* <small>{event.id} </small> */}
             <IconSexe sexe={event.sexe} double={event.typeDouble} />
             <span>{event.name}</span>
@@ -83,15 +83,16 @@ export const Events: Component<Props> = (props) => {
                     selectDraw(event, draw);
                     showDialog("draw");
                   }}
-                ></i>
+                />
                 {/* <small>{draw.id} </small> */}
-                <i class="icon2-draw"></i>
+                <i class="icon2-draw" />
+                <Show when={draw.lock}><i class="icon2-locker opacity-60 mr-1" /></Show>
                 {draw.name} {draw.suite ? '(c)' : ''}
                 {/* TODO list the count of registered players in this draw, by rank */}
 
                 <span class="float-right hover">&Gt;</span>
 
-                {/* <span class=" float-right hover" onClick={() => commandManager.wrap(() => deleteDraw(draw.id))}><i class="icon2-cross"></i></span> */}
+                {/* <span class=" float-right hover" onClick={() => commandManager.wrap(() => deleteDraw(draw.id))}><i class="icon2-cross" /></span> */}
               </A>
             </div>
           }</For>

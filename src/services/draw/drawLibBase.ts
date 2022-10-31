@@ -4,6 +4,7 @@ import type { TEvent } from '../../domain/tournament';
 import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
+import { ASSERT } from '../../utils/tool';
 
 export abstract class DrawLibBase implements IDrawLib {
 
@@ -18,7 +19,7 @@ export abstract class DrawLibBase implements IDrawLib {
     abstract findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
     abstract computeScore(): boolean; //CalculeScore
     abstract boxesOpponents(match: Match): { box1: Box; box2: Box };
-    abstract isJoueurNouveau(box: Box): boolean;
+    abstract isNewPlayer(box: Box): boolean;
   
     protected findBox<T extends Box = Box>(position: number, create?: boolean): T | undefined {
         let box = by(this.draw.boxes, 'position', position);
@@ -30,9 +31,9 @@ export abstract class DrawLibBase implements IDrawLib {
 
     resetDraw( nPlayer: number): void {
         //remove qualif out
-        const next = nextGroup(this.event, this.draw);
-        if (next && this.draw.boxes) {
-            const [groupStart, groupEnd] = next;
+        const nextGrp = nextGroup(this.event, this.draw);
+        if (nextGrp && this.draw.boxes) {
+            const [groupStart, groupEnd] = nextGrp;
             for (let i = groupStart; i < groupEnd; i++) {
                 const d = this.event.draws[i];
                 const boxes = d.boxes;
@@ -123,9 +124,9 @@ export abstract class DrawLibBase implements IDrawLib {
 
         // const boxOut = box as Match;
         // if (boxOut.qualifOut) {
-        //     const next = nextGroup(this.event, this.draw);
-        //     if (next) {
-        //         const [,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+        //     const nextgrp = nextGroup(this.event, this.draw);
+        //     if (nextgrp) {
+        //         const [,boxIn] = groupFindPlayerIn(this.event, nextgrp, boxOut.qualifOut);
         //         if (boxIn) {
         //             if (!boxIn.playerId
         //                 && !this.putPlayer(boxIn, playerId, true)) {
@@ -185,10 +186,10 @@ export abstract class DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            const prev = previousGroup(this.event, this.draw);
-            if (!playerId && prev && inNumber !== QEMPTY) {
+            const prevGroup = previousGroup(this.event, this.draw);
+            if (!playerId && prevGroup && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
-                const [d,boxOut] = groupFindPlayerOut(this.event, prev, inNumber);
+                const [d,boxOut] = groupFindPlayerOut(this.event, prevGroup, inNumber);
                 if (boxOut) {	//V0997
                     playerId = boxOut.playerId;
                 }
@@ -242,7 +243,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
         // TODO simplify: if qualifOut, find the qualifIn matching box in next draw group
         // const boxOut = box as Match;
-        // const [nextDraw,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+        // const [nextDraw,boxIn] = groupFindPlayerIn(this.event, nextgrp, boxOut.qualifOut);
 
         if (result.playerId) {
             if (!this.putPlayer(box, result.playerId, boxQ)) {
@@ -303,10 +304,10 @@ export abstract class DrawLibBase implements IDrawLib {
 
         //ASSERT(EnleveJoueurOk(box, bForce));
 
-        // const next = nextGroup(this.event, this.draw);
+        // const nextgrp = nextGroup(this.event, this.draw);
         // const boxOut = box as Match;
-        // if (boxOut.qualifOut && next) {
-        //     const [,boxIn] = groupFindPlayerIn(this.event, next, boxOut.qualifOut);
+        // if (boxOut.qualifOut && nextgrp) {
+        //     const [,boxIn] = groupFindPlayerIn(this.event, nextgrp, boxOut.qualifOut);
         //     if (boxIn) {
         //         if (!this.removePlayer(boxIn, true)) {
         //             throw new Error('error');
@@ -407,11 +408,11 @@ export abstract class DrawLibBase implements IDrawLib {
 
         box.locked = true;
 
-        const prev = previousGroup(this.event, this.draw);
-        if (prev) {
+        const prevGroup = previousGroup(this.event, this.draw);
+        if (prevGroup) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                const [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
+                const [d,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -430,11 +431,11 @@ export abstract class DrawLibBase implements IDrawLib {
 
         delete box.locked;
 
-        const prev = previousGroup(this.event, this.draw);
-        if (prev) {
+        const prevGroup = previousGroup(this.event, this.draw);
+        if (prevGroup) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                const [d,boxOut] = groupFindPlayerOut(this.event, prev, boxIn.qualifIn);
+                const [d,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }
@@ -578,12 +579,5 @@ export abstract class DrawLibBase implements IDrawLib {
         } else {
             return (box.position << 1) + 1;
         }
-    }
-}
-
-function ASSERT(b: boolean, message?: string): void {
-    if (!b) {
-        debugger;
-        throw new Error(message || 'Assertion is false');
     }
 }

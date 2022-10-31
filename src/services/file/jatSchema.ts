@@ -1,12 +1,14 @@
-import { Box, Draw, DrawType, Match, QEMPTY } from "../../domain/draw";
+import { Box, Draw, DrawType, Match, PlayerIn, QEMPTY } from "../../domain/draw";
 import { Player } from "../../domain/player";
 import { TEvent, Tournament } from "../../domain/tournament";
+import { ASSERT } from "../../utils/tool";
 import { drawLib } from "../draw/drawLib";
+import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
 import { isMatch } from "../drawService";
 import { ranksName } from "../tournamentService";
 import { category, rank } from "../types";
-import { byId } from "../util/find";
-import { array, arrayb, bstr, byte, customData, date, dword, Fields, float, generateId, i16, schema, word } from "./serializer";
+import { byId, indexOf } from "../util/find";
+import { array, arrayb, bstr, byte, customData, date, dword, FieldParent, Fields, float, generateId, i16, schema, word } from "./serializer";
 
 const DAY = 24 * 3600 * 1000, YEAR = DAY * 365.25;
 const MAX_JOUR = 42;
@@ -36,9 +38,9 @@ export const jatFileType = {
 };
 
 const categoryFFT = [
-    10,17,24,30,50,60,64,70,80,90,100,
+    10, 17, 24, 30, 50, 60, 64, 70, 80, 90, 100,
     110,
-    120,125,130,140,150,160,170,180,190
+    120, 125, 130, 140, 150, 160, 170, 180, 190
 ];
 
 const rankFields: Fields = {
@@ -52,7 +54,7 @@ const rankFields: Fields = {
                 c = PAS_CLASSEMT;
             }
             const ranks = rank.list();
-            return  ranks[19 - c / 60];
+            return ranks[19 - c / 60];
         },
         valid: (c) => c === PAS_CLASSEMT || (MAXCLAST <= c && c <= NC),
     },
@@ -62,13 +64,14 @@ const playerFields: Fields /* <Player> */ = {
     _schema: { type: schema, valid: (s) => s === 'CJoueur' },
     version: { type: byte, def: 10, valid: (v, p) => v <= 10 },
     sexe: { version: 4, type: byte }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
-    teamIds: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: arrayb, itemType: word, valid: (a) => a.length <= 4,
+    teamIds: {
+        predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: arrayb, itemType: word, valid: (a) => a.length <= 4,
         reviver: (a: number[], p) => {
             return a.map((playerId) => String(playerId)); // playerId is converted to Player below
         }
     },
     teamName: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: bstr, reviver: (s) => s || undefined },
-    licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: dword, reviver:(l) => l || undefined }, // TODO by types
+    licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: dword, reviver: (l) => l || undefined }, // TODO by types
     name: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: bstr },
     firstname: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: bstr },
     adress1: { type: bstr, reviver: (s) => s || undefined },
@@ -119,7 +122,7 @@ const playerFields: Fields /* <Player> */ = {
     _: {
         type(_, p) {
             if (p) {
-                p.sexe = ['H','F','M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+                p.sexe = ['H', 'F', 'M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
             }
         }
     }
@@ -215,7 +218,7 @@ const boxFields: Fields /* <PlayerIn & Match> */ = {
 const drawFields: Fields /* <Draw> */ = {
     _schema: { type: schema, valid: (s) => s === 'CTableau' },
     version: { type: byte, def: 10, valid: (v, p) => v <= 10 },
-    id: { version: 10, type: word, def: generateId, reviver:(id) => String(id) },
+    id: { version: 10, type: word, def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: bstr, reviver: (s, p) => { p.name = s; } },
     name: { version: 5, type: bstr },
     nbColumn: { type: byte, valid: (n) => MIN_COL <= n }, // MAX_COL depends on type
@@ -232,14 +235,18 @@ const drawFields: Fields /* <Draw> */ = {
 
     boxes: {
         type: array, itemType: boxFields, reviver: (b, p) => {
+            const posMin = positionMin(p.nbOut), posMax = positionMax(p.nbColumn, p.nbOut);
             return b.map((o: Box, i: number) => {
                 o.position = i;
                 return o;
-            });
+            }).filter((o: Box) => !(p.type === DrawType.Knockout || p.type === DrawType.Final)
+                || (posMin <= o.position && o.position <= posMax
+                    && o.position >= positionBottomCol(column(o.position), p.nbOut))
+            );
         }
     },
-    lock: { version: 4, type: byte, def: 0 },
-    _lock: { maxVersion: 1, type: byte, reviver: (b, p) => { p.lock = b; } },
+    lock: { version: 4, type: byte, def: 0, reviver:(l) => l || undefined },
+    _lock: { maxVersion: 1, type: byte, reviver: (b, p) => { if (b) { p.lock = b; } } },
     orientation: { type: byte },
     _minRank: { maxVersion: 7, type: byte }, // TODO
     _maxRank: { maxVersion: 7, type: byte }, // TODO
@@ -248,14 +255,32 @@ const drawFields: Fields /* <Draw> */ = {
     suite: { version: 7, type: byte, def: 0 },
     formatMatch: { version: 8, type: byte },
     _: {
-        type(_, draw) {
-            if (draw && !draw.name) {
+        type(_, p) {
+            const draw = p as Draw;
+            if (!draw.name) {
                 if (draw.type === DrawType.Final) {
                     draw.name = "Final draw";
                 } else {
                     draw.name = ranksName(draw.minRank, draw.maxRank);
                 }
             }
+
+            // hide boxes on left off entering players
+            // const hideBox = (box: Box, b: number) => box.hidden = true;
+            const deleteBox = (box: Box) => {
+                if (box.playerId) {
+                    console.warn('cleanup draw', draw.id, draw.name, `box.pos=${box.position}`, 'player=', box.playerId);
+                } else {
+                    const b = indexOf(draw.boxes, "position", box.position);
+                    delete draw.boxes[b];
+                }
+            }
+            draw.boxes.forEach((box: PlayerIn) => {
+                if (box.order) {
+                    scanLeftBoxes(draw, box.position, false, deleteBox);
+                }
+            });
+
             // TODO init joueur QS
             // if (draw.type & TABLEAU_POULE) {
             //     for(let i=iHautCol( iColMin()); i>=0; i--){
@@ -271,7 +296,7 @@ const drawFields: Fields /* <Draw> */ = {
 const eventFields: Fields /* <TEvent> */ = {
     _schema: { type: schema, valid: (s) => s === 'CEpreuve' },
     version: { type: byte, def: 10, valid: (v, p) => v <= 10 },
-    id: { version: 9, type: word, def: generateId, reviver:(id) => String(id) },
+    id: { version: 9, type: word, def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: bstr, reviver: (s, p) => { p.name = s; } },
     name: { version: 10, type: bstr },
     sexe: {
@@ -291,14 +316,15 @@ const eventFields: Fields /* <TEvent> */ = {
     },
     _categ3: { maxVersion: 3, type: byte, reviver: (b) => [0, 1, 2, 3, 5, 7, 9, 11, 12, 13, 15, 17, 18][b], valid: () => false },
     _categ7: { maxVersion: 6, type: byte, reviver: (b) => b * 10, valid: () => false },
-    category: { version: 7, type: byte, reviver(b) {
-        // @ts-expect-error
-        if (this._type.name === "FFT") {
-            return categoryFFT.indexOf(b);    
+    category: {
+        version: 7, type: byte, reviver(b) {
+            // @ts-expect-error
+            if (this._type.name === "FFT") {
+                return categoryFFT.indexOf(b);
+            }
+            // TODO, from .ini, by types
+            return `category${b}`;
         }
-        // TODO, from .ini, by types
-        return `category${b}`;
-     }
     },
     _bDouble: { type: byte },
     _rankAccept: { version: 2, maxVersion: 7, type: byte, reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
@@ -317,7 +343,7 @@ const eventFields: Fields /* <TEvent> */ = {
             delete this._curSexe; // clean-up
 
             if (event) {
-                event.sexe = ['H','F','M'][event.sexe & ~EQUIPE_MASK]; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
+                event.sexe = ['H', 'F', 'M'][event.sexe & ~EQUIPE_MASK]; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
 
                 // cleanup draws.boxes
                 event.draws.forEach((draw: Draw) => {
@@ -364,7 +390,7 @@ const infoFields: Fields /* <TournamentInfo> */ = {
 
 export const docFields: Fields /* <Tournament> */ = {
     version: { type: byte, def: 13, valid: (v, p) => v <= 13 },
-    id: { version: 13, type: word, def: generateId, reviver:(id) => String(id) },
+    id: { version: 13, type: word, def: generateId, reviver: (id) => id ? String(id) : generateId() },
     types: {
         version: 9, type: {
             name: { version: 9, type: bstr, def: 'FFT', valid: (t) => t === 'FFT' },
@@ -408,29 +434,31 @@ export const docFields: Fields /* <Tournament> */ = {
             }
         }
     },
-    _: { type(_, p) {
-        const doc = p as Tournament;
-        //convert players registration
-        doc.players.forEach((p, i) => {
-            p.id = String(i);
+    _: {
+        type(_, p) {
+            const doc = p as Tournament;
+            //convert players registration
+            doc.players.forEach((p, i) => {
+                p.id = String(i);
 
-            // compute team name
-            if (p.teamIds) {
-                p.name = (p as any).teamName ||
-                    p.teamIds
-                    // .map((playerId) => byId(doc.players, playerId, `team player #${playerId} not found`))
-                    .map((playerId) => byId(doc.players, playerId) ?? {name:`#${playerId}`} as Player)
-                    .map((player) => `${player.name} ${player?.firstname?.[0] ?? ''}`.trim() )
-                    .join(' - ');
-                delete (p as any).teamName;
-            }
+                // compute team name
+                if (p.teamIds) {
+                    p.name = (p as any).teamName ||
+                        p.teamIds
+                            // .map((playerId) => byId(doc.players, playerId, `team player #${playerId} not found`))
+                            .map((playerId) => byId(doc.players, playerId) ?? { name: `#${playerId}` } as Player)
+                            .map((player) => `${player.name} ${player?.firstname?.[0] ?? ''}`.trim())
+                            .join(' - ');
+                    delete (p as any).teamName;
+                }
 
-            const dw = p.registration as unknown as number;
-            p.registration = doc.events.map((event, i) => 
-                (dw & (1 << i)) ? event.id : undefined
-            ).filter((id): id is string => !!id);
-        })
-    }}
+                const dw = p.registration as unknown as number;
+                p.registration = doc.events.map((event, i) =>
+                    (dw & (1 << i)) ? event.id : undefined
+                ).filter((id): id is string => !!id);
+            })
+        }
+    }
 } as const;
 
 export function convert(docJat: any): Tournament {
