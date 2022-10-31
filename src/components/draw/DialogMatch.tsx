@@ -2,7 +2,7 @@ import { Component, For, JSX, onMount, onCleanup, from } from 'solid-js';
 import { Draw, Match } from '../../domain/draw';
 import { drawLib } from '../../services/draw/drawLib';
 import { Player } from '../../domain/player';
-import { TEvent } from '../../domain/tournament';
+import { Place, TEvent } from '../../domain/tournament';
 import { matchFormat } from '../../services/types';
 import { useForm } from '../util/useForm';
 import { byId } from '../../services/util/find';
@@ -21,7 +21,7 @@ type Props = {
   draw: Draw;
   match: Match;
   players: Player[];
-  places: string[];
+  places: Place[];
   onOk: (event: TEvent, draw: Draw, match: Match) => void;
   onClose: () => void;
 }
@@ -62,8 +62,6 @@ export const DialogMatch: Component<Props> = (props) => {
 
   const matchFormats = matchFormat.list();
 
-  const places = props.places ?? [];
-
   const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
     evt.preventDefault();
 
@@ -88,7 +86,7 @@ export const DialogMatch: Component<Props> = (props) => {
       canceled: form.canceled,
       vainqDef: form.vainqDef,
 
-      place: form.place?.trim(),
+      place: form.place,
       date: form.date,
 
       matchFormat: form.matchFormat,
@@ -162,8 +160,8 @@ export const DialogMatch: Component<Props> = (props) => {
             <div class="mb-1">
               <label for="place" class="inline-block w-3/12 text-right pr-3">Court:</label>
               <select id="place" value={form.place} onChange={updateField('place')} class="w-6/12 p-1">
-                <option></option>
-                <For each={places}>{(place) => <option>{place}</option>}</For>
+                <option value={undefined}></option>
+                <For each={props.places}>{(place, i) => <option value={i()}>{place.name}</option>}</For>
               </select>
             </div>
 

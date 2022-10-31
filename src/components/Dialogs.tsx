@@ -11,8 +11,10 @@ import { updateEvent } from "../services/eventService";
 import { DialogDraw } from "./draw/DialogDraw";
 import { DialogMatch } from "./draw/DialogMatch";
 import { Match as MatchBox } from "../domain/draw";
+import { DialogPlace } from "./planning/DialogPlace";
+import { updatePlace } from "../services/planningService";
 
-export type DialogName = 'info' | 'player' | 'event' | 'draw' | 'match';
+export type DialogName = 'info' | 'place' | 'player' | 'event' | 'draw' | 'match';
 
 export const [dialog, showDialog] = createSignal<DialogName>();
 
@@ -25,8 +27,17 @@ export const Dialogs: Component = () => {
             />
         </Match>
         <Match when={dialog() === "player"}>
-            <DialogPlayer events={selection.tournament.events} player={selection.player}
+            <DialogPlayer
+                events={selection.tournament.events}
+                player={selection.player}
+                players={selection.tournament.players}
                 onOk={commandManager.wrap(updatePlayer)}
+                onClose={() => showDialog()}
+            />
+        </Match>
+        <Match when={dialog() === "place"}>
+            <DialogPlace place={selection.place}
+                onOk={commandManager.wrap(updatePlace)}
                 onClose={() => showDialog()}
             />
         </Match>

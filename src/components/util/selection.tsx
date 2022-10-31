@@ -1,18 +1,19 @@
 import { createStore, produce } from "solid-js/store";
 import { Box, Draw } from "../../domain/draw";
 import { Player } from "../../domain/player";
-import { DEFAULT_SLOT_LENGTH, TEvent, Tournament } from "../../domain/tournament";
+import { DEFAULT_SLOT_LENGTH, Place, TEvent, Tournament } from "../../domain/tournament";
 import { DrawProblem, PlayerProblem } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
 
 export interface SelectionItems {
     tournament: Tournament;
+    player?: Player;
     event?: TEvent;
     draw?: Draw;
     box?: Box;
     boxQ?: Box;
-    player?: Player;
+    place?: Place;
 
     playerProblems: Map<string,PlayerProblem[]>;
     drawProblems: Map<string, DrawProblem[]>;
@@ -34,6 +35,7 @@ export function selectTournament(tournament: Tournament) {
         sel.draw = undefined;
         sel.box = undefined;
         sel.boxQ = undefined;
+        sel.place = undefined;
 
         sel.playerProblems = new Map(
             tournament.players.map((player) => [player.id, validatePlayer(player)])
@@ -52,6 +54,12 @@ export function selectTournament(tournament: Tournament) {
 export function selectPlayer(player?: Player): void {
     update((sel) => {
         sel.player = player;
+    });
+}
+
+export function selectPlace(place?: Place): void {
+    update((sel) => {
+        sel.place = place;
     });
 }
 
@@ -160,3 +168,8 @@ export function urlBox(box?: Box, draw?: Draw, event?: TEvent) {
     }
     return `/event/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? box.position : ''}`.replace(/\/+$/, '');
 }
+
+export function urlPlace(place?: Place) {
+    return `/planning/${encodeURIComponent(place?.name ?? '')}`.replace(/\/+$/, '');
+}
+

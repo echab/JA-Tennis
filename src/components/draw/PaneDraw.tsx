@@ -142,6 +142,7 @@ export const PaneDraw: Component = () => {
                 event={event()!}
                 draw={draw()!}
                 players={selection.tournament.players}
+                places={selection.tournament.places ?? []}
             />
         </Show>
     </div>;

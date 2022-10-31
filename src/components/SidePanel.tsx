@@ -6,6 +6,7 @@ import { Players } from "./player/Players";
 import { Tournaments } from "./tournament/Tournaments";
 import { Badge } from "./misc/Badge";
 import { selection } from "./util/selection";
+import { Planning } from "./planning/Planning";
 
 type Props = {
 }
@@ -88,7 +89,10 @@ export const SidePanel: Component<Props> = () => {
                         <Events events={selection.tournament?.events ?? []} />
                     </Match>
                     <Match when={pane() === 3}>
-                        <div>Planning...</div>
+                        <Planning
+                            places={selection.tournament.places ?? []}
+                            short={true}
+                        />
                     </Match>
                     <Match when={pane() === 4}>
                         <Problems />

@@ -2,10 +2,10 @@ import { Player } from "./player";
 import { RankString, ScoreString } from "./types";
 
 export const enum DrawType {
-  Normal, // = 0
+  Knockout, // = 0
   Final, // = 1
-  PouleSimple, // = 2
-  PouleAR, // = 3
+  Roundrobin, // = 2
+  RoundrobinReturn, // = 3
 }
 export const enum Mode {
   Build,
@@ -57,7 +57,7 @@ export interface Match extends Box {
   vainqDef?: boolean; //TODO english
 
   //Planning
-  place?: string;
+  place?: number;
   date?: Date;
 
   matchFormat?: string; //FFT extent

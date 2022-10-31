@@ -5,24 +5,27 @@ export class CategoryFFT implements Category {
     // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf
 
     private _category: { [name: string]: { ageMax?: number; ageMin?: number } } = {
-        "-8ans": { ageMax: 8 },
-        "-9ans": { ageMax: 9 },
-        "-10ans": { ageMax: 10 },
-        "-11ans": { ageMax: 11 },
-        "-12ans": { ageMax: 12 },
-        "-13ans": { ageMax: 13 },
-        "-14ans": { ageMax: 14 },
-        "-15ans": { ageMax: 15 },
-        "-16ans": { ageMax: 16 },
-        "-17ans": { ageMax: 17 },
-        "-18ans": { ageMax: 18 },
-        "Senior": { ageMin: 18, ageMax: 34 },
-        "+35ans": { ageMin: 35 },
-        "+45ans": { ageMin: 45 },
-        "+55ans": { ageMin: 55 },
-        "+65ans": { ageMin: 60 },
-        "+70ans": { ageMin: 70 },
-        "+75ans": { ageMin: 75 }
+        "-8ans": { ageMax: 8 },   //010
+        "-9ans": { ageMax: 9 },   //017
+        "-10ans": { ageMax: 10 }, //024
+        "-11ans": { ageMax: 11 }, //030
+        "-12ans": { ageMax: 12 }, //050
+        "-13ans": { ageMax: 13 }, //060
+        "-14ans": { ageMax: 14 }, //064
+        "-15ans": { ageMax: 15 }, //070
+        "-16ans": { ageMax: 16 }, //080
+        "-17ans": { ageMax: 17 }, //090
+        "-18ans": { ageMax: 18 }, //100
+        "Senior": { ageMin: 18, ageMax: 34 }, // 110
+        "+35ans": { ageMin: 35 }, //120
+        "+40ans": { ageMin: 40 }, //125
+        "+45ans": { ageMin: 45 }, //130
+        "+50ans": { ageMin: 50 }, //140
+        "+55ans": { ageMin: 55 }, //150
+        "+60ans": { ageMin: 60 }, //160
+        "+65ans": { ageMin: 65 }, //170
+        "+70ans": { ageMin: 70 }, //180
+        "+75ans": { ageMin: 75 }  //190
     };
     //private _beginOfTime = new Date(0);
     currentYear: number; //for Spec

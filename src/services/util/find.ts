@@ -57,8 +57,13 @@ export function mapBy<T,K = number>(array: T[], member: StringKey<T>): Map<K,T> 
     return new Map(array.map((item) => [item[member] as unknown as K, item]));
 }
 
+export function byId<T extends {id: string}>(array: T[], value: any): T | undefined;
+export function byId<T extends {id: string}>(array: T[], value: any, error: string): T;
 export function byId<T extends {id: string}>(array: T[], value: any, error?: string): T | undefined {
     const i = indexOf(array, "id" as any, value, error);
+    if (error && !array[i]) {
+        throw new Error(error);
+    }
     return array[i];
 }
 

@@ -94,7 +94,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     const isTypePoule = draw.type >= 2;
     const lib = drawLib(event, draw);
 
-    if (draw.type !== DrawType.Normal
+    if (draw.type !== DrawType.Knockout
         && draw.type !== DrawType.Final) {
         return result;
     }
@@ -386,7 +386,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     }
                     //}
 
-                    if (!match.playerId && !match.place && tournament.places?.length && tournament._dayCount) {
+                    if (!match.playerId && match.place === undefined && tournament.places?.length && tournament._dayCount) {
                         result.push({ message: 'ERR_PLN_COURT_NO', draw, box: match, player });
                     }
                 }

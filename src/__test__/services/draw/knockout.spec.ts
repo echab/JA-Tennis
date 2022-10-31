@@ -7,7 +7,7 @@ import { onlyDefined } from "../../../services/util/object";
 
 const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 'Senior', maxRank: '15/1', draws: [] };
 
-const DRAW: Draw = { id: 'D0', name: 'draw1', type: DrawType.Normal, minRank: 'NC', maxRank: '30/4', nbColumn: 3, nbOut: 2, boxes: [] };
+const DRAW: Draw = { id: 'D0', name: 'draw1', type: DrawType.Knockout, minRank: 'NC', maxRank: '30/4', nbColumn: 3, nbOut: 2, boxes: [] };
 
 const PLAYER1: Player = { id: "J0", name: "Albert", sexe: "H", rank: "NC", registration: [] };
 const PLAYER2: Player = { id: "J1", name: "Bernard", sexe: "H", rank: "30/5", registration: [] };

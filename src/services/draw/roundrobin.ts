@@ -65,7 +65,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
                 const diag = iDiagonalePos(nCol, b);
                 if (b < 0 || maxPos < b
-                    || b === diag || (b < diag && this.draw.type === DrawType.PouleSimple)) {
+                    || b === diag || (b < diag && this.draw.type === DrawType.Roundrobin)) {
                     this.draw.boxes.splice(i, 1);    //remove the exceeding box
                     continue;
                 }
@@ -84,7 +84,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                     //Append the matches
                     const diag = iDiagonalePos(nCol, b);
                     for (b -= nCol; b >= 0; b -= nCol) {
-                        if (b === diag || (b < diag && this.draw.type === DrawType.PouleSimple)) {
+                        if (b === diag || (b < diag && this.draw.type === DrawType.Roundrobin)) {
                             continue;
                         }
                         const match = newBox(this.draw, undefined, b) as Match;
@@ -293,7 +293,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                 //Append the matches
                 const diag = iDiagonalePos(draw.nbColumn, b);
                 for (b -= draw.nbColumn; b >= 0; b -= draw.nbColumn) {
-                    if (b === diag || (b < diag && draw.type === DrawType.PouleSimple)) {
+                    if (b === diag || (b < diag && draw.type === DrawType.Roundrobin)) {
                         continue;
                     }
                     const match = newBox<Match>(draw, undefined, b);

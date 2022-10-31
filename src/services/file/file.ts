@@ -16,10 +16,10 @@ export async function openFile(): Promise<Tournament> {
 }
 
 async function readFile(fileHandle: any): Promise<Tournament> {
-    console.log('reading ', fileHandle.name);
+    // console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
     const { size, lastModifiedDate, type } = file;
-    console.log('size=', size, 'lastModifiedDate=', lastModifiedDate);
+    // console.log('size=', size, 'lastModifiedDate=', lastModifiedDate);
     // const content = await file.stream();
     // for await (const value of streamAsyncIterator(content)) {
     const buffer = await file.arrayBuffer();

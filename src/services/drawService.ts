@@ -100,7 +100,7 @@ export function newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
   const draw: Draw = {
     id: Guid.create("d"),
     name: "",
-    type: DrawType.Normal,
+    type: DrawType.Knockout,
     nbColumn: 3,
     nbOut: 1,
     minRank: after ? rank.next(after.maxRank) : rank.first(),
@@ -119,7 +119,7 @@ export function newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
 }
 
 export function initDraw(draw: Draw, parent: TEvent): void {
-  draw.type = draw.type || DrawType.Normal;
+  draw.type = draw.type || DrawType.Knockout;
   draw.nbColumn = draw.nbColumn || 0;
   draw.nbOut = draw.nbOut || 0;
   draw.mode = draw.mode || Mode.Build;
@@ -296,7 +296,7 @@ export function nextGroup(event: TEvent, draw: Draw): [number, number] | undefin
 //}
 
 export function isSlot(box: Match): boolean { //isCreneau
-  return isMatch(box) && (!!box.place || !!box.date);
+  return isMatch(box) && (box.place !== undefined || !!box.date);
 }
 
 export function findSeeded(

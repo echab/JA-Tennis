@@ -2,7 +2,7 @@ import { Component, For } from 'solid-js';
 import { PlayerIn, Draw, DrawType, Match } from '../../domain/draw';
 import { mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
-import { TEvent } from '../../domain/tournament';
+import { Place, TEvent } from '../../domain/tournament';
 import './Draw.css';
 import { DrawBox } from './DrawBox';
 
@@ -10,13 +10,14 @@ type Props = {
   event: TEvent,
   draw: Draw,
   players: Player[],
+  places: Place[],
 }
 
 export const DrawRoundRobin: Component<Props> = (props) => {
 
   const boxes = () => mapBy<PlayerIn & Match>(props.draw.boxes as Match[], 'position');
 
-  const simple = props.draw.type === DrawType.PouleSimple
+  const simple = props.draw.type === DrawType.Roundrobin
 
   //for round robin, fill the list of rows/columns for the view
   const rows = () => {

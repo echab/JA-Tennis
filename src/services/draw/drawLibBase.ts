@@ -514,7 +514,7 @@ export abstract class DrawLibBase implements IDrawLib {
                 //v0998
                 const opponents = lib.boxesOpponents(match);
                 if (opponents.box1 && opponents.box2
-                    && (sourceMatch.place || sourceMatch.date)
+                    && (sourceMatch.place !== undefined || sourceMatch.date !== undefined)
                     ) {
                     if (!this.putSlot(match, sourceMatch)) {
                         throw new Error('error');
@@ -556,7 +556,7 @@ export abstract class DrawLibBase implements IDrawLib {
     // }
 
     isTypePoule(): boolean {
-        return this.draw.type === DrawType.PouleSimple || this.draw.type === DrawType.PouleAR;
+        return this.draw.type === DrawType.Roundrobin || this.draw.type === DrawType.RoundrobinReturn;
     }
     
     iDiagonale(box: Box): number {

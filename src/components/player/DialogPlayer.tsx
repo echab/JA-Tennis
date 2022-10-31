@@ -1,11 +1,16 @@
+import { A } from '@solidjs/router';
 import { Component, For, JSX, onMount, onCleanup, mergeProps, Show } from 'solid-js';
 import { OptionalId } from '../../domain/object';
 import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
 import { deletePlayer } from '../../services/playerService';
+import { isSexeCompatible } from '../../services/tournamentService';
 import { rank, category } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
+import { byId } from '../../services/util/find';
+import { IconSexe } from '../misc/IconSexe';
+import { urlPlayer } from '../util/selection';
 import { useForm } from '../util/useForm';
 
 const EMPTY: OptionalId<Player> = { name: '', sexe: 'H', rank: 'NC', registration: [] };
@@ -13,6 +18,7 @@ const EMPTY: OptionalId<Player> = { name: '', sexe: 'H', rank: 'NC', registratio
 type Props = {
   player?: OptionalId<Player>;
   events: TEvent[];
+  players: Player[];
   onOk: (player: OptionalId<Player>) => void;
   onClose: () => void;
 }
@@ -81,7 +87,7 @@ export const DialogPlayer: Component<Props> = (props) => {
   return (
     <dialog ref={refDlg!} class="p-0">
       <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
-        <b><i class='icon2-player'></i> {props.player ? `Edit player ${props.player?.name ?? ''}` : 'New player'}</b>
+        <b><i class='icon2-player'></i> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
         <small>Id: {props.player?.id}</small>
         <button type="button" data-dismiss="modal" aria-hidden="true"
           onclick={() => refDlg.close()}
@@ -109,10 +115,36 @@ export const DialogPlayer: Component<Props> = (props) => {
               value={form.name} onChange={updateField("name")} />
             {/*<span class="error" show.bind="playerForm.name.$error.required">Required!</span> */}
           </div>
-          <div class="mb-1">
-            <label for="firstname" class="inline-block w-3/12 text-right pr-3">First name:</label>
-            <input id="firstname" type="text" value={form.firstname ?? ''} onChange={updateField('firstname')} class="w-9/12 p-1" />
-          </div>
+          <Show when={form.teamIds} fallback={
+            <div class="mb-1">
+              <label for="firstname" class="inline-block w-3/12 text-right pr-3">First name:</label>
+              <input id="firstname" type="text" value={form.firstname ?? ''} onChange={updateField('firstname')} class="w-9/12 p-1" />
+            </div>
+          }>
+            <div class="mb-1 flex">
+              <div class="inline-block w-3/12 text-right pr-3">
+                Team:<br/>
+                <button type="button" class="rounded-full p-1" title="Add team member">➕</button>
+              </div>
+              <ul>
+                <For each={form.teamIds}>{(playerId) => {
+                  const teamPlayer = byId(props.players, playerId);
+                  return <li>{
+                    teamPlayer
+                      ? <span>
+                        <A href={urlPlayer(teamPlayer)}><i class="icon2-info"/></A>
+                        <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname?.[0] ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
+                      </span>
+                      : `#${playerId}`                    
+                  }
+                  <button type="button" class="rounded-full p-1 hover">✖</button>
+                  </li> ;
+                } 
+                }</For>
+              </ul>
+            </div>
+          </Show>
+
           <div class="mb-1">
             <label for="rank" class="inline-block w-3/12 text-right pr-3">Rank:</label>
             <select id="rank" value={form.rank} onChange={updateField('rank')} class="w-2/12 p-1">
@@ -124,6 +156,7 @@ export const DialogPlayer: Component<Props> = (props) => {
             <div class="mb-1">
               <label class="inline-block w-3/12 text-right pr-3">Birth:</label>
               <input name="birth" type="date" value={form.birth?.toISOString().substring(0, 10) ?? ''} onChange={updateField('birth')} class="p-1" />
+              <span class="ml-2">{form.birth && category.ofDate(form.birth)}</span>
             </div>
             <div class="mb-1">
               <label class="inline-block w-3/12 text-right pr-3">Club:</label>
@@ -138,12 +171,14 @@ export const DialogPlayer: Component<Props> = (props) => {
             <div class="mb-1 flex">
               <label class="inline-block w-3/12 text-right pr-3">Events:</label>
               <div class="inline-block">
-                <For each={props.events}>{(event) =>
+                <For each={props.events.filter((event) => isSexeCompatible(event, form.sexe))}>{(event) =>
                   <div>
                     <label><input name="registration" type="checkbox"
                       value={event.id}
                       checked={form.registration.includes(event.id)}
-                    /> {event.name}</label>
+                    /> <span class="border-l-8" style={{ "border-color": event.color ?? 'transparent' }}>
+                      <IconSexe sexe={event.sexe}/>{event.name}
+                    </span></label>
                   </div>
                 }</For>
               </div>

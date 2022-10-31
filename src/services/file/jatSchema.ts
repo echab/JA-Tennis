@@ -1,10 +1,11 @@
-import { Box, Draw, DrawType, Match, PlayerIn } from "../../domain/draw";
+import { Box, Draw, DrawType, Match } from "../../domain/draw";
 import { Player } from "../../domain/player";
-import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
-import { Rank, Score } from "../../domain/types";
+import { TEvent, Tournament } from "../../domain/tournament";
 import { drawLib } from "../draw/drawLib";
 import { isMatch } from "../drawService";
-import { rank } from "../types";
+import { ranksName } from "../tournamentService";
+import { category, rank } from "../types";
+import { byId } from "../util/find";
 import { array, arrayb, bstr, byte, customData, date, dword, Fields, float, generateId, i16, schema, word } from "./serializer";
 
 const DAY = 24 * 3600 * 1000, YEAR = DAY * 365.25;
@@ -34,12 +35,18 @@ export const jatFileType = {
     accept: { 'binary/x-jat': ['.jat'] }
 };
 
+const categoryFFT = [
+    10,17,24,30,50,60,64,70,80,90,100,
+    110,
+    120,125,130,140,150,160,170,180,190
+];
+
 const rankFields: Fields = {
     // _rankAccept: { version: 2, maxVersion: 7, type: byte, reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     _return: {
         type: byte,
         reviver(c, p) {
-            // TODO by types, using this._curSexe
+            // TODO by types, using this._curSexe and this._type.name
             c = (c - 1) * 60;
             if (c === MAXCLAST - 60) {
                 c = PAS_CLASSEMT;
@@ -55,18 +62,22 @@ const playerFields: Fields /* <Player> */ = {
     _schema: { type: schema, valid: (s) => s === 'CJoueur' },
     version: { type: byte, def: 10, valid: (v, p) => v <= 10 },
     sexe: { version: 4, type: byte }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
-    teamMates: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: arrayb, itemType: word, valid: (a) => a.length <= 4 },
-    teamName: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: bstr },
-    licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: dword }, // TODO by types
+    teamIds: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: arrayb, itemType: word, valid: (a) => a.length <= 4,
+        reviver: (a: number[], p) => {
+            return a.map((playerId) => String(playerId)); // playerId is converted to Player below
+        }
+    },
+    teamName: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: bstr, reviver: (s) => s || undefined },
+    licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: dword, reviver:(l) => l || undefined }, // TODO by types
     name: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: bstr },
     firstname: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: bstr },
-    adress1: { type: bstr },
-    adress2: { type: bstr },
-    zipCode: { type: bstr },
-    city: { type: bstr },
-    phone1: { type: bstr },
-    phone2: { type: bstr },
-    email: { version: 5, type: bstr, def: '' },
+    adress1: { type: bstr, reviver: (s) => s || undefined },
+    adress2: { type: bstr, reviver: (s) => s || undefined },
+    zipCode: { type: bstr, reviver: (s) => s || undefined },
+    city: { type: bstr, reviver: (s) => s || undefined },
+    phone1: { type: bstr, reviver: (s) => s || undefined },
+    phone2: { type: bstr, reviver: (s) => s || undefined },
+    email: { version: 5, type: bstr, def: '', reviver: (s) => s || undefined },
     birth: {
         type: date, reviver: (d, p) => {
             // TODO: compute Categorie from birthDate
@@ -76,17 +87,17 @@ const playerFields: Fields /* <Player> */ = {
         }
     },
     // solde: { maxVersion: 6, type(reader, _, { version }) { return (version < 7) ? float.call(this) : dword.call(this); } }, // decimal * 100
-    solde: { version: 7, type: dword }, // decimal * 100
-    _solde: { maxVersion: 6, type: float, reviver: (v, p) => { p.solde = v; } },
-    soldeType: { version: 8, type: byte },
-    soldeEspece: { version: 10, type: dword, def: 0 },
-    soldeCheque: { version: 10, type: dword, def: 0 },
+    solde: { version: 7, type: dword, reviver: (v) => v || undefined }, // decimal * 100
+    _solde: { maxVersion: 6, type: float, reviver: (v, p) => { if (v) { p.solde = v; } } },
+    soldeType: { version: 8, type: byte, reviver: (v) => v || undefined },
+    soldeEspece: { version: 10, type: dword, def: 0, reviver: (v) => v || undefined },
+    soldeCheque: { version: 10, type: dword, def: 0, reviver: (v) => v || undefined },
     rank: { type: rankFields },
     rank2: { type: rankFields },
-    bfRank: { version: 9, type: byte },
-    nationality: { version: 9, type: bstr },
+    bfRank: { version: 9, type: byte, reviver: (v) => v || undefined },
+    nationality: { version: 9, type: bstr, reviver: (s) => s || undefined },
     _sexe: { maxVersion: 3, type: byte, reviver: (sexe, p) => { p.sexe = sexe; } },
-    club: { type: bstr },
+    club: { type: bstr, reviver: (s) => s || undefined },
     registration: { type: dword },
     _partenaire: { version: 2, type: word },
     avail: {
@@ -103,11 +114,13 @@ const playerFields: Fields /* <Player> */ = {
             return result;
         }
     },
-    comment: { version: 3, type: bstr },
+    comment: { version: 3, type: bstr, reviver: (s) => s || undefined },
     dateMaj: { type: date },
     _: {
         type(_, p) {
-            p!.sexe = ['H','F','H','F','M'][p!.sexe]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+            if (p) {
+                p.sexe = ['H','F','M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+            }
         }
     }
 } as const;
@@ -196,7 +209,7 @@ const boxFields: Fields /* <PlayerIn & Match> */ = {
         }
     },
     place: { version: 2, type: i16, reviver: (c, p) => (c !== -1 && p.version > 2 ? c : undefined) },
-    note: { version: 4, type: bstr, reviver: (s, p) => (s || undefined) },
+    note: { version: 4, type: bstr, reviver: (s) => s || undefined },
 } as const;
 
 const drawFields: Fields /* <Draw> */ = {
@@ -228,10 +241,10 @@ const drawFields: Fields /* <Draw> */ = {
     lock: { version: 4, type: byte, def: 0 },
     _lock: { maxVersion: 1, type: byte, reviver: (b, p) => { p.lock = b; } },
     orientation: { type: byte },
-    _rankMin: { maxVersion: 7, type: byte }, // TODO
-    _rankMax: { maxVersion: 7, type: byte }, // TODO
-    rankMin: { version: 8, type: rankFields },
-    rankMax: { version: 8, type: rankFields },
+    _minRank: { maxVersion: 7, type: byte }, // TODO
+    _maxRank: { maxVersion: 7, type: byte }, // TODO
+    minRank: { version: 8, type: rankFields },
+    maxRank: { version: 8, type: rankFields },
     suite: { version: 7, type: byte, def: 0 },
     formatMatch: { version: 8, type: byte },
     _: {
@@ -240,7 +253,7 @@ const drawFields: Fields /* <Draw> */ = {
                 if (draw.type === DrawType.Final) {
                     draw.name = "Final draw";
                 } else {
-                    draw.name = draw.rankMin === draw.rankMax ? draw.rankMin : `${draw.rankMin} - ${draw.rankMax}`;
+                    draw.name = ranksName(draw.minRank, draw.maxRank);
                 }
             }
             // TODO init joueur QS
@@ -266,17 +279,30 @@ const eventFields: Fields /* <TEvent> */ = {
             if (b & DOUBLE_MASK_OLD) {
                 b = (b | EQUIPE_MASK) & (~DOUBLE_MASK_OLD);
             }
-            //@ts-ignore
+
+            if (b & EQUIPE_MASK) {
+                p.typeDouble = true;
+            }
+
+            // @ts-expect-error
             this._curSexe = b; // used by inner draws for rank
             return b;
         }
     },
     _categ3: { maxVersion: 3, type: byte, reviver: (b) => [0, 1, 2, 3, 5, 7, 9, 11, 12, 13, 15, 17, 18][b], valid: () => false },
     _categ7: { maxVersion: 6, type: byte, reviver: (b) => b * 10, valid: () => false },
-    category: { version: 7, type: byte, reviver: (b) => `categorie${b}` }, // TODO, from .ini, by types
+    category: { version: 7, type: byte, reviver(b) {
+        // @ts-expect-error
+        if (this._type.name === "FFT") {
+            return categoryFFT.indexOf(b);    
+        }
+        // TODO, from .ini, by types
+        return `category${b}`;
+     }
+    },
     _bDouble: { type: byte },
     _rankAccept: { version: 2, maxVersion: 7, type: byte, reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
-    rankMax: { version: 8, type: rankFields }, // TODO use version of FFT types instead of tableau.version
+    maxRank: { version: 8, type: rankFields }, // TODO use version of FFT types instead of tableau.version
     consolation: { type: byte },
     start: { type: date },
     end: { type: date },
@@ -287,11 +313,11 @@ const eventFields: Fields /* <TEvent> */ = {
     color: { version: 5, type: dword, def: 0xFFFFFF },
     _: {
         type(_, event) {
-            // @ts-ignore
+            // @ts-expect-error
             delete this._curSexe; // clean-up
 
             if (event) {
-                event.sexe = ['H','F','H','F','M'][event.sexe]; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
+                event.sexe = ['H','F','M'][event.sexe & ~EQUIPE_MASK]; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
 
                 // cleanup draws.boxes
                 event.draws.forEach((draw: Draw) => {
@@ -314,23 +340,23 @@ const infoFields: Fields /* <TournamentInfo> */ = {
     // version: { type(r, _, p) { return p.version; } },
     name: { type: bstr },
     _bEpreuve: { type: byte, maxVersion: 5 },
-    homologation: { type: bstr },
+    homologation: { type: bstr, reviver: (s) => s || undefined },
     _start: { maxVersion: 11, type: date },
     _end: { maxVersion: 11, type: date },
     _isPlanning: { version: 7, type: byte },
     club: {
         type: {
             name: { type: bstr },
-            adress1: { type: bstr },
-            adress2: { version: 6, type: bstr },
-            ligue: { type: bstr },
+            adress1: { type: bstr, reviver: (s) => s || undefined },
+            adress2: { version: 6, type: bstr, reviver: (s) => s || undefined },
+            ligue: { type: bstr, reviver: (s) => s || undefined },
         }
     },
     referee: {
         type: {
             name: { type: bstr },
-            adress1: { type: bstr },
-            adress2: { version: 6, type: bstr },
+            adress1: { type: bstr, reviver: (s) => s || undefined },
+            adress2: { version: 6, type: bstr, reviver: (s) => s || undefined },
         }
     },
     clubNo: { version: 3, maxVersion: 5, type: dword },
@@ -345,6 +371,10 @@ export const docFields: Fields /* <Tournament> */ = {
             versionTypes: { version: 9, type: byte, def: 1, valid: (v) => v <= 5 },
             data: { version: 10, type: customData },
         }, def: { name: 'FFT', version: 1 },
+        reviver(t) {
+            // @ts-expect-error
+            this._type = t;
+        },
     },
     start: { version: 12, type: date },
     end: { version: 12, type: date },
@@ -383,6 +413,18 @@ export const docFields: Fields /* <Tournament> */ = {
         //convert players registration
         doc.players.forEach((p, i) => {
             p.id = String(i);
+
+            // compute team name
+            if (p.teamIds) {
+                p.name = (p as any).teamName ||
+                    p.teamIds
+                    // .map((playerId) => byId(doc.players, playerId, `team player #${playerId} not found`))
+                    .map((playerId) => byId(doc.players, playerId) ?? {name:`#${playerId}`} as Player)
+                    .map((player) => `${player.name} ${player?.firstname?.[0] ?? ''}`.trim() )
+                    .join(' - ');
+                delete (p as any).teamName;
+            }
+
             const dw = p.registration as unknown as number;
             p.registration = doc.events.map((event, i) => 
                 (dw & (1 << i)) ? event.id : undefined

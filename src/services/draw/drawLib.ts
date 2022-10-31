@@ -34,7 +34,7 @@ export interface IDrawLib {
 
 export function drawLib(event: TEvent, draw: Draw) : IDrawLib & DrawLibBase {
   // TODO cache result WeakMap
-  if (draw.type === DrawType.Normal ||draw.type === DrawType.Final) {
+  if (draw.type === DrawType.Knockout ||draw.type === DrawType.Final) {
     return new Knockout(event, draw);
   }
   return new Roundrobin(event, draw);

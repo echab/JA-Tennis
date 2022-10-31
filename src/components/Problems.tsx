@@ -2,6 +2,7 @@ import { A } from "@solidjs/router";
 import { Component, createSignal, For, Show } from "solid-js";
 import { DrawProblem } from "../domain/validation";
 import { validateTournament } from "../services/validationService";
+import { IconSexe } from "./misc/IconSexe";
 import { drawById, selection, urlBox, urlDraw, urlPlayer } from "./util/selection";
 
 export const Problems: Component = () => {
@@ -27,31 +28,31 @@ export const Problems: Component = () => {
                 )}</For>
             )}</For>
             {/* <For each={Object.entries(selection.drawProblems)} fallback={ */}
-            <For each={[...selection.drawProblems.entries()]} fallback={
+            <For each={[...selection.drawProblems.entries()]
+                .filter(([edId]) => !selectedDraw() || (edId.startsWith(`${selection.draw?.id}-`)))    
+            } fallback={
                 <div>No draw error.</div>
             }>{([eventdrawId, errors]: [string, DrawProblem[]]) => {
                 const {draw, event} = drawById(eventdrawId);
                 return (
-                    <Show when={!selectedDraw() || (draw && draw?.id === selection.draw?.id)}>
-                        <li class="p-2">
-                            <h4 class="bg-slate-300 border-l-8"
-                                style={{ "border-color": event?.color ?? 'transparent' }}
-                            >
-                                <A href={urlDraw(draw, event)} replace={true}>
-                                    {event?.name} - {draw?.name || eventdrawId}
-                                </A>
-                            </h4>
-                            <ul>
-                                <For each={errors}>{({message, detail, player, box}) => (
-                                    <li>
-                                        <A href={urlBox(box, draw, event)} replace={true}>
-                                            {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
-                                        </A>
-                                    </li>
-                                )}</For>
-                            </ul>
-                        </li>
-                    </Show>
+                    <li class="p-2">
+                        <h4 class="bg-slate-300 border-l-8"
+                            style={{ "border-color": event?.color ?? 'transparent' }}
+                        >
+                            <A href={urlDraw(draw, event)} replace={true}>
+                                <IconSexe sexe={event?.sexe}/>{event?.name} - {draw?.name || eventdrawId}
+                            </A>
+                        </h4>
+                        <ul>
+                            <For each={errors}>{({message, detail, player, box}) => (
+                                <li>
+                                    <A href={urlBox(box, draw, event)} replace={true}>
+                                        {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
+                                    </A>
+                                </li>
+                            )}</For>
+                        </ul>
+                    </li>
                 );
             }}</For>
         </ul>

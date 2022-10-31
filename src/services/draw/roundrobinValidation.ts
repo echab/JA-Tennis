@@ -7,8 +7,8 @@ import { isMatch, isPlayerIn } from '../drawService';
 function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
-    if (draw.type === DrawType.PouleSimple
-        || draw.type === DrawType.PouleAR) {
+    if (draw.type === DrawType.Roundrobin
+        || draw.type === DrawType.RoundrobinReturn) {
 
         result.splice(-1,0,...validatePoule(draw));
 

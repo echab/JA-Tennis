@@ -6,7 +6,7 @@ import { Player } from '../../domain/player';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
 import { deleteDraw, groupDraw, groupFindAllPlayerOut } from '../../services/drawService';
-import { getRegisteredPlayers } from '../../services/tournamentService';
+import { getRegisteredPlayers, ranksName } from '../../services/tournamentService';
 import { rank, category } from '../../services/types';
 import { columnMax, countInCol } from '../../utils/drawUtil';
 import { useForm } from '../util/useForm';
@@ -14,7 +14,7 @@ import { commandManager } from '../../services/util/commandManager';
 import { selectDraw } from '../util/selection';
 import { IconSexe } from '../misc/IconSexe';
 
-const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Normal, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
+const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Knockout, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
 type Props = {
   event: TEvent;
@@ -52,10 +52,10 @@ export const DialogDraw: Component<Props> = (props) => {
   }
 
   const drawTypes: { value: number; label: string; }[] = [];
-  drawTypes[DrawType.Normal] = { value: DrawType.Normal, label: "Normal" }; //TODO translate
+  drawTypes[DrawType.Knockout] = { value: DrawType.Knockout, label: "Knock out" };
   drawTypes[DrawType.Final] = { value: DrawType.Final, label: "Final" };
-  drawTypes[DrawType.PouleSimple] = { value: DrawType.PouleSimple, label: "Round-robin simple" };
-  drawTypes[DrawType.PouleAR] = { value: DrawType.PouleAR, label: "Round-robin double" };
+  drawTypes[DrawType.Roundrobin] = { value: DrawType.Roundrobin, label: "Round-robin" };
+  drawTypes[DrawType.RoundrobinReturn] = { value: DrawType.RoundrobinReturn, label: "Round-robin with return" };
 
   const categories: CategoryString[] = category.list();
 
@@ -76,7 +76,7 @@ export const DialogDraw: Component<Props> = (props) => {
   }
 
   const getNbEntry = (): number => {
-    return form.type & DrawType.PouleSimple
+    return form.type & DrawType.Roundrobin
       ? form.nbColumn // TODO type poule
       : countInCol(columnMax(form.nbColumn, form.nbOut), form.nbOut);
   }
@@ -88,7 +88,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
     let result: OptionalId<Draw>[] = [{
       id: form.id || undefined,
-      name: form.name.trim(),
+      name: form.name.trim() || ranksName(form.minRank, form.maxRank),
       type: form.type,
       suite: form.suite,
 
@@ -139,9 +139,10 @@ export const DialogDraw: Component<Props> = (props) => {
           <input id="id" type="hidden" value={form.id} />
           <div class="mb-1">
             <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
-            <input id="name" type="text" required class="w-9/12 p-1"
+            <input id="name" type="text" class="w-9/12 p-1"
               autofocus
-              value={form.name} onChange={updateField("name")} />
+              placeholder={ranksName(form.minRank, form.maxRank)}
+              value={form.name !== ranksName(form.minRank, form.maxRank) ? form.name : ''} onChange={updateField("name")} />
             {/*<span class="error" show.bind="eventForm.name.$error.required">Required!</span> */}
           </div>
 

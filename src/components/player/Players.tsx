@@ -21,7 +21,7 @@ export const Players: Component<Props> = (props) => {
   
   const params = useParams<Params>();
 
-  const [registred, setRegistred] = createSignal(false);
+  const [registred, setRegistred] = createSignal(props.short);
 
   // change selection on url change
   createEffect(() => {
@@ -91,7 +91,7 @@ export const Players: Component<Props> = (props) => {
           </tr>
         </thead>
         <tbody ondragstart={dragStart}>
-          <For each={props.players.filter((p) => !registred() || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
+          <For each={props.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
             <tr classList={{ info: player.id === selection.player?.id }}
               onclick={[selectPlayer,player]}
               draggable={true} data-type="player" data-id={player.id}
@@ -128,7 +128,7 @@ export const Players: Component<Props> = (props) => {
                 </td>
                 <td>
                   <For each={player.registration}>{(eventId, i) =>
-                    <span>{(i() ? ', ' : '') + eventById[eventId].name}</span>
+                    <span>{(i() ? ', ' : '') + eventById[eventId]?.name}</span>
                   }</For>
                 </td>
                 <td>

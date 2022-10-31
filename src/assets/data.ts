@@ -32,7 +32,7 @@ export const mockTournament: Tournament = {
           name: "NC",
           minRank: "NC",
           maxRank: "NC",
-          type: DrawType.Normal,
+          type: DrawType.Knockout,
           nbColumn: 2,
           nbOut: 2,
           boxes: [

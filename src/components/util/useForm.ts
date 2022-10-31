@@ -48,7 +48,8 @@ export function useForm<FormFields extends object = {}>(
       setForm({ [fieldName]: !!inputElement.checked } as any);
     } else if (inputElement.type === "radio") {
       if (inputElement.checked) {
-        setForm({ [fieldName]: inputElement.value } as any);
+        const v = inputElement.value;
+        setForm({ [fieldName]: inputElement.dataset.json ? JSON.parse(v) : v } as any);
       }
     } else if (inputElement.type === "number") {
       setForm({ [fieldName]: inputElement.valueAsNumber } as any);

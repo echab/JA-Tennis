@@ -28,7 +28,7 @@ export type Player = {
     //Coordinates
 
     //Teams
-    players?: Player[];  //TODO class Team extends Player
+    teamIds?: string[];  //TODO? class Team extends Player
 
     //Availability
     comment?: string;

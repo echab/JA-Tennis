@@ -27,6 +27,18 @@ export const Events: Component<Props> = (props) => {
   }
 
   return <>
+      <div class="flex justify-between items-center px-2">
+        <h3>Draws</h3>
+
+        <button type="button" class="rounded-full p-2 hover"
+          onclick={() => {
+            selectEvent(undefined);
+            showDialog("event");
+          }}
+        >➕ Add an event</button>
+
+        {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
+      </div>
     <For each={props.events} fallback={<div>No event</div>}>{(event) =>
       <div
         aria-selected={event.id === selection.event?.id}
@@ -95,6 +107,6 @@ export const Events: Component<Props> = (props) => {
         selectEvent(undefined);
         showDialog("event");
       }}
-    >➕ Add event</button>
+    >➕ Add an event</button>
   </>
 }

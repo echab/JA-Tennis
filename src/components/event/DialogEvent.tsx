@@ -43,7 +43,7 @@ export const DialogEvent: Component<Props> = (props) => {
       const result: OptionalId<TEvent> = {
          id: form.id || undefined,
          name: form.name.trim(),
-         typeDouble: form.typeDouble,
+         typeDouble: !!form.typeDouble,
          sexe: form.sexe,
          category: form.category,
          maxRank: form.maxRank,
@@ -102,7 +102,24 @@ export const DialogEvent: Component<Props> = (props) => {
                TODO: matchFormat
                */}
 
-               <div class="flex space-x-6">
+               <div class="flex space-x-6 mb-1">
+                  <label class="inline-block w-3/12 text-right pr-3 h-8">Type:</label>
+                  {/* <label>
+                     <input value="false" data-json type="radio" name="typeDouble" required
+                        checked={!form.typeDouble}
+                        onChange={updateField("typeDouble")} // TODO ca marche pas
+                         /> Simple</label>
+                  <label>
+                     <input value="true" data-json type="radio" name="typeDouble" required
+                        checked={form.typeDouble} 
+                        onChange={updateField("typeDouble")} /> Double</label> */}
+                  <label>
+                     <input value="true" type="checkbox" name="typeDouble"
+                        checked={form.typeDouble} 
+                        onChange={updateField("typeDouble")} /> Double</label>
+               </div>
+
+               <div class="flex space-x-6 mb-1">
                   <label class="inline-block w-3/12 text-right pr-3 h-8">Sexe:</label>
                   <label>
                      <input value='H' type="radio" required
@@ -118,7 +135,7 @@ export const DialogEvent: Component<Props> = (props) => {
                <div class="mb-1">
                   <label for="category" class="inline-block w-3/12 text-right pr-3">Category:</label>
                   <select id="category" value={form.category} onChange={updateField('category')} class="w-3/12 p-1">
-                     <For each={categories}>{(cat) => <option>{cat}</option>}</For>
+                     <For each={categories}>{(cat, i) => <option value={i()}>{cat}</option>}</For>
                   </select>
                </div>
                <div class="mb-1">

@@ -4,7 +4,7 @@ import { PlayerIn, Draw, Match, DrawType } from '../../domain/draw';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../utils/drawUtil';
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
-import { TEvent } from '../../domain/tournament';
+import { Place, TEvent } from '../../domain/tournament';
 import { showDialog } from '../Dialogs';
 import { A, useParams } from '@solidjs/router';
 import { Params } from '../App';
@@ -15,6 +15,7 @@ type Props = {
   event: TEvent,
   draw: Draw,
   players: Player[],
+  places: Place[],
 }
 
 export const DrawKnockout: Component<Props> = (props) => {
@@ -95,7 +96,11 @@ export const DrawKnockout: Component<Props> = (props) => {
                     }}
                   ></i>
                   <Show when={box?.score} fallback={
-                    <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
+                    <>
+                      <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
+                      <Show when={box?.place !== undefined}> <span class="place">{(box!.place ? props.places[box!.place]?.name: '') ?? ''}</span></Show>
+                      {/* TODO place name */}
+                    </>
                   }><span class="score">{box!.score}</span></Show>
 
                   <Show when={isRight && props.draw.type !== DrawType.Final}>

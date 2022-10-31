@@ -12,7 +12,7 @@ export interface Tournament {
 
     events: TEvent[];
 
-    places?: string[];
+    places?: Place[];
 
     _url?: string;
 
@@ -74,4 +74,9 @@ export interface TEvent {
     color ?: string;
 
     draws: Draw[];
+}
+
+export type Place = {
+    name: string;
+    avail: number[];
 }

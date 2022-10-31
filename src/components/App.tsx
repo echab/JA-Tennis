@@ -12,12 +12,14 @@ import { ErrorToast } from './misc/ErrorToast';
 import styles from './App.module.css';
 import '../assets/icons.css';
 import { TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
+import { Planning } from './planning/Planning';
 
 export type Params = {
   playerId?: string;
   eventId?: string;
   drawId?: string;
   boxPos?: string;
+  place?: string;
 }
 
 export const App: Component = () => (
@@ -69,6 +71,9 @@ export const Content: Component = () => (
           events={selection.tournament.events}
           players={selection.tournament.players}
         />
+      } />
+      <Route path="/planning/:place?" element={
+        <Planning places={selection.tournament.places ?? []} />
       } />
     </Routes>
   </div>

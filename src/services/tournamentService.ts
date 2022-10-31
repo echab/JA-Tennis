@@ -6,7 +6,7 @@ import { rank } from "./types";
 import { Player } from "../domain/player";
 import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH } from "../domain/tournament";
 import { DAYS } from "../utils/date";
-import { RankString } from "../domain/types";
+import { Rank, RankString } from "../domain/types";
 import { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
 
@@ -184,4 +184,8 @@ export function sortPlayers(players: Array<Player | number>): void {
 export function isSexeCompatible(event: TEvent, sexe: string): boolean {
   return event.sexe === sexe || //sexe épreuve = sexe joueur
     (event.sexe === "M" && !event.typeDouble); //ou simple mixte
+}
+
+export function ranksName(minRank: RankString, maxRank: RankString) : string {
+  return minRank === maxRank ? minRank : `${minRank} - ${maxRank}`;
 }
