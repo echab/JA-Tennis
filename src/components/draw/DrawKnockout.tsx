@@ -1,6 +1,6 @@
 import { Component, For, Show } from 'solid-js';
 import { selectBox, urlBox } from '../util/selection';
-import { PlayerIn, Draw, Match, DrawType } from '../../domain/draw';
+import { PlayerIn, Draw, Match, DrawType, Mode } from '../../domain/draw';
 import { byId, mapBy } from '../../services/util/find';
 import { Player } from '../../domain/player';
 import { Place, TEvent } from '../../domain/tournament';
@@ -60,60 +60,62 @@ export const DrawKnockout: Component<Props> = (props) => {
             <td rowspan={rowspan} classList={{
               even, odd, qs: isRight
             }}>
-              {/* TODO <DrawBox box={b} players={props.players} /> */}
-              <A class="boite joueur block"
-                classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
-                // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
-                // onclick={() => navigate(urlBox(box), {replace:true})}
-                href={urlBox(box)} replace noScroll={true}
-                id={`pos${box?.position}`}
-              >
-                <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
-                <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
+              <Show when={props.draw.lock === Mode.Build || even || odd}>
+                {/* TODO <DrawBox box={b} players={props.players} /> */}
+                <A class="boite joueur block"
+                  classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
+                  // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
+                  // onclick={() => navigate(urlBox(box), {replace:true})}
+                  href={urlBox(box)} replace noScroll={true}
+                  id={`pos${box?.position}`}
+                >
+                  <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
+                  <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
 
-                <Show when={box?.order}><small class="pr-1">{box!.order}</small></Show>
-                <Show when={box && isMatch(box)}><small class="pr-1">m</small></Show>
+                  <Show when={box?.order}><small class="pr-1">{box!.order}</small></Show>
+                  <Show when={box && isMatch(box)}><small class="pr-1">m</small></Show>
 
-                <span class="nom">{player?.name}
-                  <Show when={box?.order}> {player?.firstname}</Show>
-                </span>
-                <Show when={box?.order && player?.rank}><span class="classement">{player!.rank}</span></Show>
-                <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
-                <br />
-                <Show when={box?.order}>
-                  {/* <i class="icon2-qualif-in hover" title="Edit qualified in"
-                    onclick={() => {
-                      selectBox(props.event, props.draw, box);
-                      // showDialog("qualif");
-                    }}
-                  /> */}
-                  <span class="club">{player?.club}</span>
-                </Show>
-                <Show when={box && isMatch(box)}>
-                  <i class="icon2-match hover" title="Edit the match"
-                    onclick={() => {
-                      selectBox(props.event, props.draw, box);
-                      showDialog("match");
-                    }}
-                  />
-                  <Show when={box?.score} fallback={
-                    <>
-                      <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
-                      <Show when={box?.place !== undefined}> <span class="place">{(box!.place ? props.places[box!.place]?.name: '') ?? ''}</span></Show>
-                      {/* TODO place name */}
-                    </>
-                  }><span class="score">{box!.score}</span></Show>
-
-                  <Show when={isRight && props.draw.type !== DrawType.Final}>
-                    <i class="icon2-qualif-out hover" title="Edit qualified out"
+                  <span class="nom">{player?.name}
+                    <Show when={box?.order}> {player?.firstname}</Show>
+                  </span>
+                  <Show when={box?.order && player?.rank}><span class="classement">{player!.rank}</span></Show>
+                  <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
+                  <br />
+                  <Show when={box?.order}>
+                    {/* <i class="icon2-qualif-in hover" title="Edit qualified in"
                       onclick={() => {
                         selectBox(props.event, props.draw, box);
                         // showDialog("qualif");
                       }}
-                    />
+                    /> */}
+                    <span class="club">{player?.club}</span>
                   </Show>
-                </Show>
-              </A>
+                  <Show when={box && isMatch(box)}>
+                    <i class="icon2-match hover" title="Edit the match"
+                      onclick={() => {
+                        selectBox(props.event, props.draw, box);
+                        showDialog("match");
+                      }}
+                    />
+                    <Show when={box?.score} fallback={
+                      <>
+                        <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
+                        <Show when={box?.place !== undefined}> <span class="place">{(box!.place ? props.places[box!.place]?.name: '') ?? ''}</span></Show>
+                        {/* TODO place name */}
+                      </>
+                    }><span class="score">{box!.score}</span></Show>
+
+                    <Show when={isRight && props.draw.type !== DrawType.Final}>
+                      <i class="icon2-qualif-out hover" title="Edit qualified out"
+                        onclick={() => {
+                          selectBox(props.event, props.draw, box);
+                          // showDialog("qualif");
+                        }}
+                      />
+                    </Show>
+                  </Show>
+                </A>
+              </Show>
             </td>
           }</For>
         </tr>

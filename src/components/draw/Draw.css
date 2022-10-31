@@ -24,7 +24,7 @@ table.tableau tr:last-child>td
 */
 
 .tableau td {
-    height: var(--boite-height);
+    /* height: var(--boite-height); */
     min-width: var(--boite-width);
     padding: 3px;
 }
