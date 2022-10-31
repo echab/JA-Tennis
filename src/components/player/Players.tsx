@@ -63,7 +63,6 @@ export const Players: Component<Props> = (props) => {
                 /> registered</label>
 
         <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
-        {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
         <Show when={props.short}>
           <A href={urlPlayer()} replace={true} class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
         </Show>

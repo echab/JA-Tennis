@@ -80,8 +80,8 @@ export const PaneDraw: Component = () => {
     }
 
     return <div class="flex flex-col items-start">
-        <div class="flex justify-between self-stretch items-center px-2">
-            <h4 class="border-l-8"
+        <div class="flex justify-between self-stretch items-center px-2 sticky top-0 z-20">
+            <h4 class="border-l-8 bg-white bg-opacity-80"
                 style={{ "border-color": event()?.color ?? 'transparent' }}
             >
                 <IconSexe sexe={event()?.sexe} double={event()?.typeDouble} />
@@ -91,7 +91,7 @@ export const PaneDraw: Component = () => {
                         // onclick={() => selectDraw(event()!, prevDraw())}
                         // disabled={!prevDraw()}
                         classList={{ "pointer-events-none": !prevDraw() }}
-                        href={`/event/${params.eventId}/${prevDraw()?.id}`} replace={true}
+                        href={`/draw/${params.eventId}/${prevDraw()?.id}`} replace={true}
                         title="View the previous draw of the event"
                     ><i class="icon2-left-arrow"></i></A>
                     {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info"></i></button> */}
@@ -99,14 +99,14 @@ export const PaneDraw: Component = () => {
                     <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50"
                         // onclick={() => selectDraw(event()!, nextDraw())}
                         // disabled={!nextDraw()}
-                        href={`/event/${params.eventId}/${nextDraw()?.id}`} replace={true}
+                        href={`/draw/${params.eventId}/${nextDraw()?.id}`} replace={true}
                         classList={{ "pointer-events-none": !nextDraw() }}
                         title="View the next draw of the event"
                     ><i class="icon2-right-arrow"></i></A>
                 </Show>
             </h4>
             <Show when={event() && draw()}>
-                <div>
+                <div class="bg-white bg-opacity-80">
                     <button class="p-2 rounded-full" title="Edit draw information"
                         onClick={() => showDialog("draw")}
                     ><i class="icon2-info"></i></button>

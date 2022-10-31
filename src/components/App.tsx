@@ -63,7 +63,7 @@ export const Main: Component = () => {
 export const Content: Component = () => (
   <div class="grow">
     <Routes>
-      <Route path="/event/:eventId/:drawId?/:boxPos?" element={
+      <Route path="/draw/:eventId/:drawId?/:boxPos?" element={
         <PaneDraw />
       } />
       <Route path="/players/:playerId?" element={
