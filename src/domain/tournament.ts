@@ -8,6 +8,12 @@ export interface Tournament {
 
     info: TournamentInfo;
 
+    types: {
+        name: string; // FFT
+        versionTypes: number; // 5
+        data: any;
+    };
+
     players: Player[];
 
     events: TEvent[];
@@ -32,6 +38,7 @@ export interface TournamentInfo {
 
     club?: {
         name: string;
+        ligue: string;
     } & Coordinates,
 
     referee?: {
@@ -61,7 +68,7 @@ export interface TEvent {
     typeDouble ?: boolean;
     sexe: 'H' | 'F' | 'M';
 
-    category: CategoryString;
+    category: number; // CategoryString;
     maxRank: RankString;
 
     consolation ?: boolean;
@@ -74,6 +81,8 @@ export interface TEvent {
     color ?: string;
 
     draws: Draw[];
+
+    formatMatch?: number;
 }
 
 export type Place = {

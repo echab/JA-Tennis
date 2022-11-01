@@ -30,6 +30,8 @@ export interface Draw {
   nbColumn: number;
   nbOut: number;
 
+  formatMatch?: number;
+
   orientation?: number; //Default, Portrait, Landscape
 
   //matches: Match[];

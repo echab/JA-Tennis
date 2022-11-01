@@ -23,7 +23,10 @@ export type Player = {
 
     //Registrations
     registration: string[]; //TEvent ids
-    solde?: Number;
+    solde?: number;
+    soldeType?: number;
+    soldeEspece?: number;
+    soldeCheque?: number;
 
     //Coordinates
 
@@ -31,6 +34,7 @@ export type Player = {
     teamIds?: string[];  //TODO? class Team extends Player
 
     //Availability
+    avail?: number[];
     comment?: string;
 
 } & Coordinates;

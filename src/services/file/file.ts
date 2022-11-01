@@ -25,8 +25,8 @@ async function readFile(fileHandle: any): Promise<Tournament> {
     const buffer = await file.arrayBuffer();
     const value = new Uint8Array(buffer);
 
-    const reader = createSerializer(true, value, 0);
-    const doc = reader.deserialize(docFields, NaN, 'doc');
+    const reader = createSerializer(value);
+    const doc = reader.readFields(docFields, NaN, 'doc');
     console.log(doc);
 
     fileName = fileHandle.name;
