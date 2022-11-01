@@ -15,8 +15,12 @@ export abstract class DrawLibBase implements IDrawLib {
     abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
 
     abstract setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
+
+    /** @deprecated TODO could be implement in drawService, not specific to knockout/roundrobin */
     abstract findPlayerIn(inNumber: number): PlayerIn | undefined; //FindQualifieEntrant
+    /** @deprecated TODO could be implement in drawService, not specific to knockout/roundrobin */
     abstract findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
+
     abstract computeScore(): boolean; //CalculeScore
     abstract boxesOpponents(match: Match): { box1: Box; box2: Box };
     abstract isNewPlayer(box: Box): boolean;

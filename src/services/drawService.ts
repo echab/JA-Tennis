@@ -186,12 +186,12 @@ export function newBox<T extends Box = Box>(
 
 /** A match, with a score field */
 export function isMatch(box: Box): box is Match {
-  return box && "undefined" !== typeof (box as Match).score;
+  return box && (box as Match).score !== undefined;
 }
 
 /** A input player, without a score field */
 export function isPlayerIn(box: Box): box is PlayerIn {
-  return box && "undefined" === typeof (box as Match).score;
+  return box && (box as Match).score !== undefined;
 }
 
 export function _updateQualif(event: TEvent, draw: Draw): void {
@@ -341,6 +341,7 @@ export function groupFindQ(event: TEvent, draw: Draw, box: Box): Box | undefined
  * @param group 
  * @param iQualifie 
  * @returns draw and box
+ * @deprecated see findGroupQualifIns
  */
 export function groupFindPlayerIn(
   event: TEvent,
@@ -360,6 +361,7 @@ export function groupFindPlayerIn(
   return [];
 }
 
+/** @deprecated see findGroupQualifOuts */
 export function groupFindPlayerOut(
   event: TEvent,
   [groupStart, groupEnd]: [number, number],
@@ -385,11 +387,12 @@ export function groupFindPlayerOut(
     }
   }
   if (iQualifie <= outCount) {
-    return <any>-2; //TODO
+    return -2 as any; //TODO
   }
   return [];
 }
 
+/** @deprecated see findGroupQualifOuts */
 export function groupFindAllPlayerOut(
   event: TEvent,
   origin: Draw | [number, number],
@@ -405,26 +408,6 @@ export function groupFindAllPlayerOut(
     const [, m] = groupFindPlayerOut(event, group, i);
     if (m) {
       a.push(hideNumbers ? QEMPTY : i);
-    }
-  }
-  return a;
-}
-
-/** @deprecated used only by aurelia draw-draw */
-export function findAllPlayerOutBox(
-  event: TEvent,
-  origin: Draw | [number, number],
-): Match[] { //FindAllQualifieSortantBox
-  //Récupère les qualifiés sortants du tableau
-  const group = isArray(origin) ? origin : groupDraw(event, origin);
-  if (!group) {
-    return [];
-  }
-  const a: Match[] = [];
-  for (let i = 1; i <= MAX_QUALIF; i++) {
-    const [, m] = groupFindPlayerOut(event, group, i);
-    if (m) {
-      a.push(m);
     }
   }
   return a;

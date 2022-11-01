@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { byId, indexOf } from "./find";
+import { indexOf } from "./find";
 
 export interface Command {
   name: string;
