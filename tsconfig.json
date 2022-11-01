@@ -24,7 +24,6 @@
   ],
   "exclude": [
     "dist",
-    "node_modules",
-    "src/views-au"
+    "node_modules"
   ]
 }

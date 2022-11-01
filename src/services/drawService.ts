@@ -438,7 +438,10 @@ export function findDrawPlayerIds(draw: Draw, withQualifIn = true): Set<string> 
   );
 }
 
-/** list all input qualifies or players (exclusively) */
+/**
+ * List all input qualifies or players (exclusively)
+ * @returns an array of `Player`s or qualify `number`s which could be `QEMPTY`
+ */
 export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player | number)[] {
   return (draw.boxes as PlayerIn[])
     .map(({ qualifIn, playerId, order }) => order
@@ -447,58 +450,36 @@ export function findDrawPlayersOrQ(draw: Draw, players: Player[]): (Player | num
     .filter((q): q is Player | number => q !== undefined);
 }
 
-/** list all output qualifies */
-export function findGroupQualifOuts(event: TEvent, [groupStart, groupEnd]: [number, number]): [Draw, number][] {
-  const result: [Draw, number][] = [];
+/**
+ * List all output qualifies
+ * @returns an array of [qualifNum, Draw, position]
+ */
+export function findGroupQualifOuts(event: TEvent, [groupStart, groupEnd]: [number, number]): [number, Draw, number][] {
+  const result: [number, Draw, number][] = [];
   for (let i = groupStart; i < groupEnd; i++) {
     const draw = event.draws[i];
     result.push(...
       (draw.boxes as Match[])
-        .map(({ qualifOut }) => qualifOut)
-        .filter((q): q is number => q !== undefined)
-        .map<[Draw, number]>((q) => [draw, q])
-    );
-  }
-  return result;
-}
-
-/** list all input qualifies */
-export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [number, number]): [Draw, number][] {
-  const result: [Draw, number][] = [];
-  for (let i = groupStart; i < groupEnd; i++) {
-    const draw = event.draws[i];
-    result.push(...
-      (draw.boxes as PlayerIn[])
-        .map(({ qualifIn }) => qualifIn)
-        .filter((q): q is number => q !== undefined)
-        .map<[Draw, number]>((q) => [draw, q])
+        .filter(({qualifOut}) => qualifOut !== undefined)
+        .map<[number, Draw, number]>(({ qualifOut, position }) => [qualifOut!, draw, position])
     );
   }
   return result;
 }
 
 /**
- * Fill or erase a box with qualified in and/or player
- * setPlayerIn
- *
- * @param box
- * @param inNumber (optional)
- * @param player   (optional)
+ * List all input qualifies
+ * @returns an array of [qualifNum, Draw, position]
  */
-// static setPlayerIn(box: PlayerIn, inNumber?: number, player?: Player): boolean {
-//     // inNumber=0 => enlève qualifié
-//     return _drawLibs[box._draw.type].setPlayerIn(box, inNumber, player);
-// }
-
-// static setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
-//     // iQualifie=0 => enlève qualifié
-//     return _drawLibs[box._draw.type].setPlayerOut(box, outNumber);
-// }
-
-// static computeScore(draw: Draw): boolean {
-//     return _drawLibs[draw.type].computeScore(draw);
-// }
-
-// static boxesOpponents(match: Match): { box1: Box; box2: Box } {
-//     return _drawLibs[match._draw.type].boxesOpponents(match);
-// }
+export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [number, number]): [number, Draw, number][] {
+  const result: [number, Draw, number][] = [];
+  for (let i = groupStart; i < groupEnd; i++) {
+    const draw = event.draws[i];
+    result.push(...
+      (draw.boxes as PlayerIn[])
+        .filter(({qualifIn}) => qualifIn !== undefined)
+        .map<[number, Draw, number]>(({ qualifIn, position }) => [qualifIn!, draw, position])
+    );
+  }
+  return result;
+}

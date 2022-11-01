@@ -59,7 +59,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
 
     if (!draw.suite) {
         const group = groupDraw(event, draw);
-        const qualifOuts = findGroupQualifOuts(event, group).map(([_, q]) => q).sort((a, b) => a - b).filter((q) => q !== QEMPTY);
+        const qualifOuts = findGroupQualifOuts(event, group).map(([q]) => q).sort((a, b) => a - b).filter((q) => q !== QEMPTY);
         if (qualifOuts.length) {
             const missing: string[] = [];
             for (let e = 1; e <= qualifOuts.at(-1)!; e++) {
@@ -71,20 +71,6 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
                 result.push({ message: 'ERR_TAB_SORTANT_NO', draw, detail: missing.join(' ') });
             }
         }
-        // //Trouve le plus grand Qsortant
-        // let e = MAX_QUALIF;
-        // for (e = MAX_QUALIF; e >= 1; e--) { // TODO get all qualifOuts then sort
-        //     const [, m] = groupFindPlayerOut(event, group, e);
-        //     if (m) {
-        //         break;
-        //     }
-        // }
-        // for (let e2 = 1; e2 <= e; e2++) {
-        //     const [, m] = groupFindPlayerOut(event, group, e2);
-        //     if (!m) {
-        //         result.push({ message: 'ERR_TAB_SORTANT_NO', draw, detail: 'Q' + e2 });
-        //     }
-        // }
     }
 
     return result;
@@ -504,8 +490,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     if (!draw.suite) {
         const prevGroup = previousGroup(event, draw);
         if (prevGroup) {
-            const qualifOuts = findGroupQualifOuts(event, prevGroup).filter(([_,q]) => q !== QEMPTY);
-            const missing = qualifOuts.filter(([_, q]) => !lib.findPlayerIn(q)).map(([_,q]) => `Q${q}`);
+            const qualifOuts = findGroupQualifOuts(event, prevGroup).filter(([q]) => q !== QEMPTY);
+            const missing = qualifOuts.filter(([q]) => !lib.findPlayerIn(q)).map(([q]) => `Q${q}`);
             if (missing.length) {
                 result.push({ message: 'ERR_TAB_SORTANT_PREC_NO', draw, detail: missing.join(' ') });
             }
