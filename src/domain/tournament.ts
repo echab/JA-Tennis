@@ -1,6 +1,6 @@
 import { Draw, Match } from "./draw";
 import { Player } from "./player";
-import { CategoryString, RankString } from "./types";
+import { RankString } from "./types";
 
 export interface Tournament {
 
@@ -11,7 +11,7 @@ export interface Tournament {
     types: {
         name: string; // FFT
         versionTypes: number; // 5
-        data: any;
+        data?: any;
     };
 
     players: Player[];

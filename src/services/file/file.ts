@@ -26,7 +26,7 @@ async function readFile(fileHandle: any): Promise<Tournament> {
     const value = new Uint8Array(buffer);
 
     const reader = createSerializer(value);
-    const doc = reader.readFields(docFields, NaN, 'doc');
+    const doc = reader.readObject(docFields, NaN, 'doc');
     console.log(doc);
 
     fileName = fileHandle.name;
@@ -41,6 +41,10 @@ export async function saveFile() {
         suggestedName: fileName
     });
     const writable = await fileHandle.createWritable();
+
+    const writer = createSerializer(new Uint8Array(8192)); // TODO size
+    // writer.writeObject(doc, docFields, NaN, 'doc');
+
     // await writable.write(contents);
     await writable.close();
 }

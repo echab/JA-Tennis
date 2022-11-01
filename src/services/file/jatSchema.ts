@@ -60,7 +60,7 @@ const rankFields: Fields<{}> = {
 } as const;
 
 const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
-    _schema: { type: "schema", valid: (s) => s === 'CJoueur' },
+    _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
     sexe: { version: 4, type: "byte" }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
     teamIds: {
@@ -88,7 +88,7 @@ const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
             return d;
         }
     },
-    // solde: { maxVersion: 6, type(writing, _, { version }) { return (version < 7) ? this.float : this.dword; } }, // decimal * 100
+    // solde: { maxVersion: 6, type(writing, value, _, { version }) { return (version < 7) ? this.float : this.dword; } }, // decimal * 100
     solde: { version: 7, type: "dword", reviver: (v) => v || undefined }, // decimal * 100
     _solde: { maxVersion: 6, type: "float", reviver: (v, p) => { if (v) { p.solde = v; } } },
     soldeType: { version: 8, type: "byte", reviver: (v) => v || undefined },
@@ -103,7 +103,7 @@ const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
     registration: { type: "dword" },
     _partenaire: { version: 2, type: "word" },
     avail: {
-        version: 3, type(writing, _, doc) {
+        version: 3, type(writing, value, _, doc) {
             const result = [];
             const nDay = this.word;
             for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
@@ -119,7 +119,7 @@ const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
     comment: { version: 3, type: "bstr", reviver: (s) => s || undefined },
     dateMaj: { type: "date" },
     _: {
-        type(writing, _, p) {
+        type(writing, value, _, p) {
             if (p) {
                 p.sexe = ['H', 'F', 'M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
             }
@@ -129,7 +129,7 @@ const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
 
 const scoreFields: Fields<{game:any, flag:number}> = {
     game: {
-        type(writing, _, parent) {
+        type(writing, value, _, parent) {
             return Array(5).fill(0).map(() => {
                 const b = this.byte;
                 return [b & 0xf, (b >> 4) & 0xf]; // {j1:4, j2:4}
@@ -160,7 +160,7 @@ const scoreFields: Fields<{game:any, flag:number}> = {
 } as const;
 
 const boxFields: Fields<PlayerIn & Match & {version:number}> = {
-    _schema: { type: "schema", valid: (s) => s === 'CBoite' },
+    _schema: { type: "schema", valid: (s) => s === 'CBoite', replacer: () => 'CBoite' },
     version: { type: "byte", def: 4, valid: (v, p) => v <= 4 },
     playerId: {
         type: "i16", reviver: (id) => id === -1 ? undefined : String(id)
@@ -215,7 +215,7 @@ const boxFields: Fields<PlayerIn & Match & {version:number}> = {
 } as const;
 
 const drawFields: Fields<Draw & {version:number, dateMaj: Date}> = {
-    _schema: { type: "schema", valid: (s) => s === 'CTableau' },
+    _schema: { type: "schema", valid: (s) => s === 'CTableau', replacer: () => 'CTableau' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
     id: { version: 10, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
@@ -254,7 +254,7 @@ const drawFields: Fields<Draw & {version:number, dateMaj: Date}> = {
     suite: { version: 7, type: "byte", def: 0 },
     formatMatch: { version: 8, type: "byte" },
     _: {
-        type(writing, _, p) {
+        type(writing, value, _, p) {
             const draw = p as Draw;
             if (!draw.name) {
                 if (draw.type === DrawType.Final) {
@@ -293,7 +293,7 @@ const drawFields: Fields<Draw & {version:number, dateMaj: Date}> = {
 } as const;
 
 const eventFields: Fields<TEvent & {version:number, dateMaj: Date}> = {
-    _schema: { type: "schema", valid: (s) => s === 'CEpreuve' },
+    _schema: { type: "schema", valid: (s) => s === 'CEpreuve', replacer: () => 'CEpreuve' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
     id: { version: 9, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
@@ -337,7 +337,7 @@ const eventFields: Fields<TEvent & {version:number, dateMaj: Date}> = {
     formatMatch: { version: 4, type: "byte", reviver: (f) => f }, // TODO
     color: { version: 5, type: "dword", def: 0xFFFFFF },
     _: {
-        type(writing, _, event) {
+        type(writing, value, _, event) {
             // @ts-expect-error
             delete this._curSexe; // clean-up
 
@@ -362,7 +362,7 @@ const eventFields: Fields<TEvent & {version:number, dateMaj: Date}> = {
 } as const;
 
 const infoFields: Fields<TournamentInfo> = {
-    // version: { type(writing, _, p) { return p.version; } },
+    // version: { type(writing, value, _, p) { return p.version; } },
     name: { type: "bstr" },
     _bEpreuve: { type: "byte", maxVersion: 5 },
     homologation: { type: "bstr", reviver: (s) => s || undefined },
@@ -414,13 +414,13 @@ export const docFields: Fields<Tournament & {version:number}> = {
     places: {
         version: 4, type: "array", itemType: {
             name: { type: "bstr" },
-            _day: { type(writing, f, p) { return []; } }, // [0..MAX_JOUR]
-            avail: { type(writing, f, p) { return []; } }, // [0..MAX_JOUR]
+            _day: { type(writing, value, f, p) { return []; } }, // [0..MAX_JOUR]
+            avail: { type(writing, value, f, p) { return []; } }, // [0..MAX_JOUR]
         }
     },
     _content: { version: 5, type: "byte", def: 0 }, // Contenu { tournoi = 1, epreuve = 2, tableau = 3, boites  = 4, joueurs = 5 }
     '_courts.avail': {
-        version: 8, type(writing, _, doc) {
+        version: 8, type(writing, value, _, doc) {
             if (!doc) { throw new Error("undefined doc"); }
             doc._nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
             for (let i = 0; i < doc._nDay; i++) {
@@ -435,7 +435,7 @@ export const docFields: Fields<Tournament & {version:number}> = {
         }
     },
     _: {
-        type(writing, _, p) {
+        type(writing, value, _, p) {
             const doc = p as Tournament;
 
             if (p && !p.info.start) {

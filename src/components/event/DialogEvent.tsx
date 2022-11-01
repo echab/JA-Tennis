@@ -8,7 +8,7 @@ import { commandManager } from '../../services/util/commandManager';
 import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
 
-const EMPTY: OptionalId<TEvent> = { name: '', sexe: 'H', category: '', maxRank: 'NC', draws: [] };
+const EMPTY: OptionalId<TEvent> = { name: '', sexe: 'H', category: -1, maxRank: 'NC', draws: [] };
 
 type Props = {
    event?: OptionalId<TEvent>;

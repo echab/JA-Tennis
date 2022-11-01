@@ -32,6 +32,7 @@ export const DialogInfo: Component<Props> = (props) => {
 
       const club: TournamentInfo["club"] = {
          name: form.club?.name.trim() || '',
+         ligue: form.club?.ligue.trim() || '',
          adress1: form.club?.adress1?.trim() || undefined,
          adress2: form.club?.adress2?.trim() || undefined,
          zipCode: form.club?.zipCode?.trim() || undefined,

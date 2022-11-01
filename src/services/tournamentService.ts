@@ -77,6 +77,7 @@ export async function save(tournament: Tournament, url?: string) {
 export function newTournament(source?: Tournament): Tournament {
   const tournament: Tournament = source ? { ...source } : {
     id: Guid.create("T"),
+    types: { name: 'FFT', versionTypes: 5 },
     info: { name: "", slotLength: DEFAULT_SLOT_LENGTH },
     players: [],
     events: [],

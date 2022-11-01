@@ -3,6 +3,7 @@ import { Tournament } from "../domain/tournament";
 
 export const mockTournament: Tournament = {
   id: "1",
+  types: { name: 'FFT', versionTypes: 5 },
   info: {
     name: "Test1",
     slotLength: 90 // minutes
@@ -23,7 +24,7 @@ export const mockTournament: Tournament = {
       id: "E0",
       name: "Messieurs - 4e série",
       sexe: "H",
-      category: "Senior",
+      category: 11,
       maxRank: "30/1",
       color: "#dadaf9",
       draws: [
@@ -66,7 +67,7 @@ export const mockTournament: Tournament = {
       id: "E1",
       name: "Dames",
       sexe: "F",
-      category: "Senior",
+      category: 11,
       maxRank: "30/1",
       color: "#f9dada",
       draws: [

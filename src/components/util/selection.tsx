@@ -19,7 +19,7 @@ export interface SelectionItems {
     drawProblems: Map<string, DrawProblem[]>;
 }
 
-const emptyTournament: Tournament = { id: '', info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
+const emptyTournament: Tournament = { id: '', types: {name:'', versionTypes:-1}, info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
 
 export const [selection, setSelection] = createStore<SelectionItems>({
     tournament: emptyTournament,

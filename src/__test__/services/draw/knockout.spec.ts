@@ -5,7 +5,7 @@ import { GenerateType } from "../../../services/draw/drawLib";
 import { Knockout } from "../../../services/draw/knockout";
 import { onlyDefined } from "../../../services/util/object";
 
-const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 'Senior', maxRank: '15/1', draws: [] };
+const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 11, maxRank: '15/1', draws: [] };
 
 const DRAW: Draw = { id: 'D0', name: 'draw1', type: DrawType.Knockout, minRank: 'NC', maxRank: '30/4', nbColumn: 3, nbOut: 2, boxes: [] };
 
