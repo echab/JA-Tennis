@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 const decoder = new TextDecoder("iso-8859-1");
 // const decoder = new TextDecoder("windows-1252");
 
@@ -59,7 +60,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             if (type === 'array' || type ==='arrayb') {
                 r = this.readArrayItems(r, field, parent, name);
             }
-            return r;        
+            return r;
         } else if (typeof type === "function") {
             return type.call(this, false, undefined, field, parent, name); // FnType
         } else {
@@ -138,7 +139,8 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         for (const [name, field] of Object.entries(fields)) {
             // TODO _return or _*
             // @ts-expect-error
-            this.writeField(value[name], field, result, name);
+            const v = !name.startsWith('_') ? value[name] : undefined;
+            this.writeField(v, field, result, name);
         }
         return result as unknown as T;
     },
@@ -153,7 +155,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         if (!itemType) { throw new Error("undefined field or itemType"); }
         items.forEach((item) => this.writeType(item, itemType, field, doc, name));
     },
-    
+
     get byte() {
         // return this.reading ? this.read(1)[0] : this.write(b);
         return this.readBytes(1)[0];
@@ -161,14 +163,14 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     set byte(b) {
         this._buffer[this._position++] = b;
     },
-    
+
     get char() {
         return decoder.decode(this.readBytes(1));
     },
     set char(c) {
         this.byte = c.charCodeAt(0);
     },
-    
+
     get word() {
         const [a, b] = this.readBytes(2);
         return a + (b << 8);
@@ -177,7 +179,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this.byte = w & 0xFF
         this.byte =(w >> 8) & 0xFF;
     },
-    
+
     get i16() {
         const r = this._view.getInt16(this._position, true);
         this._position += 2;
@@ -187,7 +189,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._view.setInt16(this._position, i, true);
         this._position += 2;
     },
-    
+
     get dword() {
         const [a, b, c, d] = this.readBytes(4);
         return a + (b << 8) + (c << 16) + (d << 24);
@@ -196,7 +198,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._view.setUint32(this._position, dw, true);
         this._position += 4;
     },
-    
+
     get float() {
         const r = this._view.getFloat32(this._position, true);
         this._position += 4;
@@ -206,21 +208,21 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._view.setFloat32(this._position, f, true);
         this._position += 4;
     },
-    
+
     get date() {
         const [a, b, c, d] = this.readBytes(4);
         // format: { day:5, month: 4, f1: 7, year: 15, f2:1 } { second: 5, minute: 6, hour: 5 }
         // d=.yyyyyyy c=yyyyyyyy b=.......m a=mmmddddd
-    
+
         // _dos_getftime()
         // yyyyyyym mmmddddd hhhhhmmm mmmsssss > y + 1980; s/2
         // dos_date = year * 512 + month * 32 + day
         // dos_time = hour * 2048 + minute * 32 + second / 2
-    
+
         const day = a & 0x1f;
         const month = (a >> 5) | ((b & 1) << 3);
         const year = c | ((d & 0x7f) << 8);
-    
+
         if (day === 0 && month === 0) {
             if (year === 0) {
                 return undefined;
@@ -244,15 +246,15 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this.byte = 0;
         this.byte = 0;
     },
-    
+
     get bstr() {
         const n = this.byte;
         return decoder.decode(this.readBytes(n));
     },
     set bstr(s) {
         // const buf = encoder.encode(s); // UTF-8
-        const buf = new Uint8Array([...s].map((c)=> c.charCodeAt(0)));
-        this.byte = buf.length; 
+        const buf = new Uint8Array([...s ?? ''].map((c)=> c.charCodeAt(0)));
+        this.byte = buf.length;
         this.writeBytes(buf);
     },
 
@@ -273,15 +275,15 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         return generateId();
     },
     set generateId(id) {},
-    
+
     get customData() { return; },
     set customData(d) {},
-    
+
     get schema() {
         // https://learn.microsoft.com/en-us/cpp/mfc/tn002-persistent-object-data-format?view=msvc-170
         // https://www.codeproject.com/Articles/1176939/All-About-MFC-Serialization
         // atlmfc/src/mfc/arcobj.cpp
-    
+
         const wTag = this.word;
         let obTag;
         if (wTag === wBigObjectTag) {
@@ -290,12 +292,11 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             obTag = ((wTag & wClassTag) << 16) | (wTag & ~wClassTag);
         }
         if (wTag === wNewClassTag) {
-            const pid = this.word;
+            this.word; // pid === 1
             const className = decoder.decode(this.readBytes(this.word));
             this._classNames[this._nMapCount] = className;
             this._nMapCount += 2; // class + instance
             return className;
-    
         } else {
             const nClassIndex = obTag & ~dwBigClassTag;
             if (nClassIndex === 0) {
@@ -311,12 +312,13 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         if (nClassIndex === -1) {
             const wTag = wNewClassTag;
             this.word = wTag;
-            this.word = 0; // TODO pid;
+            this.word = 1; // pid;
             this.writeBytes(encoder.encode(className));
             this._classNames[this._nMapCount] = className;
             this._nMapCount += 2; // class + instance
         } else {
-            const wTag = nClassIndex; // TODO
+            const obTag = nClassIndex;
+            const wTag = ((obTag >> 16) & wClassTag) | (obTag & ~wClassTag);
             this.word = wTag;
             this._nMapCount += 1;
         }

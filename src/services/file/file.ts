@@ -1,13 +1,12 @@
 import { Tournament } from "../../domain/tournament";
-import { convert, docFields, jatFileType } from "./jatSchema";
+import { docFields, jatFileType } from "./jatSchema";
 import { createSerializer } from "./serializer";
 
 let fileName: string = '';
 
 export async function openFile(): Promise<Tournament> {
     // alert('hello');
-    const w: any = window;
-    const [fileHandle] = await w.showOpenFilePicker({
+    const [fileHandle] = await showOpenFilePicker({
         types: [jatFileType],
         excludeAcceptAllOption: true,
         multiple: false,
@@ -18,7 +17,7 @@ export async function openFile(): Promise<Tournament> {
 async function readFile(fileHandle: any): Promise<Tournament> {
     // console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
-    const { size, lastModifiedDate, type } = file;
+    // const { size, lastModifiedDate, type } = file;
     // console.log('size=', size, 'lastModifiedDate=', lastModifiedDate);
     // const content = await file.stream();
     // for await (const value of streamAsyncIterator(content)) {
@@ -34,18 +33,20 @@ async function readFile(fileHandle: any): Promise<Tournament> {
     return doc;
 }
 
-export async function saveFile() {
-    const w: any = window;
-    const fileHandle = await w.showSaveFilePicker({
+export async function saveFile(doc: Tournament) {
+    const fileHandle = await showSaveFilePicker({
         types: [jatFileType],
-        suggestedName: fileName
+        suggestedName: fileName.replace(/\.jat$/i, '-saved$0'),
     });
     const writable = await fileHandle.createWritable();
 
     const writer = createSerializer(new Uint8Array(8192)); // TODO size
-    // writer.writeObject(doc, docFields, NaN, 'doc');
+    // @ts-expect-error
+    writer.writeObject(doc, docFields, docFields.version.def, 'doc');
 
-    // await writable.write(contents);
+    await writable.write(writer._buffer);
+    await writable.truncate(writer._position);
+
     await writable.close();
 }
 

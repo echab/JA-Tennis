@@ -43,10 +43,13 @@ const categoryFFT = [
     120, 125, 130, 140, 150, 160, 170, 180, 190
 ];
 
+const optionalString = (s: string | undefined) => s?.trim() || undefined;
+
 const rankFields: Fields<Record<string, unknown>> = {
     // _rankAccept: { version: 2, maxVersion: 7, type: "byte", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     _return: {
         type: "byte",
+        valid: (c) => c === PAS_CLASSEMT || (MAXCLAST <= c && c <= NC),
         reviver(c, p) {
             // TODO by types, using this._curSexe and this._type.name
             c = (c - 1) * 60;
@@ -56,7 +59,11 @@ const rankFields: Fields<Record<string, unknown>> = {
             const ranks = rank.list();
             return ranks[19 - c / 60];
         },
-        valid: (c) => c === PAS_CLASSEMT || (MAXCLAST <= c && c <= NC),
+        replacer(c) {
+            const ranks = rank.list();
+            const r = ranks.indexOf(c);
+            return r;
+        }
     },
 } as const;
 
@@ -73,14 +80,14 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _teamName: { predicate: ({ sexe }: any) => sexe & EQUIPE_MASK, type: "bstr", reviver: (s: string, p) => p._teamName = s || undefined },
     licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "dword", reviver: (l) => l || undefined }, // TODO by types
     name: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr" },
-    firstname: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr" },
-    adress1: { type: "bstr", reviver: (s) => s || undefined },
-    adress2: { type: "bstr", reviver: (s) => s || undefined },
-    zipCode: { type: "bstr", reviver: (s) => s || undefined },
-    city: { type: "bstr", reviver: (s) => s || undefined },
-    phone1: { type: "bstr", reviver: (s) => s || undefined },
-    phone2: { type: "bstr", reviver: (s) => s || undefined },
-    email: { version: 5, type: "bstr", def: '', reviver: (s) => s || undefined },
+    firstname: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr", reviver: optionalString },
+    adress1: { type: "bstr", reviver: optionalString },
+    adress2: { type: "bstr", reviver: optionalString },
+    zipCode: { type: "bstr", reviver: optionalString },
+    city: { type: "bstr", reviver: optionalString },
+    phone1: { type: "bstr", reviver: optionalString },
+    phone2: { type: "bstr", reviver: optionalString },
+    email: { version: 5, type: "bstr", reviver: optionalString },
     birth: {
         type: "date", reviver: (d, p) => {
             // TODO: compute Categorie from birthDate
@@ -98,46 +105,59 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     rank: { type: rankFields },
     rank2: { type: rankFields },
     _bfRank: { version: 9, type: "byte", reviver: (v) => v || undefined },
-    nationality: { version: 9, type: "bstr", reviver: (s) => s || undefined },
+    nationality: { version: 9, type: "bstr", reviver: optionalString },
     _sexe: { maxVersion: 3, type: "byte", reviver: (sexe, p) => { p.sexe = sexe; } },
-    club: { type: "bstr", reviver: (s) => s?.trim() || undefined },
+    club: { type: "bstr", reviver: optionalString },
     registration: { type: "dword" },
     _partenaire: { version: 2, type: "word" },
     avail: {
         version: 3, type(writing, value, _, doc) {
-            const result = [];
-            const nDay = this.word;
-            for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
-                let avail = this.dword;
-                if (doc!.version! < 11) {
-                    avail = 0xFFFFFFFF;	//always available
+            if (!writing) {
+                const result = [];
+                const nDay = this.word;
+                for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
+                    let avail = this.dword;
+                    if (doc!.version! < 11) {
+                        avail = 0xFFFFFFFF;	//always available
+                    }
+                    result[i] = avail;
                 }
-                result[i] = avail;
+                return result;
+            } else {
+                // TODO
             }
-            return result;
         }
     },
-    comment: { version: 3, type: "bstr", reviver: (s) => s || undefined },
+    comment: { version: 3, type: "bstr", reviver: optionalString },
     dateMaj: { type: "date" },
     _: {
         type(writing, value, _, p) {
             if (p) {
-                p.sexe = ['H', 'F', 'M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+                if (!writing) {
+                    p.sexe = ['H', 'F', 'M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+                } else {
+                    // TODO
+                }
             }
         }
     }
+    // TODO version:1 two additional "00 00" (pos 67 into jeu2test-3.jat) not read ?!?
 } as const;
 
 const scoreFields: Fields<{game: any, flag: number}> = {
     game: {
         type(writing, value, _, parent) {
-            return Array(5).fill(0).map(() => {
-                const b = this.byte;
-                return [b & 0xf, (b >> 4) & 0xf]; // {j1:4, j2:4}
-            });
+            if (!writing) {
+                return Array(5).fill(0).map(() => {
+                    const b = this.byte;
+                    return [b & 0xf, (b >> 4) & 0xf]; // {j1:4, j2:4}
+                });
+            } else {
+                // TODO
+            }
         }, reviver: (game, p) => {
             const r = [];
-            for (let [a, b] of game) {
+            for (const [a, b] of game) {
                 if (a === 0 && b === 0) {
                     break;
                 }
@@ -145,7 +165,11 @@ const scoreFields: Fields<{game: any, flag: number}> = {
             }
             p.score = r.join(' ');
             return game;
-        }
+        }, replacer(game) {
+            Array(5).fill(0).forEach(() => {
+                this.byte = 0; // TODO
+            })
+        },
     },
     flag: {
         type: "byte", reviver: (f, p) => {  // WO = 1, PREVENU = 2, VAINQDEF = 4, PREVENU1 = 8, PREVENU2 = 16
@@ -156,7 +180,9 @@ const scoreFields: Fields<{game: any, flag: number}> = {
                 p.score += ' VD';
             }
             return f;
-        }
+        }, replacer: (f) => {
+            return (f?.match(/WO/) ? 1 : 0) + (f?.match(/VD/) ? 4 : 0);
+        },
     },
 } as const;
 
@@ -170,7 +196,10 @@ const boxFields: Fields<PlayerIn & Match & {version: number}> = {
         type: scoreFields, reviver: (s, p) => {
             p._score = s;
             return s.score;
-        }
+        }, replacer: (s, p) => {
+            p._score = s;
+            return { game: s, flag: s };
+        },
     },
     _flags: {
         type: "word", reviver: (f, p) => {
@@ -212,13 +241,13 @@ const boxFields: Fields<PlayerIn & Match & {version: number}> = {
         }
     },
     place: { version: 2, type: "i16", reviver: (c, p) => (c !== -1 && p.version > 2 ? c : undefined) },
-    note: { version: 4, type: "bstr", reviver: (s) => s || undefined },
+    note: { version: 4, type: "bstr", reviver: optionalString },
 } as const;
 
 const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CTableau', replacer: () => 'CTableau' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
-    id: { version: 10, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
+    id: { version: 10, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
     name: { version: 5, type: "bstr", reviver: (s) => s?.trim() },
     nbColumn: { type: "byte", valid: (n) => MIN_COL <= n }, // MAX_COL depends on type
@@ -257,38 +286,42 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     _: {
         type(writing, value, _, p) {
             const draw = p as Draw;
-            if (!draw.name) {
-                if (draw.type === DrawType.Final) {
-                    draw.name = "Final draw";
-                } else {
-                    draw.name = ranksName(draw.minRank, draw.maxRank);
+            if (!writing) {
+                if (!draw.name) {
+                    if (draw.type === DrawType.Final) {
+                        draw.name = "Final draw";
+                    } else {
+                        draw.name = ranksName(draw.minRank, draw.maxRank);
+                    }
                 }
-            }
 
-            // hide boxes on left off entering players
-            // const hideBox = (box: Box, b: number) => box.hidden = true;
-            const deleteBox = (box: Box) => {
-                if (box.playerId) {
-                    console.warn('cleanup draw', draw.id, draw.name, `box.pos=${box.position}`, 'player=', box.playerId);
-                } else {
-                    const b = indexOf(draw.boxes, "position", box.position);
-                    delete draw.boxes[b];
+                // hide boxes on left off entering players
+                // const hideBox = (box: Box, b: number) => box.hidden = true;
+                const deleteBox = (box: Box) => {
+                    if (box.playerId) {
+                        console.warn('cleanup draw', draw.id, draw.name, `box.pos=${box.position}`, 'player=', box.playerId);
+                    } else {
+                        const b = indexOf(draw.boxes, "position", box.position);
+                        delete draw.boxes[b];
+                    }
                 }
-            }
-            draw.boxes.forEach((box: PlayerIn) => {
-                if (box.order) {
-                    scanLeftBoxes(draw, box.position, false, deleteBox);
-                }
-            });
+                draw.boxes.forEach((box: PlayerIn) => {
+                    if (box.order) {
+                        scanLeftBoxes(draw, box.position, false, deleteBox);
+                    }
+                });
 
-            // TODO init joueur QS
-            // if (draw.type & TABLEAU_POULE) {
-            //     for(let i=iHautCol( iColMin()); i>=0; i--){
-            //         if( m_pBoite[ iDiagonale( i)]->isQualifieSortant()){
-            //             m_pBoite[ iDiagonale( i)]->m_iJoueur = m_pBoite[ ADVERSAIRE1( i)]->m_iJoueur;
-            //         }
-            //     }
-            // }
+                // TODO init joueur QS
+                // if (draw.type & TABLEAU_POULE) {
+                //     for(let i=iHautCol( iColMin()); i>=0; i--){
+                //         if( m_pBoite[ iDiagonale( i)]->isQualifieSortant()){
+                //             m_pBoite[ iDiagonale( i)]->m_iJoueur = m_pBoite[ ADVERSAIRE1( i)]->m_iJoueur;
+                //         }
+                //     }
+                // }
+            } else {
+                // TODO
+            }
         }
     },
 } as const;
@@ -296,7 +329,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
 const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CEpreuve', replacer: () => 'CEpreuve' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
-    id: { version: 9, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
+    id: { version: 9, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
     name: { version: 10, type: "bstr" },
     sexe: {
@@ -339,29 +372,33 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
     color: { version: 5, type: "dword", def: 0xFFFFFF, reviver: (c: number) => `#${(c).toString(16).padStart(6,'0').replace(/^(\d\d)(\d\d)(\d\d)$/, '$3$2$1')}` },
     _: {
         type(writing, value, _, evt) {
-            // @ts-expect-error
-            delete this._curSexe; // clean-up
+            if (!writing) {
+                // @ts-expect-error
+                delete this._curSexe; // clean-up
 
-            if (evt) {
-                const event = evt as TEvent;
-                event.sexe = ['H', 'F', 'M'][evt.sexe & ~EQUIPE_MASK] as Sexe; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
+                if (evt) {
+                    const event = evt as TEvent;
+                    event.sexe = ['H', 'F', 'M'][evt.sexe & ~EQUIPE_MASK] as Sexe; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
 
-                if (!event.name) {
-                    event.name = `${event.typeDouble ? 'Double ': 'Simple '}${{ H:'Messieurs', F:'Dames', M:'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
-                }
+                    if (!event.name) {
+                        event.name = `${event.typeDouble ? 'Double ': 'Simple '}${{ H:'Messieurs', F:'Dames', M:'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
+                    }
 
-                // cleanup draws.boxes
-                event.draws.forEach((draw: Draw) => {
-                    const lib = drawLib(event as TEvent, draw);
-                    draw.boxes.forEach((box) => {
-                        if (isMatch(box)) {
-                            const opp = lib.boxesOpponents(box);
-                            if (!opp.box1 || !opp.box2) {
-                                delete (box as Partial<Match>).score; // not a match
+                    // cleanup draws.boxes
+                    event.draws.forEach((draw: Draw) => {
+                        const lib = drawLib(event as TEvent, draw);
+                        draw.boxes.forEach((box) => {
+                            if (isMatch(box)) {
+                                const opp = lib.boxesOpponents(box);
+                                if (!opp.box1 || !opp.box2) {
+                                    delete (box as Partial<Match>).score; // not a match
+                                }
                             }
-                        }
+                        });
                     });
-                });
+                }
+            } else {
+                // TODO
             }
         }
     }
@@ -371,23 +408,23 @@ const infoFields: Fields<TournamentInfo> = {
     // version: { type(writing, value, _, p) { return p.version; } },
     name: { type: "bstr" },
     _bEpreuve: { type: "byte", maxVersion: 5 },
-    homologation: { type: "bstr", reviver: (s) => s || undefined },
+    homologation: { type: "bstr", reviver: optionalString },
     start: { maxVersion: 11, type: "date" },
     end: { maxVersion: 11, type: "date" },
     _isPlanning: { version: 7, type: "byte" },
     club: {
         type: {
             name: { type: "bstr" },
-            adress1: { type: "bstr", reviver: (s) => s || undefined },
-            adress2: { version: 6, type: "bstr", reviver: (s) => s || undefined },
-            ligue: { type: "bstr", reviver: (s) => s || undefined },
+            adress1: { type: "bstr", reviver: optionalString },
+            adress2: { version: 6, type: "bstr", reviver: optionalString },
+            ligue: { type: "bstr", reviver: optionalString },
         }
     },
     referee: {
         type: {
             name: { type: "bstr" },
-            adress1: { type: "bstr", reviver: (s) => s || undefined },
-            adress2: { version: 6, type: "bstr", reviver: (s) => s || undefined },
+            adress1: { type: "bstr", reviver: optionalString },
+            adress2: { version: 6, type: "bstr", reviver: optionalString },
         }
     },
     _clubNo: { version: 3, maxVersion: 5, type: "dword" },
@@ -395,7 +432,7 @@ const infoFields: Fields<TournamentInfo> = {
 
 export const docFields: Fields<Tournament & {version: number}> = {
     version: { type: "byte", def: 13, valid: (v, p) => v <= 13 },
-    id: { version: 13, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
+    id: { version: 13, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     types: {
         version: 9, type: {
             name: { version: 9, type: "bstr", def: 'FFT', valid: (t) => t === 'FFT' },
@@ -420,25 +457,41 @@ export const docFields: Fields<Tournament & {version: number}> = {
     places: {
         version: 4, type: "array", itemType: {
             name: { type: "bstr" },
-            _day: { type(writing, value, f, p) { return []; } }, // [0..MAX_JOUR]
-            avail: { type(writing, value, f, p) { return []; } }, // [0..MAX_JOUR]
+            _day: { type(writing, value, f, p) {
+                if (!writing) {
+                    return [];
+                } else {
+                    // TODO
+                }
+            } }, // [0..MAX_JOUR]
+            avail: { type(writing, value, f, p) {
+                if (!writing) {
+                    return [];
+                } else {
+                    // TODO
+                }
+            } }, // [0..MAX_JOUR]
         }
     },
     _content: { version: 5, type: "byte", def: 0 }, // Contenu { tournoi = 1, epreuve = 2, tableau = 3, boites  = 4, joueurs = 5 }
     '_courts.avail': {
         version: 8, type(writing, value, _, doc) {
             if (!doc) { throw new Error("undefined doc"); }
-            if (doc._start && doc._end) {
-                doc._nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
-                for (let i = 0; i < doc._nDay; i++) {
-                    for (const place of doc.places) {
-                        let avail = this.dword;
-                        if (doc.version! < 11) {
-                            avail = 0xFFFFFFFF;	//always available
+            if (!writing) {
+                if (doc._start && doc._end) {
+                    doc._nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
+                    for (let i = 0; i < doc._nDay; i++) {
+                        for (const place of doc.places) {
+                            let avail = this.dword;
+                            if (doc.version! < 11) {
+                                avail = 0xFFFFFFFF;	//always available
+                            }
+                            place.avail[i] = avail;
                         }
-                        place.avail[i] = avail;
                     }
                 }
+            } else {
+                // TODO
             }
         }
     },
@@ -446,35 +499,40 @@ export const docFields: Fields<Tournament & {version: number}> = {
         type(writing, value, _, p) {
             const doc = p as Tournament;
 
-            if (p && !p.info.start) {
-                p.info.start = p._start;
-                p.info.end = p._end;
-                delete p._start;
-                delete p._end;
-            }
+            if (!writing) {
 
-            //convert players registration
-            doc.players.forEach((p, i) => {
-                p.id = String(i);
-
-                // compute team name
-                if (p.teamIds) {
-                    // @ts-expect-error
-                    p.name = p._teamName ||
-                        p.teamIds
-                            // .map((playerId) => byId(doc.players, playerId, `team player #${playerId} not found`))
-                            .map((playerId) => byId(doc.players, playerId) ?? { name: `#${playerId}` } as Player)
-                            .map((player) => `${player.name} ${player?.firstname?.[0] ?? ''}`.trim())
-                            .join(' - ');
-                    // @ts-expect-error
-                    delete p._teamName;
+                if (p && !p.info.start) {
+                    p.info.start = p._start;
+                    p.info.end = p._end;
+                    delete p._start;
+                    delete p._end;
                 }
 
-                const dw = p.registration as unknown as number;
-                p.registration = doc.events.map((event, i) =>
-                    (dw & (1 << i)) ? event.id : undefined
-                ).filter((id): id is string => !!id);
-            })
+                //convert players registration
+                doc.players.forEach((p, i) => {
+                    p.id = String(i);
+
+                    // compute team name
+                    if (p.teamIds) {
+                        // @ts-expect-error
+                        p.name = p._teamName ||
+                            p.teamIds
+                                // .map((playerId) => byId(doc.players, playerId, `team player #${playerId} not found`))
+                                .map((playerId) => byId(doc.players, playerId) ?? { name: `#${playerId}` } as Player)
+                                .map((player) => `${player.name} ${player?.firstname?.[0] ?? ''}`.trim())
+                                .join(' - ');
+                        // @ts-expect-error
+                        delete p._teamName;
+                    }
+
+                    const dw = p.registration as unknown as number;
+                    p.registration = doc.events.map((event, i) =>
+                        (dw & (1 << i)) ? event.id : undefined
+                    ).filter((id): id is string => !!id);
+                })
+            } else {
+                // TODO
+            }
         }
     }
 } as const;
