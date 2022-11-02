@@ -70,9 +70,10 @@ const rankFields: Fields<Record<string, unknown>> = {
 const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
-    sexe: { version: 4, type: "byte" }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+    sexe: { version: 4, type: "byte", replacer: (s, p) => "HFM".indexOf(p.sexe) | (p.teamIds ? EQUIPE_MASK : 0) }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
     teamIds: {
-        predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: "arrayb", itemType: "word", valid: (a) => a.length <= 4,
+        predicate: ({ sexe }) => sexe & EQUIPE_MASK,
+        type: "arrayb", itemType: "word", valid: (a) => a.length <= 4,
         reviver: (a: number[], p) => {
             return a.map((playerId) => String(playerId)); // playerId is converted to Player below
         }
@@ -106,7 +107,7 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     rank2: { type: rankFields },
     _bfRank: { version: 9, type: "byte", reviver: (v) => v || undefined },
     nationality: { version: 9, type: "bstr", reviver: optionalString },
-    _sexe: { maxVersion: 3, type: "byte", reviver: (sexe, p) => { p.sexe = sexe; } },
+    _sexe: { maxVersion: 3, type: "byte", reviver: (sexe, p) => { p.sexe = sexe; }, replacer: (s, p) => "HFM".indexOf(p.sexe) },
     club: { type: "bstr", reviver: optionalString },
     registration: { type: "dword" },
     _partenaire: { version: 2, type: "word" },
@@ -124,7 +125,11 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
                 }
                 return result;
             } else {
-                // TODO
+                const nDay = value.length;
+                this.word = nDay;
+                for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
+                    this.dword = value[i]; // TODO
+                }
             }
         }
     },
@@ -136,7 +141,7 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
                 if (!writing) {
                     p.sexe = ['H', 'F', 'M'][p.sexe & ~EQUIPE_MASK]; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
                 } else {
-                    // TODO
+                    // TODO?
                 }
             }
         }
@@ -198,7 +203,7 @@ const boxFields: Fields<PlayerIn & Match & {version: number}> = {
             return s.score;
         }, replacer: (s, p) => {
             p._score = s;
-            return { game: s, flag: s };
+            return { game: s, flag: s } as unknown as string;
         },
     },
     _flags: {
@@ -320,7 +325,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
                 //     }
                 // }
             } else {
-                // TODO
+                // TODO?
             }
         }
     },
@@ -345,7 +350,7 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
             // @ts-expect-error
             this._curSexe = b; // used by inner draws for rank
             return b;
-        }
+        }, replacer: (s, p) => "HFM".indexOf(s) | (p.typeDouble ? EQUIPE_MASK : 0)
     },
     _categ3: { maxVersion: 3, type: "byte", reviver: (b) => [0, 1, 2, 3, 5, 7, 9, 11, 12, 13, 15, 17, 18][b], valid: () => false },
     _categ7: { maxVersion: 6, type: "byte", reviver: (b) => b * 10, valid: () => false },

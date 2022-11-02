@@ -36,7 +36,7 @@ async function readFile(fileHandle: any): Promise<Tournament> {
 export async function saveFile(doc: Tournament) {
     const fileHandle = await showSaveFilePicker({
         types: [jatFileType],
-        suggestedName: fileName.replace(/\.jat$/i, '-saved$0'),
+        suggestedName: fileName.replace(/(\.jat)$/i, '-saved$1'),
     });
     const writable = await fileHandle.createWritable();
 

@@ -26,7 +26,7 @@ export type Field<T> = {
     def?: any,
     predicate?: (this: Serializer, parent: any) => boolean | number,
     reviver?: (this: Serializer, v: any, parent?: any) => T,
-    replacer?: (this: Serializer, v: any, parent?: any) => T,
+    replacer?: (this: Serializer, v: T | undefined, parent?: any) => any,
     valid?: (this: Serializer, v: any, parent?: any) => boolean,
     itemType?: Type | FnType<any> | Fields<any> // TODO no any
 };
@@ -129,13 +129,14 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
                 return r as T;
             }
             if (typeof r !== 'undefined' && !name.startsWith('_')) {
-                (result as any)[name] = r;
+                // @ts-expect-error
+                result[name] = r;
             }
         }
         return result as unknown as T;
     },
-    writeObject<T>(value: T, fields: Fields<T>, parentVersion: number, name?: string) {
-        const result = { version: parentVersion }; // by default, inherit version from parent
+    writeObject<T>(value: (T & { version?: number }) | undefined, fields: Fields<T>, parentVersion: number, name?: string) {
+        const result = { version: value?.version ?? parentVersion }; // by default, inherit version from parent
         for (const [name, field] of Object.entries(fields)) {
             // TODO _return or _*
             // @ts-expect-error
@@ -186,7 +187,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         return r;
     },
     set i16(i) {
-        this._view.setInt16(this._position, i, true);
+        this._view.setInt16(this._position, i ?? 0, true);
         this._position += 2;
     },
 
@@ -195,7 +196,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         return a + (b << 8) + (c << 16) + (d << 24);
     },
     set dword(dw) {
-        this._view.setUint32(this._position, dw, true);
+        this._view.setUint32(this._position, dw ?? 0, true);
         this._position += 4;
     },
 
@@ -205,7 +206,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         return r;
     },
     set float(f) {
-        this._view.setFloat32(this._position, f, true);
+        this._view.setFloat32(this._position, f ?? 0.0, true);
         this._position += 4;
     },
 
@@ -313,7 +314,9 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             const wTag = wNewClassTag;
             this.word = wTag;
             this.word = 1; // pid;
-            this.writeBytes(encoder.encode(className));
+            const buf = encoder.encode(className);
+            this.word = buf.length;
+            this.writeBytes(buf);
             this._classNames[this._nMapCount] = className;
             this._nMapCount += 2; // class + instance
         } else {
