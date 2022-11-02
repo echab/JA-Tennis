@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 
 type Props = {
-    sexe?: 'H' | 'F' | 'M';
+    sexe?: Sexe;
     double?: boolean;
 }
 

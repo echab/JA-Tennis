@@ -1,5 +1,6 @@
+/* eslint-disable no-bitwise */
 import { Box, Draw, DrawType, Match, PlayerIn, QEMPTY } from "../../domain/draw";
-import { Player } from "../../domain/player";
+import { Player, Sexe } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
 import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
@@ -42,7 +43,7 @@ const categoryFFT = [
     120, 125, 130, 140, 150, 160, 170, 180, 190
 ];
 
-const rankFields: Fields<{}> = {
+const rankFields: Fields<Record<string, unknown>> = {
     // _rankAccept: { version: 2, maxVersion: 7, type: "byte", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     _return: {
         type: "byte",
@@ -59,7 +60,7 @@ const rankFields: Fields<{}> = {
     },
 } as const;
 
-const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
+const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
     sexe: { version: 4, type: "byte" }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
@@ -99,7 +100,7 @@ const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
     _bfRank: { version: 9, type: "byte", reviver: (v) => v || undefined },
     nationality: { version: 9, type: "bstr", reviver: (s) => s || undefined },
     _sexe: { maxVersion: 3, type: "byte", reviver: (sexe, p) => { p.sexe = sexe; } },
-    club: { type: "bstr", reviver: (s) => s || undefined },
+    club: { type: "bstr", reviver: (s) => s?.trim() || undefined },
     registration: { type: "dword" },
     _partenaire: { version: 2, type: "word" },
     avail: {
@@ -127,7 +128,7 @@ const playerFields: Fields<Player & {version:number, dateMaj:Date}> = {
     }
 } as const;
 
-const scoreFields: Fields<{game:any, flag:number}> = {
+const scoreFields: Fields<{game: any, flag: number}> = {
     game: {
         type(writing, value, _, parent) {
             return Array(5).fill(0).map(() => {
@@ -159,7 +160,7 @@ const scoreFields: Fields<{game:any, flag:number}> = {
     },
 } as const;
 
-const boxFields: Fields<PlayerIn & Match & {version:number}> = {
+const boxFields: Fields<PlayerIn & Match & {version: number}> = {
     _schema: { type: "schema", valid: (s) => s === 'CBoite', replacer: () => 'CBoite' },
     version: { type: "byte", def: 4, valid: (v, p) => v <= 4 },
     playerId: {
@@ -214,12 +215,12 @@ const boxFields: Fields<PlayerIn & Match & {version:number}> = {
     note: { version: 4, type: "bstr", reviver: (s) => s || undefined },
 } as const;
 
-const drawFields: Fields<Draw & {version:number, dateMaj: Date}> = {
+const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CTableau', replacer: () => 'CTableau' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
     id: { version: 10, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
-    name: { version: 5, type: "bstr" },
+    name: { version: 5, type: "bstr", reviver: (s) => s?.trim() },
     nbColumn: { type: "byte", valid: (n) => MIN_COL <= n }, // MAX_COL depends on type
     nbOut: { type: "byte" },
     type: {
@@ -292,7 +293,7 @@ const drawFields: Fields<Draw & {version:number, dateMaj: Date}> = {
     },
 } as const;
 
-const eventFields: Fields<TEvent & {version:number, dateMaj: Date}> = {
+const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CEpreuve', replacer: () => 'CEpreuve' },
     version: { type: "byte", def: 10, valid: (v, p) => v <= 10 },
     id: { version: 9, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
@@ -335,14 +336,19 @@ const eventFields: Fields<TEvent & {version:number, dateMaj: Date}> = {
 
     draws: { type: "array", itemType: drawFields, valid: (a) => a.length <= 63 },
     formatMatch: { version: 4, type: "byte", reviver: (f) => f }, // TODO
-    color: { version: 5, type: "dword", def: 0xFFFFFF },
+    color: { version: 5, type: "dword", def: 0xFFFFFF, reviver: (c: number) => `#${(c).toString(16).padStart(6,'0').replace(/^(\d\d)(\d\d)(\d\d)$/, '$3$2$1')}` },
     _: {
-        type(writing, value, _, event) {
+        type(writing, value, _, evt) {
             // @ts-expect-error
             delete this._curSexe; // clean-up
 
-            if (event) {
-                event.sexe = ['H', 'F', 'M'][event.sexe & ~EQUIPE_MASK]; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
+            if (evt) {
+                const event = evt as TEvent;
+                event.sexe = ['H', 'F', 'M'][evt.sexe & ~EQUIPE_MASK] as Sexe; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
+
+                if (!event.name) {
+                    event.name = `${event.typeDouble ? 'Double ': 'Simple '}${{ H:'Messieurs', F:'Dames', M:'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
+                }
 
                 // cleanup draws.boxes
                 event.draws.forEach((draw: Draw) => {
@@ -387,7 +393,7 @@ const infoFields: Fields<TournamentInfo> = {
     _clubNo: { version: 3, maxVersion: 5, type: "dword" },
 } as const;
 
-export const docFields: Fields<Tournament & {version:number}> = {
+export const docFields: Fields<Tournament & {version: number}> = {
     version: { type: "byte", def: 13, valid: (v, p) => v <= 13 },
     id: { version: 13, type: "word", def: "generateId", reviver: (id) => id ? String(id) : generateId() },
     types: {
@@ -422,14 +428,16 @@ export const docFields: Fields<Tournament & {version:number}> = {
     '_courts.avail': {
         version: 8, type(writing, value, _, doc) {
             if (!doc) { throw new Error("undefined doc"); }
-            doc._nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
-            for (let i = 0; i < doc._nDay; i++) {
-                for (let b = 0; b < doc.places.length; b++) {
-                    let avail = this.dword;
-                    if (doc.version! < 11) {
-                        avail = 0xFFFFFFFF;	//always available
+            if (doc._start && doc._end) {
+                doc._nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
+                for (let i = 0; i < doc._nDay; i++) {
+                    for (const place of doc.places) {
+                        let avail = this.dword;
+                        if (doc.version! < 11) {
+                            avail = 0xFFFFFFFF;	//always available
+                        }
+                        place.avail[i] = avail;
                     }
-                    doc.places[b].avail[i] = avail;
                 }
             }
         }
@@ -451,13 +459,15 @@ export const docFields: Fields<Tournament & {version:number}> = {
 
                 // compute team name
                 if (p.teamIds) {
-                    p.name = (p as any)._teamName ||
+                    // @ts-expect-error
+                    p.name = p._teamName ||
                         p.teamIds
                             // .map((playerId) => byId(doc.players, playerId, `team player #${playerId} not found`))
                             .map((playerId) => byId(doc.players, playerId) ?? { name: `#${playerId}` } as Player)
                             .map((player) => `${player.name} ${player?.firstname?.[0] ?? ''}`.trim())
                             .join(' - ');
-                    delete (p as any)._teamName;
+                    // @ts-expect-error
+                    delete p._teamName;
                 }
 
                 const dw = p.registration as unknown as number;
@@ -468,7 +478,3 @@ export const docFields: Fields<Tournament & {version:number}> = {
         }
     }
 } as const;
-
-export function convert(docJat: any): Tournament {
-    return docJat as unknown as Tournament;
-}

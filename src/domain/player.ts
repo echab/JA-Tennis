@@ -1,7 +1,8 @@
-﻿import { Box } from "./draw";
-import { Coordinates } from "./tournament";
+﻿import { Coordinates } from "./tournament";
 
 export type Id = string;
+
+export type Sexe = 'H' | 'F' | 'M';
 
 export type Player = {
 
@@ -10,7 +11,7 @@ export type Player = {
     //General info
     name: string;
     firstname?: string;
-    sexe: 'H' | 'F' | 'M';
+    sexe: Sexe;
     birth?: Date;
     category?: string;
     club?: string;

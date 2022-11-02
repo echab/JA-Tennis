@@ -31,7 +31,7 @@ async function readFile(fileHandle: any): Promise<Tournament> {
 
     fileName = fileHandle.name;
 
-    return convert(doc);
+    return doc;
 }
 
 export async function saveFile() {
