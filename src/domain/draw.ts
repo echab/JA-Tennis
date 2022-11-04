@@ -2,44 +2,44 @@ import { Player } from "./player";
 import { RankString, ScoreString } from "./types";
 
 export const enum DrawType {
-  Knockout, // = 0
-  Final, // = 1
-  Roundrobin, // = 2
-  RoundrobinReturn, // = 3
+    Knockout, // = 0
+    Final, // = 1
+    Roundrobin, // = 2
+    RoundrobinReturn, // = 3
 }
 export const enum Mode {
-  Build,
-  Plan,
-  Play,
-  Lock,
+    Build,
+    Plan,
+    Play,
+    Lock,
 }
 
 export interface Draw {
-  id: string; //new draw has no id
+    id: string; //new draw has no id
 
-  name: string;
+    name: string;
 
-  type: DrawType; //Normal, Final, Poule simple, Poule aller/retour
+    type: DrawType; //Normal, Final, Poule simple, Poule aller/retour
 
-  suite?: boolean;
+    suite?: boolean;
 
-  minRank: RankString;
-  maxRank: RankString;
+    minRank: RankString;
+    maxRank: RankString;
 
-  //nbEntry: number;
-  nbColumn: number;
-  nbOut: number;
+    //nbEntry: number;
+    nbColumn: number;
+    nbOut: number;
 
-  formatMatch?: number;
+    formatMatch?: number;
 
-  orientation?: number; //Default, Portrait, Landscape
+    orientation?: number; //Default, Portrait, Landscape
 
-  //matches: Match[];
-  boxes: (PlayerIn | Match)[];
+    //matches: Match[];
+    boxes: Array<PlayerIn | Match>;
 
-  lock?: Mode;
+    lock?: Mode;
 
-  //_refresh?: Date; //force refresh //TODO?
+    //_refresh?: Date; //force refresh //TODO?
 }
 
 //export interface IDrawDimensions {
@@ -50,44 +50,44 @@ export interface Draw {
 //}
 
 export interface Match extends Box {
-  //winner: number; //1 or 2 (or undefined)
-  score: ScoreString; //a match is a box with a score member
-  wo?: boolean;
-  qualifOut?: number;
+    //winner: number; //1 or 2 (or undefined)
+    score: ScoreString; //a match is a box with a score member
+    wo?: boolean;
+    qualifOut?: number;
 
-  canceled?: boolean;
-  vainqDef?: boolean; //TODO english
+    canceled?: boolean;
+    vainqDef?: boolean; //TODO english
 
-  //Planning
-  place?: number;
-  date?: Date;
+    //Planning
+    place?: number;
+    date?: Date;
 
-  matchFormat?: string; //FFT extent
+    matchFormat?: string; //FFT extent
 
-  note?: string;
+    note?: string;
 
-  _player1?: Player; //TODO for planning and dialog match
-  _player2?: Player;
+    _player1?: Player; //TODO for planning and dialog match
+    _player2?: Player;
 }
 
 export interface PlayerIn extends Box {
-  order?: number;
-  qualifIn?: number;
-  seeded?: number;
+    order?: number; // 0 or undefined:not computed,  >0: first appearance, 	<0: next appearances
+    qualifIn?: number;
+    seeded?: number;
 }
 
 export const QEMPTY = 0;
 
 export interface Box {
-  // id: string;
-  position: number;
+    // id: string;
+    position: number;
 
-  hidden?: boolean;
-  locked?: boolean;
+    hidden?: boolean;
+    locked?: boolean;
 
-  playerId?: string;
+    playerId?: string;
 
-  //Planning
-  receive?: boolean;
-  aware?: boolean;
+    //Planning
+    receive?: boolean;
+    aware?: boolean;
 }

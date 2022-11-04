@@ -25,7 +25,7 @@ async function readFile(fileHandle: any): Promise<Tournament> {
     const value = new Uint8Array(buffer);
 
     const reader = createSerializer(value);
-    const doc = reader.readObject(docFields, NaN, 'doc');
+    const doc = reader.readObject(docFields);
     console.log(doc);
 
     fileName = fileHandle.name;
@@ -41,8 +41,7 @@ export async function saveFile(doc: Tournament) {
     const writable = await fileHandle.createWritable();
 
     const writer = createSerializer(new Uint8Array(8192)); // TODO size
-    // @ts-expect-error
-    writer.writeObject(doc, docFields, docFields.version.def, 'doc');
+    writer.writeObject(doc, docFields, docFields.version.def);
 
     await writable.write(writer._buffer);
     await writable.truncate(writer._position);

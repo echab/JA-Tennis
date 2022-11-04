@@ -6,14 +6,13 @@ const encoder = new TextEncoder(); // "iso-8859-1"
 
 export type Serializer = ReturnType<typeof createSerializer>;
 
-export type Type = keyof Omit<Serializer, `${"_"|"read"|"write"}${string}`|"seek">
+export type Type = keyof Omit<Serializer, `${"_"|"read"|"write"}${string}`|"writing"|"seek">
 
 export type FieldParent = { version?: number, [k: string]: any };
 
 export type FnType<T> = (
     this: Serializer,
-    writing: boolean,
-    value: any, // for writing only
+    value: any, // for this.writing only
     fields?: Field<T>,
     parent?: FieldParent,
     name?: string
@@ -31,7 +30,7 @@ export type Field<T> = {
     itemType?: Type | FnType<any> | Fields<any> // TODO no any
 };
 
-export type Fields<T> = {[P in keyof T]: Field<T[P]> } | { [Q: `_${string}`] : Field<any> };
+export type Fields<T extends { version?: number }> = {[P in keyof T]: Field<T[P]> } & { [Q: `_${string}`]: Field<any> };
 
 const wBigObjectTag = 0x7fff;
 const wClassTag = 0x8000;
@@ -39,8 +38,10 @@ const wNewClassTag = 0xffff;
 const dwBigClassTag = 0x80000000;
 
 export const createSerializer = (buffer: Uint8Array, position = 0) => ({
+    writing: false,
     _position: position,
     _buffer: buffer,
+    _arrayIndex: NaN,
     _view: new DataView(buffer.buffer),
     _classNames: [] as string[],
     _nMapCount: 1,
@@ -53,36 +54,54 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._buffer.set(bytes, this._position);
         this._position += bytes.byteLength;
     },
-    readType<T>(type: string | FnType<T> | Fields<T>, field: Field<T>, parent: any, name?: string) {
+    readType<T>(
+        type: string | FnType<T> | Fields<T>,
+        field: Field<T>,
+        parent: any,
+        name?: string
+    ) {
+        this.writing = false;
         if (typeof type === 'string') {
-            // @ts-expect-error
-            let r = this[type];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let r = (this as any)[type];
             if (type === 'array' || type ==='arrayb') {
                 r = this.readArrayItems(r, field, parent, name);
             }
             return r;
         } else if (typeof type === "function") {
-            return type.call(this, false, undefined, field, parent, name); // FnType
+            return type.call(this, undefined, field, parent, name); // FnType
         } else {
-            return this.readObject(type, parent.version, name);
+            return this.readObject(type, parent.version);
         }
     },
-    writeType<T>(value: any, type: string | FnType<T> | Fields<T>, field: Field<T>, parent: any, name?: string) {
+    writeType<T>(
+        value: any,
+        type: string | FnType<T> | Fields<T>,
+        field: Field<T>,
+        parent: any,
+        name?: string
+    ) {
+        this.writing = true;
         if (typeof type === 'string') {
             if (type === 'array' || type ==='arrayb') {
                 this[type] = value.length;
                 this.writeArrayItems(value, field, parent, name);
             } else {
-                // @ts-expect-error
-                this[type] = value;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (this as any)[type] = value;
             }
         } else if (typeof type === "function") {
-            type.call(this, true, value, field, parent, name); // FnType
+            type.call(this, value, field, parent, name); // FnType
         } else {
-            this.writeObject(value, type, parent.version, name);
+            this.writeObject(value, type, parent.version);
         }
     },
-    readField<T>(field: Field<T>, parent: FieldParent, name: string): T | undefined {
+    readField<T>(
+        field: Field<T>,
+        parent: FieldParent,
+        name: string
+    ): T | undefined {
+        this.writing = false;
         const { version, maxVersion, predicate, type, def, valid, reviver } = field;
         if ((maxVersion || version) && !parent.version) {
             throw new Error(`Missing parent.version for ${name}`);
@@ -106,7 +125,13 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             return r;
         }
     },
-    writeField<T>(value: T | undefined, field: Field<T>, parent: FieldParent, name: string) {
+    writeField<T>(
+        value: T | undefined,
+        field: Field<T>,
+        parent: FieldParent,
+        name: string
+    ) {
+        this.writing = true;
         const { version, maxVersion, predicate, type, def, replacer } = field;
         if ((maxVersion || version) && !parent.version) {
             throw new Error(`Missing parent.version for ${name}`);
@@ -121,40 +146,65 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             }
         }
     },
-    readObject<T>(fields: Fields<T>, parentVersion: number, name?: string): T {
+    readObject<T extends { version?: number }>(
+        fields: Fields<T>,
+        parentVersion: number = NaN
+    ): T {
+        this.writing = false;
         const result = { version: parentVersion }; // by default, inherit version from parent
-        for (const [name, field] of Object.entries(fields)) {
-            const r = this.readField(field, result, name);
-            if (name === '_return') {
-                return r as T;
-            }
-            if (typeof r !== 'undefined' && !name.startsWith('_')) {
-                // @ts-expect-error
-                result[name] = r;
+        for (const [fieldName, field] of Object.entries(fields)) {
+            const r = this.readField(field, result, fieldName);
+            if (r !== undefined && !fieldName.startsWith('_')) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (result as any)[fieldName] = r;
             }
         }
         return result as unknown as T;
     },
-    writeObject<T>(value: (T & { version?: number }) | undefined, fields: Fields<T>, parentVersion: number, name?: string) {
-        const result = { version: value?.version ?? parentVersion }; // by default, inherit version from parent
-        for (const [name, field] of Object.entries(fields)) {
-            // TODO _return or _*
-            // @ts-expect-error
-            const v = !name.startsWith('_') ? value[name] : undefined;
-            this.writeField(v, field, result, name);
+    writeObject<T extends { version?: number }>(
+        value: T | undefined,
+        fields: Fields<T>,
+        parentVersion: number
+    ) {
+        this.writing = true;
+        const parent = { ...value, version: value?.version ?? parentVersion }; // by default, inherit version from parent
+        for (const [fieldName, field] of Object.entries(fields)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const v = !fieldName.startsWith('_') ? (value as any)[fieldName] : undefined;
+            this.writeField(v, field, parent, fieldName);
         }
-        return result as unknown as T;
     },
 
-    readArrayItems<T>(n: number, field: Field<T>, doc?: FieldParent, name?: string): T[] {
+    readArrayItems<T>(
+        n: number,
+        field: Field<T>,
+        doc?: FieldParent,
+        name?: string
+    ): T[] {
         const { itemType } = field;
         if (!itemType) { throw new Error("undefined field or itemType"); }
-        return Array(n).fill(0).map(() => this.readType(itemType, field, doc, name));
+        const prev = this._arrayIndex;
+        const result = Array(n).fill(0).map((_, i) => {
+            this._arrayIndex = i;
+            return this.readType(itemType, field, doc, name);
+        });
+        this._arrayIndex = prev;
+        return result;
     },
-    writeArrayItems<T>(items: any[], field: Field<T>, doc?: FieldParent, name?: string) {
+    writeArrayItems<T>(
+        items: T[],
+        field: Field<T>,
+        doc?: FieldParent,
+        name?: string
+    ) {
         const { itemType } = field;
         if (!itemType) { throw new Error("undefined field or itemType"); }
-        items.forEach((item) => this.writeType(item, itemType, field, doc, name));
+        const prev = this._arrayIndex;
+        items.forEach((item, i) => {
+            this._arrayIndex = i;
+            this.writeType(item, itemType, field, doc, name);
+        });
+        this._arrayIndex = prev;
     },
 
     get byte() {

@@ -3,6 +3,7 @@ import { Player, Sexe } from "./player";
 import { RankString } from "./types";
 
 export interface Tournament {
+    version: number; // 13
 
     id: string;
 
@@ -38,7 +39,7 @@ export interface TournamentInfo {
 
     club?: {
         name: string;
-        ligue: string;
+        ligue?: string;
     } & Coordinates,
 
     referee?: {
