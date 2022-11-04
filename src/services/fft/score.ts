@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Score } from "../../domain/types";
 
 export class ScoreFFT implements Score {
@@ -15,8 +16,8 @@ export class ScoreFFT implements Score {
         //check score
         const sets = score.split(/\s+/);
         let nSet1 = 0, nSet2 = 0;
-        for (let i = 0; i < sets.length; i++) {
-            const games = sets[i].split("/");
+        for (const st of sets) {
+            const games = st.split("/");
 
             const j1 = parseInt(games[0]);
             const j2 = parseInt(games[1]);
@@ -38,15 +39,12 @@ export class ScoreFFT implements Score {
 
         return true;
     }
-
-
-
 }
 
 const MAX_SET = 5;
 
 export class ScoreDeltaFFT {
-    m_Jeu: { j1: number; j2: number; }[];
+    m_Jeu: Array<{ j1: number; j2: number; }>;
 
     constructor(score: string, fm: string) {
         const sets = score.matchAll(/\b(\d+\/\d+)\b/g);

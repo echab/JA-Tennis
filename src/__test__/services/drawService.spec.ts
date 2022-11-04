@@ -1,9 +1,9 @@
 import { groupDraw, previousGroup, nextGroup } from "../../services/drawService";
-import { Draw, DrawType } from "../../domain/draw";
+import { Draw, FINAL, KNOCKOUT } from "../../domain/draw";
 import type { TEvent } from "../../domain/tournament";
 
 const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 11, maxRank: 'NC', draws: [] };
-const DRAW: Draw = { id: 'D0', name: 'draw1', type: DrawType.Knockout, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 2, boxes: [] };
+const DRAW: Draw = { id: 'D0', name: 'draw1', type: KNOCKOUT, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 2, boxes: [] };
 
 describe("drawService", () =>{
 
@@ -38,7 +38,7 @@ describe("drawService", () =>{
             {...DRAW, id:'D4', cont: true},
             {...DRAW, id:'D5', cont: true},
             {...DRAW, id:'D6' },
-            {...DRAW, id:'D7', type:DrawType.Final},
+            {...DRAW, id:'D7', type:FINAL},
         ]};
 
         it("returns the group of first draw", () => {
@@ -128,7 +128,7 @@ describe("drawService", () =>{
             {...DRAW, id:'D4', cont: true},
             {...DRAW, id:'D5', cont: true},
             {...DRAW, id:'D6' },
-            {...DRAW, id:'D7', type:DrawType.Final},
+            {...DRAW, id:'D7', type:FINAL},
         ]};
 
         it("returns nothing for first group", () => {
@@ -173,7 +173,7 @@ describe("drawService", () =>{
             {...DRAW, id:'D4', cont: true},
             {...DRAW, id:'D5', cont: true},
             {...DRAW, id:'D6' },
-            {...DRAW, id:'D7', type:DrawType.Final},
+            {...DRAW, id:'D7', type:FINAL},
         ]};
 
         it("returns the second group for first draw", () => {

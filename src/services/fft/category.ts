@@ -43,7 +43,7 @@ export class CategoryFFT implements Category {
         const refDate = new Date(now.getFullYear(), 9, 1);    //1er Octobre
         this.currentYear = now.getFullYear() + (now > refDate ? 1 : 0);
 
-        for (const c in this._category) {
+        for (const c of Object.keys(this._category)) {
             this._categories.push(c);
         }
         for (let i = this._categories.length - 1; i >= 0; i--) {
@@ -74,8 +74,7 @@ export class CategoryFFT implements Category {
     ofDate(date: Date): string {
         const age = this.getAge(date);
         let prev = '';
-        let i: string;
-        for (i in this._category) {
+        for (const i of Object.keys(this._category)) {
             const categ = this._category[i];
 
             if (categ.ageMax && categ.ageMax < age) {
@@ -102,7 +101,7 @@ export class CategoryFFT implements Category {
 
         //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.
 
-        const idxSenior = this._index['Senior'];
+        const idxSenior = this._index.Senior;
         const idxEvent = this._index[eventCategory];
 
         //Epreuve senior
@@ -116,13 +115,13 @@ export class CategoryFFT implements Category {
         if (idxEvent < idxSenior) {
             //Epreuve jeunes
             if (catPlayer.ageMax
-                && catEvent.ageMax 
+                && catEvent.ageMax
                 && catPlayer.ageMax <= catEvent.ageMax) {
                 return true;
             }
         } else {
             //Epreuve vétérans
-            if (catEvent.ageMin 
+            if (catEvent.ageMin
                 && catPlayer.ageMin
                 && catEvent.ageMin <= catPlayer.ageMin) {
                 return true;
@@ -134,7 +133,7 @@ export class CategoryFFT implements Category {
         //TODO? 2006/08/28	AgeMin() < playerCategory.AgeMin()	//vétéran
 
         //	return playerCategory.isVide() || isVide()
-        //		(playerCategory.AgeMin() <= AgeMax() 
+        //		(playerCategory.AgeMin() <= AgeMax()
         //		&& AgeMin() <= playerCategory.AgeMax() );
     }
 }

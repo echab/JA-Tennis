@@ -210,7 +210,6 @@ describe("commandManager", () => {
     });
 
     it("should ignore empty transaction", () => {
-        const counter: Counter = { count: 0 };
         const cmdManager = createCommandManager(5);
 
         cmdManager.beginTransaction('transac2');
@@ -369,7 +368,7 @@ describe("insertItem", () => {
     });
 
     it("should insert item in empty array", () => {
-        const array: (number | string)[] = [];
+        const array: Array<number | string> = [];
 
         const cmd = insertItem(array, 0, "Bar");
         expect(array).toStrictEqual(["Bar"]);
@@ -397,7 +396,7 @@ describe("insertItem", () => {
     it("should throw if out of range", () => {
         const array = [1, "Foo"];
 
-        const cmd = insertItem(array, 2, "Bar");
+        insertItem(array, 2, "Bar");
         expect(array).toStrictEqual([1, "Foo", "Bar"]);
 
         const t = () => {
@@ -422,7 +421,7 @@ describe("insertItem", () => {
     it("should throw if out of range negative", () => {
         const array = [1, "Foo", 2];
 
-        const cmd = insertItem(array, -3, "Bar");
+        insertItem(array, -3, "Bar");
         expect(array).toStrictEqual(["Bar", 1, "Foo", 2]);
 
         const t = () => {
@@ -463,7 +462,7 @@ describe("removeItem", () => {
         const array = [1, "Foo"];
 
         const t = () => {
-            const cmd = removeItem(array, 2);
+            removeItem(array, 2);
         }
         expect(t).toThrow('Index out of range');
     });
@@ -472,7 +471,7 @@ describe("removeItem", () => {
         const array = [1, "Foo"];
 
         const t = () => {
-            const cmd = removeItem(array, -3);
+            removeItem(array, -3);
         }
         expect(t).toThrow('Index out of range');
     });

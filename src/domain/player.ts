@@ -13,14 +13,14 @@ export type Player = {
     firstname?: string;
     sexe: Sexe;
     birth?: Date;
-    category?: string;
+    category?: string; // TODO? number?
     club?: string;
     licence?: string;
     nationality?: string;
-    external ?: boolean;   //TODO FFT extent
-    assimilated ?: boolean;    //TODO FFT extent
+    external?: boolean;   //TODO FFT extent
+    assimilated?: boolean;    //TODO FFT extent
     rank: string;
-    rank2 ?: string;
+    rank2?: string;
 
     //Registrations
     registration: string[]; //TEvent ids

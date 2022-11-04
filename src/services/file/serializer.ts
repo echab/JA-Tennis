@@ -6,9 +6,9 @@ const encoder = new TextEncoder(); // "iso-8859-1"
 
 export type Serializer = ReturnType<typeof createSerializer>;
 
-export type Type = keyof Omit<Serializer, `${"_"|"read"|"write"}${string}`|"writing"|"seek">
+export type Type = keyof Omit<Serializer, `${"_" | "read" | "write"}${string}` | "writing" | "seek">
 
-export type FieldParent = { version?: number, [k: string]: any };
+export type FieldParent<T extends Record<string, any> = any> = T & { version?: number };
 
 export type FnType<T> = (
     this: Serializer,
@@ -21,16 +21,16 @@ export type FnType<T> = (
 export type Field<T> = {
     version?: number,
     maxVersion?: number,
-    type: Type | FnType<T> | Fields<T>,
+    type: Type | FnType<T> | Fields<any>,
     def?: any,
-    predicate?: (this: Serializer, parent: any) => boolean | number,
-    reviver?: (this: Serializer, v: any, parent?: any) => T,
-    replacer?: (this: Serializer, v: T | undefined, parent?: any) => any,
-    valid?: (this: Serializer, v: any, parent?: any) => boolean,
+    predicate?: (this: Serializer, parent: FieldParent) => boolean | number,
+    reviver?: (this: Serializer, v: any, parent: FieldParent) => T,
+    replacer?: (this: Serializer, v: T | undefined, parent: FieldParent) => any,
+    valid?: (this: Serializer, v: any, parent?: FieldParent) => boolean,
     itemType?: Type | FnType<any> | Fields<any> // TODO no any
 };
 
-export type Fields<T extends { version?: number }> = {[P in keyof T]: Field<T[P]> } & { [Q: `_${string}`]: Field<any> };
+export type Fields<T extends { version?: number }> = { [P in keyof T]: Field<T[P]> } & { [Q: `_${string}`]: Field<any> };
 
 const wBigObjectTag = 0x7fff;
 const wClassTag = 0x8000;
@@ -55,45 +55,46 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._position += bytes.byteLength;
     },
     readType<T>(
-        type: string | FnType<T> | Fields<T>,
+        type: string | FnType<T> | Fields<any>,
         field: Field<T>,
-        parent: any,
+        parent: FieldParent,
         name?: string
     ) {
         this.writing = false;
         if (typeof type === 'string') {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let r = (this as any)[type];
-            if (type === 'array' || type ==='arrayb') {
+            if (type === 'array' || type === 'arrayb') {
                 r = this.readArrayItems(r, field, parent, name);
             }
             return r;
         } else if (typeof type === "function") {
             return type.call(this, undefined, field, parent, name); // FnType
         } else {
-            return this.readObject(type, parent.version);
+            return this.readObject(type, parent?.version);
         }
     },
     writeType<T>(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         value: any,
-        type: string | FnType<T> | Fields<T>,
+        type: string | FnType<T> | Fields<any>,
         field: Field<T>,
-        parent: any,
+        parent: FieldParent,
         name?: string
     ) {
         this.writing = true;
         if (typeof type === 'string') {
-            if (type === 'array' || type ==='arrayb') {
-                this[type] = value.length;
+            if (type === 'array' || type === 'arrayb') {
+                this[type] = value.length; // setter for the array length
                 this.writeArrayItems(value, field, parent, name);
             } else {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (this as any)[type] = value;
+                (this as any)[type] = value; // setter
             }
         } else if (typeof type === "function") {
             type.call(this, value, field, parent, name); // FnType
         } else {
-            this.writeObject(value, type, parent.version);
+            this.writeObject(value, type, parent?.version);
         }
     },
     readField<T>(
@@ -108,7 +109,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         }
         if ((!maxVersion || (parent.version ?? 0) <= maxVersion)
             && (!predicate || predicate.call(this, parent))) {
-            let r: any;
+            let r: T;
             if (!version || version <= (parent.version ?? 99)) {
                 r = this.readType(type, field, parent, name);
             } else {
@@ -132,7 +133,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         name: string
     ) {
         this.writing = true;
-        const { version, maxVersion, predicate, type, def, replacer } = field;
+        const { version, maxVersion, predicate, type, replacer } = field;
         if ((maxVersion || version) && !parent.version) {
             throw new Error(`Missing parent.version for ${name}`);
         }
@@ -164,7 +165,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     writeObject<T extends { version?: number }>(
         value: T | undefined,
         fields: Fields<T>,
-        parentVersion: number
+        parentVersion?: number
     ) {
         this.writing = true;
         const parent = { ...value, version: value?.version ?? parentVersion }; // by default, inherit version from parent
@@ -178,7 +179,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     readArrayItems<T>(
         n: number,
         field: Field<T>,
-        doc?: FieldParent,
+        parent: FieldParent,
         name?: string
     ): T[] {
         const { itemType } = field;
@@ -186,7 +187,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         const prev = this._arrayIndex;
         const result = Array(n).fill(0).map((_, i) => {
             this._arrayIndex = i;
-            return this.readType(itemType, field, doc, name);
+            return this.readType(itemType, field, parent, name);
         });
         this._arrayIndex = prev;
         return result;
@@ -194,7 +195,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     writeArrayItems<T>(
         items: T[],
         field: Field<T>,
-        doc?: FieldParent,
+        parent: FieldParent,
         name?: string
     ) {
         const { itemType } = field;
@@ -202,7 +203,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         const prev = this._arrayIndex;
         items.forEach((item, i) => {
             this._arrayIndex = i;
-            this.writeType(item, itemType, field, doc, name);
+            this.writeType(item, itemType, field, parent, name);
         });
         this._arrayIndex = prev;
     },
@@ -228,7 +229,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     },
     set word(w) {
         this.byte = w & 0xFF
-        this.byte =(w >> 8) & 0xFF;
+        this.byte = (w >> 8) & 0xFF;
     },
 
     get i16() {
@@ -304,7 +305,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     },
     set bstr(s) {
         // const buf = encoder.encode(s); // UTF-8
-        const buf = new Uint8Array([...s ?? ''].map((c)=> c.charCodeAt(0)));
+        const buf = new Uint8Array([...s ?? ''].map((c) => c.charCodeAt(0)));
         this.byte = buf.length;
         this.writeBytes(buf);
     },
@@ -325,10 +326,10 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     get generateId() {
         return generateId();
     },
-    set generateId(id) {},
+    set generateId(id) { },
 
     get customData() { return; },
-    set customData(d) {},
+    set customData(d) { },
 
     get schema() {
         // https://learn.microsoft.com/en-us/cpp/mfc/tn002-persistent-object-data-format?view=msvc-170

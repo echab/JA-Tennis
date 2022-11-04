@@ -1,12 +1,13 @@
-﻿import { columnMax, column, positionTopCol, positionOpponent1, positionMax, positionBottomCol } from './knockoutLib';
+﻿/* eslint-disable no-bitwise */
+import { columnMax, column, positionTopCol, positionOpponent1, positionMax, positionBottomCol } from './knockoutLib';
 import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 import { indexOf, byId } from '../util/find';
 import { category, rank, score } from '../types';
-import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
+import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL, KNOCKOUT } from '../../domain/draw';
 import { RankString } from '../../domain/types';
 import { TEvent, Tournament } from '../../domain/tournament';
 import { isRegistred, isSexeCompatible } from '../tournamentService';
-import { MINUTES } from '../../utils/date';
+import { DAYS, HOURS, MINUTES } from '../../utils/date';
 import { drawLib } from './drawLib';
 import { DrawProblem } from '../../domain/validation';
 import { ASSERT } from '../../utils/tool';
@@ -40,7 +41,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
     const prevGroup = previousGroup(event, draw);
     if (prevGroup) {
         const firstDraw = event.draws[prevGroup[0]];
-        if (firstDraw.type !== DrawType.Final && draw.minRank && firstDraw.maxRank) {
+        if (firstDraw.type !== FINAL && draw.minRank && firstDraw.maxRank) {
             if (rank.compare(draw.minRank, firstDraw.maxRank) < 0) {
                 result.push({ message: 'ERR_TAB_CLASSMAX_OVR', draw });
             }
@@ -50,7 +51,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
     const nextGrp = nextGroup(event, draw);
     if (nextGrp) {
         const firstDraw = event.draws[nextGrp[0]];
-        if (draw.type !== DrawType.Final && draw.maxRank && firstDraw.minRank) {
+        if (draw.type !== FINAL && draw.maxRank && firstDraw.minRank) {
             if (rank.compare(firstDraw.minRank, draw.maxRank) < 0) {
                 result.push({ message: 'ERR_TAB_CLASSMAX_NEXT_OVR', draw });
             }
@@ -79,7 +80,6 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
 function validateMatches(draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
-
     return result;
 }
 
@@ -91,8 +91,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     const isTypePoule = draw.type >= 2;
     const lib = drawLib(event, draw);
 
-    if (draw.type !== DrawType.Knockout
-        && draw.type !== DrawType.Final) {
+    if (draw.type !== KNOCKOUT
+        && draw.type !== FINAL) {
         return result;
     }
 
@@ -140,8 +140,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     pClastMaxCol[colMax] = 'NC';    //pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();
 
     //Match avec deux joueurs gagné par un des deux joueurs
-    for (let i = 0; i < draw.boxes.length; i++) {
-        const box = draw.boxes[i];
+    for (const box of draw.boxes) {
         const boxIn = isPlayerIn(box) ? box : undefined;
         const match = isMatch(box) ? box : undefined;
         const b = box.position;
@@ -168,7 +167,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             result.push({ message: 'ERR_TAB_DUPLI', draw, box: boxIn, player });
         }
 
-        //if( boxes[ i].order >= 0 && player) 
+        //if( boxes[ i].order >= 0 && player)
         if (player && boxIn && lib.isNewPlayer(boxIn) && !boxIn.qualifIn) {
 
             //DONE 00/03/07: Tableau, joueur sans classement
@@ -226,8 +225,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             //DONE 00/01/10: 2 joueurs du même club
             //DONE 00/03/03: Test de club identique même si le club est vide
             //TODO 00/07/27: Test de club identique avec des matches joués
-
-
 
             ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
 
@@ -327,10 +324,10 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 }
 
                 if (tournament.info.start && tournament.info.end && tournament._day) {
-                    tournament._dayCount = dateDiff(tournament.info.start, tournament.info.end, UnitDate.Day) + 1;
+                    tournament._dayCount = dateDiff(tournament.info.start, tournament.info.end, DAYS) + 1;
 
                     if (tournament._dayCount) {
-                        const iDay = dateDiff(match.date, tournament.info.start, UnitDate.Day);
+                        const iDay = dateDiff(match.date, tournament.info.start, DAYS);
                         if (0 <= iDay && iDay < tournament._dayCount) {	//v0998
 
                             const dayMatches = tournament._day[iDay];
@@ -390,7 +387,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
             }
 
-
             //DONE 01/08/01 (00/05/28): CTableau, interdit d'avoir plus de Qualifiés que de joueurs admis directement
 
             //DONE 01/08/19 (00/05/28): CTableau, interdit de prévoir plus d'un tour d'écart entre deux joueurs de même classement
@@ -421,7 +417,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 const prevGroup = previousGroup(event, draw);
                 if (prevGroup) {
                     //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                    const [d, m] = groupFindPlayerOut(event, prevGroup, e);
+                    const [, m] = groupFindPlayerOut(event, prevGroup, e);
                     if (!m) {
                         result.push({ message: 'ERR_TAB_ENTRANT_PREC_NO', draw, box: boxIn, player });
                     } else if (m.playerId !== boxIn.playerId) {
@@ -439,15 +435,15 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 //ASSERT(!isTypePoule || (b === iDiagonale(b)));	//Qs que dans diagonale des poules
 
                 //DONE 00/03/07: CTableau, qualifié sortant en double
-                let j = lib.findPlayerOut(e);
+                const j = lib.findPlayerOut(e);
                 if (j && (j.position !== b)) {
                     result.push({ message: 'ERR_TAB_SORTANT_DUP', draw, box: match, player, detail: `Q${e}` });
                 }
 
-                if (draw.type === DrawType.Final) {
+                if (draw.type === FINAL) {
                     result.push({ message: 'ERR_TAB_SORTANT_FINAL', draw, box, player, detail: `Q${e}` });
                 }
-                /*			
+                /*
                 pSuite = getSuivant();
                 if( pSuite && (j = pSuite.findPlayerIn( e, &pSuite)) !== -1) {
                     if( boxes[ i].playerId !== pSuite.boxes[ j].playerId) {
@@ -474,8 +470,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     result.push({ message: 'ERR_TAB_TETESERIE_ENTRANT', draw: d, box: boxIn, detail: 'Seeded ' + e });
                 }
 
-                for (let i = 0; i < draw.boxes.length; i++) {
-                    const boxIn2 = draw.boxes[i] as PlayerIn;
+                for (const box of draw.boxes) {
+                    const boxIn2 = box as PlayerIn;
                     if (boxIn2.seeded === e && boxIn2.position !== boxIn.position) {
                         result.push({ message: 'ERR_TAB_TETESERIE_DUP', draw: d, box: boxIn, detail: 'Seeded ' + e });
                     }
@@ -502,7 +498,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         result.push({ message: 'ERR_POULE_SORTANT_NO', draw });
     }
 
-    if (draw.type === DrawType.Final) {
+    if (draw.type === FINAL) {
         const [, groupEnd] = groupDraw(event, draw);
         if (draw.cont || event.draws[groupEnd - 1]?.id !== draw.id) {
             result.push({ message: 'ERR_TAB_SUITE_FINAL', draw });
@@ -529,12 +525,7 @@ function CompString(a?: string, b?: string): number {
     return u === v ? 0 : u < v ? -1 : 1;
 }
 
-enum UnitDate {
-    Day = 1000 * 60 * 60 * 24,
-    Hour = 1000 * 60 * 60
-}
-
-function dateDiff(first: Date, second: Date, unit: UnitDate) {
+function dateDiff(first: Date, second: Date, unit: typeof DAYS | typeof HOURS) {
 
     // Copy date parts of the timestamps, discarding the time parts.
     const one = new Date(first.getFullYear(), first.getMonth(), first.getDate());

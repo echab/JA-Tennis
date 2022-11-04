@@ -1,5 +1,5 @@
 import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
-import { Draw, DrawType, Mode } from '../../domain/draw';
+import { Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
@@ -14,7 +14,7 @@ import { selectDraw } from '../util/selection';
 import { IconSexe } from '../misc/IconSexe';
 import { columnMax, countInCol } from '../../services/draw/knockoutLib';
 
-const EMPTY: OptionalId<Draw> = { name: '', type: DrawType.Knockout, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
+const EMPTY: OptionalId<Draw> = { name: '', type: KNOCKOUT, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
 type Props = {
     event: TEvent;
@@ -53,10 +53,10 @@ export const DialogDraw: Component<Props> = (props) => {
     }
 
     const drawTypes: Array<{ value: number; label: string; }> = [];
-    drawTypes[DrawType.Knockout] = { value: DrawType.Knockout, label: "Knock out" };
-    drawTypes[DrawType.Final] = { value: DrawType.Final, label: "Final" };
-    drawTypes[DrawType.Roundrobin] = { value: DrawType.Roundrobin, label: "Round-robin" };
-    drawTypes[DrawType.RoundrobinReturn] = { value: DrawType.RoundrobinReturn, label: "Round-robin with return" };
+    drawTypes[KNOCKOUT] = { value: KNOCKOUT, label: "Knock out" };
+    drawTypes[FINAL] = { value: FINAL, label: "Final" };
+    drawTypes[ROUNDROBIN] = { value: ROUNDROBIN, label: "Round-robin" };
+    drawTypes[ROUNDROBIN_RETURN] = { value: ROUNDROBIN_RETURN, label: "Round-robin with return" };
 
     /** @returns registered players and entries numbers from previous draw */
     const registeredPlayersOrQ = (): Array<Player|number> => {
@@ -76,7 +76,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
     const getNbEntry = (): number => {
         // eslint-disable-next-line no-bitwise
-        return form.type & DrawType.Roundrobin
+        return form.type & ROUNDROBIN
             ? form.nbColumn // TODO type poule
             : countInCol(columnMax(form.nbColumn, form.nbOut), form.nbOut);
     }
@@ -177,7 +177,7 @@ export const DialogDraw: Component<Props> = (props) => {
                         <legend>Dimensions:</legend>
                         <div class="mb-1">
                             <span class="inline-block w-3/12 text-right pr-3"></span>
-                            <label><input type="checkbox" checked={form.lock === Mode.Plan} value={Mode.Plan} onchange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
+                            <label><input type="checkbox" checked={form.lock === PLAN} value={PLAN} onchange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
                         </div>
                         <div class="mb-1">
                             <label for="nbIn" class="inline-block w-3/12 text-right pr-3">Entries:</label>

@@ -59,7 +59,7 @@ export const Dialogs: Component = () => {
             <DialogMatch event={selection.event!} draw={selection.draw!}
                 players={selection.tournament.players} places={selection.tournament.places ?? []}
                 match={selection.box as MatchBox}
-                
+
                 onOk={commandManager.wrap(updateMatch)}
                 onClose={() => showDialog()}
             />

@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { Box, Draw, DrawType, Match, PlayerIn, QEMPTY } from "../../domain/draw";
+import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../../domain/draw";
 import { Player, Sexe } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
 import { ScoreString } from "../../domain/types";
@@ -10,7 +10,7 @@ import { isMatch } from "../drawService";
 import { ranksName } from "../tournamentService";
 import { rank } from "../types";
 import { byId, indexOf } from "../util/find";
-import { Fields, FnType, generateId, Serializer } from "./serializer";
+import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
 
 const DAY = 24 * 3600 * 1000; // YEAR = DAY * 365.25;
 const MAX_JOUR = 42;
@@ -47,7 +47,7 @@ const categoryFFT = [
 
 const optionalString = (s: string | undefined) => s?.trim() || undefined;
 
-const rankFields: FnType<string> = function(this: Serializer & { _curSexe?: number }, c) {
+function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, c: T): T {
     // _rankAccept: { version: 2, maxVersion: 7, type: "byte", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     if (!this.writing) {
         let c = this.byte;
@@ -60,15 +60,15 @@ const rankFields: FnType<string> = function(this: Serializer & { _curSexe?: numb
             c = PAS_CLASSEMT;
         }
         const ranks = rank.list();
-        return ranks[19 - c / 60];
+        return ranks[19 - c / 60] as T;
 
     } else {
         const ranks = rank.list();
         const r = ranks.indexOf(c);
         this.word = r;
-        return '';
+        return '' as T;
     }
-};
+}
 
 const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
@@ -82,7 +82,7 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
             return a.map((playerId) => String(playerId)); // playerId is converted to Player below
         }
     },
-    _teamName: { predicate: ({ sexe }: any) => sexe & EQUIPE_MASK, type: "bstr", reviver: (s: string, p) => p._teamName = s || undefined },
+    _teamName: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: "bstr", reviver: (s: string, p) => p._teamName = s || undefined },
     licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "dword", reviver: (l) => l || undefined }, // TODO by types
     name: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr" },
     firstname: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr", reviver: optionalString },
@@ -206,7 +206,7 @@ const boxFields: Fields<PlayerIn & Match & {version: number}> = {
     },
     date: { type: "date" },
     _hour: {
-        type: "word", reviver: (h, p: {date?: Date}) => {
+        type: "word", reviver: (h, p: FieldParent<{ date?: Date }>) => {
             if (p.date && h !== undefined) {
                 p.date.setHours(Math.trunc(h / 60), Math.trunc(h % 60));
             }
@@ -246,7 +246,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     boxes: {
         type: "array", itemType: boxFields, reviver: (b, p) => {
             const posMin = positionMin(p.nbOut), posMax = positionMax(p.nbColumn, p.nbOut);
-            return b.filter((o: Box) => !(p.type === DrawType.Knockout || p.type === DrawType.Final)
+            return b.filter((o: Box) => !(p.type === KNOCKOUT || p.type === FINAL)
                 || (posMin <= o.position && o.position <= posMax
                     && o.position >= positionBottomCol(column(o.position), p.nbOut))
             );
@@ -266,7 +266,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
             const draw = p as Draw;
             if (!this.writing) {
                 if (!draw.name) {
-                    if (draw.type === DrawType.Final) {
+                    if (draw.type === FINAL) {
                         draw.name = "Final draw";
                     } else {
                         draw.name = ranksName(draw.minRank, draw.maxRank);

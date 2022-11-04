@@ -1,6 +1,6 @@
 import type { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
+import { Draw, Box, Match, PlayerIn, QEMPTY, ROUNDROBIN } from '../../domain/draw';
 import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
 import { groupDraw, groupFindPlayerIn, newBox, newDraw, nextGroup } from '../drawService';
@@ -51,7 +51,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         if (nJoueur) {
             throw new Error("Not implemnted");
         }
-        
+
         //ASSERT( SetDimensionOk( draw, oldDraw, nPlayer));
 
         if (oldDraw && this.draw.nbColumn !== oldDraw.nbColumn) {
@@ -66,7 +66,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
                 const diag = iDiagonalePos(nCol, b);
                 if (b < 0 || maxPos < b
-                    || b === diag || (b < diag && this.draw.type === DrawType.Roundrobin)) {
+                    || b === diag || (b < diag && this.draw.type === ROUNDROBIN)) {
                     this.draw.boxes.splice(i, 1);    //remove the exceeding box
                     continue;
                 }
@@ -85,7 +85,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                     //Append the matches
                     const diag = iDiagonalePos(nCol, b);
                     for (b -= nCol; b >= 0; b -= nCol) {
-                        if (b === diag || (b < diag && this.draw.type === DrawType.Roundrobin)) {
+                        if (b === diag || (b < diag && this.draw.type === ROUNDROBIN)) {
                             continue;
                         }
                         const match = newBox(this.draw, undefined, b) as Match;
@@ -128,8 +128,8 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             return;
         }
 
-        for (let i = 0; i < this.draw.boxes.length; i++) {
-            const boxOut = this.draw.boxes[i] as Match;
+        for (const box of this.draw.boxes) {
+            const boxOut = box as Match | undefined;
             if (boxOut && boxOut.qualifOut === iQualifie) {
                 return boxOut;
             }
@@ -162,9 +162,9 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
             //Enlève le précédent n° de qualifié sortant
             if (box.qualifOut)
-                if (!this.setPlayerOut(box)) {	//Enlève le qualifié
-                    ASSERT(false);
-                }
+            {if (!this.setPlayerOut(box)) {	//Enlève le qualifié
+                ASSERT(false);
+            }}
 
             this.setPlayerOut(box, outNumber);
 
@@ -234,7 +234,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    generateDraw(generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[] {
+    generateDraw(generate: GenerateType, registeredPlayersOrQ: Array<Player|number>): Draw[] {
         const refDraw = this.draw;
 
         const [groupStart] = groupDraw(this.event, refDraw);
@@ -294,7 +294,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                 //Append the matches
                 const diag = iDiagonalePos(draw.nbColumn, b);
                 for (b -= draw.nbColumn; b >= 0; b -= draw.nbColumn) {
-                    if (b === diag || (b < diag && draw.type === DrawType.Roundrobin)) {
+                    if (b === diag || (b < diag && draw.type === ROUNDROBIN)) {
                         continue;
                     }
                     const match = newBox<Match>(draw, undefined, b);

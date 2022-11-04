@@ -10,16 +10,15 @@ export class RankFFT implements Rank {
         "promotion": "-15,-30"                        // -6 > -7
     };
 
-    private _groups = <string[]>[];
+    private _groups: string[] = [];
     private _groupOf: { [rank: string]: string } = {};
     private _ranks: string[] = [];
     private _index: { [rank: string]: number } = {};
 
     constructor() {
-        let i: string;
-        for (i in this._group) {
+        for (const i of Object.keys(this._group)) {
             this._groups.push(i);
-            const g: string[] = this._group[i].split(",");
+            const g = this._group[i].split(",");
             this._ranks = this._ranks.concat(g);
             for (let j = g.length - 1; j >= 0; j--) {
                 this._groupOf[g[j]] = i;

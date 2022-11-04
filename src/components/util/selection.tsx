@@ -19,7 +19,7 @@ export interface SelectionItems {
     drawProblems: Map<string, DrawProblem[]>;
 }
 
-const emptyTournament: Tournament = { id: '', types: {name:'', versionTypes:-1}, info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
+const emptyTournament: Tournament = { version: 13, id: '', types: { name: '', versionTypes: -1 }, info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
 
 export const [selection, setSelection] = createStore<SelectionItems>({
     tournament: emptyTournament,
@@ -39,7 +39,7 @@ export function selectTournament(tournament: Tournament) {
 
         sel.playerProblems = new Map(
             tournament.players.map((player) => [player.id, validatePlayer(player)])
-            .filter(([,err]) => err.length) as Iterable<[string,PlayerProblem[]]>
+                .filter(([,err]) => err.length) as Iterable<[string,PlayerProblem[]]>
         );
         // sel.drawProblems.clear();
         sel.drawProblems = new Map(
@@ -128,7 +128,8 @@ export function update(fn: (original: SelectionItems) => void) {
 }
 
 /** find a draw from id which could be a composed like `idDraw-idEvent` */
-export function drawById(idDraw: string, parent?: string | Tournament) : {draw?:Draw, event?:TEvent} {
+export function drawById(idDraw: string, parent?: string | Tournament): {draw?: Draw, event?: TEvent} {
+    // eslint-disable-next-line prefer-const
     let [idDraw2, idEvent2 /* , idTournament */] = idDraw.split('-');
     let tournament = selection.tournament;
     if (parent) {

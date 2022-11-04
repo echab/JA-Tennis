@@ -13,14 +13,14 @@ export function copy(source: any, destination?: any) {
             }
         }
     } else {
-        if (source === destination) throw new Error("Can't copy equivalent objects or arrays");
+        if (source === destination) { throw new Error("Can't copy equivalent objects or arrays"); }
         if (isArray(source)) {
             destination.length = 0;
-            for (let i = 0; i < source.length; i++) {
-                destination.push(copy(source[i]));
+            for (const src of source) {
+                destination.push(copy(src));
             }
         } else {
-            for (let key in source) {
+            for (const key in source) {
                 if (source.hasOwnProperty(key) && "_$".indexOf(key.charAt(0)) === -1) {  //ignore prefixes _ and $
                     destination[key] = copy(source[key]);
                 }

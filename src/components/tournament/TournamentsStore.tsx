@@ -6,11 +6,11 @@ import { createLocalStore } from "../../services/util/localStore";
 import { reviver } from "../../utils/date";
 
 // TODO store tournaments as binary, to avoid deep reactivity, and initTournament on load
-type StoredTournament = {
-    name: string;
-    date: Date;
-    content: string; // JSON.stringify
-}
+// type StoredTournament = {
+//     name: string;
+//     date: Date;
+//     content: string; // JSON.stringify
+// }
 
 const context = createContext<[Tournament[], SetStoreFunction<Tournament[]>]>(
     [[], () => {}], // no-op store
@@ -18,17 +18,14 @@ const context = createContext<[Tournament[], SetStoreFunction<Tournament[]>]>(
 
 // TODO replace initTournament by a reviver
 
-function replacer<T>(key: string, value: T) : T | undefined {
+function replacer<T>(key: string, value: T): T | undefined {
     if (key.startsWith('_')) {
         return undefined;
     }
     return value;
 }
 
-type Props = {
-}
-
-export const TournamentsProvider: ParentComponent<Props> = (props) => {
+export const TournamentsProvider: ParentComponent = (props) => {
     /** Store of tournaments */
     const tournamentsStore = createLocalStore<Tournament[]>("jat", [mockTournament], { reviver, replacer });
 

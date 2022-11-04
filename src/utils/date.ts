@@ -1,4 +1,5 @@
 export const MINUTES = 60_000;
+export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * 60 * MINUTES;
 
 /**

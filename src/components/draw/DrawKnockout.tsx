@@ -1,13 +1,13 @@
 /* eslint-disable no-bitwise */
+import type { Player } from '../../domain/player';
+import type { Place, TEvent } from '../../domain/tournament';
+import type { Params } from '../App';
 import { Component, For, Show } from 'solid-js';
 import { selectBox, urlBox } from '../util/selection';
-import { PlayerIn, Draw, Match, DrawType, Mode } from '../../domain/draw';
+import { PlayerIn, Draw, Match, BUILD, FINAL } from '../../domain/draw';
 import { byId, mapBy } from '../../services/util/find';
-import { Player } from '../../domain/player';
-import { Place, TEvent } from '../../domain/tournament';
 import { showDialog } from '../Dialogs';
 import { A, useParams } from '@solidjs/router';
-import { Params } from '../App';
 import { isMatch } from '../../services/drawService';
 import './Draw.css';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../services/draw/knockoutLib';
@@ -61,7 +61,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                         <td rowspan={rowspan} classList={{
                             even, odd, qs: isRight
                         }}>
-                            <Show when={props.draw.lock === Mode.Build || even || odd}>
+                            <Show when={props.draw.lock === BUILD || even || odd}>
                                 {/* TODO <DrawBox box={b} players={props.players} /> */}
                                 <A class="boite joueur block print:border-none print:bg-transparent"
                                     classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
@@ -106,7 +106,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             </>
                                         }><span class="score">{box!.score}</span></Show>
 
-                                        <Show when={isRight && props.draw.type !== DrawType.Final}>
+                                        <Show when={isRight && props.draw.type !== FINAL}>
                                             <i class="icon2-qualif-out hover" title="Edit qualified out"
                                                 onclick={() => {
                                                     selectBox(props.event, props.draw, box);

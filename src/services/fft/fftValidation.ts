@@ -1,7 +1,7 @@
 ﻿// FFT validation services
 
 import { by, byId } from '../util/find';
-import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
+import { Draw, PlayerIn, FINAL } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import type { TEvent, Tournament } from '../../domain/tournament';
@@ -10,7 +10,7 @@ import type { DrawProblem, IValidation, PlayerProblem } from '../../domain/valid
 import { column, positionMax } from '../draw/knockoutLib';
 
 function validatePlayer(player: Player): PlayerProblem[] {
-    const result : PlayerProblem[] = [];
+    const result: PlayerProblem[] = [];
 
     // if (player.sexe === 'F') {
     //     result.push({message:'Debug error player', player, detail: 'some details'})
@@ -33,7 +33,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     const players = tournament.players;
 
-    let lib = drawLib(event, draw);
+    const lib = drawLib(event, draw);
 
     const isTypePoule = draw.type >= 2;
 
@@ -42,8 +42,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     let nqe = 0;
 
     //TODOjs
-    for (let i = 0; i < draw.boxes.length; i++) {
-        const box = draw.boxes[i];
+    for (const box of draw.boxes) {
         const boxIn = isPlayerIn(box) ? box : undefined;
         const match = isMatch(box) ? box : undefined;
 
@@ -91,7 +90,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             //}
         }
 
-
         //VERIFIE	//3
         //DONE 00/03/04: CTableau, Deux qualifiés entrants se rencontrent
 
@@ -115,7 +113,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         }
     }
 
-    if (draw.type === DrawType.Final) {
+    if (draw.type === FINAL) {
 
         //VERIFIE	//5
         const [, boxT] = findSeeded(event, draw, 1);
@@ -124,9 +122,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             result.push({message:'ERR_TAB_TETESERIE_FINAL_NO', draw, box: boxMax});
         }
     }
-
-
-
 
     //******************SAME old code using lpfn******************
     //ST_EPREUVE epreuve;
@@ -187,7 +182,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     //                                bRes = -1;
     //                            }
     //                        }
-
 
     //                        if (ISPOULE(tableau)) {	//Poule
 
@@ -279,7 +273,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     //                            pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();	//NC
     //                            //				GET_APP.m_pFactA = pFactOld;
 
-
     //                            //Match avec deux joueurs gagné par un des deux joueurs
     //                            for (b = bMax; b >= bMin; b--) {
     //                                if (!glpfn.GetBoite(pDoc, e, t, b, &boite))
@@ -348,7 +341,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     //                            pColClast.RemoveAll();
     //                            delete []pClastMaxCol;
 
-
     //                            if (tableau.Type == 1) {	//Tableau Final(bonus)
 
     //                                //Tableau final
@@ -364,7 +356,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     //                        }
 
-
     //                        if (iTableau !== -1)
     //                            break;
     //                    }
@@ -375,7 +366,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     //            }
 
     return result;
-
 
 }
 

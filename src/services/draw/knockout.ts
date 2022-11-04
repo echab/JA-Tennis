@@ -1,9 +1,10 @@
+/* eslint-disable no-bitwise */
 import { DrawLibBase } from './drawLibBase';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent, positionOpponent1, positionOpponent2, positionTopCol, scanLeftBoxes } from './knockoutLib';
 import { by, byId } from '../util/find';
 import { isObject } from '../util/object'
 import { rank } from '../types';
-import { DrawType, Draw, Box, Match, PlayerIn, QEMPTY } from '../../domain/draw';
+import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
 import { findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
@@ -39,12 +40,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     /** @override */
     nbColumnForPlayers( nJoueur: number): number {
 
-        
         const colMin = columnMin(this.draw.nbOut);
 
         let c = colMin + 1
-        for (; countInCol(c, this.draw.nbOut) < nJoueur && c < MAX_COL; c++) {
-        }
+        // eslint-disable-next-line no-empty
+        for (; countInCol(c, this.draw.nbOut) < nJoueur && c < MAX_COL; c++) {}
 
         if (MAX_COL <= c) {
             throw new Error('Max_COL is reached ' + c);
@@ -57,8 +57,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     resize( oldDraw?: Draw, nPlayer?: number): void {
 
         //ASSERT( SetDimensionOk( this.draw, oldDraw, nPlayer));
-
-        
 
         if (nPlayer) {    //AgranditTableau to fit all players
             this.draw.nbColumn = this.nbColumnForPlayers(nPlayer);
@@ -79,8 +77,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[] {
-        let playersOrQ : Array<Player|number> = [];
+    generateDraw( generate: GenerateType, registeredPlayersOrQ: Array<Player|number>): Draw[] {
+        let playersOrQ: Array<Player|number> = [];
         let m_nMatchCol;
         if (generate === GenerateType.Create) {   //from registred players
             m_nMatchCol = Array(MAX_COL).fill(0);
@@ -116,7 +114,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     private fillMatchs( m_nMatchCol: number[], nMatchRestant: number, colGauche?: number): void { //RempliMatchs
 
-        
         const colMin = columnMin(this.draw.nbOut);
 
         colGauche = colGauche || colMin;
@@ -140,7 +137,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Init m_nMatchCol à partir du tableau existant
     private countMatchs(): number[] { //CompteMatchs
 
-        
         let b: number, c2: number | undefined, n: number, bColSansMatch: boolean;
 
         const m_nMatchCol: number[] = new Array(MAX_COL);
@@ -186,7 +182,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     n++;
                 }
             }
-            //TODO 00/04/13: CTableau, CompteMatch à refaire pour cas tordus		
+            //TODO 00/04/13: CTableau, CompteMatch à refaire pour cas tordus
             //-------.
             //       |---A---.
             //-------'       |
@@ -255,18 +251,17 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //        if( bColSansMatch) {
         //            //Refait la répartition tout à droite
         //            this.RempliMatchs(nMatchRestant, c+1);
-        //            break; 
+        //            break;
         //        }
         //    } else
         //        bColSansMatch = true;
-        //}	
+        //}
 
         return m_nMatchCol;
     }
 
     private TirageEchelonne( m_nMatchCol: number[]): boolean {		//Suivant
 
-        
         const colMin = columnMin(this.draw.nbOut);
         const colMax = columnMax(this.draw.nbColumn, this.draw.nbOut);
 
@@ -295,7 +290,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     private TirageEnLigne( m_nMatchCol: number[]): boolean {	//Precedent
 
-        
         const colMin = columnMin(this.draw.nbOut);
 
         //Cherche où est-ce qu'on peut ajouter un match en partant de la gauche
@@ -328,9 +322,9 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
         //Récupère les joueurs du tableau
         const result: Array<string|number> = [];
-        for (let i = 0; i < this.draw.boxes.length; i++) {
+        for (const box of this.draw.boxes) {
 
-            const boxIn = this.draw.boxes[i] as PlayerIn;
+            const boxIn = box as PlayerIn | undefined;
             if (!boxIn) {
                 continue;
             }
@@ -425,7 +419,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //fou les joueurs en commençant par les qualifiés entrants
         iJoueur = 0;    //players.length - 1;
         for (; o > 0; o--) {
-            let b = pOrdreInv[o];
+            const b = pOrdreInv[o];
             if (b === -1) {
                 continue;
             }
@@ -488,7 +482,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //		draw.boxes[ b].setLockMatch( false);
 
         //Mets les qualifiés sortants
-        if (draw.type !== DrawType.Final) {
+        if (draw.type !== FINAL) {
 
             //Find the first unused qualif number
             const group = groupDraw(this.event, draw);
@@ -519,7 +513,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     /** @override */
     boxesOpponents(match: Match): { box1: PlayerIn|Match; box2: PlayerIn|Match } {
-        
+
         const pos1 = positionOpponent1(match.position),
             pos2 = positionOpponent2(match.position);
         return {
@@ -548,15 +542,15 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     (opponents.box1 && opponents.box1.playerId)
                     ||
                     (opponents.box2 && opponents.box2.playerId)
-                    )
-                );
+                )
+            );
     }
 
     /** @override */
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
-        let res = super.setPlayerIn(box, inNumber, playerId);
+        const res = super.setPlayerIn(box, inNumber, playerId);
         if (res) {
             if (inNumber) {	//Ajoute un qualifié entrant
                 //Qualifié entrant pas déjà pris
@@ -588,7 +582,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (outNumber) {	//Ajoute un qualifié sortant
 
             //Met à jour le tableau suivant
-            let d: Draw | undefined, boxIn: PlayerIn | undefined;
+            let boxIn: PlayerIn | undefined;
             if (nextGrp && box.playerId && box.qualifOut) {
                 [,boxIn] = groupFindPlayerIn(this.event, nextGrp, outNumber);
                 if (boxIn) {
@@ -728,7 +722,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //Numéro du tête de série d'une boite (identique dans plusieurs boites)
     private seededQ(i: number, nQualifie: number): number { //iTeteSerieQ
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
 
@@ -768,7 +762,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Ordre de remplissage des boites en partant de la droite
     //et en suivant les têtes de série
     private orderQ(i: number, nQualifie: number): number { //iOrdreQ
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         return this.seededQ(i, nQualifie) - 1
@@ -779,7 +773,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Partie du tableau de i par rapport au qualifié sortant
     //retour: 0 à nQualifie-1, en partant du bas
     iPartieQ(i: number, nQualifie: number): number {   //not private for Sped?
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         const c = column(i);
@@ -790,7 +784,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
     //Numére de boite de la partie de tableau, ramenée à un seul qualifié
     private shiftLeftQ(i: number, nQualifie: number): number { // iDecaleGaucheQ
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         const c: number = column(i);
@@ -800,21 +794,20 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             + positionBottomCol(c - columnMin(nQualifie));
     }
 
-
     //Têtes de série de haut en bas (non FFT)
 
     //Numéro du tête de série d'une boite (identique dans plusieurs boites)
     private seededQhb(i: number, nQualifie: number): number { //iTeteSerieQhb
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
 
         if (column(i) === columnMin(nQualifie)) {
             //Colonne de droite, numéroter 1 à n en partant du bas (OK!)
             if (nQualifie === 1 << column(nQualifie - 1)) 	//Puissance de deux ?
-                return i === 0 ? 1 : this.seededQhb(i, 1);	// TODO à corriger
+            {return i === 0 ? 1 : this.seededQhb(i, 1);}	// TODO à corriger
             else
-                return 1 + this.partQhb(i, nQualifie);
+            {return 1 + this.partQhb(i, nQualifie);}
         } else {
             //Tête de série précédente (de droite)
             const t: number = this.seededQhb(positionMatch(i), nQualifie);
@@ -842,7 +835,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Ordre de remplissage des boites en partant de la droite
     //et en suivant les têtes de série
     private orderQhb(i: number, nQualifie: number): number { //iOrdreQhb
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         return this.seededQhb(i, nQualifie) - 1
@@ -853,18 +846,18 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     //Partie du tableau de i par rapport au qualifié sortant
     //retour: 0 à nQualifie-1, en partant du bas
     private partQhb(i: number, nQualifie: number): number { //iPartieQhb
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         const c: number = column(i);
-        //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );  
+        //	return (i - positionBottomCol(c, nQualifie) ) / countInCol(c - columnMin( nQualifie) );
         return (nQualifie - 1) - Math.floor((i - positionBottomCol(c, nQualifie)) / countInCol(c - columnMin(nQualifie)));
         // 	return MulDiv( i - positionBottomCol(c, nQualifie), 1, countInCol(c - columnMin( nQualifie)) );
         //TODOjs? pb division entière
     }
 
     private shifthLeftQhb(i: number, nQualifie: number): number { //iDecaleGaucheQhb
-        
+
         //ASSERT(0 <= i && i < MAX_BOITE);
         ASSERT(1 <= nQualifie && nQualifie <= countInCol(column(i)));
         const c: number = column(i);

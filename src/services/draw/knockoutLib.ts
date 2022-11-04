@@ -1,4 +1,4 @@
-import { requestCallback } from "solid-js";
+/* eslint-disable no-bitwise */
 import { Box, Draw } from "../../domain/draw";
 import { by } from "../util/find";
 
@@ -6,7 +6,8 @@ export function column(pos: number): number {    //iCol
     // = Math.trunc(Math.log2(x+1))
     //TODO?, use a table
     let col = -1;
-    for (pos++; pos; pos >>= 1, col++) { }
+    // eslint-disable-next-line no-empty
+    for (pos++; pos; pos >>= 1, col++) {}
     return col;
 }
 
@@ -72,7 +73,12 @@ export function positionOpponents(pos: number): { pos1: number; pos2: number } {
     };
 }
 
-export function scanLeftBoxes(draw: Draw, position: number, evenWithPlayer: boolean, callback: (box: Box, pos: number) => void): void { //iBoiteDeGauche
+export function scanLeftBoxes(
+    draw: Draw,
+    position: number,
+    evenWithPlayer: boolean,
+    callback: (box: Box, pos: number) => void
+): void { //iBoiteDeGauche
 
     //formule de décalage à gauche:
     //
@@ -102,7 +108,7 @@ export function scanLeftBoxes(draw: Draw, position: number, evenWithPlayer: bool
                 callback(box, b);
                 break;
             }
-        };
+        }
         pos = b;
     }
 }

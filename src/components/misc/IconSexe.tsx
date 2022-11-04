@@ -1,4 +1,5 @@
 import { Component } from "solid-js";
+import { Sexe } from "../../domain/player";
 
 type Props = {
     sexe?: Sexe;

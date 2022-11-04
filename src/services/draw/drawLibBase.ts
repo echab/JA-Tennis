@@ -1,4 +1,5 @@
-﻿import { Draw, Box, DrawType, Match, PlayerIn, QEMPTY } from '../../domain/draw';
+﻿/* eslint-disable no-bitwise */
+import { Draw, Box, Match, PlayerIn, QEMPTY, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
 import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
@@ -12,7 +13,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
     abstract nbColumnForPlayers( nJoueur: number): number;
     abstract resize( oldDraw?: Draw, nJoueur?: number): void;
-    abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: (Player|number)[]): Draw[];
+    abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: Array<Player|number>): Draw[];
 
     abstract setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
 
@@ -24,7 +25,7 @@ export abstract class DrawLibBase implements IDrawLib {
     abstract computeScore(): boolean; //CalculeScore
     abstract boxesOpponents(match: Match): { box1: Box; box2: Box };
     abstract isNewPlayer(box: Box): boolean;
-  
+
     protected findBox<T extends Box = Box>(position: number, create?: boolean): T | undefined {
         let box = by(this.draw.boxes, 'position', position);
         if (!box && create) {
@@ -43,8 +44,8 @@ export abstract class DrawLibBase implements IDrawLib {
                 const boxes = d.boxes;
                 if (boxes) {
                     const drawLibNext = drawLib(this.event, d);
-                    for (let b = 0; b < boxes.length; b++) {
-                        const box = boxes[b] as Match | undefined;
+                    for (const b of boxes) {
+                        const box = b as Match | undefined;
                         if (box?.qualifOut) {
                             drawLibNext.setPlayerOut(box);
                         }
@@ -82,8 +83,8 @@ export abstract class DrawLibBase implements IDrawLib {
     // /**
     //  * Fill or erase a box with qualified in and/or player
     //  * setPlayerIn
-    //  * 
-    //  * @param box 
+    //  *
+    //  * @param box
     //  * @param inNumber (optional)
     //  * @param player   (optional)
     //  */
@@ -112,7 +113,7 @@ export abstract class DrawLibBase implements IDrawLib {
             }
         }
 
-        const boxIn = isPlayerIn(box) ? box : undefined;
+        // const boxIn = isPlayerIn(box) ? box : undefined;
         const match = isMatch(box) ? box : undefined;
         box.playerId = playerId;
         // box._player = player;
@@ -173,8 +174,8 @@ export abstract class DrawLibBase implements IDrawLib {
         //    computeScore( (CDocJatennis*)((CFrameTennis*)AfxGetMainWnd())->GetActiveDocument());
         //    //TODO Poule, Lock
         //} else
-        //if( iBoiteMin() <= IAUTRE( box) 
-        // && iBoiteMin() <= IMATCH( box) 
+        //if( iBoiteMin() <= IAUTRE( box)
+        // && iBoiteMin() <= IMATCH( box)
         // && boxes[ IAUTRE( box)]->isJoueur()
         // && boxes[ IMATCH( box)]->isJoueur()) {
         //    lockBox( box);
@@ -193,7 +194,7 @@ export abstract class DrawLibBase implements IDrawLib {
             const prevGroup = previousGroup(this.event, this.draw);
             if (!playerId && prevGroup && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
-                const [d,boxOut] = groupFindPlayerOut(this.event, prevGroup, inNumber);
+                const [,boxOut] = groupFindPlayerOut(this.event, prevGroup, inNumber);
                 if (boxOut) {	//V0997
                     playerId = boxOut.playerId;
                 }
@@ -328,7 +329,7 @@ export abstract class DrawLibBase implements IDrawLib {
         /*
         const boxIn = box as PlayerIn;
         //delete boxIn.order;
-    
+
         //Delock les adversaires
         if( this.isTypePoule()) {
             if( isMatch( box)) {
@@ -336,9 +337,9 @@ export abstract class DrawLibBase implements IDrawLib {
                 BOOL bMatch = false;
 
                 //matches de la ligne
-                for( i=this.ADVERSAIRE1( box) - GetnColonne(); 
-                    i>= iBoiteMin() && !bMatch; 
-                    i -= GetnColonne()) 
+                for( i=this.ADVERSAIRE1( box) - GetnColonne();
+                    i>= iBoiteMin() && !bMatch;
+                    i -= GetnColonne())
                 {
                     if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
@@ -346,9 +347,9 @@ export abstract class DrawLibBase implements IDrawLib {
                     }
                 }
                 //matches de la colonne
-                for( i=iHautCol( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())); 
-                    i>= iBasColQ( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())) && !bMatch; 
-                    i --) 
+                for( i=iHautCol( iRowPoule( this.ADVERSAIRE1( box), GetnColonne()));
+                    i>= iBasColQ( iRowPoule( this.ADVERSAIRE1( box), GetnColonne())) && !bMatch;
+                    i --)
                 {
                     if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
@@ -360,8 +361,8 @@ export abstract class DrawLibBase implements IDrawLib {
 
                 bMatch = false;
                 //matches de la ligne
-                for( i=this.ADVERSAIRE2( box) - GetnColonne(); 
-                    i>= iBoiteMin() && !bMatch; 
+                for( i=this.ADVERSAIRE2( box) - GetnColonne();
+                    i>= iBoiteMin() && !bMatch;
                     i -= GetnColonne())
                 {
                     if( i !== box && boxes[ i]->isLock()) {
@@ -370,9 +371,9 @@ export abstract class DrawLibBase implements IDrawLib {
                     }
                 }
                 //matches de la colonne
-                for( i=iHautCol( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())); 
-                    i>= iBasColQ( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())) && !bMatch; 
-                    i --) 
+                for( i=iHautCol( iRowPoule( this.ADVERSAIRE2( box), GetnColonne()));
+                    i>= iBasColQ( iRowPoule( this.ADVERSAIRE2( box), GetnColonne())) && !bMatch;
+                    i --)
                 {
                     if( i !== box && boxes[ i]->isLock()) {
                         bMatch = true;
@@ -381,7 +382,7 @@ export abstract class DrawLibBase implements IDrawLib {
                 }
                 if( !bMatch)
                     unlockBox( this.ADVERSAIRE2(box));
-    
+
             }
 
             this.computeScore(box._draw);
@@ -416,7 +417,7 @@ export abstract class DrawLibBase implements IDrawLib {
         if (prevGroup) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                const [d,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
+                const [,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -439,7 +440,7 @@ export abstract class DrawLibBase implements IDrawLib {
         if (prevGroup) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                const [d,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
+                const [,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }
@@ -516,7 +517,7 @@ export abstract class DrawLibBase implements IDrawLib {
                 const opponents = lib.boxesOpponents(match);
                 if (opponents.box1 && opponents.box2
                     && (sourceMatch.place !== undefined || sourceMatch.date !== undefined)
-                    ) {
+                ) {
                     if (!this.putSlot(match, sourceMatch)) {
                         throw new Error('error');
                     }
@@ -527,7 +528,7 @@ export abstract class DrawLibBase implements IDrawLib {
                 }
                 match.matchFormat = sourceMatch.matchFormat;
 
-                match.note = match.note;
+                match.note = sourceMatch.note;
             }
         }
 
@@ -557,17 +558,16 @@ export abstract class DrawLibBase implements IDrawLib {
     // }
 
     isTypePoule(): boolean {
-        return this.draw.type === DrawType.Roundrobin || this.draw.type === DrawType.RoundrobinReturn;
+        return this.draw.type === ROUNDROBIN || this.draw.type === ROUNDROBIN_RETURN;
     }
-    
+
     iDiagonale(box: Box): number {
-        const draw = this.draw;
         return this.isTypePoule() ? (box.position % this.draw.nbColumn) * (this.draw.nbColumn + 1) : box.position;
     }
     isGauchePoule(box: Box): boolean {
         return this.isTypePoule() ? (box.position >= (this.draw.nbColumn * this.draw.nbColumn)) : false;
     }
-    
+
     ADVERSAIRE1(box: Box): number {
         if (this.isTypePoule()) {
             const n = this.draw.nbColumn;

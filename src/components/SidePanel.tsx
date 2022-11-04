@@ -8,10 +8,7 @@ import { Badge } from "./misc/Badge";
 import { selection } from "./util/selection";
 import { Planning } from "./planning/Planning";
 
-type Props = {
-}
-
-export const SidePanel: Component<Props> = () => {
+export const SidePanel: Component = () => {
 
     const [pane, setPane] = createSignal(0);
 

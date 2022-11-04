@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import { DrawType } from "../../../domain/draw";
 import type { Tournament } from "../../../domain/tournament";
+import { KNOCKOUT } from "../../../domain/draw";
 import { docFields } from "../../../services/file/jatSchema";
 import { createSerializer } from "../../../services/file/serializer";
 import { readFile } from 'node:fs/promises';
@@ -21,7 +21,7 @@ describe("jatSchema", () => {
             {
                 id: 'E1', name: 'Simple mens', sexe: 'H', category: 11, maxRank: '30/1', draws: [
                     {
-                        id: 'D11', name: 'First draw', type: DrawType.Knockout, nbColumn: 2, nbOut: 2, minRank: 'NC', maxRank: '40', boxes: [
+                        id: 'D11', name: 'First draw', type: KNOCKOUT, nbColumn: 2, nbOut: 2, minRank: 'NC', maxRank: '40', boxes: [
                             { position: 6, playerId: 'J1' },
                             { position: 2, score: '6/4 6/1', date: new Date('2022-11-03T20:30Z'), playerId: 'J1', qualifOut: 1 },
                             { position: 5, playerId: 'J2' },

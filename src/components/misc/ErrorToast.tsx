@@ -4,7 +4,7 @@ type Props = {
     message: string;
 }
 
-export const ErrorToast : Component<Props> = (props) => {
+export const ErrorToast: Component<Props> = (props) => {
     console.error(props.message);
 
     return <div class="bg-black text-white border-red-500 border-2">

@@ -1,5 +1,5 @@
 import { Ranking, Score } from '../../domain/types';
-import { ScoreFFT,ScoreDeltaFFT} from './score';
+import { ScoreDeltaFFT} from './score';
 
 export class RankingFFT implements Ranking {
 
@@ -65,6 +65,7 @@ export class RankingFFT implements Ranking {
     }
 
     Ordre(): number {
+        // eslint-disable-next-line no-bitwise
         return ((this.dPoint + 0x80) << 24) + ((this.dSet2 + 0x80) << 16) + (this.dJeu + 0x8000);
     }
 }

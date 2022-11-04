@@ -23,7 +23,6 @@ export function seedPositionOpponent2(pos: number, nCol: number): number {    //
     return Math.floor(pos / nCol) + (nCol * nCol);
 }
 
-
 export function positionMatchPoule(row: number, col: number, nCol: number): number { //IMATCH
     return (col * nCol) + row;
 }
@@ -45,4 +44,4 @@ export function iDiagonalePos(nbColumn: number, pos: number): number {
 export function ADVERSAIRE1(draw: Draw, pos: number): number {
     const n = draw.nbColumn;
     return pos % n + n * n;
-};
+}

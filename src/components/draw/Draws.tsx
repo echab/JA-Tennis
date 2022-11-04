@@ -1,9 +1,8 @@
-import { Component, For } from 'solid-js';
-import { selection } from '../util/selection';
+import { Component } from 'solid-js';
 import { Draw } from '../../domain/draw';
 
 type Props = {
-  draws: Draw[];
+    draws: Draw[];
 }
 
 export const Draws: Component<Props> = (props) => {

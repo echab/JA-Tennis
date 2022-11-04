@@ -4,7 +4,7 @@ import { extend, isArray, isObject } from "./util/object";
 import { ASSERT, shuffle } from "../utils/tool";
 import { rank } from "./types";
 
-import { Box, Draw, DrawType, Match, Mode, PlayerIn, QEMPTY } from "../domain/draw";
+import { Box, BUILD, Draw, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
@@ -15,8 +15,8 @@ import { Player } from "../domain/player";
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32;
 
-// modeBuild = Mode.Build;
-// modePlan = Mode.Plan;
+// modeBuild = BUILD;
+// modePlan = PLAN;
 // modePlay = Mode.Play;
 // modeLock = Mode.Lock;
 
@@ -99,7 +99,7 @@ export function newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
     const draw: Draw = {
         id: Guid.create("d"),
         name: "",
-        type: DrawType.Knockout,
+        type: KNOCKOUT,
         nbColumn: 3,
         nbOut: 1,
         minRank: after ? rank.next(after.maxRank) : rank.first(),
@@ -118,10 +118,10 @@ export function newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
 }
 
 export function initDraw(draw: Draw, parent: TEvent): void {
-    draw.type ||= DrawType.Knockout;
-    draw.nbColumn ||=  0;
-    draw.nbOut ||=  0;
-    draw.lock ||=  Mode.Build;
+    draw.type ||= KNOCKOUT;
+    draw.nbColumn ||= 0;
+    draw.nbOut ||= 0;
+    draw.lock ||= BUILD;
 }
 
 export function deleteDraw(drawId: string): Command {
@@ -160,7 +160,7 @@ export function newBox<T extends Box = Box>(
     source?: string | Box,
     position?: number,
 ): T {
-    const box: T = <any>{};
+    const box: T = {} as T;
     if (isObject(source)) {
         extend(box, source);
     //box.id = undefined;
@@ -245,10 +245,10 @@ export function groupDraw(event: TEvent, draw: Draw): [number, number] {
         return [0, 0];
     }
     let iStart = i, iNext = i + 1;
-    for (; iStart > 0 && draws[iStart].cont; iStart--) {
-    }
-    for (; iNext < draws.length && draws[iNext].cont; iNext++) {
-    }
+    // eslint-disable-next-line no-empty
+    for (; iStart > 0 && draws[iStart].cont; iStart--) {}
+    // eslint-disable-next-line no-empty
+    for (; iNext < draws.length && draws[iNext].cont; iNext++) {}
     return [iStart, iNext];
 }
 
@@ -257,8 +257,8 @@ export function previousGroup(event: TEvent, draw: Draw): [number, number] | und
     const draws = event.draws;
     const i = draws.findIndex(({ id }) => id === draw.id);
     let iStart = i;
-    for (; iStart > 0 && draws[iStart].cont; iStart--) {
-    }
+    // eslint-disable-next-line no-empty
+    for (; iStart > 0 && draws[iStart].cont; iStart--) {}
     if (iStart > 0) {
         return groupDraw(event, draws[iStart - 1]);
     }
@@ -270,8 +270,8 @@ export function nextGroup(event: TEvent, draw: Draw): [number, number] | undefin
     const i = draws.findIndex(({ id }) => id === draw.id);
     if (i >= 0) {
         let iNext = i + 1;
-        for (; iNext < draws.length && draws[iNext].cont; iNext++) {
-        }
+        // eslint-disable-next-line no-empty
+        for (; iNext < draws.length && draws[iNext].cont; iNext++) {}
         if (iNext < draws.length) {
             return groupDraw(event, draws[iNext]);
         }
@@ -307,8 +307,8 @@ export function findSeeded(
     const [groupStart, groupEnd] = isArray(origin) ? origin : groupDraw(event, origin);
     for (let i = groupStart; i < groupEnd; i++) {
         const boxes = event.draws[i].boxes;
-        for (let j = 0; j < boxes.length; j++) {
-            const boxIn: PlayerIn = boxes[j];
+        for (const box of boxes) {
+            const boxIn: PlayerIn = box;
             if (boxIn.seeded === iTeteSerie) {
                 return [event.draws[i], boxIn];
             }

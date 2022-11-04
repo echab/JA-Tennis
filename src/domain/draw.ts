@@ -1,23 +1,11 @@
 import { Player } from "./player";
 import { RankString, ScoreString } from "./types";
 
-// export const KNOCKOUT = 0, FINAL = 1, ROUNDROBIN = 2, ROUNDROBIN_RETURN = 3;
-// export type DrawType = typeof KNOCKOUT | typeof FINAL | typeof ROUNDROBIN | typeof ROUNDROBIN_RETURN;
+export const KNOCKOUT = 0, FINAL = 1, ROUNDROBIN = 2, ROUNDROBIN_RETURN = 3;
+export type DrawType = typeof KNOCKOUT | typeof FINAL | typeof ROUNDROBIN | typeof ROUNDROBIN_RETURN;
 
-// export const BUILD = 0, PLAN = 1, PLAY = 2, LOCK = 3;
-// export type Mode = typeof BUILD | typeof PLAN | typeof PLAY | typeof LOCK;
-export const enum DrawType {
-    Knockout, // = 0
-    Final, // = 1
-    Roundrobin, // = 2
-    RoundrobinReturn, // = 3
-}
-export const enum Mode {
-    Build,
-    Plan,
-    Play,
-    Lock,
-}
+export const BUILD = 0, PLAN = 1, PLAY = 2, LOCK = 3;
+export type Mode = typeof BUILD | typeof PLAN | typeof PLAY | typeof LOCK;
 
 export interface Draw {
     id: string; //new draw has no id

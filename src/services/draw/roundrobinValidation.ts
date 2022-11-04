@@ -1,5 +1,4 @@
-﻿import { Draw, DrawType, Box, Match, PlayerIn } from '../../domain/draw';
-import type { Player } from '../../domain/player';
+﻿import { Draw, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { DrawProblem } from '../../domain/validation';
 import { isMatch, isPlayerIn } from '../drawService';
@@ -7,8 +6,7 @@ import { isMatch, isPlayerIn } from '../drawService';
 function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
-    if (draw.type === DrawType.Roundrobin
-        || draw.type === DrawType.RoundrobinReturn) {
+    if (draw.type === ROUNDROBIN || draw.type === ROUNDROBIN_RETURN) {
 
         result.splice(-1,0,...validatePoule(draw));
 
@@ -68,8 +66,7 @@ function validateMatches(draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
     //Match avec deux joueurs gagné par un des deux joueurs
-    for (let i = 0; i < draw.boxes.length; i++) {
-        const box = draw.boxes[i];
+    for (const box of draw.boxes) {
         const boxIn = isPlayerIn(box) ? box : undefined;
         const match = isMatch(box) ? box : undefined;
 
@@ -97,7 +94,6 @@ function validateMatches(draw: Draw): DrawProblem[] {
             //    }
             //}
         }
-
 
     }
 

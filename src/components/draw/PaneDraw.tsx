@@ -4,12 +4,12 @@ import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
 import { selection, drawById, selectBox, urlBox, update } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
-import { Params } from "../App";
+import type { Params } from "../App";
 import { IconSexe } from "../misc/IconSexe";
-import { commandManager, setItem } from "../../services/util/commandManager";
+import { commandManager } from "../../services/util/commandManager";
 import { drawLib, GenerateType } from "../../services/draw/drawLib";
 import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
-import { Mode } from "../../domain/draw";
+import { BUILD, PLAN, PLAY } from "../../domain/draw";
 
 export const PaneDraw: Component = () => {
 
@@ -53,8 +53,8 @@ export const PaneDraw: Component = () => {
     const lockDraw = () => {
         update((sel) => {
             if (sel.draw) {
-                sel.draw.lock = 1 - (sel.draw.lock ?? 0);
-            }            
+                sel.draw.lock = sel.draw.lock === PLAN ? BUILD : PLAN;
+            }
         });
     };
 
@@ -121,12 +121,13 @@ export const PaneDraw: Component = () => {
                     ><i class="icon2-info" /></button>
 
                     <button class="p-2 rounded-full [&[aria-selected=true]]:bg-blue-200" title="Lock/unlock draw updates"
-                        aria-selected={draw()?.lock === Mode.Plan}
+                        aria-selected={draw()?.lock === PLAN}
                         onClick={lockDraw}
                     ><i class="icon2-locker" /></button>
 
-                    <Show when={draw()?.lock === Mode.Build}>
-                        <Show when={!((draw()?.type ?? 0) & 2)}>
+                    <Show when={draw()?.lock === BUILD}>
+                        {/* eslint-disable-next-line no-bitwise */}
+                        <Show when={!((draw()?.type ?? BUILD) & PLAY)}>
                             <button class="p-2 rounded-full" title="Change the draw structure to be more progressive"
                                 onClick={generateLeft}
                             ><i class="icon2-draw-left" /></button>
