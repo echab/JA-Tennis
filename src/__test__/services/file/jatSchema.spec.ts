@@ -47,10 +47,29 @@ describe("jatSchema", () => {
         expect(result).toMatchSnapshot();
     });
 
+    // it('should read binary tournament1.jat file into snapshot', async () => {
+    //     const b = await readFile(`${__dirname}/tournament1.jat`);
+
+    //     expect(new Uint8Array(b.buffer)).toMatchSnapshot();
+    // });
+
     it('should save tournament to array buffer', () => {
         const writer = createSerializer(new Uint8Array(8192)); // TODO size
         writer.writeObject(tournament2, docFields, docFields.version.def);
+        const buf = writer._buffer.slice(0, writer._position);
 
-        expect(writer._buffer).toMatchSnapshot();
+        expect(buf).toMatchSnapshot();
+    });
+
+    it('should save and reload same tournament', () => {
+        const writer = createSerializer(new Uint8Array(8192)); // TODO size
+        writer.writeObject(tournament2, docFields, docFields.version.def);
+        const buf = writer._buffer.slice(0, writer._position);
+
+        const reader = createSerializer(buf);
+        const result = reader.readObject(docFields);
+
+        expect(result.version).toBe(13);
+        expect(result).toMatchObject(tournament2);
     });
 });

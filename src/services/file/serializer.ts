@@ -55,6 +55,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._position += bytes.byteLength;
     },
     readType<T>(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         type: string | FnType<T> | Fields<any>,
         field: Field<T>,
         parent: FieldParent,
@@ -77,6 +78,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     writeType<T>(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         value: any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         type: string | FnType<T> | Fields<any>,
         field: Field<T>,
         parent: FieldParent,
@@ -85,7 +87,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this.writing = true;
         if (typeof type === 'string') {
             if (type === 'array' || type === 'arrayb') {
-                this[type] = value.length; // setter for the array length
+                this[type] = value?.length ?? 0; // setter for the array length
                 this.writeArrayItems(value, field, parent, name);
             } else {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -171,7 +173,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         const parent = { ...value, version: value?.version ?? parentVersion }; // by default, inherit version from parent
         for (const [fieldName, field] of Object.entries(fields)) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const v = !fieldName.startsWith('_') ? (value as any)[fieldName] : undefined;
+            const v = !fieldName.startsWith('_') && value ? (value as any)[fieldName] : undefined;
             this.writeField(v, field, parent, fieldName);
         }
     },
@@ -193,7 +195,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         return result;
     },
     writeArrayItems<T>(
-        items: T[],
+        items: T[] | undefined,
         field: Field<T>,
         parent: FieldParent,
         name?: string
@@ -201,7 +203,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         const { itemType } = field;
         if (!itemType) { throw new Error("undefined field or itemType"); }
         const prev = this._arrayIndex;
-        items.forEach((item, i) => {
+        items?.forEach((item, i) => {
             this._arrayIndex = i;
             this.writeType(item, itemType, field, parent, name);
         });
@@ -341,7 +343,8 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         if (wTag === wBigObjectTag) {
             obTag = this.dword;
         } else {
-            obTag = ((wTag & wClassTag) << 16) | (wTag & ~wClassTag);
+            // obTag = ((wTag & wClassTag) << 16) | (wTag & ~wClassTag);
+            obTag = wTag & wBigObjectTag;
         }
         if (wTag === wNewClassTag) {
             this.word; // pid === 1
@@ -350,8 +353,9 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             this._nMapCount += 2; // class + instance
             return className;
         } else {
-            const nClassIndex = obTag & ~dwBigClassTag;
-            if (nClassIndex === 0) {
+            // const nClassIndex = obTag & ~dwBigClassTag;
+            const nClassIndex = obTag;
+            if (nClassIndex === 0 || !this._classNames[nClassIndex]) {
                 throw new Error(`invalid class index ${nClassIndex}`);
             }
             const className = this._classNames[nClassIndex];
@@ -371,9 +375,18 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             this._classNames[this._nMapCount] = className;
             this._nMapCount += 2; // class + instance
         } else {
-            const obTag = nClassIndex;
-            const wTag = ((obTag >> 16) & wClassTag) | (obTag & ~wClassTag);
-            this.word = wTag;
+            if (nClassIndex >= wBigObjectTag) {
+                this.word = wBigObjectTag;
+                this.dword = nClassIndex;
+            } else {
+                // const obTag = nClassIndex | dwBigClassTag;
+                // const wTag = ((obTag >> 16) & wClassTag) | (obTag & ~wClassTag);
+                // const wTag = (((obTag >> 16) & wClassTag) | obTag) & ~wClassTag;
+                const wTag = nClassIndex | wClassTag;
+                // obTag = 0x80000001 == -2147483647
+                // wTag  = 0x8001 == 32769
+                this.word = wTag;
+            }
             this._nMapCount += 1;
         }
     }

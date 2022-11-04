@@ -72,7 +72,7 @@ function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, 
 
 const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
-    version: { type: "byte", def: 10, valid: (v) => v <= 10 },
+    version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { type() { return String(this._arrayIndex); } },
     sexe: { version: 4, type: "byte", replacer: (s, p) => "HFM".indexOf(p.sexe) | (p.teamIds ? EQUIPE_MASK : 0) }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
     teamIds: {
@@ -115,27 +115,26 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     club: { type: "bstr", reviver: optionalString },
     registration: { type: "dword" },
     _partenaire: { version: 2, type: "word" },
-    avail: {
-        version: 3, type(value, _, doc) {
-            if (!this.writing) {
-                const result = [];
-                const nDay = this.word;
-                for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
-                    let avail = this.dword;
-                    if (doc!.version! < 11) {
-                        avail = 0xFFFFFFFF;	//always available
-                    }
-                    result[i] = avail;
+    avail: { version: 3, type(value, _, doc) {
+        if (!this.writing) {
+            const result = [];
+            const nDay = this.word;
+            for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
+                let avail = this.dword;
+                if (doc!.version! < 11) {
+                    avail = 0xFFFFFFFF;	//always available
                 }
-                return result;
-            } else {
-                const nDay = value.length;
-                this.word = nDay;
-                for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
-                    this.dword = value[i]; // TODO
-                }
+                result[i] = avail;
+            }
+            return result;
+        } else {
+            const nDay = value?.length ?? 0;
+            this.word = nDay;
+            for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
+                this.dword = value[i] ?? -1; // TODO
             }
         }
+    }
     },
     comment: { version: 3, type: "bstr", reviver: optionalString },
     dateMaj: { type: "date" },
@@ -164,12 +163,12 @@ const scoreFields: FnType<ScoreString> = function(value: string) {
         const flags = this.byte;
         return `${games}${flags & 1 ? 'WO' : ''}${flags & 4 ? ' VD' : ''}`;
     } else {
-        const games = value.replace(/WO|\s*VD/g, '').split(' ').map((game) => game.split('/').map((g) => parseInt(g,10)));
+        const games = (value ?? '').replace(/WO|\s*VD/g, '').split(' ').map((game) => game.split('/').map((g) => parseInt(g,10)));
         for (let i=0; i< 5; i++) {
             const [g1,g2] = games[i] ?? [0,0];
             this.byte = g1 & 0xf | (g2 & 0xf) << 4;
         }
-        const flags = (value.match(/WO/) ? 1 : 0) | (value.match(/VD/) ? 4 : 0)
+        const flags = (value?.match(/WO/) ? 1 : 0) | (value?.match(/VD/) ? 4 : 0)
         this.byte = flags;
         return '';
     }
@@ -177,33 +176,31 @@ const scoreFields: FnType<ScoreString> = function(value: string) {
 
 const boxFields: Fields<PlayerIn & Match & {version: number}> = {
     _schema: { type: "schema", valid: (s) => s === 'CBoite', replacer: () => 'CBoite' },
-    version: { type: "byte", def: 4, valid: (v) => v <= 4 },
+    version: { type: "byte", def: 4, valid: (v) => v <= 4, replacer: () => 4 },
     position: { type() { return this._arrayIndex; }},
     playerId: {
         type: "i16", reviver: (id) => id === -1 ? undefined : String(id)
     },
     score: { type: scoreFields },
-    _flags: {
-        type: "word", reviver: (f, p) => {
-            if (f & 1) { p.hidden = true; }
-            const qualif = (f >> 1) & 0b11; //0=no, 1=Entrant,	2=Sortant,	3=T�teS�rie
-            const num = (f >> 3) & 0b11111;
-            switch (qualif) {
-                case 1: p.qualifIn = num || QEMPTY; break;
-                case 2: p.qualifOut = num || QEMPTY; break;
-                case 3: p.seeded = num || QEMPTY; break;
-            }
-            if (((f >> 8) & 0b1)) { p.receive = true; }
-
-            const aware1 = (f >> 9) & 0b11;	//Le joueur1 est pr�venu (0=non, 1=r�p, 2=oui)
-            const aware2 = (f >> 11) & 0b11;	//Le joueur2 est pr�venu (0=non, 1=r�p, 2=oui)
-
-            p.fm = f >> 13; // formatMatch
-
-            // return f & 0x1FFF;
-            return undefined;
+    _flags: { type: "word", reviver: (f, p) => {
+        if (f & 1) { p.hidden = true; }
+        const qualif = (f >> 1) & 0b11; //0=no, 1=Entrant,	2=Sortant,	3=T�teS�rie
+        const num = (f >> 3) & 0b11111;
+        switch (qualif) {
+            case 1: p.qualifIn = num || QEMPTY; break;
+            case 2: p.qualifOut = num || QEMPTY; break;
+            case 3: p.seeded = num || QEMPTY; break;
         }
-    },
+        if (((f >> 8) & 0b1)) { p.receive = true; }
+
+        const aware1 = (f >> 9) & 0b11;	//Le joueur1 est pr�venu (0=non, 1=r�p, 2=oui)
+        const aware2 = (f >> 11) & 0b11;	//Le joueur2 est pr�venu (0=non, 1=r�p, 2=oui)
+
+        p.fm = f >> 13; // formatMatch
+
+        // return f & 0x1FFF;
+        return undefined;
+    }},
     date: { type: "date" },
     _hour: {
         type: "word", reviver: (h, p: FieldParent<{ date?: Date }>) => {
@@ -227,7 +224,7 @@ const boxFields: Fields<PlayerIn & Match & {version: number}> = {
 
 const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CTableau', replacer: () => 'CTableau' },
-    version: { type: "byte", def: 10, valid: (v) => v <= 10 },
+    version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10},
     id: { version: 10, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
     name: { version: 5, type: "bstr", reviver: (s) => s?.trim() },
@@ -306,7 +303,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
 
 const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CEpreuve', replacer: () => 'CEpreuve' },
-    version: { type: "byte", def: 10, valid: (v) => v <= 10 },
+    version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { version: 9, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p) => { p.name = s; } },
     name: { version: 10, type: "bstr" },
@@ -407,7 +404,7 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
 } as const;
 
 export const docFields: Fields<Tournament> = {
-    version: { type: "byte", def: 13, valid: (v) => v <= 13 },
+    version: { type: "byte", def: 13, valid: (v) => v <= 13, replacer: () => 13 },
     id: { version: 13, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     types: {
         version: 9, type: {
