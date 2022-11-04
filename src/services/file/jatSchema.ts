@@ -259,7 +259,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     _maxRank: { maxVersion: 7, type: "byte" }, // TODO
     minRank: { version: 8, type: rankFields },
     maxRank: { version: 8, type: rankFields },
-    suite: { version: 7, type: "byte", def: 0 },
+    cont: { version: 7, type: "byte", def: 0 },
     formatMatch: { version: 8, type: "byte" },
     _: {
         type(value, _, p) {

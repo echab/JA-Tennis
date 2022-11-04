@@ -1,6 +1,11 @@
 import { Player } from "./player";
 import { RankString, ScoreString } from "./types";
 
+// export const KNOCKOUT = 0, FINAL = 1, ROUNDROBIN = 2, ROUNDROBIN_RETURN = 3;
+// export type DrawType = typeof KNOCKOUT | typeof FINAL | typeof ROUNDROBIN | typeof ROUNDROBIN_RETURN;
+
+// export const BUILD = 0, PLAN = 1, PLAY = 2, LOCK = 3;
+// export type Mode = typeof BUILD | typeof PLAN | typeof PLAY | typeof LOCK;
 export const enum DrawType {
     Knockout, // = 0
     Final, // = 1
@@ -21,7 +26,7 @@ export interface Draw {
 
     type: DrawType; //Normal, Final, Poule simple, Poule aller/retour
 
-    suite?: boolean;
+    cont?: boolean;
 
     minRank: RankString;
     maxRank: RankString;

@@ -267,7 +267,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                 draw = refDraw;
             } else {
                 draw = newDraw(event, refDraw);
-                draw.suite = true;
+                draw.cont = true;
             }
             draw.boxes = [];
             draw.name = name + (nDraw > 1 ? ' (' + (t + 1) + ')' : '');

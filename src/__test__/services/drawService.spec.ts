@@ -1,15 +1,15 @@
 import { groupDraw, previousGroup, nextGroup } from "../../services/drawService";
 import { Draw, DrawType } from "../../domain/draw";
-import { TEvent } from "../../domain/tournament";
+import type { TEvent } from "../../domain/tournament";
 
-const EVENT: TEvent = {id:'E0', name:'event1', sexe:'H', category:11, maxRank:'NC', draws:[]};
-const DRAW: Draw = { id:'D0', name:'draw1', type:DrawType.Knockout, minRank:'NC', maxRank:'NC', nbColumn:3, nbOut:2, boxes:[]};
+const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 11, maxRank: 'NC', draws: [] };
+const DRAW: Draw = { id: 'D0', name: 'draw1', type: DrawType.Knockout, minRank: 'NC', maxRank: 'NC', nbColumn: 3, nbOut: 2, boxes: [] };
 
 describe("drawService", () =>{
 
     describe("groupDrawIndex", () => {
 
-        const event1 = { ...EVENT, draws: [
+        const event1: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
             {...DRAW, id:'D1'},
             {...DRAW, id:'D2'},
@@ -30,13 +30,13 @@ describe("drawService", () =>{
             expect(result).toStrictEqual([2,3]);
         });
 
-        const event2 = { ...EVENT, draws: [
+        const event2: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
-            {...DRAW, id:'D1', suite: true},
-            {...DRAW, id:'D2', suite: true},
+            {...DRAW, id:'D1', cont: true},
+            {...DRAW, id:'D2', cont: true},
             {...DRAW, id:'D3'},
-            {...DRAW, id:'D4', suite: true},
-            {...DRAW, id:'D5', suite: true},
+            {...DRAW, id:'D4', cont: true},
+            {...DRAW, id:'D5', cont: true},
             {...DRAW, id:'D6' },
             {...DRAW, id:'D7', type:DrawType.Final},
         ]};
@@ -55,7 +55,6 @@ describe("drawService", () =>{
             const result = groupDraw(event2, event2.draws[2]);
             expect(result).toStrictEqual([0,3]);
         });
-
 
         it("returns the second group of first draw", () => {
             const result = groupDraw(event2, event2.draws[3]);
@@ -82,10 +81,10 @@ describe("drawService", () =>{
             expect(result).toStrictEqual([7,8]);
         });
 
-        const event3 = { ...EVENT, draws: [
+        const event3: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
-            {...DRAW, id:'D1', suite: true},
-            {...DRAW, id:'D2', suite: true},
+            {...DRAW, id:'D1', cont: true},
+            {...DRAW, id:'D2', cont: true},
         ]};
 
         it("returns the single group of first draw", () => {
@@ -106,7 +105,7 @@ describe("drawService", () =>{
 
     describe("previousGroupIndex", () => {
 
-        const event1 = { ...EVENT, draws: [
+        const event1: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
             {...DRAW, id:'D1'},
         ]};
@@ -121,13 +120,13 @@ describe("drawService", () =>{
             expect(result).toStrictEqual([0,1]);
         });
 
-        const event2 = { ...EVENT, draws: [
+        const event2: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
-            {...DRAW, id:'D1', suite: true},
-            {...DRAW, id:'D2', suite: true},
+            {...DRAW, id:'D1', cont: true},
+            {...DRAW, id:'D2', cont: true},
             {...DRAW, id:'D3'},
-            {...DRAW, id:'D4', suite: true},
-            {...DRAW, id:'D5', suite: true},
+            {...DRAW, id:'D4', cont: true},
+            {...DRAW, id:'D5', cont: true},
             {...DRAW, id:'D6' },
             {...DRAW, id:'D7', type:DrawType.Final},
         ]};
@@ -151,7 +150,7 @@ describe("drawService", () =>{
 
     describe("nextGroupIndex", () => {
 
-        const event1 = { ...EVENT, draws: [
+        const event1: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
             {...DRAW, id:'D1'},
         ]};
@@ -166,13 +165,13 @@ describe("drawService", () =>{
             expect(result).toBe(undefined)
         });
 
-        const event2 = { ...EVENT, draws: [
+        const event2: TEvent = { ...EVENT, draws: [
             {...DRAW, id:'D0'},
-            {...DRAW, id:'D1', suite: true},
-            {...DRAW, id:'D2', suite: true},
+            {...DRAW, id:'D1', cont: true},
+            {...DRAW, id:'D2', cont: true},
             {...DRAW, id:'D3'},
-            {...DRAW, id:'D4', suite: true},
-            {...DRAW, id:'D5', suite: true},
+            {...DRAW, id:'D4', cont: true},
+            {...DRAW, id:'D5', cont: true},
             {...DRAW, id:'D6' },
             {...DRAW, id:'D7', type:DrawType.Final},
         ]};

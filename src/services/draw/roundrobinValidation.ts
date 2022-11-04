@@ -23,7 +23,7 @@ function validatePoule(draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
     //TODOjs
-    ////Compte le nombre de Qs de la poule (et pas dans suite)
+    ////Compte le nombre de Qs de la poule (et pas dans cont)
     //let e = 0;
     //for (let i = draw.nbColumn - 1; i >= 0; i--) {
     //    if (boxes[iDiagonale(i)].isQualifieSortant())

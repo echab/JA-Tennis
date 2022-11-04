@@ -73,7 +73,7 @@ export const Events: Component<Props> = (props) => {
               classList={{ error: selection.drawProblems.has(`${draw.id}-${event.id}`) }}
             >
               <A class="[&[aria-selected=true]]:bg-blue-200 block"
-                classList={{ "mt-2": !draw.suite }}
+                classList={{ "mt-2": !draw.cont }}
                 aria-selected={selection.draw?.id === draw.id}
                 // onclick={() => selectDraw(event, draw)}
                 href={urlDraw(draw, event)} replace
@@ -87,7 +87,7 @@ export const Events: Component<Props> = (props) => {
                 {/* <small>{draw.id} </small> */}
                 <i class="icon2-draw" />
                 <Show when={draw.lock}><i class="icon2-locker opacity-60 mr-1" /></Show>
-                {draw.name} {draw.suite ? '(c)' : ''}
+                {draw.name} {draw.cont ? '(c)' : ''}
                 {/* TODO list the count of registered players in this draw, by rank */}
 
                 <span class="float-right hover">&Gt;</span>

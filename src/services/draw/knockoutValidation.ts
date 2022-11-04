@@ -18,7 +18,7 @@ const MAX_TETESERIE = 32,
 function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
-    if (draw.suite) {
+    if (draw.cont) {
         const iTableau = indexOf(event.draws, 'id', draw.id);
         if (iTableau === 0 /* || !draw._previous */) {
             result.push({ message: 'ERR_TAB_SUITE_PREMIER', draw });
@@ -57,7 +57,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
         }
     }
 
-    if (!draw.suite) {
+    if (!draw.cont) {
         const group = groupDraw(event, draw);
         const qualifOuts = findGroupQualifOuts(event, group).map(([q]) => q).sort((a, b) => a - b).filter((q) => q !== QEMPTY);
         if (qualifOuts.length) {
@@ -414,7 +414,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
                 //DONE 00/03/07: CTableau, qualifié entrant en double
                 let j: Box | undefined;
-                if (!draw.suite && (j = lib.findPlayerIn(e)) && (j.position !== b)) {
+                if (!draw.cont && (j = lib.findPlayerIn(e)) && (j.position !== b)) {
                     result.push({ message: 'ERR_TAB_ENTRANT_DUP', draw, box: boxIn, player });
                 }
 
@@ -462,7 +462,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     //Check Têtes de série
     //	if( !isTypePoule)
-    if (!draw.suite) {
+    if (!draw.cont) {
         for (let e2 = 0, e = 1; e <= MAX_TETESERIE; e++) {
             const [d, boxIn] = findSeeded(event, draw, e);
             if (boxIn && d) {
@@ -487,7 +487,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     }
 
     //Tous les qualifiés sortants du tableau précédent sont utilisés
-    if (!draw.suite) {
+    if (!draw.cont) {
         const prevGroup = previousGroup(event, draw);
         if (prevGroup) {
             const qualifOuts = findGroupQualifOuts(event, prevGroup).filter(([q]) => q !== QEMPTY);
@@ -504,7 +504,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     if (draw.type === DrawType.Final) {
         const [, groupEnd] = groupDraw(event, draw);
-        if (draw.suite || event.draws[groupEnd - 1]?.id !== draw.id) {
+        if (draw.cont || event.draws[groupEnd - 1]?.id !== draw.id) {
             result.push({ message: 'ERR_TAB_SUITE_FINAL', draw });
         }
 
