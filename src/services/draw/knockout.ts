@@ -2,7 +2,7 @@
 import { DrawLibBase } from './drawLibBase';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent, positionOpponent1, positionOpponent2, positionTopCol, scanLeftBoxes } from './knockoutLib';
 import { by, byId } from '../util/find';
-import { isObject } from '../util/object'
+import { defined, isObject } from '../util/object'
 import { rank } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
@@ -102,7 +102,9 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             }
             const registeredPlayers = registeredPlayersOrQ.filter((p): p is Player => typeof p !== 'number');
 
-            playersOrQ = this.getDrawPlayersOrQ().map((pq) => (typeof pq === 'number' ? pq : byId(registeredPlayers, pq)!));
+            playersOrQ = this.getDrawPlayersOrQ()
+                .map((pq) => (typeof pq === 'number' ? pq : byId(registeredPlayers, pq)))
+                .filter(defined);
         }
 
         //Tri et Mélange les joueurs de même classement
@@ -448,7 +450,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
                 const boxIn = this.findBox<PlayerIn>(b);
                 if (boxIn) {
-                    delete (boxIn as any).score; //not a match
+                    delete (boxIn as Partial<Match>).score; //not a match
                     boxIn.order = iJoueur + 1; // TODO test
                     if (qualif) {	//Qualifié entrant
                         this.setPlayerIn(boxIn, qualif);
@@ -604,8 +606,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             //Met à jour le tableau suivant
             if (nextGrp && box.playerId && boxIn) {
-                if (!this.putPlayer(boxIn, box.playerId, undefined, true)) {
-                }
+                this.putPlayer(boxIn, box.playerId, undefined, true);
             }
 
         } else {	//Enlève un qualifié sortant

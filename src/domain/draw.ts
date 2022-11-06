@@ -55,12 +55,14 @@ export interface Match extends Box {
     place?: number;
     date?: Date;
 
-    matchFormat?: string; //FFT extent
+    matchFormat?: number; //FFT extent
+
+    //Planning
+    receive?: 0 | 1; // player2 is receiving
+    aware1?: 0 | 1 | 2; // the player is aware (0=no, 1=voice message, 2=yes)
+    aware2?: 0 | 1 | 2;
 
     note?: string;
-
-    _player1?: Player; //TODO for planning and dialog match
-    _player2?: Player; //TODO PlayerIn to get Q and playerId
 }
 
 export interface PlayerIn extends Box {
@@ -72,15 +74,10 @@ export interface PlayerIn extends Box {
 export const QEMPTY = 0;
 
 export interface Box {
-    // id: string;
     position: number;
 
-    hidden?: boolean;
+    hidden?: boolean; // TODO hidden Box should be deleted
     locked?: boolean;
 
     playerId?: string;
-
-    //Planning
-    receive?: boolean;  // TODO move into Match as receive1, receive1, aware1, aware2 (for compatibility with roundrobin)
-    aware?: boolean;
 }

@@ -41,6 +41,7 @@ export const DialogPlace: Component<Props> = (props) => {
     };
 
     return (
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         <dialog ref={refDlg!} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-planning' /> Place</b>

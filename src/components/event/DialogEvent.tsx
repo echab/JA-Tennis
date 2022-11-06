@@ -3,7 +3,7 @@ import { OptionalId } from '../../domain/object';
 import { TEvent } from '../../domain/tournament';
 import { RankString, CategoryString } from '../../domain/types';
 import { deleteEvent } from '../../services/eventService';
-import { rank, category } from '../../services/types';
+import { rank, category, matchFormat } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
 import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
@@ -34,6 +34,8 @@ export const DialogEvent: Component<Props> = (props) => {
 
     const ranks: RankString[] = rank.list();
     const categories: CategoryString[] = category.list();
+
+    const matchFormats = matchFormat.list();
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
         evt.preventDefault();
@@ -76,6 +78,7 @@ export const DialogEvent: Component<Props> = (props) => {
     }
 
     return (
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         <dialog ref={refDlg!} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <b><IconSexe sexe={props.event?.sexe} double={event?.typeDouble} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
@@ -98,7 +101,6 @@ export const DialogEvent: Component<Props> = (props) => {
 
                     {/*
                TODO: consolation
-               TODO: matchFormat
                */}
 
                     <div class="flex space-x-6 mb-1">
@@ -157,6 +159,14 @@ export const DialogEvent: Component<Props> = (props) => {
                     <div class="mb-1">
                         <label class="inline-block w-3/12 text-right pr-3">End:</label>
                         <input name="end" type="date" value={form.end?.toISOString().substring(0, 10) ?? ''} onChange={updateField('end')} class="p-1" />
+                    </div>
+
+                    <div class="mb-1">
+                        <label for="matchFormat" class="inline-block w-3/12 text-right pr-3">Match format:</label>
+                        <select id="matchFormat" value={form.matchFormat} onChange={updateField('matchFormat')} class="w-9/12 p-1">
+                            <option></option>
+                            <For each={matchFormats}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
+                        </select>
                     </div>
 
                     <div class="mb-1">

@@ -1,5 +1,5 @@
 import { initEvent } from "./eventService";
-import { Guid } from "./util/guid";
+import { guid } from "./util/guid";
 import { copy } from "../utils/tool";
 import { shuffle } from "../utils/tool";
 import { rank } from "./types";
@@ -76,7 +76,7 @@ export async function save(tournament: Tournament, url?: string) {
 export function newTournament(source?: Tournament): Tournament {
     const tournament: Tournament = source ? { ...source } : {
         version: 13,
-        id: Guid.create("T"),
+        id: guid("T"),
         types: { name: 'FFT', versionTypes: 5 },
         info: { name: "", slotLength: DEFAULT_SLOT_LENGTH },
         players: [],

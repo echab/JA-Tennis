@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { Sexe } from "../../domain/player";
+import { SexeString } from "../../domain/player";
 
 type Props = {
-    sexe?: Sexe;
+    sexe?: SexeString;
     double?: boolean;
 }
 

@@ -1,4 +1,5 @@
 import { createStore, NotWrappable, Part } from "solid-js/store";
+import type { CustomPartial } from "solid-js/store/types/store";
 import { defined } from "../../services/util/object";
 
 declare type W<T> = Exclude<T, NotWrappable>;
@@ -39,24 +40,26 @@ export function useForm<FormFields extends object = Record<string, unknown>>(
     const clearField = (fieldName: keyof FormFields) => {
         setForm({
             [fieldName]: "",
-        } as any);
+        } as CustomPartial<FormFields>);
     };
 
     const updateField = (fieldName: keyof FormFields) => (event: Event) => {
         const inputElement = event.currentTarget as HTMLInputElement;
         if (inputElement.type === "checkbox") {
-            setForm({ [fieldName]: !!inputElement.checked } as any);
+            setForm({ [fieldName]: !!inputElement.checked } as CustomPartial<FormFields>);
         } else if (inputElement.type === "radio") {
             if (inputElement.checked) {
                 const v = inputElement.value;
-                setForm({ [fieldName]: inputElement.dataset.json ? JSON.parse(v) : v } as any);
+                setForm({ [fieldName]: inputElement.dataset.json ? JSON.parse(v) : v } as CustomPartial<FormFields>);
             }
         } else if (inputElement.type === "number") {
-            setForm({ [fieldName]: inputElement.valueAsNumber } as any);
+            setForm({ [fieldName]: inputElement.valueAsNumber } as CustomPartial<FormFields>);
         } else if (inputElement.type === "date") {
-            setForm({ [fieldName]: inputElement.valueAsDate } as any);
+            setForm({ [fieldName]: inputElement.valueAsDate } as CustomPartial<FormFields>);
+        } else if (inputElement.type === "datetime-local") {
+            setForm({ [fieldName]: new Date(inputElement.value) } as CustomPartial<FormFields>);
         } else {
-            setForm({ [fieldName]: inputElement.value } as any);
+            setForm({ [fieldName]: inputElement.value } as CustomPartial<FormFields>);
         }
     };
 

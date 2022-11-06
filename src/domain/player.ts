@@ -2,7 +2,7 @@
 
 export type Id = string;
 
-export type Sexe = 'H' | 'F' | 'M';
+export type SexeString = 'H' | 'F' | 'M';
 
 export type Player = {
 
@@ -11,7 +11,7 @@ export type Player = {
     //General info
     name: string;
     firstname?: string;
-    sexe: Sexe;
+    sexe: SexeString;
     birth?: Date;
     category?: string; // TODO? number?
     club?: string;

@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { Component, For, JSX, onMount, onCleanup, Show } from 'solid-js';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
-import type { TEvent } from '../../domain/tournament';
+import type { Tournament } from '../../domain/tournament';
 import type { RankString } from '../../domain/types';
 import { deletePlayer } from '../../services/playerService';
 import { isSexeCompatible } from '../../services/tournamentService';
@@ -17,8 +17,7 @@ const EMPTY: OptionalId<Player> = { name: '', sexe: 'H', rank: 'NC', registratio
 
 type Props = {
     player?: OptionalId<Player>;
-    events: TEvent[];
-    players: Player[];
+    tournament: Tournament;
     onOk: (player: OptionalId<Player>) => void;
     onClose: () => void;
 }
@@ -79,12 +78,15 @@ export const DialogPlayer: Component<Props> = (props) => {
     };
 
     const deleteAndClose = () => {
-        commandManager.add(deletePlayer(form.id!));
+        if (form.id) {
+            commandManager.add(deletePlayer(form.id));
+        }
         refDlg.close();
     // props.onClose();
     }
 
     return (
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         <dialog ref={refDlg!} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-player' /> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
@@ -128,7 +130,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                             </div>
                             <ul>
                                 <For each={form.teamIds}>{(playerId) => {
-                                    const teamPlayer = byId(props.players, playerId);
+                                    const teamPlayer = byId(props.tournament.players, playerId);
                                     return <li>{
                                         teamPlayer
                                             ? <span>
@@ -171,7 +173,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                         <div class="mb-1 flex">
                             <label class="inline-block w-3/12 text-right pr-3">Events:</label>
                             <div class="inline-block">
-                                <For each={props.events.filter((event) => isSexeCompatible(event, form.sexe))}>{(event) =>
+                                <For each={props.tournament.events.filter((event) => isSexeCompatible(event, form.sexe))}>{(event) =>
                                     <div>
                                         <label><input name="registration" type="checkbox"
                                             value={event.id}

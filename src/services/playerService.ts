@@ -5,16 +5,16 @@ import { TEvent } from "../domain/tournament";
 import { removeValue } from "./util/array";
 import type { Command } from "./util/commandManager";
 import { indexOf } from "./util/find";
-import { Guid } from "./util/guid";
+import { guid } from "./util/guid";
 
 export function updatePlayer(
     player: OptionalId<Player>,
 ): Command {
-    // const p: Player = { ...player, id: Guid.create("p") }; // clone source
+    // const p: Player = { ...player, id: guid("p") }; // clone source
     const p = player as Player;
     const id = player.id;
     if (!id) {
-        player.id = Guid.create("p");
+        player.id = guid("p");
     }
     const i = id ? indexOf(selection.tournament.players, "id", id) : -1;
     // const prev = id ? { ...selection.tournament.players[i] } : undefined; // clone

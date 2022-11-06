@@ -1,6 +1,6 @@
 import { useSearchParams } from "@solidjs/router";
 import { createStore, produce } from "solid-js/store";
-import type { Box, Draw } from "../../domain/draw";
+import type { Box, Draw, Match, PlayerIn } from "../../domain/draw";
 import type { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, Place, TEvent, Tournament } from "../../domain/tournament";
 import type { DrawProblem, PlayerProblem } from "../../domain/validation";
@@ -13,8 +13,8 @@ export interface SelectionItems {
     player?: Player;
     event?: TEvent;
     draw?: Draw;
-    box?: Box;
-    boxQ?: Box;
+    box?: PlayerIn | Match;
+    boxQ?: PlayerIn | Match;
     day?: number;
     place?: Place;
 
@@ -104,7 +104,7 @@ export function selectDraw(event?: TEvent, draw?: Draw): void {
     });
 }
 
-export function selectBox(event: TEvent, draw: Draw, box?: Box): void {
+export function selectBox(event: TEvent, draw: Draw, box?: PlayerIn | Match): void {
     // TODO should navigate, effect?
     update((sel) => {
         sel.event = event;

@@ -1,4 +1,4 @@
-import { Component, createSignal, Match, Switch } from "solid-js";
+import { Component, createSignal, Match as Case, Switch } from "solid-js";
 import { commandManager } from "../services/util/commandManager";
 import { DialogInfo } from "./tournament/DialogInfo";
 import { DialogPlayer } from "./player/DialogPlayer";
@@ -10,7 +10,7 @@ import { updateDraws, updateMatch } from "../services/drawService";
 import { updateEvent } from "../services/eventService";
 import { DialogDraw } from "./draw/DialogDraw";
 import { DialogMatch } from "./draw/DialogMatch";
-import { Match as MatchBox } from "../domain/draw";
+import { Match } from "../domain/draw";
 import { DialogPlace } from "./planning/DialogPlace";
 import { updatePlace } from "../services/planningService";
 
@@ -20,49 +20,52 @@ export const [dialog, showDialog] = createSignal<DialogName>();
 
 export const Dialogs: Component = () => {
     return <Switch>
-        <Match when={dialog() === "info"}>
+        <Case when={dialog() === "info"}>
             <DialogInfo info={selection.tournament.info}
                 onOk={commandManager.wrap(updateInfo)}
                 onClose={() => showDialog()}
             />
-        </Match>
-        <Match when={dialog() === "player"}>
+        </Case>
+        <Case when={dialog() === "player"}>
             <DialogPlayer
-                events={selection.tournament.events}
                 player={selection.player}
-                players={selection.tournament.players}
+                tournament={selection.tournament}
                 onOk={commandManager.wrap(updatePlayer)}
                 onClose={() => showDialog()}
             />
-        </Match>
-        <Match when={dialog() === "place" && selection.place}>
-            <DialogPlace place={selection.place!}
+        </Case>
+        <Case when={dialog() === "place" && selection.place}>
+            <DialogPlace
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                place={selection.place!}
                 onOk={commandManager.wrap(updatePlace)}
                 onClose={() => showDialog()}
             />
-        </Match>
-        <Match when={dialog() === "event"}>
-            <DialogEvent event={selection.event}
+        </Case>
+        <Case when={dialog() === "event"}>
+            <DialogEvent
+                event={selection.event}
                 onOk={commandManager.wrap(updateEvent)}
                 onClose={() => showDialog()}
             />
-        </Match>
-        <Match when={dialog() === "draw"}>
+        </Case>
+        <Case when={dialog() === "draw"}>
+            {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
             <DialogDraw event={selection.event!} draw={selection.draw}
-                allPlayers={selection.tournament.players}
+                tournament={selection.tournament}
 
                 onOk={commandManager.wrap(updateDraws)}
                 onClose={() => showDialog()}
             />
-        </Match>
-        <Match when={dialog() === "match" && selection.event && selection.draw}>
-            <DialogMatch event={selection.event!} draw={selection.draw!}
-                players={selection.tournament.players} places={selection.tournament.places ?? []}
-                match={selection.box as MatchBox}
+        </Case>
+        <Case when={dialog() === "match" && selection.event && selection.draw}>
+            {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
+            <DialogMatch event={selection.event!} draw={selection.draw!} tournament={selection.tournament}
+                match={selection.box as Match}
 
                 onOk={commandManager.wrap(updateMatch)}
                 onClose={() => showDialog()}
             />
-        </Match>
+        </Case>
     </Switch>
 }

@@ -383,7 +383,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         return true;
     }
 
-    isNewPlayer(box: Box): boolean {
+    isNewPlayer(/* box: Box */): boolean {
         throw new Error('Not implemented RoundRobin.isJoueurNouveau');
     }
 }

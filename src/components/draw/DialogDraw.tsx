@@ -3,7 +3,7 @@ import { Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../.
 import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
-import type { TEvent } from '../../domain/tournament';
+import type { TEvent, Tournament } from '../../domain/tournament';
 import type { RankString } from '../../domain/types';
 import { deleteDraw, groupDraw, groupFindAllPlayerOut } from '../../services/drawService';
 import { getRegisteredPlayers, ranksName } from '../../services/tournamentService';
@@ -19,7 +19,7 @@ const EMPTY: OptionalId<Draw> = { name: '', type: KNOCKOUT, minRank: '', maxRank
 type Props = {
     event: TEvent;
     draw?: OptionalId<Draw>;
-    allPlayers: Player[];
+    tournament: Tournament;
     // eslint-disable-next-line no-unused-vars
     onOk(event: TEvent, draws: Array<OptionalId<Draw>>): void;
     onClose(): void;
@@ -60,7 +60,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
     /** @returns registered players and entries numbers from previous draw */
     const registeredPlayersOrQ = (): Array<Player|number> => {
-        const players: Array<Player|number> = getRegisteredPlayers(props.allPlayers, props.event, form.minRank, form.maxRank);
+        const players: Array<Player|number> = getRegisteredPlayers(props.tournament.players, props.event, form.minRank, form.maxRank);
         const prevDraw = props.event.draws.at(-1) as Draw | undefined;
         if (prevDraw) {
             const [iStart, iNext] = groupDraw(props.event, prevDraw);
@@ -126,6 +126,7 @@ export const DialogDraw: Component<Props> = (props) => {
     }
 
     return (
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         <dialog ref={refDlg!} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <span><i class='icon2-draw' /> <IconSexe sexe={props.event.sexe} double={props.event.typeDouble} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>

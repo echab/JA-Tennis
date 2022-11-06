@@ -12,6 +12,7 @@ export interface Category {
 
 export interface Licence {
     isValid(licence: string): boolean;
+    getKey(licence: string): string | undefined;
 }
 
 export type RankString = string;
@@ -48,7 +49,7 @@ export interface MatchFormat {
 }
 
 export interface MatchFormats {
-    list(): { [code: string]: MatchFormat };
+    list(): MatchFormat[];
 }
 
 export type ScoreString = string;

@@ -1,15 +1,14 @@
 /* eslint-disable max-classes-per-file */
 import { Score } from "../../domain/types";
 
-export class ScoreFFT implements Score {
+const reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
 
-    private static reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
+export class ScoreFFT implements Score {
 
     isValid(score: string): boolean {
 
-        const a = ScoreFFT.reScore.exec(score + " ");
-
-        if (a === null) {
+        const m = score.match(reScore);
+        if (!m) {
             return false;
         }
 
@@ -19,8 +18,8 @@ export class ScoreFFT implements Score {
         for (const st of sets) {
             const games = st.split("/");
 
-            const j1 = parseInt(games[0]);
-            const j2 = parseInt(games[1]);
+            const j1 = parseInt(games[0], 10);
+            const j2 = parseInt(games[1], 10);
 
             if (j1 > j2 && j1 >= 6) {
                 if (j1 >= 7 && j2 < 5) {

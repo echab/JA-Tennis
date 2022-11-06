@@ -1,5 +1,5 @@
 import { getId, indexOf } from "./util/find";
-import { Guid } from "./util/guid";
+import { guid } from "./util/guid";
 import { initDraw } from "./drawService";
 import { Tournament, TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
@@ -14,7 +14,7 @@ export function updateEvent(
     const e = event as TEvent;
     const id = event.id;
     if (!id) {
-        event.id = Guid.create("e");
+        event.id = guid("e");
     }
     const i = id ? indexOf(selection.tournament.events, "id", id) : -1;
     // const prev = id ? { ...selection.tournament.events[i] } : undefined; // clone
@@ -46,7 +46,7 @@ export function updateEvent(
 
 export function newEvent(parent: Tournament, source?: TEvent): TEvent {
     const event: TEvent = source ? {...source} as TEvent : {} as TEvent;
-    event.id = event.id || Guid.create("e");
+    event.id = event.id || guid("e");
 
     initEvent(event, parent);
     return event;

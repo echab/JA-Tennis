@@ -63,7 +63,7 @@ export const SidePanel: Component = () => {
             </li>
         </ul>
         <Show when={pane() !== undefined}>
-            <div class="flex-grow">
+            <div class="flex-grow overflow-x-auto">
                 <Switch>
                     <Match when={pane() === 1}>
                         <Tournaments />

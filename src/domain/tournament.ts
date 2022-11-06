@@ -1,5 +1,5 @@
 import type { Draw, Match, PlayerIn } from "./draw";
-import type { Player, Sexe } from "./player";
+import type { Player, SexeString } from "./player";
 import type { RankString } from "./types";
 
 export interface Tournament {
@@ -12,7 +12,7 @@ export interface Tournament {
     types: {
         name: string; // FFT
         versionTypes: number; // 5
-        data?: any;
+        data?: unknown;
     };
 
     players: Player[];
@@ -64,7 +64,7 @@ export interface TEvent {
     name: string;
 
     typeDouble?: boolean;
-    sexe: Sexe;
+    sexe: SexeString;
 
     category: number; // CategoryString;
     maxRank: RankString;
@@ -74,13 +74,11 @@ export interface TEvent {
     start?: Date;
     end?: Date;
 
-    matchFormat?: string;    //FFT extent
+    matchFormat?: number;    //FFT extent
 
     color?: string;
 
     draws: Draw[];
-
-    formatMatch?: number;
 }
 
 export type Place = {

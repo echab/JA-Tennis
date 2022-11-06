@@ -1,5 +1,5 @@
 import { byId, indexOf } from "./util/find";
-import { Guid } from "./util/guid";
+import { guid } from "./util/guid";
 import { ASSERT, shuffle } from "../utils/tool";
 import { rank } from "./types";
 
@@ -10,6 +10,7 @@ import { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
 import { Player } from "../domain/player";
+import { defined } from "./util/object";
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32;
@@ -27,7 +28,7 @@ export function updateDraws(
     const d = draw as Draw;
     const id = draw.id;
     if (!id) {
-        draw.id = Guid.create("d");
+        draw.id = guid("d");
     }
     const i = id ? indexOf(event.draws, "id", id) : -1;
     // const prev = id ? { ...event.draws[i] } : undefined; // clone
@@ -60,7 +61,7 @@ export function updateDraws(
 export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
     // const id = match.id;
     // if (!id) {
-    //   match.id = Guid.create("b");
+    //   match.id = guid("b");
     // }
     const i = indexOf(draw.boxes, "position", match.position);
     const prev = { ...draw.boxes[i] } as Match; // clone
@@ -76,6 +77,7 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
         if (!sel.box || !isMatch(sel.box)) {
             throw new Error("updateMatch without selected match");
         }
+        sel.draw.boxes[i] = match;
         lib.putResult(sel.box, match, sel.boxQ);
     });
     act();
@@ -96,7 +98,7 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
 
 export function newDraw(parent: TEvent, source?: Draw, after?: Draw): Draw {
     const draw: Draw = {
-        id: Guid.create("d"),
+        id: guid("d"),
         name: "",
         type: KNOCKOUT,
         nbColumn: 3,
@@ -156,18 +158,18 @@ export function deleteDraw(drawId: string): Command {
 //newBox(parent: Draw, source?: Box, position?: number): Box
 export function newBox<T extends Box = Box>(
     parent: Draw,
-    source?: string | Box,
+    source?: number | Box,
     position?: number,
 ): T {
     let box = {} as T;
-    if (typeof source !== 'string') {
-        box = {...source} as T;
-    //box.id = undefined;
-    //box.position= undefined;
-    } else if ("string" === typeof source) { //matchFormat
+    if ("number" === typeof source) { //matchFormat
         const match = box as unknown as Match;
         match.score = ""; // delete match.score
         match.matchFormat = source;
+    } else {
+        box = {...source} as T;
+        //box.id = undefined;
+        //box.position= undefined;
     }
     if ("number" === typeof position) {
         box.position = position;
@@ -316,7 +318,7 @@ export function findSeeded(
     return [];
 }
 
-export function groupFindQ(event: TEvent, draw: Draw, box: Box): Box | undefined {
+export function groupFindQ(event: TEvent, draw: Draw, box: Box): PlayerIn | Match | undefined {
     const qualifOut = (box as Match).qualifOut;
     const qualifIn = (box as PlayerIn).qualifIn;
     if (qualifOut !== undefined && qualifOut !== QEMPTY) {
@@ -386,7 +388,8 @@ export function groupFindPlayerOut(
         }
     }
     if (iQualifie <= outCount) {
-        return -2 as any; //TODO
+        ASSERT(false);
+        // return -2 as any; //TODO
     }
     return [];
 }
@@ -416,7 +419,8 @@ export function findDrawPlayerIds(draw: Draw, withQualifIn = true): Set<string> 
     return new Set(
         (draw.boxes as PlayerIn[])
             .filter(({ playerId, qualifIn }) => playerId && (withQualifIn || !qualifIn))
-            .map<string>(({ playerId }) => playerId!)
+            .map(({ playerId }) => playerId)
+            .filter(defined)
     );
 }
 
@@ -443,6 +447,7 @@ export function findGroupQualifOuts(event: TEvent, [groupStart, groupEnd]: [numb
         result.push(...
         (draw.boxes as Match[])
             .filter(({qualifOut}) => qualifOut !== undefined)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map<[number, Draw, number]>(({ qualifOut, position }) => [qualifOut!, draw, position])
         );
     }
@@ -460,6 +465,7 @@ export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [numbe
         result.push(...
         (draw.boxes as PlayerIn[])
             .filter(({qualifIn}) => qualifIn !== undefined)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map<[number, Draw, number]>(({ qualifIn, position }) => [qualifIn!, draw, position])
         );
     }

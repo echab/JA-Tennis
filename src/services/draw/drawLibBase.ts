@@ -2,13 +2,14 @@
 import { Draw, Box, Match, PlayerIn, QEMPTY, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
-import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, isPlayerIn } from '../drawService';
+import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot } from '../drawService';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
 import { ASSERT } from '../../utils/tool';
 
 export abstract class DrawLibBase implements IDrawLib {
 
+    // eslint-disable-next-line @typescript-eslint/no-parameter-properties
     constructor(public event: TEvent, public draw: Draw) {}
 
     abstract nbColumnForPlayers( nJoueur: number): number;
