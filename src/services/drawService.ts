@@ -1,6 +1,5 @@
 import { byId, indexOf } from "./util/find";
 import { Guid } from "./util/guid";
-import { extend, isArray, isObject } from "./util/object";
 import { ASSERT, shuffle } from "../utils/tool";
 import { rank } from "./types";
 
@@ -160,9 +159,9 @@ export function newBox<T extends Box = Box>(
     source?: string | Box,
     position?: number,
 ): T {
-    const box: T = {} as T;
-    if (isObject(source)) {
-        extend(box, source);
+    let box = {} as T;
+    if (typeof source !== 'string') {
+        box = {...source} as T;
     //box.id = undefined;
     //box.position= undefined;
     } else if ("string" === typeof source) { //matchFormat
@@ -304,7 +303,7 @@ export function findSeeded(
     iTeteSerie: number,
 ): [Draw, PlayerIn] | [] { //FindTeteSerie
     ASSERT(1 <= iTeteSerie && iTeteSerie <= MAX_TETESERIE);
-    const [groupStart, groupEnd] = isArray(origin) ? origin : groupDraw(event, origin);
+    const [groupStart, groupEnd] = Array.isArray(origin) ? origin : groupDraw(event, origin);
     for (let i = groupStart; i < groupEnd; i++) {
         const boxes = event.draws[i].boxes;
         for (const box of boxes) {
@@ -349,7 +348,7 @@ export function groupFindPlayerIn(
     iQualifie: number,
 ): [Draw, PlayerIn] | [] {
     ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
-    //const group = isArray(group) ? group : groupDraw(event, group);
+    //const group = Array.isArray(group) ? group : groupDraw(event, group);
     for (let i = groupStart; i < groupEnd; i++) {
         const d = event.draws[i];
         const lib = drawLib(event, d);
@@ -368,7 +367,7 @@ export function groupFindPlayerOut(
     iQualifie: number,
 ): [Draw, Match] | [] {
     ASSERT(1 <= iQualifie && iQualifie <= MAX_QUALIF);
-    //const group = isArray(origin) ? origin : groupDraw(event, origin);
+    //const group = Array.isArray(origin) ? origin : groupDraw(event, origin);
     for (let i = groupStart; i < groupEnd; i++) {
         const d = event.draws[i];
         const lib = drawLib(event, d);
@@ -399,7 +398,7 @@ export function groupFindAllPlayerOut(
     hideNumbers?: boolean,
 ): number[] { //FindAllQualifieSortant
     //Récupère les qualifiés sortants du tableau
-    const group = isArray(origin) ? origin : groupDraw(event, origin);
+    const group = Array.isArray(origin) ? origin : groupDraw(event, origin);
     if (!group) {
         return [];
     }

@@ -1,22 +1,21 @@
 /* eslint-disable no-bitwise */
-import type { Player } from '../../domain/player';
-import type { Place, TEvent } from '../../domain/tournament';
+import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Params } from '../App';
 import { Component, For, Show } from 'solid-js';
-import { selectBox, urlBox } from '../util/selection';
+import { selectBox, selectDay, urlBox } from '../util/selection';
 import { PlayerIn, Draw, Match, BUILD, FINAL } from '../../domain/draw';
 import { byId, mapBy } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
 import { A, useParams } from '@solidjs/router';
 import { isMatch } from '../../services/drawService';
-import './Draw.css';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../services/draw/knockoutLib';
+import { dayOf } from '../../services/planningService';
+import './Draw.css';
 
 type Props = {
     event: TEvent,
     draw: Draw,
-    players: Player[],
-    places: Place[],
+    tournament: Tournament,
 }
 
 export const DrawKnockout: Component<Props> = (props) => {
@@ -40,7 +39,7 @@ export const DrawKnockout: Component<Props> = (props) => {
             const visible = !!box && (!!box.order || box.qualifIn !== undefined || isMatch(box))
             result.push({
                 box,
-                player: byId(props.players, box?.playerId),
+                player: byId(props.tournament.players, box?.playerId),
                 even: (pos & 1) === 0 && visible,
                 odd: (pos & 1) !== 0 && visible,
                 rowspan: 1 << ic,
@@ -62,7 +61,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                             even, odd, qs: isRight
                         }}>
                             <Show when={props.draw.lock === BUILD || even || odd}>
-                                {/* TODO <DrawBox box={b} players={props.players} /> */}
+                                {/* TODO <DrawBox box={b} players={props.tournament.players} /> */}
                                 <A class="boite joueur block print:border-none print:bg-transparent"
                                     classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
                                     // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
@@ -98,11 +97,23 @@ export const DrawKnockout: Component<Props> = (props) => {
                                                 showDialog("match");
                                             }}
                                         />
+                                        <Show when={box?.date}>
+                                            <i title="View in planning"
+                                                classList={{
+                                                    'icon2-planning':  !!box?.date,
+                                                    'hover':  !!box?.date,
+                                                    'icon2-planning-no': !box?.date,
+                                                }}
+                                                onclick={(evt) => {
+                                                    evt.preventDefault();
+                                                    selectDay(dayOf(box?.date, props.tournament.info));
+                                                }}
+                                            />
+                                        </Show>
                                         <Show when={box?.score} fallback={
                                             <>
                                                 <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
-                                                <Show when={box?.place !== undefined}> <span class="place">{(box!.place ? props.places[box!.place]?.name: '') ?? ''}</span></Show>
-                                                {/* TODO place name */}
+                                                <Show when={box?.place !== undefined}> <span class="place">{(box!.place ? props.tournament.places?.[box!.place]?.name: '') ?? ''}</span></Show>
                                             </>
                                         }><span class="score">{box!.score}</span></Show>
 

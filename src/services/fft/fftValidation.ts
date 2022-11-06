@@ -94,11 +94,11 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         //DONE 00/03/04: CTableau, Deux qualifiés entrants se rencontrent
 
         if (!isTypePoule && match) {
-            const opponent = lib.boxesOpponents(match);
-            if ((opponent.box1 as PlayerIn).qualifIn
-                && (opponent.box2 as PlayerIn).qualifIn) {
-                const player1 = byId(players, opponent.box1.playerId);
-                result.push({message:'ERR_ENTRANT_MATCH', draw, box: opponent.box1, player: player1});
+            const {player1, player2} = lib.boxesOpponents(match);
+            if (player1.qualifIn
+                && player2.qualifIn) {
+                const p1 = byId(players, player1.playerId);
+                result.push({message:'ERR_ENTRANT_MATCH', draw, box: player1, player: p1});
             }
         }
 

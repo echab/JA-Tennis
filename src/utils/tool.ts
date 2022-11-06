@@ -1,10 +1,10 @@
-﻿import { isArray, isDate, isObject} from '../services/util/object';
+﻿import { isDate, isObject} from '../services/util/object';
 
 export function copy(source: any, destination?: any) {
     if (!destination) {
         destination = source;
         if (source) {
-            if (isArray(source)) {
+            if (Array.isArray(source)) {
                 destination = copy(source, []);
             } else if (isDate(source)) {
                 destination = new Date(source.getTime());
@@ -14,7 +14,7 @@ export function copy(source: any, destination?: any) {
         }
     } else {
         if (source === destination) { throw new Error("Can't copy equivalent objects or arrays"); }
-        if (isArray(source)) {
+        if (Array.isArray(source)) {
             destination.length = 0;
             for (const src of source) {
                 destination.push(copy(src));

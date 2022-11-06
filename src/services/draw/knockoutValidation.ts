@@ -7,10 +7,11 @@ import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL, KNOCKOUT } from '../../domai
 import { RankString } from '../../domain/types';
 import { TEvent, Tournament } from '../../domain/tournament';
 import { isRegistred, isSexeCompatible } from '../tournamentService';
-import { DAYS, HOURS, MINUTES } from '../../utils/date';
+import { MINUTES } from '../../utils/date';
 import { drawLib } from './drawLib';
 import { DrawProblem } from '../../domain/validation';
 import { ASSERT } from '../../utils/tool';
+import { dayOf, matchesByDays } from '../planningService';
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
@@ -110,16 +111,16 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     // - Ecart maximal souhaité DEUX échelons
 
     const isMatchJoue = (match: Match): boolean => {
-        const opponent = lib.boxesOpponents(match);
-        return !!match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
+        const {player1, player2 } = lib.boxesOpponents(match);
+        return !!match.playerId && !!player1.playerId && !!player2.playerId;
     };
 
     const isMatchJouable = (match: Box): boolean => {
         if (!isMatch(match)) {
             return false;
         }
-        const opponent = lib.boxesOpponents(match);
-        return !match.playerId && !!opponent.box1.playerId && !!opponent.box2.playerId;
+        const {player1, player2 } = lib.boxesOpponents(match);
+        return !match.playerId && !!player1.playerId && !!player2.playerId;
     };
 
     if (draw.minRank && draw.maxRank && rank.compare(draw.maxRank, draw.minRank) < 0) {
@@ -228,10 +229,9 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
             ASSERT(positionOpponent1(b) <= positionMax(draw.nbColumn, draw.nbOut));
 
-            //TODO boxesOpponents(match)
-            const opponent = lib.boxesOpponents(match);
+            const { player1, player2 } = lib.boxesOpponents(match);
 
-            ASSERT(!!opponent.box1 && !!opponent.box2);
+            ASSERT(!!player1 && !!player2);
 
             if (!match.score) {
 
@@ -252,54 +252,54 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
                 //ASSERT( boxes[ i].playerId==-1 || player.isInscrit( tournament.FindEpreuve( this)) );
                 ASSERT(column(b) < colMax);
-                if (!opponent.box1.playerId || !opponent.box2.playerId) {
+                if (!player1.playerId || !player2.playerId) {
                     result.push({ message: 'ERR_MATCH_JOUEUR_NO', draw, box: match });
 
-                } else if (opponent.box1.playerId !== match.playerId
-                    && opponent.box2.playerId !== match.playerId) {
+                } else if (player1.playerId !== match.playerId
+                    && player2.playerId !== match.playerId) {
                     result.push({ message: 'ERR_VAINQUEUR_MIS', draw, box: match, player });
                 }
             }
 
             if (!isMatchJoue(match)) {
 
-                const player1 = byId(players, opponent.box1.playerId); // opponent.box1._player
-                const player2 = byId(players, opponent.box2.playerId); // opponent.box2._player
+                const p1 = byId(players, player1.playerId);
+                const p2 = byId(players, player2.playerId);
 
                 //match before opponent 2
-                const opponent1 = lib.boxesOpponents(opponent.box1 as Match);
-                const opponent2 = lib.boxesOpponents(opponent.box2 as Match);
+                const opponent1 = lib.boxesOpponents(player1 as Match);
+                const opponent2 = lib.boxesOpponents(player2 as Match);
 
-                const player21 = byId(players, opponent2.box1?.playerId); // opponent2.box1._player
-                const player22 = byId(players, opponent2.box2?.playerId); // opponent2.box2._player
+                const player21 = byId(players, opponent2.player1?.playerId);
+                const player22 = byId(players, opponent2.player2?.playerId);
 
-                const player11 = byId(players, opponent1.box1?.playerId); // opponent1.box1._player
-                const player12 = byId(players, opponent1.box2?.playerId); // opponent1.box2._player
+                const player11 = byId(players, opponent1.player1?.playerId);
+                const player12 = byId(players, opponent1.player2?.playerId);
 
-                if (player1) {
-                    if (player2) {
-                        if (!CompString(player1.club, player2.club)) {
-                            result.push({ message: 'ERR_MEME_CLUB1', draw, box: match, player, detail: player1.club });
+                if (p1) {
+                    if (p2) {
+                        if (!CompString(p1.club, p2.club)) {
+                            result.push({ message: 'ERR_MEME_CLUB1', draw, box: match, player, detail: p1.club });
                         }
-                    } else if (isMatchJouable(opponent.box2)) { //!isTypePoule &&
+                    } else if (isMatchJouable(player2)) { //!isTypePoule &&
 
-                        if (!CompString(player1.club, player21?.club)) {
-                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: player1.club });
-                        } else if (!CompString(player1.club, player22?.club)) {
-                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: player1.club });
+                        if (!CompString(p1.club, player21?.club)) {
+                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: p1.club });
+                        } else if (!CompString(p1.club, player22?.club)) {
+                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: p1.club });
                         }
                     }
                 } else if (isTypePoule) {
                     //TODO Poule
-                } else if (player2) {
-                    if (isMatchJouable(opponent.box1)) {
-                        if (!CompString(player2.club, player11?.club)) {
-                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: player2.club });
-                        } else if (!CompString(player2.club, player12?.club)) {
-                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: player2.club });
+                } else if (p2) {
+                    if (isMatchJouable(player1)) {
+                        if (!CompString(p2.club, player11?.club)) {
+                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: p2.club });
+                        } else if (!CompString(p2.club, player12?.club)) {
+                            result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: p2.club });
                         }
                     }
-                } else if (isMatchJouable(opponent.box1) && isMatchJouable(opponent.box2)) {
+                } else if (isMatchJouable(player1) && isMatchJouable(player2)) {
                     if (!CompString(player11?.club, player21?.club)
                         || !CompString(player11?.club, player22?.club)) {
                         result.push({ message: 'ERR_MEME_CLUB2', draw, box: match, player, detail: player11?.club });
@@ -323,30 +323,25 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     result.push({ message: 'ERR_DATE_MATCH_EPREUVE', draw, box: match, player, detail: match.date.toDateString() });
                 }
 
-                if (tournament.info.start && tournament.info.end && tournament._day) {
-                    tournament._dayCount = dateDiff(tournament.info.start, tournament.info.end, DAYS) + 1;
+                if (tournament.info.start && tournament.info.end) {
+                    const day = dayOf(match.date, tournament.info);
+                    if (isFinite(day)) {
+                        const dayMatches = matchesByDays(tournament)[day];
+                        ASSERT(dayMatches && dayMatches.length <= MAX_MATCHJOUR);
 
-                    if (tournament._dayCount) {
-                        const iDay = dateDiff(match.date, tournament.info.start, DAYS);
-                        if (0 <= iDay && iDay < tournament._dayCount) {	//v0998
+                        for (let m = dayMatches.length - 1; m >= 0; m--) {
+                            const match2 = dayMatches[m].match;
 
-                            const dayMatches = tournament._day[iDay];
-                            ASSERT(dayMatches.length <= MAX_MATCHJOUR);
-
-                            for (let m = dayMatches.length - 1; m >= 0; m--) {
-                                const match2 = dayMatches[m];
-
-                                if (match2.position !== match.position
-                                    && match2.place === match.place
-                                    && match2.date
-                                    && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength * MINUTES) {
-                                    result.push({ message: 'ERR_PLN_OVERLAP', draw, box: match, player, detail: match.date.toDateString() });
-                                }
+                            if (match2.position !== match.position
+                                && match2.place === match.place
+                                && match2.date
+                                && Math.abs(match.date.getTime() - match2.date.getTime()) < tournament.info.slotLength * MINUTES) {
+                                result.push({ message: 'ERR_PLN_OVERLAP', draw, box: match, player, detail: match.date.toDateString() });
                             }
-                        } else {
-                            //Match en dehors du planning
-                            result.push({ message: 'ERR_DATE_MATCH_TOURNOI', draw, box: match, player, detail: match.date.toDateString() });
                         }
+                    } else {
+                        //Match en dehors du planning
+                        result.push({ message: 'ERR_DATE_MATCH_TOURNOI', draw, box: match, player, detail: match.date.toDateString() });
                     }
                 }
 
@@ -359,10 +354,10 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 if (match.date) {
 
                     //if (!isTypePoule) {
-                    const match1 = opponent.box1 as Match;
-                    const match2 = opponent.box2 as Match;
+                    const match1 = player1 as Match;
+                    const match2 = player2 as Match;
 
-                    if (isMatch(opponent.box1)
+                    if (isMatch(player1)
                         && match1.date) {
                         if (match.date < match1.date) {
                             result.push({ message: 'ERR_DATE_MATCHS', draw, box: match, player, detail: match.date.toDateString() });
@@ -371,7 +366,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                         }
                     }
 
-                    if (isMatch(opponent.box2) && match2.date) {
+                    if (isMatch(player2) && match2.date) {
                         if (match.date < match2.date) {
                             result.push({ message: 'ERR_DATE_MATCHS', draw, box: match, player, detail: match.date.toDateString() });
                         } else if (match.date.getTime() < (match2.date.getTime() + ((tournament.info.slotLength * MINUTES) << 1))) {
@@ -380,7 +375,9 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     }
                     //}
 
-                    if (!match.playerId && match.place === undefined && tournament.places?.length && tournament._dayCount) {
+                    if (!match.playerId && match.place === undefined && tournament.places?.length
+                    //  && tournament._dayCount
+                    ) {
                         result.push({ message: 'ERR_PLN_COURT_NO', draw, box: match, player });
                     }
                 }
@@ -523,15 +520,6 @@ function CompString(a?: string, b?: string): number {
     //upper case comparison
     const u = a.toUpperCase(), v = b.toUpperCase();
     return u === v ? 0 : u < v ? -1 : 1;
-}
-
-function dateDiff(first: Date, second: Date, unit: typeof DAYS | typeof HOURS) {
-
-    // Copy date parts of the timestamps, discarding the time parts.
-    const one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
-    const two = new Date(second.getFullYear(), second.getMonth(), second.getDate());
-
-    return Math.floor((two.getTime() - one.getTime()) / unit);
 }
 
 // export const knockoutValidation: IValidation = ;

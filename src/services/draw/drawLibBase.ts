@@ -23,7 +23,7 @@ export abstract class DrawLibBase implements IDrawLib {
     abstract findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
 
     abstract computeScore(): boolean; //CalculeScore
-    abstract boxesOpponents(match: Match): { box1: Box; box2: Box };
+    abstract boxesOpponents(match: Match): { player1: PlayerIn; player2: PlayerIn };
     abstract isNewPlayer(box: Box): boolean;
 
     protected findBox<T extends Box = Box>(position: number, create?: boolean): T | undefined {
@@ -514,8 +514,8 @@ export abstract class DrawLibBase implements IDrawLib {
 
                 //if( isCreneau( box))
                 //v0998
-                const opponents = lib.boxesOpponents(match);
-                if (opponents.box1 && opponents.box2
+                const { player1, player2 } = lib.boxesOpponents(match);
+                if (player1 && player2
                     && (sourceMatch.place !== undefined || sourceMatch.date !== undefined)
                 ) {
                     if (!this.putSlot(match, sourceMatch)) {

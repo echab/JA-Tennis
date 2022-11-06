@@ -3,11 +3,10 @@ import { Guid } from "./util/guid";
 import { copy } from "../utils/tool";
 import { shuffle } from "../utils/tool";
 import { rank } from "./types";
-import { Player } from "../domain/player";
+import type { Player } from "../domain/player";
 import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH } from "../domain/tournament";
-import { DAYS } from "../utils/date";
-import { RankString } from "../domain/types";
-import { Command } from "./util/commandManager";
+import type { RankString } from "../domain/types";
+import type { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
 
 /** This function load tournament data from an url. */
@@ -116,12 +115,6 @@ export function initTournament(tournament: Tournament): Tournament {
 
     tournament.info = tournament.info ?? { name: "" };
     tournament.info.slotLength = tournament.info.slotLength ?? DEFAULT_SLOT_LENGTH;
-    if (tournament.info.start && tournament.info.end) {
-        tournament._dayCount = Math.floor(
-            (tournament.info.end.getTime() - tournament.info.start.getTime()) / DAYS +
-        1,
-        );
-    }
 
     return tournament;
 }

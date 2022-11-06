@@ -35,8 +35,8 @@ export const Dialogs: Component = () => {
                 onClose={() => showDialog()}
             />
         </Match>
-        <Match when={dialog() === "place"}>
-            <DialogPlace place={selection.place}
+        <Match when={dialog() === "place" && selection.place}>
+            <DialogPlace place={selection.place!}
                 onOk={commandManager.wrap(updatePlace)}
                 onClose={() => showDialog()}
             />

@@ -1,37 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const slice = [].slice;
-
-/** @deprecated use destructuring instead: `dst = {...dst, ...src}` */
-export function extend(dst: any, src?: any) {
-    return baseExtend(dst, slice.call(arguments, 1), false);
-}
-
-function baseExtend(dst: any, objs: any[], deep: boolean) {
-    for (let i = 0, ii = objs.length; i < ii; ++i) {
-        const obj = objs[i];
-        if (!isObject(obj) && !(typeof obj === 'function')) {continue;}
-        const keys = Object.keys(obj);
-        for (let j = 0, jj = keys.length; j < jj; j++) {
-            const key = keys[j];
-            const src = obj[key];
-
-            if (deep && isObject(src)) {
-                if (isDate(src)) {
-                    dst[key] = new Date(src.valueOf());
-                } else {
-                    if (!isObject(dst[key])) {dst[key] = isArray(src) ? [] : {};}
-                    baseExtend(dst[key], [src], true);
-                }
-            } else {
-                dst[key] = src;
-            }
-        }
-    }
-
-    return dst;
-}
-
 /**
  * @ngdoc function
  * @name angular.isObject
@@ -66,20 +34,6 @@ export function isObject(value: any): value is Record<string, unknown> {
 export function isDate(value: any): value is Date {
     return toString.call(value) === "[object Date]";
 }
-
-/**
- * @ngdoc function
- * @name angular.isArray
- * @module ng
- * @kind function
- *
- * @description
- * Determines if a reference is an `Array`.
- *
- * @param {*} value Reference to check.
- * @returns {boolean} True if `value` is an `Array`.
- */
-export const isArray = Array.isArray;
 
 /**
  * For annotation of overridden methods

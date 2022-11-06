@@ -1,5 +1,5 @@
-import { Player } from "./player";
-import { RankString, ScoreString } from "./types";
+import type { Player } from "./player";
+import type { RankString, ScoreString } from "./types";
 
 export const KNOCKOUT = 0, FINAL = 1, ROUNDROBIN = 2, ROUNDROBIN_RETURN = 3;
 export type DrawType = typeof KNOCKOUT | typeof FINAL | typeof ROUNDROBIN | typeof ROUNDROBIN_RETURN;
@@ -60,7 +60,7 @@ export interface Match extends Box {
     note?: string;
 
     _player1?: Player; //TODO for planning and dialog match
-    _player2?: Player;
+    _player2?: Player; //TODO PlayerIn to get Q and playerId
 }
 
 export interface PlayerIn extends Box {
@@ -81,6 +81,6 @@ export interface Box {
     playerId?: string;
 
     //Planning
-    receive?: boolean;
+    receive?: boolean;  // TODO move into Match as receive1, receive1, aware1, aware2 (for compatibility with roundrobin)
     aware?: boolean;
 }

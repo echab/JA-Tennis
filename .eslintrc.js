@@ -2,7 +2,7 @@
 module.exports = {
     // libs that run in both envs, browser & node, don't access global variables that are browser or node specific
     "env": {
-        "browser": false,    // enables Browser global variables, like localStorage
+        "browser": true,    // enables Browser global variables, like localStorage
         "es6": true,         // enables new ES6 global variables, such as Set
         "node": false,       // enables Node global variables, like process
     },

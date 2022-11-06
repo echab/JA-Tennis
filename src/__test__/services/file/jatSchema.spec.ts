@@ -55,7 +55,7 @@ describe("jatSchema", () => {
 
     it('should save tournament to array buffer', () => {
         const writer = createSerializer(new Uint8Array(8192)); // TODO size
-        writer.writeObject(tournament2, docFields, docFields.version.def);
+        writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
         expect(buf).toMatchSnapshot();
@@ -63,7 +63,7 @@ describe("jatSchema", () => {
 
     it('should save and reload same tournament', () => {
         const writer = createSerializer(new Uint8Array(8192)); // TODO size
-        writer.writeObject(tournament2, docFields, docFields.version.def);
+        writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
         const reader = createSerializer(buf);
@@ -72,4 +72,19 @@ describe("jatSchema", () => {
         expect(result.version).toBe(13);
         expect(result).toMatchObject(tournament2);
     });
+
+    it('should write binary with the same tournament1.jat content', async () => {
+        const b = await readFile(`${__dirname}/tournament1.jat`);
+        const expected = new Uint8Array(b.buffer);
+
+        const reader = createSerializer(new Uint8Array(b.buffer));
+        const doc = reader.readObject(docFields);
+
+        const writer = createSerializer(new Uint8Array(expected.length * 2)); // TODO size
+        writer.writeObject(doc, docFields);
+        const result = writer._buffer.slice(0, writer._position);
+
+        expect(result).toEqual(expected);
+    });
+
 });

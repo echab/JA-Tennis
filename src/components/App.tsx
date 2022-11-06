@@ -10,16 +10,21 @@ import { PaneDraw } from './draw/PaneDraw';
 import { Players } from './player/Players';
 import { ErrorToast } from './misc/ErrorToast';
 import styles from './App.module.css';
-import '../assets/icons.css';
 import { TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
 import { Planning } from './planning/Planning';
+import '../assets/icons.css';
 
 export type Params = {
     playerId?: string;
     eventId?: string;
     drawId?: string;
     boxPos?: string;
-    place?: string;
+    day?: string;
+}
+
+export type Searchs = {
+    // playerId?: string;
+    day?: string;
 }
 
 export const App: Component = () => (
@@ -49,7 +54,7 @@ export const Main: Component = () => {
                     <button type="button" disabled={!commandManager.canRedo} onclick={() => commandManager.redo()} title={`Redo ${commandManager.redoNames(1)?.[0] ?? ''}`}>↷ Redo</button>
                 </div>
                 <div>
-          selection: player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position}
+          selection: player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
                 </div>
             </header>
             <div class="flex">
@@ -72,8 +77,11 @@ export const Content: Component = () => (
                     players={selection.tournament.players}
                 />
             } />
-            <Route path="/planning/:place?" element={
-                <Planning places={selection.tournament.places ?? []} />
+            <Route path="/planning/:day?" element={
+                <Planning
+                    places={selection.tournament.places ?? []}
+                    players={selection.tournament.players}
+                />
             } />
         </Routes>
     </div>

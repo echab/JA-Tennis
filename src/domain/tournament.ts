@@ -1,6 +1,6 @@
-import { Draw, Match } from "./draw";
-import { Player, Sexe } from "./player";
-import { RankString } from "./types";
+import type { Draw, Match, PlayerIn } from "./draw";
+import type { Player, Sexe } from "./player";
+import type { RankString } from "./types";
 
 export interface Tournament {
     version: number; // 13
@@ -22,9 +22,6 @@ export interface Tournament {
     places?: Place[];
 
     _url?: string;
-
-    _dayCount?: number;
-    _day?: Match[][]; //list of matches by day
 }
 
 export const DEFAULT_SLOT_LENGTH = 90;
@@ -90,3 +87,11 @@ export type Place = {
     name: string;
     avail: number[];
 }
+
+export type Slot = {
+    event: TEvent;
+    draw: Draw;
+    match: Match;
+    player1?: PlayerIn;
+    player2?: PlayerIn;
+};

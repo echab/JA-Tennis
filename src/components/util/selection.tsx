@@ -1,10 +1,12 @@
+import { useSearchParams } from "@solidjs/router";
 import { createStore, produce } from "solid-js/store";
-import { Box, Draw } from "../../domain/draw";
-import { Player } from "../../domain/player";
+import type { Box, Draw } from "../../domain/draw";
+import type { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, Place, TEvent, Tournament } from "../../domain/tournament";
-import { DrawProblem, PlayerProblem } from "../../domain/validation";
+import type { DrawProblem, PlayerProblem } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
+import type { Searchs } from "../App";
 
 export interface SelectionItems {
     tournament: Tournament;
@@ -13,6 +15,7 @@ export interface SelectionItems {
     draw?: Draw;
     box?: Box;
     boxQ?: Box;
+    day?: number;
     place?: Place;
 
     playerProblems: Map<string,PlayerProblem[]>;
@@ -35,6 +38,7 @@ export function selectTournament(tournament: Tournament) {
         sel.draw = undefined;
         sel.box = undefined;
         sel.boxQ = undefined;
+        sel.day = undefined;
         sel.place = undefined;
 
         sel.playerProblems = new Map(
@@ -54,6 +58,12 @@ export function selectTournament(tournament: Tournament) {
 export function selectPlayer(player?: Player): void {
     update((sel) => {
         sel.player = player;
+    });
+}
+
+export function selectDay(day?: number): void {
+    update((sel) => {
+        sel.day = isFinite(day ?? NaN) ? day : undefined;
     });
 }
 
@@ -123,7 +133,7 @@ export function isDrawError(error: PlayerProblem | DrawProblem  ): error is Draw
     return !!(error as DrawProblem).draw;
 }
 
-export function update(fn: (original: SelectionItems) => void) {
+export function update(fn: (originalSelection: SelectionItems) => void) {
     setSelection(produce(fn));
 }
 
@@ -167,10 +177,17 @@ export function urlBox(box?: Box, draw?: Draw, event?: TEvent, scroll?: boolean)
     if (!draw) {
         draw = selection.draw; // reactive default value
     }
-    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`.replace(/\/+$/, '');
+
+    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`.replace(/\/+$/, buildSearch());
 }
 
-export function urlPlace(place?: Place) {
-    return `/planning/${encodeURIComponent(place?.name ?? '')}`.replace(/\/+$/, '');
+export function urlDay(day?: number) {
+    return `/planning/${day ?? ''}`.replace(/\/+$/, '');
 }
 
+/** return current searchParam string like `?day=2&player=345` if parameters are present or '' */
+function buildSearch(): string {
+    const [searchParams] = useSearchParams<Searchs>();
+    const search = new URLSearchParams(searchParams);
+    return search.entries().next() ? `?${search}` : '';
+}

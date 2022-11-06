@@ -1,16 +1,15 @@
 import { Component, For } from 'solid-js';
 import { PlayerIn, Draw, Match, ROUNDROBIN } from '../../domain/draw';
 import { mapBy } from '../../services/util/find';
-import { Player } from '../../domain/player';
-import { Place, TEvent } from '../../domain/tournament';
+import type { Player } from '../../domain/player';
+import type { TEvent, Tournament } from '../../domain/tournament';
 import './Draw.css';
 import { DrawBox } from './DrawBox';
 
 type Props = {
     event: TEvent,
     draw: Draw,
-    players: Player[],
-    places: Place[],
+    tournament: Tournament,
 }
 
 export const DrawRoundRobin: Component<Props> = (props) => {
@@ -50,7 +49,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
                 <td class="w-32"></td>
                 <For each={rows()}>{(row) =>
                     <td class="w-32">
-                        <DrawBox box={boxes().get(row[0])} players={props.players}
+                        <DrawBox box={boxes().get(row[0])} players={props.tournament.players}
                             // if.bind="!simple"
                         />
                     </td>
@@ -65,7 +64,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
                 <tr class="h-8">
                     <For each={row}>{(col, iCol) =>
                         <td classList={{ diag: isDiag(col) }}>
-                            <DrawBox box={boxes().get(col)} players={props.players}
+                            <DrawBox box={boxes().get(col)} players={props.tournament.players}
                                 //  if.bind="!simple"
                             />
                         </td>

@@ -3,6 +3,7 @@ import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../../domai
 import { Player, Sexe } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
 import { ScoreString } from "../../domain/types";
+import { atMidnight, atZeroHour } from "../../utils/date";
 import { ASSERT } from "../../utils/tool";
 import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
@@ -115,7 +116,7 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     club: { type: "bstr", reviver: optionalString },
     registration: { type: "dword" },
     _partenaire: { version: 2, type: "word" },
-    avail: { version: 3, type(value, _, doc) {
+    avail: { version: 3, type(value, _, doc) { // TODO: { type: 'array', itemType: 'dword' }
         if (!this.writing) {
             const result = [];
             const nDay = this.word;
@@ -361,8 +362,8 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
                         const lib = drawLib(event as TEvent, draw);
                         draw.boxes.forEach((box) => {
                             if (isMatch(box)) {
-                                const opp = lib.boxesOpponents(box);
-                                if (!opp.box1 || !opp.box2) {
+                                const {player1, player2} = lib.boxesOpponents(box);
+                                if (!player1 || !player2) {
                                     delete (box as Partial<Match>).score; // not a match
                                 }
                             }
@@ -381,8 +382,8 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
     name: { type: "bstr" },
     _bEpreuve: { type: "byte", maxVersion: 5 },
     homologation: { type: "bstr", reviver: optionalString },
-    start: { maxVersion: 11, type: "date" },
-    end: { maxVersion: 11, type: "date" },
+    start: { maxVersion: 11, type: "date", reviver: (d) => atZeroHour(d) },
+    end: { maxVersion: 11, type: "date", reviver: (d) => atMidnight(d) },
     _isPlanning: { version: 7, type: "byte" },
     slotLength: { type: () => 90 }, // TODO
     club: {
@@ -417,8 +418,8 @@ export const docFields: Fields<Tournament> = {
             return t;
         },
     },
-    _start: { version: 12, type: "date", reviver:(d,p) => { p._start = d; } },
-    _end: { version: 12, type: "date", reviver:(d,p) => { p._end = d; } },
+    _start: { version: 12, type: "date", reviver:(d,p) => { p._start = atZeroHour(d); } },
+    _end: { version: 12, type: "date", reviver:(d,p) => { p._end = atMidnight(d); } },
 
     players: { type: "array", itemType: playerFields },
 
@@ -429,15 +430,17 @@ export const docFields: Fields<Tournament> = {
     places: {
         version: 4, type: "array", itemType: {
             name: { type: "bstr" },
-            _day: { type(value, f) {
-                if (!this.writing) {
-                    return [];
-                } else {
-                    // TODO
-                }
-            } }, // [0..MAX_JOUR]
+            // _day: { type(value, f) {
+            //     if (!this.writing) {
+            //         return [];
+            //     } else {
+            //         // TODO
+            //     }
+            // } }, // [0..MAX_JOUR]
             avail: { type(value, f) {
                 if (!this.writing) {
+                    // TODO Array(p.info._nDay)
+                    // this.dword; // TODO
                     return [];
                 } else {
                     // TODO
@@ -447,12 +450,12 @@ export const docFields: Fields<Tournament> = {
     },
     _content: { version: 5, type: "byte", def: 0 }, // Contenu { tournoi = 1, epreuve = 2, tableau = 3, boites  = 4, joueurs = 5 }
     '_courts.avail': {
-        version: 8, type(value, _, doc) {
+        version: 8, type(value, _, doc: Tournament & { _start?: Date, _end?: Date }) {
             if (!doc) { throw new Error("undefined doc"); }
             if (!this.writing) {
-                if (doc._start && doc._end) {
-                    doc._nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
-                    for (let i = 0; i < doc._nDay; i++) {
+                if (doc._start && doc._end && doc.places?.length) {
+                    const nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
+                    for (let i = 0; i < nDay; i++) {
                         for (const place of doc.places) {
                             let avail = this.dword;
                             if (doc.version! < 11) {
@@ -474,8 +477,8 @@ export const docFields: Fields<Tournament> = {
             if (!this.writing) {
 
                 if (p && !p.info.start) {
-                    p.info.start = p._start;
-                    p.info.end = p._end;
+                    p.info.start = atZeroHour(p._start);
+                    p.info.end = atMidnight(p._end);
                     delete p._start;
                     delete p._end;
                 }

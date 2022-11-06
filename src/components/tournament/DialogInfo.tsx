@@ -1,5 +1,6 @@
 import { Component, JSX, onMount, onCleanup, Show } from 'solid-js';
 import { TournamentInfo } from '../../domain/tournament';
+import { atMidnight, atZeroHour } from '../../utils/date';
 import { useForm } from '../util/useForm';
 
 const EMPTY: TournamentInfo = { name: '', slotLength: 90 };
@@ -57,8 +58,8 @@ export const DialogInfo: Component<Props> = (props) => {
         const result: TournamentInfo = {
             name: form.name.trim(),
 
-            start: form.start && new Date(form.start) || undefined,
-            end: form.end && new Date(form.end) || undefined,
+            start: form.start && atZeroHour(new Date(form.start)) || undefined,
+            end: form.end && atMidnight(new Date(form.end)) || undefined,
 
             slotLength: form.slotLength,
 

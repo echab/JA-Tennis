@@ -40,7 +40,8 @@ export const DialogMatch: Component<Props> = (props) => {
 
     const lib = drawLib(props.event, props.draw);
 
-    const {box1, box2} = lib.boxesOpponents(props.match);
+    // TODO aware1 and aware2 are into Match, not into boxesOpponents
+    const {player1: box1, player2: box2} = lib.boxesOpponents(props.match);
 
     const player1 = byId(props.players, box1.playerId);
     const player2 = byId(props.players, box2.playerId);

@@ -29,7 +29,7 @@ export interface IDrawLib {
     findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
 
     computeScore(): boolean; //CalculeScore
-    boxesOpponents(match: Match): { box1: Box; box2: Box };
+    boxesOpponents(match: Match): { player1: PlayerIn; player2: PlayerIn };
 
     isNewPlayer(box: Box): boolean;
 }

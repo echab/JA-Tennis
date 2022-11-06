@@ -45,7 +45,7 @@ export function updateEvent(
 }
 
 export function newEvent(parent: Tournament, source?: TEvent): TEvent {
-    const event: TEvent = {...source};
+    const event: TEvent = source ? {...source} as TEvent : {} as TEvent;
     event.id = event.id || Guid.create("e");
 
     initEvent(event, parent);

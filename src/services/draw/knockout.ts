@@ -512,13 +512,13 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    boxesOpponents(match: Match): { box1: PlayerIn|Match; box2: PlayerIn|Match } {
+    boxesOpponents(match: Match): { player1: PlayerIn; player2: PlayerIn } {
 
         const pos1 = positionOpponent1(match.position),
             pos2 = positionOpponent2(match.position);
         return {
-            box1: by(this.draw.boxes, 'position', pos1) as PlayerIn|Match,
-            box2: by(this.draw.boxes, 'position', pos2) as PlayerIn|Match
+            player1: by(this.draw.boxes, 'position', pos1) as PlayerIn,
+            player2: by(this.draw.boxes, 'position', pos2) as PlayerIn
         };
     }
 
@@ -532,16 +532,16 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             return false;
         }
         const boxIn = box as PlayerIn;
-        const opponents = this.boxesOpponents(box as Match);
+        const { player1, player2 } = this.boxesOpponents(box as Match);
         return !!box.playerId
             &&
             (
                 !!boxIn.qualifIn
                 ||
                 !(
-                    (opponents.box1 && opponents.box1.playerId)
+                    (player1?.playerId)
                     ||
-                    (opponents.box2 && opponents.box2.playerId)
+                    (player2?.playerId)
                 )
             );
     }

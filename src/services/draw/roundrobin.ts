@@ -35,13 +35,13 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    boxesOpponents(match: Match): { box1: Box; box2: Box } {
+    boxesOpponents(match: Match): { player1: PlayerIn; player2: PlayerIn } {
         const n = this.draw.nbColumn;
         const pos1 = seedPositionOpponent1(match.position, n),
             pos2 = seedPositionOpponent2(match.position, n);
         return {
-            box1: by(this.draw.boxes, 'position', pos1) as Box,
-            box2: by(this.draw.boxes, 'position', pos2) as Box
+            player1: by(this.draw.boxes, 'position', pos1) as PlayerIn,
+            player2: by(this.draw.boxes, 'position', pos2) as PlayerIn
         }
     }
 

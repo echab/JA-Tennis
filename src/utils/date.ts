@@ -18,3 +18,26 @@ export function reviver<T>(key: string, value: T): T {
     }
     return value;
 }
+
+/**
+ * Compare two dates without hour
+ */
+export function dateDiff(first: Date, second: Date, unit: typeof DAYS | typeof HOURS) {
+    return Math.floor((atZeroHour(second).getTime() - atZeroHour(first).getTime()) / unit);
+}
+
+/**
+ * @returns the `date` at 0h, without the time.
+ */
+export function atZeroHour(date: Date): Date {
+    // copy date parts of the timestamps, discarding the time parts.
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+/**
+ * @returns the `date` at 23h59:59.
+ */
+export function atMidnight(date: Date): Date {
+    // copy date parts of the timestamps, discarding the time parts.
+    return  new Date(atZeroHour(date).getTime() + DAYS - 1);
+}
