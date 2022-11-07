@@ -4,7 +4,7 @@ import { Player } from "../../domain/player";
 import { Place } from "../../domain/tournament";
 import { matchesByDays } from "../../services/planningService";
 import { defined } from "../../services/util/object";
-import { DAYS } from "../../utils/date";
+import { DAYS, minutes } from "../../utils/date";
 import { Params, Searchs } from "../App";
 import { showDialog } from "../Dialogs";
 import { selection, selectDay, urlDay, selectPlace } from "../util/selection";
@@ -100,12 +100,13 @@ export const Planning: Component<Props> = (props) => {
             </Show>
         </div>
 
-        <ul class="pb-2 grid grid-rows-[12] gap-[2px]"
+        <ul class="grid gap-[2px]"
             style={{
+                'grid-template-rows': `[place] 1em repeat(${(hours.length + 1) * 12}, 1px`,
                 'grid-template-columns': `[hour] 2em repeat(${props.places.length + 1}, minmax(5em, 1fr))`
             }} >
             <For each={props.places}>{(place, i) =>
-                <li class='row-start-1' style={{
+                <li class='row-[place]' style={{
                     'grid-column-start': i() + 2
                 }}>
                     <i class="icon2-info hover" onclick={[editPlace, place]} />
@@ -113,13 +114,17 @@ export const Planning: Component<Props> = (props) => {
                 </li>
             }</For>
             <For each={hours}>{(hour, i) =>
-                <li class='col-start-[hour] text-right align-top bg-slate-200' style={{ 'grid-row-start': i() + 2 }}>{hour}</li>
+                <li class='col-[hour] text-right align-top bg-slate-200'
+                    style={{
+                        'grid-row': `${2 + i() * 12}/span 12`,
+                    }}
+                >{hour}</li>
             }</For>
 
             <For each={daySlots()}>{(slot) =>
                 <PlanningSlot slot={slot} players={selection.tournament.players} style={{
-                    'grid-column-start': 2 + (slot.match.place ?? props.places.length),
-                    'grid-row-start': 2,
+                    'grid-column': 2 + (slot.match.place ?? props.places.length),
+                    'grid-row': `${2 + Math.round( ((minutes(slot.match.date) ?? hourEnd * 60) - hourStart * 60)/ 5)}/span 18`,
                 }} />
             }</For>
         </ul>

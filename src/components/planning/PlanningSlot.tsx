@@ -54,8 +54,8 @@ export const PlanningSlot: Component<Props> = (props) => {
         <SlotPlayer qualifIn={player1?.qualifIn} player={p1} aware={match.aware1} />
         <br />
         <SlotPlayer qualifIn={player2?.qualifIn} player={p2} aware={match.aware2} />
-        <br/>
-        {match.date?.toLocaleTimeString(undefined, {timeStyle: 'short'})}
+        <br />
+        {/* {match.date?.toLocaleTimeString(undefined, {timeStyle: 'short'})} */}
         {/* ({match.date!.toLocaleString()}) */}
         {/* {match.date!.toLocaleDateString()} */}
         {/* - {match.place} */}

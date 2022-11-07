@@ -59,3 +59,7 @@ export function dateTimeLocal(date?: Date | string): string | undefined {
     const time = date.toLocaleTimeString('en-GB', { timeStyle:'short' }); // 20:45
     return `${yyyy}-${MM}-${dd}T${time}`;
 }
+
+export function minutes(date?: Date): number | undefined {
+    return date ? date.getHours() * 60 + date.getMinutes() : undefined;
+}

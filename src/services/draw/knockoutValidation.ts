@@ -165,6 +165,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             && !boxIn.qualifIn
             && !box.hidden
         ) {
+            // TODO false positive for tournament1.jat
             result.push({ message: 'ERR_TAB_DUPLI', draw, box: boxIn, player });
         }
 

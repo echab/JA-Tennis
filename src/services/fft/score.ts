@@ -6,6 +6,7 @@ const reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
 export class ScoreFFT implements Score {
 
     isValid(score: string): boolean {
+        // TODO false negative for tournament1.jat
 
         const m = score.match(reScore);
         if (!m) {

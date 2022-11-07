@@ -35,6 +35,11 @@ i.glyphicon {
 }
 
 .crossed-out {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 100'%3E%3Cpath d='M0 0L500 100M0 100L500 0' stroke='gray' stroke-width='3' stroke-opacity='0.7'/%3E%3C/svg%3E");
+  background-position: center;
+  background-size: cover;
+}
+/* .crossed-out {
   position: relative;
   display: inline-block;
 }
@@ -57,7 +62,7 @@ i.glyphicon {
   border-bottom: 2px solid gray;
   -webkit-transform: skewY(20deg);
   transform: skewY(20deg);
-}
+} */
 
 /* dialog {
   color: --fore;
