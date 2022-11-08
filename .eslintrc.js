@@ -19,6 +19,7 @@ module.exports = {
     "plugins": [
         "@typescript-eslint"
     ],
+    "ignorePatterns": ["*.config.js", "*.config.ts", ".eslintrc.js"],
     "rules": {
 
         // List of [ESLint rules](https://eslint.org/docs/rules/)

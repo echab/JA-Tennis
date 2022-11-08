@@ -104,6 +104,7 @@ module.exports = {
   // A preset that is used as a base for Jest's configuration
   // preset: 'ts-jest',
   preset: 'solid-jest/preset/browser',
+  // preset: 'solid-jest/preset/node',
 
   // Run tests from one or more projects
   // projects: undefined,

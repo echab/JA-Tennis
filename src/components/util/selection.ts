@@ -1,4 +1,3 @@
-import { useSearchParams } from "@solidjs/router";
 import { createStore, produce } from "solid-js/store";
 import type { Box, Draw, Match, PlayerIn } from "../../domain/draw";
 import type { Player } from "../../domain/player";
@@ -6,7 +5,6 @@ import { DEFAULT_SLOT_LENGTH, Place, TEvent, Tournament } from "../../domain/tou
 import type { DrawProblem, PlayerProblem } from "../../domain/validation";
 import { groupFindQ } from "../../services/drawService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
-import type { Searchs } from "../App";
 
 export interface SelectionItems {
     tournament: Tournament;
@@ -187,7 +185,8 @@ export function urlDay(day?: number) {
 
 /** return current searchParam string like `?day=2&player=345` if parameters are present or '' */
 function buildSearch(): string {
-    const [searchParams] = useSearchParams<Searchs>();
+    // const [searchParams] = useSearchParams<Searchs>();
+    const searchParams = location.search;
     const search = new URLSearchParams(searchParams);
     return search.entries().next() ? `?${search}` : '';
 }
