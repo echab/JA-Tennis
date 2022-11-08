@@ -93,10 +93,17 @@ export class CategoryFFT implements Category {
         return ''; // never
     }
 
-    isCompatible(eventCategory: CategoryString, playerCategory: CategoryString): boolean {
+    isCompatible(eventCategory: number | CategoryString | undefined, playerCategory: number | CategoryString | undefined): boolean {
 
-        if (playerCategory || !eventCategory) {
+        if (playerCategory === undefined || eventCategory === undefined) {
             return true;
+        }
+
+        if (typeof eventCategory === 'number') {
+            eventCategory = this._categories[eventCategory];
+        }
+        if (typeof playerCategory === 'number') {
+            playerCategory = this._categories[playerCategory];
         }
 
         //TODO,2006/12/31: comparer l'age du joueur au 31 septembre avec la date de début de l'épreuve.

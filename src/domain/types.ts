@@ -4,7 +4,7 @@ export interface Category {
     //currentYear: number;    //public for Spec
     list(): CategoryString[];
     isValid(category: CategoryString): boolean;
-    isCompatible(eventCategory: CategoryString, playerCategory: CategoryString): boolean
+    isCompatible(eventCategory: number | CategoryString, playerCategory: number | CategoryString): boolean
     ofDate(date: Date): CategoryString;
     getAge(date: Date): number;
     compare(category1: CategoryString, category2: CategoryString): number;
