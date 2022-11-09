@@ -293,12 +293,19 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         }
         return result;
     },
-    set date(d) {
-        // TODO
-        this.byte = 0;
-        this.byte = 0;
-        this.byte = 0;
-        this.byte = 0;
+    set date(date) {
+        let day = 0, month = 0, year = 0;
+        if (typeof date === 'number') {
+            year = date;
+        } else if (date) {
+            day = date.getDate();
+            month = date.getMonth() + 1;
+            year = date.getFullYear();
+        }
+        this.byte = day + ((month & 0x7) << 5);
+        this.byte = month >> 3;
+        this.byte = year & 0xff;
+        this.byte = (year >> 8) & 0x7f;
     },
 
     get bstr() {

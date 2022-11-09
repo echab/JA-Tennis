@@ -40,17 +40,18 @@ export const jatFileType = {
     accept: { 'binary/x-jat': ['.jat'] }
 };
 
-const optionalString = (s: string | undefined) => s?.trim() || undefined;
+// const optionalString = (s: string | undefined) => s?.trim() || undefined;
+const optionalString = (s: string | undefined) => s || undefined; // TODO just for exact matching with .jat
 
 function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, c: T): T {
     // _rankAccept: { version: 2, maxVersion: 7, type: "byte", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     if (!this.writing) {
-        let c = this.byte;
+        const b = this.byte;
 
-        ASSERT(c === PAS_CLASSEMT || (MAXCLAST <= c && c <= NC));
+        ASSERT(b === PAS_CLASSEMT || (MAXCLAST <= b && b <= NC));
 
         // TODO by types, using this._curSexe and this._type.name
-        c = (c - 1) * 60;
+        let c = (b - 1) * 60;
         if (c === MAXCLAST - 60) {
             c = PAS_CLASSEMT;
         }
@@ -60,7 +61,12 @@ function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, 
     } else {
         const ranks = rank.list();
         const r = ranks.indexOf(c);
-        this.word = r;
+        let cc = (19 - r) * 60;
+        if (cc === PAS_CLASSEMT) {
+            cc = MAXCLAST - 60;
+        }
+        const b = cc / 60 + 1;
+        this.byte = b;
         return '' as T;
     }
 }
@@ -69,7 +75,7 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
     version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { type() { return String(this._arrayIndex); } },
-    sexe: { version: 4, type: "byte", replacer: (s, p) => "HFM".indexOf(p.sexe) | (p.teamIds ? EQUIPE_MASK : 0) }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+    sexe: { version: 4, type: "byte", replacer: (s, p: Player) => "HFM".indexOf(p.sexe) | (p.teamIds ? EQUIPE_MASK : 0) }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
     teamIds: {
         predicate: ({ sexe }) => sexe & EQUIPE_MASK,
         type: "arrayb", itemType: "word", valid: (a) => a.length <= 4,
@@ -110,10 +116,18 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     rank2: { type: rankFields },
     _bfRank: { version: 9, type: "byte", reviver: (v) => v || undefined },
     nationality: { version: 9, type: "bstr", reviver: optionalString },
-    _sexe: { maxVersion: 3, type: "byte", reviver: (sexe, p: Player) => { p.sexe = sexe; }, replacer: (s, p) => "HFM".indexOf(p.sexe) },
+    _sexe: { maxVersion: 3, type: "byte",
+        reviver: (sexe, p: Player) => { p.sexe = sexe; },
+        replacer: (s, p) => "HFM".indexOf(p.sexe)
+    },
     club: { type: "bstr", reviver: optionalString },
-    registration: { type: "dword" },
-    _partenaire: { version: 2, type: "word" },
+    registration: { type: "dword", replacer(
+        this: Serializer & { _playerRegs?: Record<string, number>},
+        reg, p: Player
+    ) {
+        return this._playerRegs?.[p.id];
+    } },
+    _partenaire: { version: 2, type: "word", replacer: () => 0xffff },
     avail: { version: 3, type(value, _, doc: Tournament) { // TODO: { type: 'array', itemType: 'dword' }
         if (!this.writing) {
             const result = [];
@@ -400,6 +414,20 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
 } as const;
 
 export const docFields: Fields<Tournament> = {
+    _init: {
+        type(
+            this: Serializer & { _playerRegs?: Record<string, number>},
+            value, _,
+            doc: Tournament & { _start?: Date, _end?: Date}
+        ) {
+            if (this.writing) {
+                const eventBits = Object.fromEntries(doc.events.map(({id}, i) => [id, 1 << i]));
+                this._playerRegs = Object.fromEntries(doc.players.map(({id, registration}) =>
+                    [id, registration.reduce((a,eventId) => a + eventBits[eventId], 0)]
+                ));
+            }
+        }
+    },
     version: { type: "byte", def: 13, valid: (v) => v <= 13, replacer: () => 13 },
     id: { version: 13, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     types: {
@@ -413,8 +441,14 @@ export const docFields: Fields<Tournament> = {
             return t;
         },
     },
-    _start: { version: 12, type: "date", reviver:(d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; } },
-    _end: { version: 12, type: "date", reviver:(d: Date | undefined, p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; } },
+    _start: { version: 12, type: "date",
+        reviver:(d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; },
+        replacer:(_, p: Tournament) => p.info.start
+    },
+    _end: { version: 12, type: "date",
+        reviver:(d: Date | undefined, p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; },
+        replacer:(_, p: Tournament) => p.info.end
+    },
 
     players: { type: "array", itemType: playerFields },
 
@@ -465,7 +499,11 @@ export const docFields: Fields<Tournament> = {
         }
     },
     _: {
-        type(value, _, doc: Tournament & { _start?: Date, _end?: Date}) {
+        type(
+            this: Serializer & { _playerRegs?: Record<string, number>},
+            value, _,
+            doc: Tournament & { _start?: Date, _end?: Date}
+        ) {
             if (!this.writing) {
 
                 if (!doc.info.start && doc._start) {
@@ -477,7 +515,6 @@ export const docFields: Fields<Tournament> = {
                     delete doc._end;
                 }
 
-                //convert players registration
                 doc.players.forEach((player: Player & { _teamName?: string }) => {
 
                     // compute team name
@@ -491,13 +528,12 @@ export const docFields: Fields<Tournament> = {
                         delete player._teamName;
                     }
 
+                    //convert players registration
                     const dw = player.registration as unknown as number;
                     player.registration = doc.events.map((event, i) =>
                         (dw & (1 << i)) ? event.id : undefined
                     ).filter((id): id is string => !!id);
                 })
-            } else {
-                // TODO
             }
         }
     }

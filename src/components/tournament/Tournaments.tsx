@@ -1,5 +1,6 @@
 import { A } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
+import { mockTournament } from "../../assets/data";
 import { openFile, saveFile } from "../../services/file/file";
 import { newTournament } from "../../services/tournamentService";
 import { showDialog } from "../Dialogs";
@@ -30,6 +31,11 @@ export const Tournaments: Component = () => {
         await saveFile(selection.tournament);
     };
 
+    const clearStorage = () => {
+        localStorage.removeItem('jat');
+        setTournaments([mockTournament]);
+    };
+
     const selectItem = (index: number) => {
     // move the selected tournament on top of the list
         setTournaments((ts) => {
@@ -51,6 +57,7 @@ export const Tournaments: Component = () => {
 
             <button type="button" onClick={loadFile} class="p-2 rounded-full">💾 Open file</button>
             <button type="button" onClick={saveTheFile} class="p-2 rounded-full">💾 Save file</button>
+            <button type="button" onClick={clearStorage} class="p-2 rounded-full">❌ Clear storage</button>
         </div>
 
         {/* TODO New, Recent, Load, Save, etc... */}

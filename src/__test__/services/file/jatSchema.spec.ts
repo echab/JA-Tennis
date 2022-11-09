@@ -35,6 +35,9 @@ describe("jatSchema", () => {
         ]
     };
 
+    const consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation();
+    // consoleWarnMock.mockRestore();
+
     it('should read binary tournament1.jat file version 13', async () => {
         const b = await readFile(`${__dirname}/tournament1.jat`);
         const buf = b.buffer;
