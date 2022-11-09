@@ -9,6 +9,7 @@ import { isSexeCompatible } from '../../services/tournamentService';
 import { rank, category } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
 import { byId } from '../../services/util/find';
+import { dateLocal } from '../../utils/date';
 import { IconSexe } from '../misc/IconSexe';
 import { urlPlayer } from '../util/selection';
 import { useForm } from '../util/useForm';
@@ -52,7 +53,7 @@ export const DialogPlayer: Component<Props> = (props) => {
             sexe: form.sexe,
             firstname: form.firstname?.trim() || undefined,
             rank: form.rank,
-            birth: form.birth && new Date(form.birth) || undefined,
+            birth: form.birth !== undefined ? typeof form.birth === 'number' ? form.birth : new Date(form.birth) : undefined,
             club: form.club?.trim() || undefined,
             licence: form.licence?.trim() || undefined,
             registration: getCheckboxes(formElems.registration),
@@ -157,8 +158,9 @@ export const DialogPlayer: Component<Props> = (props) => {
                     <fieldset class="border-2"><legend>General</legend>
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Birth:</label>
-                            <input name="birth" type="date" value={form.birth?.toISOString().substring(0, 10) ?? ''} onChange={updateField('birth')} class="p-1" />
-                            <span class="ml-2">{form.birth && category.ofDate(form.birth)}</span>
+                            {/* TODO? support year only */}
+                            <input name="birth" type="date" value={dateLocal(form.birth) ?? ''} onChange={updateField('birth')} class="p-1" />
+                            <span class="ml-2">{form.birth && category.ofDate(form.birth).name}</span>
                         </div>
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Club:</label>

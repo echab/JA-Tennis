@@ -1,7 +1,7 @@
 import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
 import { OptionalId } from '../../domain/object';
 import { TEvent } from '../../domain/tournament';
-import { RankString, CategoryString } from '../../domain/types';
+import { RankString } from '../../domain/types';
 import { deleteEvent } from '../../services/eventService';
 import { rank, category, matchFormat } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
@@ -33,7 +33,6 @@ export const DialogEvent: Component<Props> = (props) => {
     const { form, updateField } = useForm<OptionalId<TEvent>>(event ?? EMPTY);
 
     const ranks: RankString[] = rank.list();
-    const categories: CategoryString[] = category.list();
 
     const matchFormats = matchFormat.list();
 
@@ -142,7 +141,7 @@ export const DialogEvent: Component<Props> = (props) => {
                     <div class="mb-1">
                         <label for="category" class="inline-block w-3/12 text-right pr-3">Category:</label>
                         <select id="category" value={form.category} onChange={updateField('category')} class="w-3/12 p-1">
-                            <For each={categories}>{(cat, i) => <option value={i()}>{cat}</option>}</For>
+                            <For each={category.list()}>{({id, name}) => <option value={id}>{name}</option>}</For>
                         </select>
                     </div>
                     <div class="mb-1">

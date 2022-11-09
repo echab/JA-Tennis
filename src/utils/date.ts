@@ -60,6 +60,25 @@ export function dateTimeLocal(date?: Date | string): string | undefined {
     return `${yyyy}-${MM}-${dd}T${time}`;
 }
 
+/** @returns a date formatted `yyyy-mm-dd` compatible with `<input type="date-local" />` */
+export function dateLocal(date?: Date | string | number): string | undefined {
+    // return date?.toISOString().substring(0,8);
+    if (!date) {
+        return undefined;
+    }
+    if (typeof date === 'string') {
+        return date.substring(0,8);
+    }
+    if (typeof date === 'number') {
+        return String(date); // year only
+    }
+
+    const yyyy = date.toLocaleDateString(undefined, { year: "numeric" });
+    const MM = date.toLocaleDateString(undefined, { month: "2-digit" });
+    const dd = date.toLocaleDateString(undefined, { day: "2-digit" });
+    return `${yyyy}-${MM}-${dd}`;
+}
+
 export function minutes(date?: Date): number | undefined {
     return date ? date.getHours() * 60 + date.getMinutes() : undefined;
 }

@@ -1,13 +1,19 @@
-export type CategoryString = string;
+export type CategoryId = number;
 
 export interface Category {
     //currentYear: number;    //public for Spec
-    list(): CategoryString[];
-    isValid(category: CategoryString): boolean;
-    isCompatible(eventCategory: number | CategoryString, playerCategory: number | CategoryString): boolean
-    ofDate(date: Date): CategoryString;
-    getAge(date: Date): number;
-    compare(category1: CategoryString, category2: CategoryString): number;
+    list(): Array<{id: number, name: string}>;
+    name(category: CategoryId): string;
+    isValid(category: CategoryId): boolean;
+    isCompatible(eventCategory: CategoryId, playerCategory: CategoryId): boolean
+
+    /** @param date or year */
+    ofDate(date: Date | number): {id: CategoryId, name: string};
+
+    /** @param date or year */
+    getAge(date: Date | number): number;
+
+    compare(category1: CategoryId, category2: CategoryId): number;
 }
 
 export interface Licence {

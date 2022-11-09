@@ -64,6 +64,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
         const qualifOuts = findGroupQualifOuts(event, group).map(([q]) => q).sort((a, b) => a - b).filter((q) => q !== QEMPTY);
         if (qualifOuts.length) {
             const missing: string[] = [];
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (let e = 1; e <= qualifOuts.at(-1)!; e++) {
                 if (!qualifOuts.includes(e)) {
                     missing.push(`Q${e}`);
@@ -212,7 +213,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             //DONE 00/05/11: CTableau, check categorie
             //Check Categorie
             if (player.category && !category.isCompatible(event.category, player.category)) {
-                result.push({ message: 'ERR_CATEG_MIS', draw, box: boxIn, player, detail:player.category });
+                result.push({ message: 'ERR_CATEG_MIS', draw, box: boxIn, player, detail:category.name(player.category) });
             }
         }
 

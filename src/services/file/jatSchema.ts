@@ -9,7 +9,7 @@ import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
 import { isMatch } from "../drawService";
 import { ranksName } from "../tournamentService";
-import { licence, rank } from "../types";
+import { category, licence, rank } from "../types";
 import { byId, indexOf } from "../util/find";
 import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
 
@@ -39,12 +39,6 @@ export const jatFileType = {
     description: 'JA-Tennis document',
     accept: { 'binary/x-jat': ['.jat'] }
 };
-
-const categoryFFT = [
-    10, 17, 24, 30, 50, 60, 64, 70, 80, 90, 100,
-    110,
-    120, 125, 130, 140, 150, 160, 170, 180, 190
-];
 
 const optionalString = (s: string | undefined) => s?.trim() || undefined;
 
@@ -98,10 +92,11 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     phone2: { type: "bstr", reviver: optionalString },
     email: { version: 5, type: "bstr", reviver: optionalString },
     birth: {
-        type: "date", reviver: (d, p: Player) => {
+        type: "date", reviver: (d: Date | number | undefined, p: Player) => {
             // TODO: compute Categorie from birthDate
-            const age = d && Math.round(new Date().getFullYear() - (typeof d === 'string' ? +d : d.getFullYear()));
-            p.category = age && `categ${age}`;
+            // const age = d && Math.round(new Date().getFullYear() - (typeof d === 'string' ? +d : d.getFullYear()));
+            // p.category = age && `categ${age}`;
+            p.category = d ? category.ofDate(d).id : undefined;
             return d;
         }
     },
@@ -326,15 +321,16 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
     },
     _categ3: { maxVersion: 3, type: "byte", reviver: (b) => [0, 1, 2, 3, 5, 7, 9, 11, 12, 13, 15, 17, 18][b], valid: () => false },
     _categ7: { maxVersion: 6, type: "byte", reviver: (b) => b * 10, valid: () => false },
-    category: {
-        version: 7, type: "byte", reviver(this: Serializer & { _type?: { name: string } }, b) {
-            if (this._type?.name === "FFT") {
-                return categoryFFT.indexOf(b);
-            }
-            // TODO, from .ini, by types
-            return -1; // `category${b}`;
-        }
-    },
+    category: { version: 7, type: "byte" },
+    // category: {
+    //     version: 7, type: "byte", reviver(this: Serializer & { _type?: { name: string } }, b) {
+    //         if (this._type?.name === "FFT") {
+    //             return categoryFFT.indexOf(b);
+    //         }
+    //         // TODO, from .ini, by types
+    //         return -1; // `category${b}`;
+    //     }
+    // },
     _bDouble: { type: "byte" },
     _rankAccept: { version: 2, maxVersion: 7, type: "byte", reviver: (c, p: FieldParent<TEvent>) => { p.maxRank = p.version && p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     maxRank: { version: 8, type: rankFields }, // TODO use version of FFT types instead of tableau.version
@@ -381,8 +377,8 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
     name: { type: "bstr" },
     _bEpreuve: { type: "byte", maxVersion: 5 },
     homologation: { type: "bstr", reviver: optionalString },
-    start: { maxVersion: 11, type: "date", reviver: (d) => atZeroHour(d) },
-    end: { maxVersion: 11, type: "date", reviver: (d) => atMidnight(d) },
+    start: { maxVersion: 11, type: "date", reviver: (d: Date | undefined) => d ? atZeroHour(d) : undefined },
+    end: { maxVersion: 11, type: "date", reviver: (d: Date | undefined) => d ? atMidnight(d) : undefined },
     _isPlanning: { version: 7, type: "byte" },
     slotLength: { type: () => 90 }, // TODO
     club: {
@@ -417,8 +413,8 @@ export const docFields: Fields<Tournament> = {
             return t;
         },
     },
-    _start: { version: 12, type: "date", reviver:(d,p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; } },
-    _end: { version: 12, type: "date", reviver:(d,p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; } },
+    _start: { version: 12, type: "date", reviver:(d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; } },
+    _end: { version: 12, type: "date", reviver:(d: Date | undefined, p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; } },
 
     players: { type: "array", itemType: playerFields },
 

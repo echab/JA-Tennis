@@ -1,6 +1,6 @@
 import type { Draw, Match, PlayerIn } from "./draw";
 import type { Player, SexeString } from "./player";
-import type { RankString } from "./types";
+import type { CategoryId, RankString } from "./types";
 
 export interface Tournament {
     version: number; // 13
@@ -66,7 +66,7 @@ export interface TEvent {
     typeDouble?: boolean;
     sexe: SexeString;
 
-    category: number; // CategoryString;
+    category: CategoryId;
     maxRank: RankString;
 
     consolation?: boolean;

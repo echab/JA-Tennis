@@ -35,7 +35,7 @@ export type Fields<T extends { version?: number }> = { [P in keyof T]: Field<T[P
 const wBigObjectTag = 0x7fff;
 const wClassTag = 0x8000;
 const wNewClassTag = 0xffff;
-const dwBigClassTag = 0x80000000;
+// const dwBigClassTag = 0x80000000;
 
 export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     writing: false,
@@ -151,7 +151,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     },
     readObject<T extends { version?: number }>(
         fields: Fields<T>,
-        parentVersion: number = NaN
+        parentVersion = NaN
     ): T {
         this.writing = false;
         const result = { version: parentVersion }; // by default, inherit version from parent
@@ -281,7 +281,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             if (year === 0) {
                 return undefined;
             }
-            return year.toString();
+            return year;
         }
         // validate date
         const result = new Date(year, month - 1, day, 12, 0, 0, 0);
@@ -328,10 +328,12 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     get generateId() {
         return generateId();
     },
-    set generateId(id) { },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    set generateId(id) {},
 
     get customData() { return; },
-    set customData(d) { },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    set customData(d) {},
 
     get schema() {
         // https://learn.microsoft.com/en-us/cpp/mfc/tn002-persistent-object-data-format?view=msvc-170

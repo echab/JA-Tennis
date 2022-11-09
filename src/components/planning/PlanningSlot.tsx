@@ -18,7 +18,7 @@ const SlotPlayer: Component<PlayerProps> = (props) => <>
         'icon2-responder': props.aware === 1,
         'icon2-aware': props.aware === 2,
     }} />
-    {props.qualifIn !== undefined ? `Q${props.qualifIn > 0 ? props.qualifIn : ''} ` : ''}
+    {/* {props.qualifIn !== undefined ? `Q${props.qualifIn > 0 ? props.qualifIn : ''} ` : ''} */}
     {props.player ? `${props.player.name} ${props.player.firstname?.[0] ?? ''}` : ''}
     <Show when={props.player}>
         <i class="icon2-player hover cursor-pointer" title={`Edit the ${props.player?.teamIds ? 'team' : 'player'}`}

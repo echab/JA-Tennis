@@ -1,4 +1,5 @@
 ﻿import { Coordinates } from "./tournament";
+import { CategoryId, RankString } from "./types";
 
 export type Id = string;
 
@@ -12,15 +13,15 @@ export type Player = {
     name: string;
     firstname?: string;
     sexe: SexeString;
-    birth?: Date;
-    category?: string; // TODO? number?
+    birth?: Date | number;
+    category?: CategoryId;
     club?: string;
     licence?: string;
     nationality?: string;
     external?: boolean;   //TODO FFT extent
     assimilated?: boolean;    //TODO FFT extent
-    rank: string;
-    rank2?: string;
+    rank: RankString;
+    rank2?: RankString;
 
     //Registrations
     registration: string[]; //TEvent ids
