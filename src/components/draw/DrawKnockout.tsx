@@ -11,6 +11,7 @@ import { isMatch } from '../../services/drawService';
 import { columnMax, columnMin, countInCol, positionTopCol } from '../../services/draw/knockoutLib';
 import { dayOf } from '../../services/planningService';
 import './Draw.css';
+import { drawLib } from '../../services/draw/drawLib';
 
 type Props = {
     event: TEvent,
@@ -52,6 +53,16 @@ export const DrawKnockout: Component<Props> = (props) => {
         return result;
     }
 
+    // for VainDef, retreive the name of the winner
+    const lib = () => drawLib(props.event, props.draw);
+    const otherName = (match?: Match) => {
+        if (!match) { return ''; }
+        const { player1, player2 } = lib().boxesOpponents(match);
+        const otherId = match.playerId ? match.playerId === player1.playerId ? player2.playerId : player1.playerId : undefined;
+        const otherPlayer = otherId ? byId(props.tournament.players, otherId) : undefined;
+        return otherPlayer ? `${otherPlayer.name} ${otherPlayer.firstname?.[0] ?? ''}` : '';
+    };
+
     return <table class="tableau">
         <tbody>
             <For each={lignes()}>{(l) =>
@@ -78,9 +89,13 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     <Show when={box?.order && box.order > 0}><small class="pr-1">{box!.order}</small></Show>
                                     <Show when={box && isMatch(box)}><small class="pr-1">m</small></Show>
 
-                                    <span class="nom">{player?.name}
-                                        <Show when={box?.order && box.order > 0}> {player?.firstname}</Show>
-                                    </span>
+                                    <Show when={box?.vainqDef} fallback={
+                                        <span class="nom">{player?.name}
+                                            <Show when={box?.order && box.order > 0}> {player?.firstname}</Show>
+                                        </span>
+                                    }>
+                                        <span class="nom inline-block border-l-2 border-gray-500 ml-2 pl-1">{player?.name} requalified<br />{otherName(box)} withdraws</span>
+                                    </Show>
                                     {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.order && box.order > 0 && player?.rank}><span class="classement">{player!.rank}</span></Show>
                                     {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
@@ -118,7 +133,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                                 }}
                                             />
                                         </Show>
-                                        <Show when={box?.score} fallback={
+                                        <Show when={box?.score || box?.wo} fallback={
                                             <>
                                                 {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                                 <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
@@ -126,7 +141,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                                 <Show when={box?.place !== undefined}> <span class="place">{props.tournament.places?.[box!.place!]?.name ?? ''}</span></Show>
                                             </>
                                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                        }><span class="score">{box!.score}</span></Show>
+                                        }><span class="score">{`${box!.score}${box?.wo ? ' WO' : ''}`}</span></Show>
 
                                         <Show when={isRight && props.draw.type !== FINAL}>
                                             <i class="icon2-qualif-out hover" title="Edit qualified out"

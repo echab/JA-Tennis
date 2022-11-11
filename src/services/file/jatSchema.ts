@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../../domain/draw";
+import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn, QEMPTY, ROUNDROBIN } from "../../domain/draw";
 import { Player, SexeString, Team } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
 import { ScoreString } from "../../domain/types";
@@ -8,9 +8,9 @@ import { ASSERT } from "../../utils/tool";
 import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
 import { isMatch } from "../drawService";
-import { ranksName } from "../tournamentService";
+import { defaultDrawName } from "../tournamentService";
 import { category, licence, rank } from "../types";
-import { byId, indexOf } from "../util/find";
+import { by, byId, indexOf } from "../util/find";
 import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
 
 const DAY = 24 * 3600 * 1000; // YEAR = DAY * 365.25;
@@ -40,8 +40,8 @@ export const jatFileType = {
     accept: { 'binary/x-jat': ['.jat'] }
 };
 
-// const optionalString = (s: string | undefined) => s?.trim() || undefined;
-const optionalString = (s: string | undefined) => s || undefined; // TODO just for exact matching with .jat
+const optionalString = (s: string | undefined) => s?.trim() || undefined;
+// const optionalString = (s: string | undefined) => s || undefined; // TODO just for exact matching with .jat
 
 function buildTeamName(teamIds: string[], players: Player[]): string {
     return teamIds.map((id) => byId(players, id) ?? { name: `#${id}` } as Player)
@@ -74,11 +74,12 @@ function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, 
     }
 }
 
-const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
+const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
     version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { type() { return String(this._arrayIndex); } },
-    sexe: { version: 4, type: "byte", // 0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+    sexe: {
+        version: 4, type: "byte", // 0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
         reviver: (b: number, p: Player & { _sexe: number }) => {
             p._sexe = b;
             return "HFM"[b & ~EQUIPE_MASK] as SexeString;
@@ -94,15 +95,17 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
         reviver: (a: number[]) => a.map((playerId) => String(playerId)),
         replacer: (a?: string[]) => a?.map((playerId) => parseInt(playerId, 10))
     },
-    _teamName: { predicate: ({ _sexe }: { _sexe: number }) => _sexe & EQUIPE_MASK, type: "bstr",
-        reviver: (s: string, p: Player & {_teamName?: string}) => p._teamName = s || undefined,
+    _teamName: {
+        predicate: ({ _sexe }: { _sexe: number }) => _sexe & EQUIPE_MASK, type: "bstr",
+        reviver: (s: string, p: Player & { _teamName?: string }) => p._teamName = s || undefined,
         replacer(
-            this: Serializer & { _playerRegs?: Record<string, number>, _teamNames?: Record<string, string | undefined>},
+            this: Serializer & { _playerRegs?: Record<string, number>, _teamNames?: Record<string, string | undefined> },
             s: string, p: Player) {
             return p.teamIds && this._teamNames?.[p.id];
         },
     },
-    licence: { predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "dword",
+    licence: {
+        predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "dword",
         reviver: (l) => l ? `${String(l).padStart(7, '0')}${licence.getKey(String(l).padStart(7, '0')) ?? ''}` : undefined,
         replacer: (s) => s ? parseInt(s, 10) : 0
     },
@@ -132,7 +135,8 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     soldeCheque: { version: 10, type: "dword", def: 0, reviver: (v) => v || undefined },
     rank: { type: rankFields },
     rank2: { type: rankFields }, //, replacer: (v, p: Player) => p.teamIds ? -1 : v },
-    _bfRank: { version: 9, type: "byte", // 1=Etranger 2=Assimilé
+    _bfRank: {
+        version: 9, type: "byte", // 1=Etranger 2=Assimilé
         reviver: (v: number, p: Player) => {
             if (v & 1) { p.foreign = true; }
             if (v & 2) { p.assimilated = true; }
@@ -140,17 +144,20 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
         replacer: (_, p: Player) => (p.foreign ? 1 : 0) | (p.assimilated ? 2 : 0)
     },
     nationality: { version: 9, type: "bstr", reviver: optionalString },
-    _sexe: { maxVersion: 3, type: "byte",
+    _sexe: {
+        maxVersion: 3, type: "byte",
         reviver: (b: number, p: Player & { _sexe: number }) => { p.sexe = 'HFM'[b & ~EQUIPE_MASK] as SexeString; return b; },
         replacer: (_, p) => "HFM".indexOf(p.sexe)
     },
     club: { type: "bstr", reviver: optionalString },
-    registration: { type: "dword", replacer(
-        this: Serializer & { _playerRegs?: Record<string, number>},
-        reg, p: Player
-    ) {
-        return this._playerRegs?.[p.id];
-    } },
+    registration: {
+        type: "dword", replacer(
+            this: Serializer & { _playerRegs?: Record<string, number> },
+            reg, p: Player
+        ) {
+            return this._playerRegs?.[p.id];
+        }
+    },
     _partenaire: { version: 2, type: "word", replacer: () => 0xffff },
     avail: { version: 3, type: 'array', itemType: 'dword', replacer: (v) => v?.slice(0, MAX_JOUR) },
     comment: { version: 3, type: "bstr", reviver: optionalString },
@@ -167,82 +174,116 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     // TODO version:1 two additional "00 00" (pos 67 into jeu2test-3.jat) not read ?!?
 } as const;
 
-const scoreFields: FnType<ScoreString> = function(value: string) {
+const scoreFields: FnType<ScoreString> = function(value: string, f: any, p: PlayerIn & Match) {
     if (!this.writing) {
         const games = Array(5).fill(0).map(() => {
             const b = this.byte;
             return [b & 0xf, (b >> 4) & 0xf]; // {j1:4, j2:4}
-        }).filter(([g1,g2]) => g1 !== 0 || g2 !== 0)
-            .map(([g1,g2]) => `${g1}/${g2}`)
+        }).filter(([g1, g2]) => g1 !== 0 || g2 !== 0)
+            .map(([g1, g2]) => `${g1}/${g2}`)
             .join(' ');
         const flags = this.byte;
-        return `${games}${flags & 1 ? 'WO' : ''}${flags & 4 ? ' VD' : ''}`;
+        if (flags & 1) { p.wo = true; }
+        if (flags & 4) { p.vainqDef = true; }
+        return games; // `${games}${flags & 1 ? 'WO' : ''}${flags & 4 ? ' VD' : ''}`;
     } else {
-        const games = (value ?? '').replace(/WO|\s*VD/g, '').split(' ').map((game) => game.split('/').map((g) => parseInt(g,10)));
-        for (let i=0; i< 5; i++) {
-            const [g1,g2] = games[i] ?? [0,0];
+        const games = (value ?? '').replace(/WO|\s*VD/g, '').split(' ').map((game) => game.split('/').map((g) => parseInt(g, 10)));
+        for (let i = 0; i < 5; i++) {
+            const [g1, g2] = games[i] ?? [0, 0];
             this.byte = g1 & 0xf | (g2 & 0xf) << 4;
         }
-        const flags = (value?.match(/WO/) ? 1 : 0) | (value?.match(/VD/) ? 4 : 0)
+        // const flags = (value?.match(/WO/) ? 1 : 0) | (value?.match(/VD/) ? 4 : 0)
+        const flags = (p.wo ? 1 : 0) | (p.vainqDef ? 4 : 0)
         this.byte = flags;
         return '';
     }
 };
 
-const boxFields: Fields<PlayerIn & Match & {version: number}> = {
+const boxFields: Fields<PlayerIn & Match & { version: number }> = {
     _schema: { type: "schema", valid: (s) => s === 'CBoite', replacer: () => 'CBoite' },
     version: { type: "byte", def: 4, valid: (v) => v <= 4, replacer: () => 4 },
-    position: { type() { return this._arrayIndex; }},
+    position: { type() { return this._arrayIndex; } },
     playerId: {
-        type: "i16", reviver: (id) => id === -1 ? undefined : String(id)
+        type: "i16",
+        reviver: (id: number) => id === -1 ? undefined : String(id),
+        replacer: (id?: string) => id === undefined ? -1 : parseInt(id, 10),
     },
     score: { type: scoreFields },
-    _flags: { type: "word", reviver: (f, p: PlayerIn & Match) => {
-        if (f & 1) { p.hidden = true; }
-        const qualif = (f >> 1) & 0b11; //0=no, 1=Entrant,	2=Sortant,	3=T�teS�rie
-        const num = (f >> 3) & 0b11111;
-        switch (qualif) {
-            case 1: p.qualifIn = num || QEMPTY; break;
-            case 2: p.qualifOut = num || QEMPTY; break;
-            case 3: p.seeded = num || QEMPTY; break;
+    _flags: {
+        type: "word",
+        reviver: (f: number, p: PlayerIn & Match) => {
+            if (f & 1) { p.hidden = true; }
+            const qualif = (f >> 1) & 0b11; //0=no, 1=Entrant,	2=Sortant,	3=T�teS�rie
+            const num = (f >> 3) & 0b11111;
+            switch (qualif) {
+                case 1: p.qualifIn = num || QEMPTY; break;
+                case 2: p.qualifOut = num || QEMPTY; break;
+                case 3: p.seeded = num || QEMPTY; break;
+            }
+            p.receive = ((f >> 8) & 0b1) ? 1 : 0;
+
+            p.aware1 = ((f >> 9) & 0b11) as (0 | 1 | 2);	//Le joueur1 est pr�venu (0=non, 1=r�p, 2=oui)
+            p.aware2 = ((f >> 11) & 0b11) as (0 | 1 | 2);	//Le joueur2 est pr�venu (0=non, 1=r�p, 2=oui)
+
+            p.matchFormat = f >> 13;
+
+            // cleanup default values
+            if (p.receive === 0) { delete p.receive; }
+            if (p.aware1 === 0) { delete p.aware1; }
+            if (p.aware2 === 0) { delete p.aware2; }
+            if (p.matchFormat === 0) { delete p.matchFormat; }
+        },
+        replacer: (f: number, p: PlayerIn & Match) => {
+            let result = f;
+            if (p.hidden) { result |= 1; }
+            if (p.qualifIn !== undefined) { result |= (1 << 1) | (p.qualifIn << 3); }
+            if (p.qualifOut !== undefined) { result |= (2 << 1) | (p.qualifOut << 3); }
+            if (p.seeded !== undefined) { result |= (3 << 1) | (p.seeded << 3); }
+            if (p.receive) { result |= (1 << 8); }
+            if (p.aware1) { result |= (p.aware1 << 9); }
+            if (p.aware2) { result |= (p.aware2 << 11); }
+            if (p.matchFormat !== undefined) { result |= p.matchFormat << 13; }
+            return result;
         }
-        p.receive = ((f >> 8) & 0b1) ? 1 : 0;
-
-        p.aware1 = ((f >> 9) & 0b11) as (0|1|2);	//Le joueur1 est pr�venu (0=non, 1=r�p, 2=oui)
-        p.aware2 = ((f >> 11) & 0b11) as (0|1|2);	//Le joueur2 est pr�venu (0=non, 1=r�p, 2=oui)
-
-        p.matchFormat = f >> 13;
-
-        // return f & 0x1FFF;
-        return undefined;
-    }},
+    },
     date: { type: "date" },
     _hour: {
-        type: "word", reviver: (h, p: FieldParent<Match>) => {
+        type: "word",
+        reviver: (h: number | undefined, p: FieldParent<Match>) => {
             if (p.date && h !== undefined) {
                 p.date.setHours(Math.trunc(h / 60), Math.trunc(h % 60));
             }
             return undefined;
+        },
+        replacer: (h: number | undefined, p: FieldParent<Match>) => {
+            return p.date ? p.date.getHours() * 60 + p.date.getMinutes() : 0;
         }
     },
     order: {
         type: "i16", reviver: (o, p: PlayerIn) => {
             if (o > 0) { // first appearance
-                delete (p as Partial<Match>).score;
+                delete (p as Partial<Match>).score; // it's not a match
             }
             return o;
         },
     },
-    place: { version: 2, type: "i16", reviver: (c, p: FieldParent<Match>) => (c !== -1 && p.version && p.version > 2 ? c : undefined) },
+    place: {
+        version: 2, type: "i16",
+        reviver: (c: number) => c !== -1 ? c : undefined,
+        replacer: (c: number | undefined) => c === undefined ? -1 : c
+    },
     note: { version: 4, type: "bstr", reviver: optionalString },
 } as const;
 
-const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
+const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
     _schema: { type: "schema", valid: (s) => s === 'CTableau', replacer: () => 'CTableau' },
-    version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10},
+    version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { version: 10, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p: Draw) => { p.name = s; } },
-    name: { version: 5, type: "bstr", reviver: (s) => s?.trim() },
+    name: { version: 5, type: "bstr",
+        reviver: (s: string) => s.trim(),
+        replacer: (s: string | undefined, p: Draw) => s !== defaultDrawName(p) ? s : undefined
+    },
     nbColumn: { type: "byte", valid: (n) => MIN_COL <= n }, // MAX_COL depends on type
     nbOut: { type: "byte" },
     type: {
@@ -258,15 +299,23 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     dateMaj: { type: "date" },
 
     boxes: {
-        type: "array", itemType: boxFields, reviver: (b, p: Draw) => {
+        type: "array", itemType: boxFields,
+        reviver: (b: Array<PlayerIn | Match>, p: Draw) => {
             const posMin = positionMin(p.nbOut), posMax = positionMax(p.nbColumn, p.nbOut);
-            return b.filter((o: Box) => !(p.type === KNOCKOUT || p.type === FINAL)
+            return b.filter((o) => !(p.type === KNOCKOUT || p.type === FINAL)
                 || (posMin <= o.position && o.position <= posMax
                     && o.position >= positionBottomCol(column(o.position), p.nbOut))
             );
-        }
+        },
+        replacer: (b: Array<PlayerIn | Match> | undefined, p: Draw) => {
+            const nBox = p.type & ROUNDROBIN ? p.nbColumn * (p.nbColumn + 1) : positionMax(p.nbColumn, p.nbOut) + 1;
+            return Array(nBox).fill(0).map((_, i) => {
+                const box = b && by(b, 'position', i);
+                return box ?? { position: i };
+            });
+        },
     },
-    lock: { version: 4, type: "byte", def: 0, reviver:(l) => l || undefined },
+    lock: { version: 4, type: "byte", def: 0, reviver: (l) => l || undefined },
     _lock: { maxVersion: 1, type: "byte", reviver: (b, p: Box) => { if (b) { p.locked = b; } } },
     orientation: { type: "byte" },
     _minRank: { maxVersion: 7, type: "byte" }, // TODO
@@ -279,11 +328,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
         type(value, _, p: Draw) {
             if (!this.writing) {
                 if (!p.name) {
-                    if (p.type === FINAL) {
-                        p.name = "Final draw";
-                    } else {
-                        p.name = ranksName(p.minRank, p.maxRank);
-                    }
+                    p.name = defaultDrawName(p);
                 }
 
                 // hide boxes on left off entering players
@@ -317,7 +362,7 @@ const drawFields: Fields<Draw & {version: number, dateMaj: Date}> = {
     },
 } as const;
 
-const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
+const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
     _schema: { type: "schema", valid: (s) => s === 'CEpreuve', replacer: () => 'CEpreuve' },
     version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { version: 9, type: "word", def: generateId, reviver: (id) => id ? String(id) : generateId() },
@@ -360,14 +405,17 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
 
     draws: { type: "array", itemType: drawFields, valid: (a) => a.length <= 63 },
     matchFormat: { version: 4, type: "byte", reviver: (f) => f },
-    color: { version: 5, type: "dword", def: 0xFFFFFF, reviver: (c: number) => `#${(c).toString(16).padStart(6,'0').replace(/^(\d\d)(\d\d)(\d\d)$/, '$3$2$1')}` },
+    color: { version: 5, type: "dword", def: 0xFFFFFF,
+        reviver: (c: number) => `#${(c).toString(16).padStart(6, '0').replace(/^(\d\d)(\d\d)(\d\d)$/, '$3$2$1')}`,
+        replacer: (c?: string) => parseInt(c?.substring(1) ?? 'ffffff', 16),
+    },
     _: {
         type(this: Serializer & { _curSexe?: number }, value, _, event: TEvent) {
             if (!this.writing) {
                 delete this._curSexe; // clean-up
 
                 if (!event.name) {
-                    event.name = `${event.typeDouble ? 'Double ': 'Simple '}${{ H:'Messieurs', F:'Dames', M:'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
+                    event.name = `${event.typeDouble ? 'Double ' : 'Simple '}${{ H: 'Messieurs', F: 'Dames', M: 'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
                 }
 
                 // cleanup draws.boxes
@@ -375,7 +423,7 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
                     const lib = drawLib(event as TEvent, draw);
                     draw.boxes.forEach((box) => {
                         if (isMatch(box)) {
-                            const {player1, player2} = lib.boxesOpponents(box);
+                            const { player1, player2 } = lib.boxesOpponents(box);
                             if (!player1 || !player2) {
                                 delete (box as Partial<Match>).score; // not a match
                             }
@@ -419,19 +467,19 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
 export const docFields: Fields<Tournament> = {
     _init: {
         type(
-            this: Serializer & { _playerRegs?: Record<string, number>, _teamNames?: Record<string, string | undefined>},
+            this: Serializer & { _playerRegs?: Record<string, number>, _teamNames?: Record<string, string | undefined> },
             value, _,
-            doc: Tournament & { _start?: Date, _end?: Date}
+            doc: Tournament & { _start?: Date, _end?: Date }
         ) {
             if (this.writing) {
                 // compute team name
                 this._teamNames = Object.fromEntries(doc.players.filter((p): p is Team => !!p.teamIds)
-                    .map(({id, teamIds, name}) => [id, name !== buildTeamName(teamIds, doc.players) ? name : undefined ]));
+                    .map(({ id, teamIds, name }) => [id, name !== buildTeamName(teamIds, doc.players) ? name : undefined]));
 
                 // compute registration
-                const eventBits = Object.fromEntries(doc.events.map(({id}, i) => [id, 1 << i]));
-                this._playerRegs = Object.fromEntries(doc.players.map(({id, registration}) =>
-                    [id, registration.reduce((a,eventId) => a + eventBits[eventId], 0)]
+                const eventBits = Object.fromEntries(doc.events.map(({ id }, i) => [id, 1 << i]));
+                this._playerRegs = Object.fromEntries(doc.players.map(({ id, registration }) =>
+                    [id, registration.reduce((a, eventId) => a + eventBits[eventId], 0)]
                 ));
             }
         }
@@ -449,13 +497,15 @@ export const docFields: Fields<Tournament> = {
             return t;
         },
     },
-    _start: { version: 12, type: "date",
-        reviver:(d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; },
-        replacer:(_, p: Tournament) => p.info.start
+    _start: {
+        version: 12, type: "date",
+        reviver: (d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; },
+        replacer: (_, p: Tournament) => p.info.start
     },
-    _end: { version: 12, type: "date",
-        reviver:(d: Date | undefined, p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; },
-        replacer:(_, p: Tournament) => p.info.end
+    _end: {
+        version: 12, type: "date",
+        reviver: (d: Date | undefined, p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; },
+        replacer: (_, p: Tournament) => p.info.end
     },
 
     players: { type: "array", itemType: playerFields },
@@ -474,19 +524,21 @@ export const docFields: Fields<Tournament> = {
             //         // TODO
             //     }
             // } }, // [0..MAX_JOUR]
-            avail: { type(value, f) {
-                if (!this.writing) {
-                    // TODO Array(p.info._nDay)
-                    // this.dword; // TODO
-                    return [];
-                } else {
-                    // TODO
+            avail: {
+                type(value, f) {
+                    if (!this.writing) {
+                        // TODO Array(p.info._nDay)
+                        // this.dword; // TODO
+                        return [];
+                    } else {
+                        // TODO
+                    }
                 }
-            } }, // [0..MAX_JOUR]
+            }, // [0..MAX_JOUR]
         }
     },
-    _content: { version: 5, type: "byte", def: 0 }, // Contenu { tournoi = 1, epreuve = 2, tableau = 3, boites  = 4, joueurs = 5 }
-    '_courts.avail': {
+    _content: { version: 5, type: "byte", def: 1, replacer: () => 1 }, // Contenu { tournoi = 1, epreuve = 2, tableau = 3, boites  = 4, joueurs = 5 }
+    '_places.avail': {
         version: 8, type(value, _, doc: Tournament & { _start?: Date, _end?: Date }) {
             if (!this.writing) {
                 if (doc._start && doc._end && doc.places?.length) {
@@ -502,15 +554,22 @@ export const docFields: Fields<Tournament> = {
                     }
                 }
             } else {
-                // TODO
+                if (doc.info.start && doc.info.end && doc.places?.length) {
+                    const nDay = Math.floor((doc.info.end.getTime() - doc.info.start.getTime()) / DAY) + 1;
+                    for (let i = 0; i < nDay; i++) {
+                        for (const place of doc.places) {
+                            this.dword = place.avail[i];
+                        }
+                    }
+                }
             }
         }
     },
     _: {
         type(
-            this: Serializer & { _playerRegs?: Record<string, number>},
+            this: Serializer & { _playerRegs?: Record<string, number> },
             value, _,
-            doc: Tournament & { _start?: Date, _end?: Date}
+            doc: Tournament & { _start?: Date, _end?: Date }
         ) {
             if (!this.writing) {
 

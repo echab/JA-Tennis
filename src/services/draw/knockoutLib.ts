@@ -11,13 +11,13 @@ export function column(pos: number): number {    //iCol
     return col;
 }
 
-export function columnMin(nQ?: number): number {   //iColMinQ
+export function columnMin(nQ = 1): number {   //iColMinQ
     return !nQ || nQ === 1
         ? 0
         : column(nQ - 2) + 1;
 }
 
-export function columnMax(nCol: number, nQ?: number): number { //iColMaxQ
+export function columnMax(nCol: number, nQ = 1): number { //iColMaxQ
     return !nQ || nQ === 1
         ? nCol - 1
         : column(nQ - 2) + nCol;
@@ -27,25 +27,25 @@ export function positionTopCol(col: number): number { // iHautCol
     return (1 << (col + 1)) - 2;
 }
 
-export function positionBottomCol(col: number, nQ?: number): number {  //iBasColQ
+export function positionBottomCol(col: number, nQ = 1): number {  //iBasColQ
     return !nQ || nQ === 1
         ? (1 << col) - 1    //iBasCol
         : (positionTopCol(col) - countInCol(col, nQ) + 1);
 }
 
-export function countInCol(col: number, nQ?: number): number { //nInColQ
+export function countInCol(col: number, nQ = 1): number { //nInColQ
     return !nQ || nQ === 1
         ? (1 << col)    //countInCol
         : nQ * countInCol(col - columnMin(nQ), 1);
 }
 
-export function positionMin(nQ?: number): number { //iBoiteMinQ
+export function positionMin(nQ = 1): number { //iBoiteMinQ
     return !nQ || nQ === 1
         ? 0
         : positionBottomCol(columnMin(nQ), nQ);
 }
 
-export function positionMax(nCol: number, nQ?: number): number {   //iBoiteMaxQ
+export function positionMax(nCol: number, nQ = 1): number {   //iBoiteMaxQ
     return !nQ || nQ === 1
         ? (1 << nCol) - 2  //iHautCol
         : positionTopCol(columnMax(nCol, nQ));

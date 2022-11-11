@@ -6,7 +6,7 @@ import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { RankString } from '../../domain/types';
 import { deleteDraw, groupDraw, groupFindAllPlayerOut } from '../../services/drawService';
-import { getRegisteredPlayers, ranksName } from '../../services/tournamentService';
+import { getRegisteredPlayers, defaultDrawName } from '../../services/tournamentService';
 import { rank } from '../../services/types';
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
@@ -88,7 +88,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
         let result: Array<OptionalId<Draw>> = [{
             id: form.id || undefined,
-            name: form.name.trim() || ranksName(form.minRank, form.maxRank),
+            name: form.name.trim() || defaultDrawName(form),
             type: form.type,
             cont: form.cont,
 
@@ -142,8 +142,8 @@ export const DialogDraw: Component<Props> = (props) => {
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
                         <input id="name" type="text" class="w-9/12 p-1"
                             autofocus
-                            placeholder={ranksName(form.minRank, form.maxRank)}
-                            value={form.name !== ranksName(form.minRank, form.maxRank) ? form.name : ''} onChange={updateField("name")} />
+                            placeholder={defaultDrawName(form)}
+                            value={form.name !== defaultDrawName(form) ? form.name : ''} onChange={updateField("name")} />
                         {/*<span class="error" show.bind="eventForm.name.$error.required">Required!</span> */}
                     </div>
 

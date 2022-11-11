@@ -33,13 +33,18 @@ export const DialogMatch: Component<Props> = (props) => {
 
     const { player1: box1, player2: box2 } = lib.boxesOpponents(props.match);
 
-    const player1 = byId(props.tournament.players, box1.playerId);
-    const player2 = byId(props.tournament.players, box2.playerId);
-
     const match: Match = { ...props.match }; // clone, without reactivity
     match.score ??= '';
 
+    const player1 = byId(props.tournament.players, box1.playerId);
+    const player2 = byId(props.tournament.players, box2.playerId);
+
     const { form, updateField } = useForm(match);
+
+    const otherPlayerId = (id: string) => id === box1.playerId ? box2.playerId : box1.playerId;
+    const winnerId = () => match.playerId
+        ? form.vainqDef ? otherPlayerId(match.playerId) : match.playerId
+        : '';
 
     const matchFormats = matchFormat.list();
 
@@ -55,7 +60,7 @@ export const DialogMatch: Component<Props> = (props) => {
             hidden: form.hidden,
             locked: form.locked,
 
-            playerId: form.playerId,
+            playerId: form.vainqDef ? otherPlayerId(form.playerId) : form.playerId,
 
             // Match:
             score: form.score.trim(),
@@ -98,7 +103,7 @@ export const DialogMatch: Component<Props> = (props) => {
                     <div class="mb-1">
                         <span class="inline-block w-3/12 text-right pr-3">Winner:</span>
                         <label><input type="radio" name="winner" class="p-1 mr-1" autofocus
-                            checked={form.playerId === player1?.id} value={player1?.id} onChange={updateField("playerId")}
+                            checked={winnerId() === player1?.id} value={player1?.id} onChange={updateField("playerId")}
                         />
                         {player1?.name} {player1?.rank}</label>
                         <br />
@@ -108,7 +113,7 @@ export const DialogMatch: Component<Props> = (props) => {
                             />None</label> */}
                         </span>
                         <label><input type="radio" name="winner" class="p-1 mr-1"
-                            checked={form.playerId === player2?.id} value={player2?.id} onChange={updateField("playerId")}
+                            checked={winnerId() === player2?.id} value={player2?.id} onChange={updateField("playerId")}
                         />
                         {player2?.name} {player2?.rank}</label>
                     </div>
@@ -123,8 +128,8 @@ export const DialogMatch: Component<Props> = (props) => {
 
                     <div class="mb-1">
                         <span class="inline-block w-3/12"></span>
-                        <label><input type="checkbox" checked={form.canceled} onChange={updateField("canceled")} /> Canceled</label>
-                        <label class="pl-3"><input type="checkbox" checked={form.vainqDef} onChange={updateField("vainqDef")} /> Vainqueur defaillant</label>
+                        <label><input type="checkbox" checked={form.canceled} onChange={updateField("canceled")} /> Gives up</label>
+                        <label class="pl-3"><input type="checkbox" checked={form.vainqDef} onChange={updateField("vainqDef")} /> Defaulting winner</label>
                     </div>
 
                     <fieldset class="border-2">

@@ -8,6 +8,7 @@ import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH } from "../doma
 import type { RankString } from "../domain/types";
 import type { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
+import { Draw, FINAL } from "../domain/draw";
 
 /** This function load tournament data from an url. */
 export async function load(file_url?: Blob | string): Promise<Tournament> {
@@ -181,6 +182,8 @@ export function isSexeCompatible(event: TEvent, sexe: string): boolean {
     (event.sexe === "M" && !event.typeDouble); //ou simple mixte
 }
 
-export function ranksName(minRank: RankString, maxRank: RankString): string {
-    return minRank === maxRank ? minRank : `${minRank} - ${maxRank}`;
+export function defaultDrawName({minRank, maxRank, type}: Pick<Draw, 'minRank' | 'maxRank' | 'type'>): string {
+    return type === FINAL
+        ? 'Final draw'
+        : minRank === maxRank ? minRank : `${minRank} - ${maxRank}`;
 }

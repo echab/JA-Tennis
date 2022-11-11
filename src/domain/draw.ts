@@ -48,8 +48,8 @@ export interface Match extends Box {
     wo?: boolean;
     qualifOut?: number;
 
-    canceled?: boolean;
-    vainqDef?: boolean; //TODO english
+    canceled?: boolean; // TODO english: gives up
+    vainqDef?: boolean; //TODO english: Defaulting winner
 
     //Planning
     place?: number;
