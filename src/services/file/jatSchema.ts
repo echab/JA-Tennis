@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../../domain/draw";
-import { Player, SexeString } from "../../domain/player";
+import { Player, SexeString, Team } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
 import { ScoreString } from "../../domain/types";
 import { atMidnight, atZeroHour } from "../../utils/date";
@@ -43,10 +43,16 @@ export const jatFileType = {
 // const optionalString = (s: string | undefined) => s?.trim() || undefined;
 const optionalString = (s: string | undefined) => s || undefined; // TODO just for exact matching with .jat
 
-function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, c: T): T {
+function buildTeamName(teamIds: string[], players: Player[]): string {
+    return teamIds.map((id) => byId(players, id) ?? { name: `#${id}` } as Player)
+        .map((p) => `${p.name} ${p?.firstname?.[0] ?? ''}`.trim())
+        .join(' / ');
+}
+
+function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, s: T): T {
     // _rankAccept: { version: 2, maxVersion: 7, type: "byte", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     if (!this.writing) {
-        const b = this.byte;
+        const b = this.i8;
 
         ASSERT(b === PAS_CLASSEMT || (MAXCLAST <= b && b <= NC));
 
@@ -60,14 +66,11 @@ function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, 
 
     } else {
         const ranks = rank.list();
-        const r = ranks.indexOf(c);
-        let cc = (19 - r) * 60;
-        if (cc === PAS_CLASSEMT) {
-            cc = MAXCLAST - 60;
-        }
+        const r = ranks.indexOf(s);
+        const cc = s === undefined ? PAS_CLASSEMT : (19 - r) * 60;
         const b = cc / 60 + 1;
-        this.byte = b;
-        return '' as T;
+        this.i8 = b;
+        return '' as T; // unused
     }
 }
 
@@ -75,21 +78,36 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     _schema: { type: "schema", valid: (s) => s === 'CJoueur', replacer: () => 'CJoueur' },
     version: { type: "byte", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { type() { return String(this._arrayIndex); } },
-    sexe: { version: 4, type: "byte", replacer: (s, p: Player) => "HFM".indexOf(p.sexe) | (p.teamIds ? EQUIPE_MASK : 0) }, //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
-    teamIds: {
-        predicate: ({ sexe }) => sexe & EQUIPE_MASK,
-        type: "arrayb", itemType: "word", valid: (a) => a.length <= 4,
-        reviver: (a: number[]) => {
-            return a.map((playerId) => String(playerId)); // playerId is converted to Player below
-        }
+    sexe: { version: 4, type: "byte", // 0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+        reviver: (b: number, p: Player & { _sexe: number }) => {
+            p._sexe = b;
+            return "HFM"[b & ~EQUIPE_MASK] as SexeString;
+        },
+        replacer: (s, p: Player & { _sexe: number }) => {
+            p._sexe = "HFM".indexOf(p.sexe) | (p.teamIds ? EQUIPE_MASK : 0);
+            return p._sexe;
+        },
     },
-    _teamName: { predicate: ({ sexe }) => sexe & EQUIPE_MASK, type: "bstr", reviver: (s: string, p: Player & {_teamName?: string}) => p._teamName = s || undefined },
-    licence: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "dword",
+    teamIds: {
+        predicate: ({ _sexe }: { _sexe: number }) => _sexe & EQUIPE_MASK,
+        type: "arrayb", itemType: "word", valid: (a) => a.length <= 4,
+        reviver: (a: number[]) => a.map((playerId) => String(playerId)),
+        replacer: (a?: string[]) => a?.map((playerId) => parseInt(playerId, 10))
+    },
+    _teamName: { predicate: ({ _sexe }: { _sexe: number }) => _sexe & EQUIPE_MASK, type: "bstr",
+        reviver: (s: string, p: Player & {_teamName?: string}) => p._teamName = s || undefined,
+        replacer(
+            this: Serializer & { _playerRegs?: Record<string, number>, _teamNames?: Record<string, string | undefined>},
+            s: string, p: Player) {
+            return p.teamIds && this._teamNames?.[p.id];
+        },
+    },
+    licence: { predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "dword",
         reviver: (l) => l ? `${String(l).padStart(7, '0')}${licence.getKey(String(l).padStart(7, '0')) ?? ''}` : undefined,
         replacer: (s) => s ? parseInt(s, 10) : 0
     },
-    name: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr" },
-    firstname: { predicate: ({ sexe }) => !(sexe & EQUIPE_MASK), type: "bstr", reviver: optionalString },
+    name: { predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "bstr" },
+    firstname: { predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "bstr", reviver: optionalString },
     adress1: { type: "bstr", reviver: optionalString },
     adress2: { type: "bstr", reviver: optionalString },
     zipCode: { type: "bstr", reviver: optionalString },
@@ -113,12 +131,18 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
     soldeEspece: { version: 10, type: "dword", def: 0, reviver: (v) => v || undefined },
     soldeCheque: { version: 10, type: "dword", def: 0, reviver: (v) => v || undefined },
     rank: { type: rankFields },
-    rank2: { type: rankFields },
-    _bfRank: { version: 9, type: "byte", reviver: (v) => v || undefined },
+    rank2: { type: rankFields }, //, replacer: (v, p: Player) => p.teamIds ? -1 : v },
+    _bfRank: { version: 9, type: "byte", // 1=Etranger 2=Assimilé
+        reviver: (v: number, p: Player) => {
+            if (v & 1) { p.foreign = true; }
+            if (v & 2) { p.assimilated = true; }
+        },
+        replacer: (_, p: Player) => (p.foreign ? 1 : 0) | (p.assimilated ? 2 : 0)
+    },
     nationality: { version: 9, type: "bstr", reviver: optionalString },
     _sexe: { maxVersion: 3, type: "byte",
-        reviver: (sexe, p: Player) => { p.sexe = sexe; },
-        replacer: (s, p) => "HFM".indexOf(p.sexe)
+        reviver: (b: number, p: Player & { _sexe: number }) => { p.sexe = 'HFM'[b & ~EQUIPE_MASK] as SexeString; return b; },
+        replacer: (_, p) => "HFM".indexOf(p.sexe)
     },
     club: { type: "bstr", reviver: optionalString },
     registration: { type: "dword", replacer(
@@ -128,33 +152,13 @@ const playerFields: Fields<Player & {version: number, dateMaj: Date}> = {
         return this._playerRegs?.[p.id];
     } },
     _partenaire: { version: 2, type: "word", replacer: () => 0xffff },
-    avail: { version: 3, type(value, _, doc: Tournament) { // TODO: { type: 'array', itemType: 'dword' }
-        if (!this.writing) {
-            const result = [];
-            const nDay = this.word;
-            for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
-                let avail = this.dword;
-                if (doc.version < 11) {
-                    avail = 0xFFFFFFFF;	//always available
-                }
-                result[i] = avail;
-            }
-            return result;
-        } else {
-            const nDay = value?.length ?? 0;
-            this.word = nDay;
-            for (let i = 0; i < nDay && i < MAX_JOUR; i++) {
-                this.dword = value[i] ?? -1; // TODO
-            }
-        }
-    }
-    },
+    avail: { version: 3, type: 'array', itemType: 'dword', replacer: (v) => v?.slice(0, MAX_JOUR) },
     comment: { version: 3, type: "bstr", reviver: optionalString },
     dateMaj: { type: "date" },
     _: {
-        type(value, _, p: Player) {
+        type(value, _, p: Player & { _sexe?: number }) {
             if (!this.writing) {
-                p.sexe = 'HFM'[(p as unknown as {sexe: number}).sexe & ~EQUIPE_MASK] as SexeString; //0=H 1=F	Equipe:4=HHH 5=FFF 6=HHFF
+                delete p._sexe;
             } else {
                 // TODO?
             }
@@ -320,7 +324,8 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
     _name: { maxVersion: 2, type: "bstr", reviver: (s, p: TEvent) => { p.name = s; } },
     name: { version: 10, type: "bstr" },
     sexe: {
-        type: "byte", reviver(this: Serializer & { _curSexe?: number }, b, p: TEvent) {
+        type: "byte",
+        reviver(this: Serializer & { _curSexe?: number }, b: number, p: TEvent) {
             if (b & DOUBLE_MASK_OLD) {
                 b = (b | EQUIPE_MASK) & (~DOUBLE_MASK_OLD);
             }
@@ -330,7 +335,7 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
             }
 
             this._curSexe = b; // used by inner draws for rank
-            return b;
+            return 'HFM'[b & ~EQUIPE_MASK] as SexeString; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
         }, replacer: (s, p) => "HFM".indexOf(s ?? 'H') | (p.typeDouble ? EQUIPE_MASK : 0)
     },
     _categ3: { maxVersion: 3, type: "byte", reviver: (b) => [0, 1, 2, 3, 5, 7, 9, 11, 12, 13, 15, 17, 18][b], valid: () => false },
@@ -360,8 +365,6 @@ const eventFields: Fields<TEvent & {version: number, dateMaj: Date}> = {
         type(this: Serializer & { _curSexe?: number }, value, _, event: TEvent) {
             if (!this.writing) {
                 delete this._curSexe; // clean-up
-
-                event.sexe = ['H', 'F', 'M'][(event as unknown as {sexe: number}).sexe & ~EQUIPE_MASK] as SexeString; //0=H 1=F Equipe:4=HHH 5=FFF 6=HHFF
 
                 if (!event.name) {
                     event.name = `${event.typeDouble ? 'Double ': 'Simple '}${{ H:'Messieurs', F:'Dames', M:'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
@@ -416,11 +419,16 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
 export const docFields: Fields<Tournament> = {
     _init: {
         type(
-            this: Serializer & { _playerRegs?: Record<string, number>},
+            this: Serializer & { _playerRegs?: Record<string, number>, _teamNames?: Record<string, string | undefined>},
             value, _,
             doc: Tournament & { _start?: Date, _end?: Date}
         ) {
             if (this.writing) {
+                // compute team name
+                this._teamNames = Object.fromEntries(doc.players.filter((p): p is Team => !!p.teamIds)
+                    .map(({id, teamIds, name}) => [id, name !== buildTeamName(teamIds, doc.players) ? name : undefined ]));
+
+                // compute registration
                 const eventBits = Object.fromEntries(doc.events.map(({id}, i) => [id, 1 << i]));
                 this._playerRegs = Object.fromEntries(doc.players.map(({id, registration}) =>
                     [id, registration.reduce((a,eventId) => a + eventBits[eventId], 0)]
@@ -519,12 +527,7 @@ export const docFields: Fields<Tournament> = {
 
                     // compute team name
                     if (player.teamIds) {
-                        player.name = player._teamName ||
-                            player.teamIds
-                                // .map((id) => byId(doc.players, id, `team player #${id} not found`))
-                                .map((id) => byId(doc.players, id) ?? { name: `#${id}` } as Player)
-                                .map((p) => `${p.name} ${p?.firstname?.[0] ?? ''}`.trim())
-                                .join(' - ');
+                        player.name = player._teamName || buildTeamName(player.teamIds, doc.players) || '';
                         delete player._teamName;
                     }
 

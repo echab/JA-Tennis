@@ -18,7 +18,7 @@ export type Player = {
     club?: string;
     licence?: string;
     nationality?: string;
-    external?: boolean;   //TODO FFT extent
+    foreign?: boolean;   //TODO FFT extent
     assimilated?: boolean;    //TODO FFT extent
     rank: RankString;
     rank2?: RankString;
@@ -40,3 +40,6 @@ export type Player = {
     comment?: string;
 
 } & Coordinates;
+
+/** Team is a Player with mandatory teamIds field */
+export type Team = Omit<Player, 'teamIds'> & { teamIds: string[] };

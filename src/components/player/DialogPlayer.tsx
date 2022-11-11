@@ -53,6 +53,7 @@ export const DialogPlayer: Component<Props> = (props) => {
             sexe: form.sexe,
             firstname: form.firstname?.trim() || undefined,
             rank: form.rank,
+            rank2: form.rank2,
             birth: form.birth !== undefined ? typeof form.birth === 'number' ? form.birth : new Date(form.birth) : undefined,
             club: form.club?.trim() || undefined,
             licence: form.licence?.trim() || undefined,
@@ -126,7 +127,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                     }>
                         <div class="mb-1 flex">
                             <div class="inline-block w-3/12 text-right pr-3">
-                Team:<br/>
+                                Team:<br/>
                                 <button type="button" class="rounded-full p-1" title="Add team member">➕</button>
                             </div>
                             <ul>
@@ -136,7 +137,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                                         teamPlayer
                                             ? <span>
                                                 <A href={urlPlayer(teamPlayer)}><i class="icon2-info" /></A>
-                                                <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname?.[0] ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
+                                                <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
                                             </span>
                                             : `#${playerId}`
                                     }
@@ -150,9 +151,17 @@ export const DialogPlayer: Component<Props> = (props) => {
 
                     <div class="mb-1">
                         <label for="rank" class="inline-block w-3/12 text-right pr-3">Rank:</label>
-                        <select id="rank" value={form.rank} onChange={updateField('rank')} class="w-2/12 p-1">
-                            <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
-                        </select>
+                        <Show when={!form.teamIds} fallback={
+                            <span class="p-1">{form.rank}</span>
+                        }>
+                            <select id="rank" value={form.rank} onChange={updateField('rank')} class="w-2/12 p-1">
+                                <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                            </select>
+                            <label for="rank2" class="inline-block w-3/12 text-right pr-3">Double:</label>
+                            <select id="rank2" value={form.rank2} onChange={updateField('rank')} class="w-2/12 p-1">
+                                <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                            </select>
+                        </Show>
                     </div>
 
                     <fieldset class="border-2"><legend>General</legend>

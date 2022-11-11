@@ -234,6 +234,16 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this.byte = (w >> 8) & 0xFF;
     },
 
+    get i8() {
+        const r = this._view.getInt8(this._position);
+        this._position += 1;
+        return r;
+    },
+    set i8(i) {
+        this._view.setInt8(this._position, i ?? 0);
+        this._position += 1;
+    },
+
     get i16() {
         const r = this._view.getInt16(this._position, true);
         this._position += 2;
