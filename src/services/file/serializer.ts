@@ -210,11 +210,11 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._arrayIndex = prev;
     },
 
-    get byte() {
+    get u8() {
         // return this.reading ? this.read(1)[0] : this.write(b);
         return this.readBytes(1)[0];
     },
-    set byte(b) {
+    set u8(b) {
         this._buffer[this._position++] = b;
     },
 
@@ -222,16 +222,16 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         return decoder.decode(this.readBytes(1));
     },
     set char(c) {
-        this.byte = c.charCodeAt(0);
+        this.u8 = c.charCodeAt(0);
     },
 
-    get word() {
+    get u16() {
         const [a, b] = this.readBytes(2);
         return a + (b << 8);
     },
-    set word(w) {
-        this.byte = w & 0xFF
-        this.byte = (w >> 8) & 0xFF;
+    set u16(w) {
+        this.u8 = w & 0xFF
+        this.u8 = (w >> 8) & 0xFF;
     },
 
     get i8() {
@@ -254,21 +254,21 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._position += 2;
     },
 
-    get dword() {
+    get u32() {
         const [a, b, c, d] = this.readBytes(4);
         return a + (b << 8) + (c << 16) + (d << 24);
     },
-    set dword(dw) {
+    set u32(dw) {
         this._view.setUint32(this._position, dw ?? 0, true);
         this._position += 4;
     },
 
-    get float() {
+    get f32() {
         const r = this._view.getFloat32(this._position, true);
         this._position += 4;
         return r;
     },
-    set float(f) {
+    set f32(f) {
         this._view.setFloat32(this._position, f ?? 0.0, true);
         this._position += 4;
     },
@@ -312,34 +312,34 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             month = date.getMonth() + 1;
             year = date.getFullYear();
         }
-        this.byte = day + ((month & 0x7) << 5);
-        this.byte = month >> 3;
-        this.byte = year & 0xff;
-        this.byte = (year >> 8) & 0x7f;
+        this.u8 = day + ((month & 0x7) << 5);
+        this.u8 = month >> 3;
+        this.u8 = year & 0xff;
+        this.u8 = (year >> 8) & 0x7f;
     },
 
     get bstr() {
-        const n = this.byte;
+        const n = this.u8;
         return decoder.decode(this.readBytes(n));
     },
     set bstr(s) {
         // const buf = encoder.encode(s); // UTF-8
         const buf = new Uint8Array([...s ?? ''].map((c) => c.charCodeAt(0)));
-        this.byte = buf.length;
+        this.u8 = buf.length;
         this.writeBytes(buf);
     },
 
     get array() {
-        return this.word; // get the array size, the items are read into readType()
+        return this.u16; // get the array size, the items are read into readType()
     },
     set array(n) {
-        this.word = n;
+        this.u16 = n;
     },
     get arrayb() {
-        return this.byte; // get the array size, the items are read into readType()
+        return this.u8; // get the array size, the items are read into readType()
     },
     set arrayb(n) {
-        this.byte = n;
+        this.u8 = n;
     },
 
     get generateId() {
@@ -357,17 +357,17 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         // https://www.codeproject.com/Articles/1176939/All-About-MFC-Serialization
         // atlmfc/src/mfc/arcobj.cpp
 
-        const wTag = this.word;
+        const wTag = this.u16;
         let obTag;
         if (wTag === wBigObjectTag) {
-            obTag = this.dword;
+            obTag = this.u32;
         } else {
             // obTag = ((wTag & wClassTag) << 16) | (wTag & ~wClassTag);
             obTag = wTag & wBigObjectTag;
         }
         if (wTag === wNewClassTag) {
-            this.word; // pid === 1
-            const className = decoder.decode(this.readBytes(this.word));
+            this.u16; // pid === 1
+            const className = decoder.decode(this.readBytes(this.u16));
             this._classNames[this._nMapCount] = className;
             this._nMapCount += 2; // class + instance
             return className;
@@ -386,17 +386,17 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         const nClassIndex = this._classNames.indexOf(className);
         if (nClassIndex === -1) {
             const wTag = wNewClassTag;
-            this.word = wTag;
-            this.word = 1; // pid;
+            this.u16 = wTag;
+            this.u16 = 1; // pid;
             const buf = encoder.encode(className);
-            this.word = buf.length;
+            this.u16 = buf.length;
             this.writeBytes(buf);
             this._classNames[this._nMapCount] = className;
             this._nMapCount += 2; // class + instance
         } else {
             if (nClassIndex >= wBigObjectTag) {
-                this.word = wBigObjectTag;
-                this.dword = nClassIndex;
+                this.u16 = wBigObjectTag;
+                this.u32 = nClassIndex;
             } else {
                 // const obTag = nClassIndex | dwBigClassTag;
                 // const wTag = ((obTag >> 16) & wClassTag) | (obTag & ~wClassTag);
@@ -404,7 +404,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
                 const wTag = nClassIndex | wClassTag;
                 // obTag = 0x80000001 == -2147483647
                 // wTag  = 0x8001 == 32769
-                this.word = wTag;
+                this.u16 = wTag;
             }
             this._nMapCount += 1;
         }
