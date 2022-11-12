@@ -42,7 +42,7 @@ export const PaneDraw: Component = () => {
     // change url on selection change
     const navigate = useNavigate();
     createEffect(() => {
-        const url = urlBox(selection.box, selection.draw, selection.event); // TODO using default params don't work?
+        const url = urlBox(selection.box); // TODO using default params don't work?
         // if (location.pathname.startsWith(urlBox()) && location.pathname !== url) {
         if (location.pathname !== url) {
             // console.log('effect: navigate from', location.pathname, 'to', url);

@@ -1,12 +1,12 @@
 import type { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { Draw, Box, Match, PlayerIn, QEMPTY, ROUNDROBIN } from '../../domain/draw';
+import { Draw, Match, PlayerIn, QEMPTY, ROUNDROBIN } from '../../domain/draw';
 import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
 import { groupDraw, groupFindPlayerIn, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
-import { ADVERSAIRE1, iDiagonalePos, positionFirstIn, positionLastIn, positionResize, seedPositionOpponent1, seedPositionOpponent2 } from './roundrobinLib';
+import { positionOpponent1, iDiagonalePos, positionFirstIn, positionLastIn, positionResize, seedPositionOpponent1, seedPositionOpponent2 } from './roundrobinLib';
 
 const MIN_COL = 0,
     MAX_COL_POULE = 22,
@@ -78,7 +78,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             if (nCol > nOld) {
                 for (let i = nCol - nOld - 1; i >= 0; i--) {
 
-                    let b = ADVERSAIRE1(this.draw, i);
+                    let b = positionOpponent1(this.draw, i);
                     const boxIn = newBox<PlayerIn>(this.draw, undefined, b);
                     this.draw.boxes.push(boxIn);
 
@@ -146,7 +146,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
         //TODOjs findBox()
         const diag = this.draw.boxes[this.iDiagonale(box)];
-        const box1 = this.draw.boxes[ADVERSAIRE1(this.draw, box.position)];
+        const box1 = this.draw.boxes[positionOpponent1(this.draw, box.position)];
 
         if (outNumber) {	//Ajoute un qualifié sortant
             // //Met à jour le tableau suivant
@@ -274,7 +274,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
 
             for (let i = draw.nbColumn - 1; i >= 0 && players.length; i--) {
 
-                let b = ADVERSAIRE1(draw, i);
+                let b = positionOpponent1(draw, i);
                 const j = t + (draw.nbColumn - i - 1) * nDraw;
 
                 const boxIn = newBox<PlayerIn>(draw, undefined, b);
@@ -304,7 +304,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             }
 
             //Ajoute 1 tête de série
-            const boxT = this.findBox<PlayerIn>(ADVERSAIRE1(draw, draw.nbColumn - 1));
+            const boxT = this.findBox<PlayerIn>(positionOpponent1(draw, draw.nbColumn - 1));
             if (boxT) {
                 boxT.seeded = t + 1;
             }

@@ -41,7 +41,7 @@ export function iDiagonalePos(nbColumn: number, pos: number): number {
     return (pos % nbColumn) * (nbColumn + 1);
 }
 
-export function ADVERSAIRE1(draw: Draw, pos: number): number {
+export function positionOpponent1(draw: Draw, pos: number): number { // ADVERSAIRE1
     const n = draw.nbColumn;
     return pos % n + n * n;
 }

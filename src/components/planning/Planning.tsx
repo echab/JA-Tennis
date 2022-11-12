@@ -122,7 +122,7 @@ export const Planning: Component<Props> = (props) => {
             }</For>
 
             <For each={daySlots()}>{(slot) =>
-                <PlanningSlot slot={slot} players={selection.tournament.players} style={{
+                <PlanningSlot slot={slot} tournament={selection.tournament} style={{
                     'grid-column': 2 + (slot.match.place ?? props.places.length),
                     'grid-row': `${2 + Math.round( ((minutes(slot.match.date) ?? hourEnd * 60) - hourStart * 60)/ 5)}/span 18`,
                 }} />

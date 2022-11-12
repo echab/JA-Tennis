@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { Component, JSX, Show } from "solid-js";
 import { Player } from "../../domain/player";
-import { Slot } from "../../domain/tournament";
+import { Slot, Tournament } from "../../domain/tournament";
 import { byId } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
 import { selectBox, selectPlayer, urlBox } from "../util/selection";
@@ -32,7 +32,7 @@ const SlotPlayer: Component<PlayerProps> = (props) => <>
 
 type Props = {
     slot: Slot;
-    players: Player[];
+    tournament: Tournament;
     style?: JSX.CSSProperties;
 }
 
@@ -41,8 +41,8 @@ export const PlanningSlot: Component<Props> = (props) => {
     const player2 = props.slot.player2;
     const match = props.slot.match;
 
-    const p1 = byId(props.players, player1?.playerId);
-    const p2 = byId(props.players, player2?.playerId);
+    const p1 = byId(props.tournament.players, player1?.playerId);
+    const p2 = byId(props.tournament.players, player2?.playerId);
 
     return <li
         class="bg-slate-300 border-l-8"
@@ -59,7 +59,7 @@ export const PlanningSlot: Component<Props> = (props) => {
         {/* ({match.date!.toLocaleString()}) */}
         {/* {match.date!.toLocaleDateString()} */}
         {/* - {match.place} */}
-        <A href={urlBox(match, props.slot.draw, props.slot.event)} title="View in draw" class="hover">
+        <A href={urlBox(match, props.slot.draw, props.slot.event, props.tournament)} title="View in draw" class="hover">
             <i class="icon2-draw"/>
         </A>
         <span class="cursor-pointer" title="Edit the match"

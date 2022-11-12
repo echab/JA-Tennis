@@ -1,4 +1,4 @@
-import { Box, Draw } from "./draw";
+import { Draw, Match, PlayerIn } from "./draw";
 import { Player } from "./player";
 import { TEvent, Tournament } from "./tournament";
 
@@ -19,7 +19,7 @@ export type PlayerProblem = {
 export type DrawProblem = {
     message: string;
     draw: Draw;
-    box?: Box;
+    box?: PlayerIn | Match;
     player?: Player;
     detail?: string;
 

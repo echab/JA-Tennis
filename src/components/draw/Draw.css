@@ -80,6 +80,7 @@ table.tableau tr:last-child>td
     /* background-color: var(--back2); */
 }
 
+.tableau .joueur:focus,
 .tableau .joueur.selected {
     border-color: var(--front2);
     background-color: var(--back2);

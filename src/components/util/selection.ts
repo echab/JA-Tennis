@@ -1,10 +1,12 @@
 import { createStore, produce } from "solid-js/store";
-import type { Box, Draw, Match, PlayerIn } from "../../domain/draw";
+import type { Draw, Match, PlayerIn } from "../../domain/draw";
 import type { Player } from "../../domain/player";
 import { DEFAULT_SLOT_LENGTH, Place, TEvent, Tournament } from "../../domain/tournament";
 import type { DrawProblem, PlayerProblem } from "../../domain/validation";
-import { groupFindQ } from "../../services/drawService";
+import { groupFindQ, isMatch } from "../../services/drawService";
+import { dayOf } from "../../services/planningService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
+import { minutes } from "../../utils/date";
 
 export interface SelectionItems {
     tournament: Tournament;
@@ -168,7 +170,10 @@ export function urlDraw(draw?: Draw, event?: TEvent) {
 }
 
 // TODO could return URL and preserve current search
-export function urlBox(box?: Box, draw?: Draw, event?: TEvent, scroll?: boolean) {
+export function urlBox(box?: PlayerIn | Match, draw?: Draw, event?: TEvent, tournament?: Tournament, scroll?: boolean) {
+    if (!tournament) {
+        tournament = selection.tournament;
+    }
     if (!event) {
         event = selection.event; // reactive default value
     }
@@ -176,7 +181,17 @@ export function urlBox(box?: Box, draw?: Draw, event?: TEvent, scroll?: boolean)
         draw = selection.draw; // reactive default value
     }
 
-    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`.replace(/\/+$/, buildSearch());
+    const search = box && isMatch(box)? {
+        day : dayOf(box.date, tournament.info),
+        hour : minutes(box.date),
+        place : box.place,
+        playerId: box.playerId,
+    } : {
+        playerId: box?.playerId
+    };
+
+    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`
+        .replace(/\/*$/, buildSearch(search));
 }
 
 export function urlDay(day?: number) {
@@ -184,9 +199,16 @@ export function urlDay(day?: number) {
 }
 
 /** return current searchParam string like `?day=2&player=345` if parameters are present or '' */
-function buildSearch(): string {
+function buildSearch(params?: Record<string, string | number | undefined>): string {
     // const [searchParams] = useSearchParams<Searchs>();
     const searchParams = location.search;
     const search = new URLSearchParams(searchParams);
+    if (params) {
+        for (const [name, value] of Object.entries(params)) {
+            if (value !== undefined) {
+                search.set(name, String(value));
+            }
+        }
+    }
     return search.entries().next() ? `?${search}` : '';
 }

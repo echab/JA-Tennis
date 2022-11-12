@@ -1,17 +1,16 @@
 /* eslint-disable no-bitwise */
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Params } from '../App';
-import { Component, For, Show } from 'solid-js';
-import { selectBox, selectDay, urlBox } from '../util/selection';
+import { Component, For, JSX, Show } from 'solid-js';
+import { selectBox, urlBox } from '../util/selection';
 import { PlayerIn, Draw, Match, BUILD, FINAL } from '../../domain/draw';
-import { byId, mapBy } from '../../services/util/find';
+import { by, byId, mapBy } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
 import { A, useParams } from '@solidjs/router';
 import { isMatch } from '../../services/drawService';
-import { columnMax, columnMin, countInCol, positionTopCol } from '../../services/draw/knockoutLib';
-import { dayOf } from '../../services/planningService';
-import './Draw.css';
+import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent1, positionTopCol } from '../../services/draw/knockoutLib';
 import { drawLib } from '../../services/draw/drawLib';
+import './Draw.css';
 
 type Props = {
     event: TEvent,
@@ -23,9 +22,9 @@ export const DrawKnockout: Component<Props> = (props) => {
 
     const params = useParams<Params>();
 
-    const lignes = () => {
-        const nLigne = countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
-        return Array(nLigne).fill(0).map((_, i) => i);
+    const lines = () => {
+        const nLine = countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
+        return Array(nLine).fill(0).map((_, i) => i);
     }
 
     const cols = (l: number) => {
@@ -63,9 +62,34 @@ export const DrawKnockout: Component<Props> = (props) => {
         return otherPlayer ? `${otherPlayer.name} ${otherPlayer.firstname?.[0] ?? ''}` : '';
     };
 
+    const handleKey: JSX.EventHandlerUnion<HTMLAnchorElement, KeyboardEvent> = (evt) => {
+        // console.log('keydown=', evt.key)
+        if (!params.boxPos) { return; }
+        const curPos = +params.boxPos;
+        const col = column(curPos);
+        let pos = -1;
+        switch(evt.key) {
+            case 'Home': pos = positionMax(props.draw.nbColumn, props.draw.nbOut); break;
+            // case 'Home': pos = positionTopCol(col); break;
+            case 'ArrowUp': if (curPos > positionTopCol(col)) { pos = curPos - 1; } break;
+            case 'ArrowDown': if (curPos < positionBottomCol(col, props.draw.nbOut)) { pos = curPos + 1; } break;
+            case 'ArrowLeft': if (col < columnMax(props.draw.nbColumn, props.draw.nbOut)) { pos = positionOpponent1(curPos); } break;
+            case 'ArrowRight': if (col > columnMin(props.draw.nbOut)) { pos = positionMatch(curPos); } break;
+            case 'End': pos = positionBottomCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut); break;
+            // case 'End': pos = positionBottomCol(col, props.draw.nbOut); break;
+        }
+        if (pos !== -1) {
+            const b = by(props.draw.boxes, 'position', pos);
+            if (b) {
+                evt.preventDefault();
+                selectBox(props.event, props.draw, b);
+            }
+        }
+    };
+
     return <table class="tableau">
         <tbody>
-            <For each={lignes()}>{(l) =>
+            <For each={lines()}>{(l) =>
                 <tr>
                     <For each={cols(l)}>{({ odd, even, rowspan, box, player, isRight }) =>
                         <td rowspan={rowspan} classList={{
@@ -79,6 +103,8 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     // onclick={() => navigate(urlBox(box), {replace:true})}
                                     href={urlBox(box)} replace noScroll={true}
                                     id={`pos${box?.position}`}
+                                    tabIndex={0}
+                                    onkeydown={handleKey}
                                 >
                                     {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
@@ -94,7 +120,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             <Show when={box?.order && box.order > 0}> {player?.firstname}</Show>
                                         </span>
                                     }>
-                                        <span class="nom inline-block border-l-2 border-gray-500 ml-2 pl-1">{player?.name} requalified<br />{otherName(box)} withdraws</span>
+                                        <span class="nom inline-block border-l-2 border-gray-500 pl-1">{player?.name} requalified<br />{otherName(box)} withdraws</span>
                                     </Show>
                                     {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.order && box.order > 0 && player?.rank}><span class="classement">{player!.rank}</span></Show>
@@ -120,19 +146,23 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             <Show when={box?.note}><i class='icon2-note'/></Show>
                                         </span>
 
-                                        <Show when={box?.date}>
-                                            <i title="View in planning"
-                                                classList={{
-                                                    'icon2-planning':  !!box?.date,
-                                                    'hover':  !!box?.date,
-                                                    'icon2-planning-no': !box?.date,
-                                                }}
-                                                onclick={(evt) => {
-                                                    evt.preventDefault();
-                                                    selectDay(dayOf(box?.date, props.tournament.info));
-                                                }}
+                                        <i classList={{
+                                            'icon2-planning-no': box && (!box.date && !box.score && !box.wo),
+                                        }} />
+
+                                        {/* <Show when={box?.date}>
+                                            <i classList={{
+                                                // 'icon2-planning':  !!box?.date,
+                                                // 'hover':  !!box?.date,
+                                                'icon2-planning-no': box && (!box.date && !box.score && !box.wo),
+                                            }}
+                                            title="View in planning"
+                                            onclick={(evt) => {
+                                                evt.preventDefault();
+                                                selectDay(dayOf(box?.date, props.tournament.info));
+                                            }}
                                             />
-                                        </Show>
+                                        </Show> */}
                                         <Show when={box?.score || box?.wo} fallback={
                                             <>
                                                 {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
@@ -151,6 +181,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                                 }}
                                             />
                                         </Show>
+                                        <Show when={box?.vainqDef}><br/><br/></Show>
                                     </Show>
                                 </A>
                             </Show>

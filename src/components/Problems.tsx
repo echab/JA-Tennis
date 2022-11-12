@@ -46,7 +46,7 @@ export const Problems: Component = () => {
                             <ul>
                                 <For each={errors}>{({message, detail, player, box}) => (
                                     <li>
-                                        <A href={urlBox(box, draw, event, true)} replace noScroll>
+                                        <A href={urlBox(box, draw, event, selection.tournament, true)} replace noScroll>
                                             {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
                                         </A>
                                     </li>
