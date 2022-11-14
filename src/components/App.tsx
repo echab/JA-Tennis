@@ -43,6 +43,29 @@ export const Main: Component = () => {
 
     selectTournament(tournaments[0]);
 
+    // const paste = async () => {
+    //     console.log('paste');
+    //     try {
+    //         const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+    //         if (permission.state === 'denied') {
+    //             throw new Error('Not allowed to read clipboard.');
+    //         }
+    //         const clipboardContents = await navigator.clipboard.read();
+    //         for (const item of clipboardContents) {
+    //             console.log(item);
+    //             // if (!item.types.includes('image/png')) {
+    //             //     throw new Error('Clipboard contains non-image data.');
+    //             // }
+    //             // const blob = await item.getType('image/png');
+    //             // destinationImage.src = URL.createObjectURL(blob);
+    //         }
+    //     }
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     catch (error: any) {
+    //         console.error(new Error(error.message));
+    //     }
+    // };
+
     return <>
         <Dialogs />
         <div class={styles.App}>
@@ -50,8 +73,12 @@ export const Main: Component = () => {
                 <span><i class="icon2-ball" /> JA-Tennis</span>
                 <div>
                     <button type="button" class="border-2 border-zinc-500" disabled={!commandManager.canUndo} onclick={() => commandManager.undo()} title={`Undo ${commandManager.undoNames(1)?.[0] ?? ''}`}>↶ Undo</button>
-          &nbsp;
+                    &nbsp;
                     <button type="button" disabled={!commandManager.canRedo} onclick={() => commandManager.redo()} title={`Redo ${commandManager.redoNames(1)?.[0] ?? ''}`}>↷ Redo</button>
+                    {/* &nbsp;
+                    <button type="button" onclick={copy} ><i class='icon2-copy'/> Copy</button>
+                    &nbsp;
+                    <button type="button" onclick={paste} ><i class='icon2-paste'/> Paste</button> */}
                 </div>
                 <div>
           selection: player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
