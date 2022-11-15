@@ -1,4 +1,3 @@
-import { initEvent } from "./eventService";
 import { guid } from "./util/guid";
 import { copy } from "../utils/tool";
 import { shuffle } from "../utils/tool";
@@ -16,7 +15,6 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
         const data = window.localStorage.tournament;
         if (data) {
             const tournament: Tournament = JSON.parse(data);
-            initTournament(tournament);
             //this.selection.select(tournament, ModelType.Tournament);
             return tournament;
         } else {
@@ -27,7 +25,6 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
         if (resp.ok) {
             const tournament = await resp.json() as Tournament;
             tournament._url = file_url;
-            initTournament(tournament);
             //this.selection.select(tournament, ModelType.Tournament);
             return tournament;
         } else {
@@ -83,11 +80,7 @@ export function newTournament(source?: Tournament): Tournament {
         players: [],
         events: [],
     };
-    return initTournament(tournament);
-}
-
-export function _newInfo(source?: TournamentInfo): TournamentInfo {
-    return { name: '', slotLength: DEFAULT_SLOT_LENGTH, ...source };
+    return tournament;
 }
 
 export function updateInfo(info: TournamentInfo): Command {
@@ -103,21 +96,6 @@ export function updateInfo(info: TournamentInfo): Command {
     });
 
     return {name:'Update info', act, undo};
-}
-
-export function initTournament(tournament: Tournament): Tournament {
-
-    if (tournament.events) {
-        for (let i = tournament.events.length - 1; i >= 0; i--) {
-            //tournament.events[i] = new TEvent(tournament, tournament.events[i]);
-            initEvent(tournament.events[i], tournament);
-        }
-    }
-
-    tournament.info = tournament.info ?? { name: "" };
-    tournament.info.slotLength = tournament.info.slotLength ?? DEFAULT_SLOT_LENGTH;
-
-    return tournament;
 }
 
 export function isRegistred(event: TEvent, player: Player): boolean {

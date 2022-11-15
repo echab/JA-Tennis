@@ -60,7 +60,7 @@ export const DialogMatch: Component<Props> = (props) => {
             hidden: form.hidden,
             locked: form.locked,
 
-            playerId: form.vainqDef ? otherPlayerId(form.playerId) : form.playerId,
+            playerId: form.vainqDef && form.playerId ? otherPlayerId(form.playerId) : form.playerId,
 
             // Match:
             score: form.score.trim(),

@@ -26,7 +26,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
             result.push({ message: 'ERR_TAB_SUITE_PREMIER', draw });
         }
 
-        const [groupStart] = groupDraw(event, draw);
+        const [groupStart] = groupDraw(event, draw.id);
         const firstDraw = event.draws[groupStart];
         if (draw.type !== firstDraw.type) {
             result.push({ message: 'ERR_TAB_SUITE_TYPE', draw });
@@ -39,7 +39,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
         }
     }
 
-    const prevGroup = previousGroup(event, draw);
+    const prevGroup = previousGroup(event, draw.id);
     if (prevGroup) {
         const firstDraw = event.draws[prevGroup[0]];
         if (firstDraw.type !== FINAL && draw.minRank && firstDraw.maxRank) {
@@ -49,7 +49,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
         }
     }
 
-    const nextGrp = nextGroup(event, draw);
+    const nextGrp = nextGroup(event, draw.id);
     if (nextGrp) {
         const firstDraw = event.draws[nextGrp[0]];
         if (draw.type !== FINAL && draw.maxRank && firstDraw.minRank) {
@@ -60,8 +60,11 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
     }
 
     if (!draw.cont) {
-        const group = groupDraw(event, draw);
-        const qualifOuts = findGroupQualifOuts(event, group).map(([q]) => q).sort((a, b) => a - b).filter((q) => q !== QEMPTY);
+        const group = groupDraw(event, draw.id);
+        const qualifOuts = findGroupQualifOuts(event, group)
+            .map(([q]) => q)
+            .filter((q) => q !== QEMPTY)
+            .sort((a, b) => a - b);
         if (qualifOuts.length) {
             const missing: string[] = [];
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -413,10 +416,10 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                     result.push({ message: 'ERR_TAB_ENTRANT_DUP', draw, box: boxIn, player });
                 }
 
-                const prevGroup = previousGroup(event, draw);
+                const prevGroup = previousGroup(event, draw.id);
                 if (prevGroup) {
                     //DONE 00/03/07: CTableau, les joueurs qualifiés entrant et sortant correspondent
-                    const [, m] = groupFindPlayerOut(event, prevGroup, e);
+                    const [m] = groupFindPlayerOut(event, prevGroup, e);
                     if (!m) {
                         result.push({ message: 'ERR_TAB_ENTRANT_PREC_NO', draw, box: boxIn, player });
                     } else if (m.playerId !== boxIn.playerId) {
@@ -483,9 +486,10 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     //Tous les qualifiés sortants du tableau précédent sont utilisés
     if (!draw.cont) {
-        const prevGroup = previousGroup(event, draw);
+        const prevGroup = previousGroup(event, draw.id);
         if (prevGroup) {
-            const qualifOuts = findGroupQualifOuts(event, prevGroup).filter(([q]) => q !== QEMPTY);
+            const qualifOuts = findGroupQualifOuts(event, prevGroup)
+                .filter(([q]) => q !== QEMPTY);
             const missing = qualifOuts.filter(([q]) => !lib.findPlayerIn(q)).map(([q]) => `Q${q}`);
             if (missing.length) {
                 result.push({ message: 'ERR_TAB_SORTANT_PREC_NO', draw, detail: missing.join(' ') });
@@ -498,7 +502,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     }
 
     if (draw.type === FINAL) {
-        const [, groupEnd] = groupDraw(event, draw);
+        const [, groupEnd] = groupDraw(event, draw.id);
         if (draw.cont || event.draws[groupEnd - 1]?.id !== draw.id) {
             result.push({ message: 'ERR_TAB_SUITE_FINAL', draw });
         }

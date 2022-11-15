@@ -5,7 +5,7 @@ import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { RankString } from '../../domain/types';
-import { deleteDraw, groupDraw, groupFindAllPlayerOut } from '../../services/drawService';
+import { deleteDraw, findGroupQualifOuts, groupDraw } from '../../services/drawService';
 import { getRegisteredPlayers, defaultDrawName } from '../../services/tournamentService';
 import { rank } from '../../services/types';
 import { useForm } from '../util/useForm';
@@ -61,13 +61,13 @@ export const DialogDraw: Component<Props> = (props) => {
     /** @returns registered players and entries numbers from previous draw */
     const registeredPlayersOrQ = (): Array<Player|number> => {
         const players: Array<Player|number> = getRegisteredPlayers(props.tournament.players, props.event, form.minRank, form.maxRank);
-        const prevDraw = props.event.draws.at(-1) as Draw | undefined;
+        const prevDraw = props.event.draws.at(-1);
         if (prevDraw) {
-            const [iStart, iNext] = groupDraw(props.event, prevDraw);
+            const [iStart, iNext] = groupDraw(props.event, prevDraw.id);
             if (iStart < iNext) {
-                const qualifs = groupFindAllPlayerOut(props.event, [iStart, iNext]);
+                const qualifs = findGroupQualifOuts(props.event, [iStart, iNext]);
                 if (qualifs.length) {
-                    return players.concat(qualifs);
+                    return players.concat(qualifs.map(([q]) => q));
                 }
             }
         }
@@ -106,8 +106,10 @@ export const DialogDraw: Component<Props> = (props) => {
         }];
 
         if ((evt.submitter as HTMLButtonElement).value === 'generate') {
-            const lib = drawLib(props.event, result[0] as Draw);
-            result = lib.generateDraw(GenerateType.Create, registeredPlayersOrQ());
+            const lib = drawLib(props.event, result[0]);
+            // const lastGroup = groups(props.event).slice(-2);
+            const lastGroup = groupDraw(props.event, props.event.draws.at(-1)?.id);
+            result = lib.generateDraw(GenerateType.Create, registeredPlayersOrQ(), lastGroup);
         }
 
         props.onOk(props.event, result);

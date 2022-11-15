@@ -1,5 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Box, Draw } from "../../domain/draw";
+import { OptionalId } from "../../domain/object";
 import { by } from "../util/find";
 
 export function column(pos: number): number {    //iCol
@@ -74,7 +75,7 @@ export function positionOpponents(pos: number): { pos1: number; pos2: number } {
 }
 
 export function scanLeftBoxes(
-    draw: Draw,
+    draw: OptionalId<Draw>,
     position: number,
     evenWithPlayer: boolean,
     callback: (box: Box, pos: number) => void

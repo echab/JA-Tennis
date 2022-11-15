@@ -1,5 +1,3 @@
-import { Draw } from "../../domain/draw";
-
 export function column(pos: number, nCol: number): number { //iColPoule
     return Math.floor(pos / nCol);
 }
@@ -41,7 +39,6 @@ export function iDiagonalePos(nbColumn: number, pos: number): number {
     return (pos % nbColumn) * (nbColumn + 1);
 }
 
-export function positionOpponent1(draw: Draw, pos: number): number { // ADVERSAIRE1
-    const n = draw.nbColumn;
-    return pos % n + n * n;
+export function positionOpponent1({ nbColumn }: { nbColumn: number }, pos: number): number { // ADVERSAIRE1
+    return pos % nbColumn + nbColumn * nbColumn;
 }

@@ -1,6 +1,5 @@
 import { getId, indexOf } from "./util/find";
 import { guid } from "./util/guid";
-import { initDraw } from "./drawService";
 import { Tournament, TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
@@ -42,26 +41,6 @@ export function updateEvent(
     });
 
     return { name: `Add event ${event.name}`, act, undo };
-}
-
-export function newEvent(parent: Tournament, source?: TEvent): TEvent {
-    const event: TEvent = source ? {...source} as TEvent : {} as TEvent;
-    event.id = event.id || guid("e");
-
-    initEvent(event, parent);
-    return event;
-}
-
-export function initEvent(event: TEvent, parent: Tournament): void {
-    // event._tournament = parent;
-
-    const c = event.draws = event.draws || [];
-    if (c) {
-        for (let i = c.length - 1; i >= 0; i--) {
-            const draw = c[i];
-            initDraw(draw, event);
-        }
-    }
 }
 
 export function deleteEvent(eventId: string): Command {

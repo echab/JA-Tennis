@@ -6,15 +6,16 @@ import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot }
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
 import { ASSERT } from '../../utils/tool';
+import { OptionalId } from '../../domain/object';
 
 export abstract class DrawLibBase implements IDrawLib {
 
     // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-    constructor(public event: TEvent, public draw: Draw) {}
+    constructor(public event: TEvent, public draw: OptionalId<Draw>) {}
 
     abstract nbColumnForPlayers( nJoueur: number): number;
     abstract resize( oldDraw?: Draw, nJoueur?: number): void;
-    abstract generateDraw( generate: GenerateType, registeredPlayersOrQ: Array<Player|number>): Draw[];
+    abstract generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[];
 
     abstract setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
 
@@ -37,7 +38,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
     resetDraw( nPlayer: number): void {
         //remove qualif out
-        const nextGrp = nextGroup(this.event, this.draw);
+        const nextGrp = nextGroup(this.event, this.draw.id);
         if (nextGrp && this.draw.boxes) {
             const [groupStart, groupEnd] = nextGrp;
             for (let i = groupStart; i < groupEnd; i++) {
@@ -192,10 +193,10 @@ export abstract class DrawLibBase implements IDrawLib {
         //ASSERT(setPlayerInOk(iBoite, inNumber, iJoueur));
 
         if (inNumber) {	//Ajoute un qualifié entrant
-            const prevGroup = previousGroup(this.event, this.draw);
+            const prevGroup = previousGroup(this.event, this.draw.id);
             if (!playerId && prevGroup && inNumber !== QEMPTY) {
                 //Va chercher le joueur dans le tableau précédent
-                const [,boxOut] = groupFindPlayerOut(this.event, prevGroup, inNumber);
+                const [boxOut] = groupFindPlayerOut(this.event, prevGroup, inNumber);
                 if (boxOut) {	//V0997
                     playerId = boxOut.playerId;
                 }
@@ -223,7 +224,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
             box.qualifIn = 0;
 
-            if (previousGroup(this.event, this.draw) && !this.removePlayer(box)) {
+            if (previousGroup(this.event, this.draw.id) && !this.removePlayer(box)) {
                 ASSERT(false);
             }
         }
@@ -414,11 +415,11 @@ export abstract class DrawLibBase implements IDrawLib {
 
         box.locked = true;
 
-        const prevGroup = previousGroup(this.event, this.draw);
+        const prevGroup = previousGroup(this.event, this.draw.id);
         if (prevGroup) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                const [,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
+                const [boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
                 if (boxOut) {
                     boxOut.locked = true;
                 }
@@ -437,11 +438,11 @@ export abstract class DrawLibBase implements IDrawLib {
 
         delete box.locked;
 
-        const prevGroup = previousGroup(this.event, this.draw);
+        const prevGroup = previousGroup(this.event, this.draw.id);
         if (prevGroup) {
             const boxIn = box as PlayerIn;
             if (boxIn.qualifIn) {
-                const [,boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
+                const [boxOut] = groupFindPlayerOut(this.event, prevGroup, boxIn.qualifIn);
                 if (boxOut) {
                     delete boxOut.locked;
                 }

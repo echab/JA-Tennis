@@ -1,10 +1,10 @@
-import { Draw, KNOCKOUT, Match, PlayerIn } from "../../../domain/draw";
+import { Draw, KNOCKOUT } from "../../../domain/draw";
+import type { OptionalId } from "../../../domain/object";
 import type { Player } from "../../../domain/player";
 import type { TEvent } from "../../../domain/tournament";
 import { GenerateType } from "../../../services/draw/drawLib";
 import { Knockout } from "../../../services/draw/knockout";
 import { findDrawPlayersOrQ } from "../../../services/drawService";
-import { onlyDefined } from "../../../services/util/object";
 
 const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 11, maxRank: '15/1', draws: [] };
 
@@ -13,27 +13,15 @@ const DRAW: Draw = { id: 'D0', name: 'draw1', type: KNOCKOUT, minRank: 'NC', max
 const PLAYER1: Player = { id: "J1", name: "Albert", sexe: "H", rank: "NC", registration: [] };
 const PLAYER2: Player = { id: "J2", name: "Bernard", sexe: "H", rank: "30/5", registration: [] };
 const PLAYER3: Player = { id: "J3", name: "Claude", sexe: "H", rank: "30/4", registration: [] };
-const PLAYER4: Player = { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: [] };
-
-function mainFields(box: PlayerIn | Match) {
-    const playerIn = box as PlayerIn;
-    const match = box as Match;
-    return onlyDefined({
-        position: box.position,
-        order: playerIn.order,
-        seeded: playerIn.seeded,
-        qualifIn: playerIn.qualifIn,
-        playerId: box.playerId,
-        score: match.score,
-        qualifOut: match.qualifOut,
-    });
-}
+// const PLAYER4: Player = { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: [] };
 
 describe("Knockout lib service", () => {
     describe("generateDraw create", () => {
-        const draw1: Draw = { ...DRAW, nbColumn: 3, nbOut: 1, boxes:[
-            { position: 0, qualifOut: 1, playerId: 'J4'}
-        ] };
+        const draw1: Draw = {
+            ...DRAW, nbColumn: 3, nbOut: 1, boxes: [
+                { position: 0, qualifOut: 1, playerId: 'J4' }
+            ]
+        };
 
         it('should create new draw with players', () => {
             const event1: TEvent = { ...EVENT }; // no draw
@@ -68,10 +56,17 @@ describe("Knockout lib service", () => {
         });
 
         it('should create draw with Q and known players', () => {
-            const event1: TEvent = { ...EVENT, draws: [draw1] };
-            const lib = new Knockout(event1, draw1);
 
-            const draws = lib.generateDraw(GenerateType.Create, [1, PLAYER2, PLAYER3]);
+            const draw0: Draw = {
+                ...DRAW, nbColumn: 3, nbOut: 1, boxes: [
+                    { position: 0, qualifOut: 1, playerId: 'J4' }
+                ]
+            };
+            const event1: TEvent = { ...EVENT, draws: [draw0] };
+            const newDraw: OptionalId<Draw> = { type: KNOCKOUT, name:'draw 2', minRank:'NC', maxRank: '30/1', nbColumn: 2, nbOut:1, boxes:[] };
+            const lib = new Knockout(event1, newDraw);
+
+            const draws = lib.generateDraw(GenerateType.Create, [1, PLAYER2, PLAYER3], [0, 1]);
 
             expect(draws.length).toBe(1);
             expect(draws[0].boxes /*.map(mainFields) */).toStrictEqual([
@@ -79,7 +74,7 @@ describe("Knockout lib service", () => {
                 { position: 2, playerId: "J3", order: 3, seeded: 1 },
                 { position: 1, score: "" },
                 { position: 3, playerId: "J2", order: 2, seeded: 2 },
-                { position: 4, playerID: "J4", qualifIn: 1, order: 1 },
+                { position: 4, playerId: "J4", qualifIn: 1, order: 1 },
             ]);
         });
     });
@@ -89,12 +84,12 @@ describe("Knockout lib service", () => {
         it('shuffle players with same rank', () => {
 
             const draw1: Draw = {
-                ...DRAW, id:'D1', boxes: [
+                ...DRAW, id: 'D1', boxes: [
                     { position: 1, qualifOut: 1, playerId: 'J1' } // qualifOut for draw2
                 ]
             };
             const draw2: Draw = {
-                ...DRAW, id:'D2', nbColumn: 2, nbOut: 2, boxes: [
+                ...DRAW, id: 'D2', nbColumn: 2, nbOut: 2, boxes: [
                     { position: 1, score: '', qualifOut: 2 },
                     { position: 2, score: '', qualifOut: 1, date: new Date('2022-10-09T16:30') },
                     { position: 3, playerId: 'J3', seeded: 1 },
@@ -124,3 +119,17 @@ describe("Knockout lib service", () => {
 
     });
 });
+
+// function mainFields(box: PlayerIn | Match) {
+//     const playerIn = box as PlayerIn;
+//     const match = box as Match;
+//     return onlyDefined({
+//         position: box.position,
+//         order: playerIn.order,
+//         seeded: playerIn.seeded,
+//         qualifIn: playerIn.qualifIn,
+//         playerId: box.playerId,
+//         score: match.score,
+//         qualifOut: match.qualifOut,
+//     });
+// }

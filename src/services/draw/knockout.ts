@@ -2,14 +2,14 @@
 import { DrawLibBase } from './drawLibBase';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent, positionOpponent1, positionOpponent2, positionTopCol, scanLeftBoxes } from './knockoutLib';
 import { by } from '../util/find';
-import { isObject } from '../util/object'
 import { rank } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, isMatch, newBox, newDraw, nextGroup } from '../drawService';
+import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
+import { OptionalId } from '../../domain/object';
 
 const MIN_COL = 0,
     MAX_COL = 9,
@@ -77,20 +77,20 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>): Draw[] {
-        let m_nMatchCol: number[];
+    generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[] {
+        let nMatchCol: number[];
         if (generate === GenerateType.Create) {   //from registred players
-            m_nMatchCol = Array(MAX_COL).fill(0);
+            nMatchCol = Array(MAX_COL).fill(0);
             this.resetDraw(playersOrQ.length);
-            this.fillMatchs(m_nMatchCol, playersOrQ.length - this.draw.nbOut);
+            this.fillMatchs(nMatchCol, playersOrQ.length - this.draw.nbOut);
         } else {    //from existing players
-            m_nMatchCol = this.countMatchs();
+            nMatchCol = this.countMatchs();
             if (generate === GenerateType.PlusEchelonne) {
-                if (!this.TirageEchelonne(m_nMatchCol)) {
+                if (!this.TirageEchelonne(nMatchCol)) {
                     return [];
                 }
             } else if (generate === GenerateType.PlusEnLigne) {
-                if (!this.TirageEnLigne(m_nMatchCol)) {
+                if (!this.TirageEnLigne(nMatchCol)) {
                     return [];
                 }
             }
@@ -99,44 +99,44 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //Tri et Mélange les joueurs de même classement
         sortPlayers(playersOrQ);
 
-        this.draw = this.buildMatches(this.draw, m_nMatchCol, playersOrQ);
-        return [this.draw];
+        const draw = this.buildMatches(this.draw, nMatchCol, playersOrQ, prevGroup);
+        return [draw];
     }
 
-    private fillMatchs( m_nMatchCol: number[], nMatchRestant: number, colGauche?: number): void { //RempliMatchs
+    private fillMatchs( nMatchCol: number[], nMatchRestant: number, colGauche?: number): void { //RempliMatchs
 
         const colMin = columnMin(this.draw.nbOut);
 
-        colGauche = colGauche || colMin;
+        colGauche ||= colMin;
 
         for (let i = colGauche; i <= MAX_COL; i++) {
-            m_nMatchCol[i] = 0;
+            nMatchCol[i] = 0;
         }
 
         //Rempli les autres matches de gauche normalement
         for (let c = Math.max(colGauche, colMin); nMatchRestant && c < MAX_COL; c++) {
             let iMax = Math.min(nMatchRestant, countInCol(c, this.draw.nbOut));
             if (colMin < c) {
-                iMax = Math.min(iMax, 2 * m_nMatchCol[c - 1]);
+                iMax = Math.min(iMax, 2 * nMatchCol[c - 1]);
             }
 
-            m_nMatchCol[c] = iMax;
+            nMatchCol[c] = iMax;
             nMatchRestant -= iMax;
         }
     }
 
-    //Init m_nMatchCol à partir du tableau existant
+    //Init nMatchCol à partir du tableau existant
     private countMatchs(): number[] { //CompteMatchs
 
         let b: number, c2: number | undefined, n: number, bColSansMatch: boolean;
 
-        const m_nMatchCol: number[] = new Array(MAX_COL);
+        const nMatchCol: number[] = new Array(MAX_COL);
 
         //Compte le nombre de joueurs entrants ou qualifié de la colonne
         const colMin = columnMin(this.draw.nbOut);
         let c = colMin;
-        m_nMatchCol[c] = this.draw.nbOut;
-        let nMatchRestant = -m_nMatchCol[c];
+        nMatchCol[c] = this.draw.nbOut;
+        let nMatchRestant = -nMatchCol[c];
         const colMax = columnMax(this.draw.nbColumn, this.draw.nbOut);
         for (c++; c <= colMax; c++) {
             n = 0;
@@ -150,14 +150,14 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             }
 
             //En déduit le nombre de matches de la colonne
-            m_nMatchCol[c] = 2 * m_nMatchCol[c - 1] - n;
+            nMatchCol[c] = 2 * nMatchCol[c - 1] - n;
 
-            nMatchRestant += n - m_nMatchCol[c];
+            nMatchRestant += n - nMatchCol[c];
             if (!n) {
                 c2 = c;
             }
 
-            if (!m_nMatchCol[c]) {
+            if (!nMatchCol[c]) {
                 break;
             }
         }
@@ -186,14 +186,14 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
             //Ajoute un match par joueur trouvé
             if (n) {
-                this.fillMatchs(m_nMatchCol, n, c2);
+                this.fillMatchs(nMatchCol, n, c2);
                 break;
             }
         }
 
         //Compte tous les joueurs entrant ou qualifiés
         c = colMin;
-        nMatchRestant = -m_nMatchCol[c];
+        nMatchRestant = -nMatchCol[c];
         for (; c <= colMax; c++) {
             n = 0;
             const bottom = positionBottomCol(c),
@@ -209,23 +209,23 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
         for (c = colMin; c <= colMax; c++) {
 
-            if (m_nMatchCol[c] > nMatchRestant) {
-                this.fillMatchs(m_nMatchCol, nMatchRestant, c);
+            if (nMatchCol[c] > nMatchRestant) {
+                this.fillMatchs(nMatchCol, nMatchRestant, c);
                 break;
             }
 
-            nMatchRestant -= m_nMatchCol[c];
+            nMatchRestant -= nMatchCol[c];
         }
 
         //Contrôle si il n'y a pas une colonne sans match
         bColSansMatch = false;
         for (nMatchRestant = 0, c = colMin; c < colMax; c++) {
-            nMatchRestant += m_nMatchCol[c];
+            nMatchRestant += nMatchCol[c];
 
-            if (m_nMatchCol[c]) {
+            if (nMatchCol[c]) {
                 if (bColSansMatch) {
                     //Refait la répartition tout à droite
-                    this.fillMatchs(m_nMatchCol, nMatchRestant, c + 1);
+                    this.fillMatchs(nMatchCol, nMatchRestant, c + 1);
                     break;
                 }
             } else {
@@ -236,9 +236,9 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         ////TODO Contrôle qu'il n'y a pas trop de match pour les joueurs
         //bColSansMatch = false;
         //for( nMatchRestant = 0, c = iColMin( draw); c< colMax; c++) {
-        //    nMatchRestant += m_nMatchCol[c];
+        //    nMatchRestant += nMatchCol[c];
         //
-        //    if( m_nMatchCol[ c]) {
+        //    if( nMatchCol[ c]) {
         //        if( bColSansMatch) {
         //            //Refait la répartition tout à droite
         //            this.RempliMatchs(nMatchRestant, c+1);
@@ -248,30 +248,30 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //        bColSansMatch = true;
         //}
 
-        return m_nMatchCol;
+        return nMatchCol;
     }
 
-    private TirageEchelonne( m_nMatchCol: number[]): boolean {		//Suivant
+    private TirageEchelonne( nMatchCol: number[]): boolean {		//Suivant
 
         const colMin = columnMin(this.draw.nbOut);
         const colMax = columnMax(this.draw.nbColumn, this.draw.nbOut);
 
         //Enlève le premier match possible en partant de la gauche
         for (let c = MAX_COL - 1; c > colMin; c--) {
-            if (undefined === m_nMatchCol[c]) {
+            if (undefined === nMatchCol[c]) {
                 continue;
             }
-            if (m_nMatchCol[c] > 1 && ((c + 1) < colMax)) {
+            if (nMatchCol[c] > 1 && ((c + 1) < colMax)) {
 
-                if ((m_nMatchCol[c + 1] + 1) > 2 * (m_nMatchCol[c] - 1)) {
+                if ((nMatchCol[c + 1] + 1) > 2 * (nMatchCol[c] - 1)) {
                     continue;
                 }
 
-                m_nMatchCol[c]--;
+                nMatchCol[c]--;
 
                 //Remet le match plus à droite
                 c++;
-                m_nMatchCol[c]++;
+                nMatchCol[c]++;
 
                 return true;
             }
@@ -279,88 +279,81 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return false;
     }
 
-    private TirageEnLigne( m_nMatchCol: number[]): boolean {	//Precedent
+    private TirageEnLigne( nMatchCol: number[]): boolean {	//Precedent
 
         const colMin = columnMin(this.draw.nbOut);
 
         //Cherche où est-ce qu'on peut ajouter un match en partant de la gauche
         let nMatchRestant = 0;
         for (let c = MAX_COL - 1; c > colMin; c--) {
-            if (undefined === m_nMatchCol[c]) {
+            if (undefined === nMatchCol[c]) {
                 continue;
             }
-            let iMax = Math.min(nMatchRestant + m_nMatchCol[c], countInCol(c, this.draw.nbOut));
+            let iMax = Math.min(nMatchRestant + nMatchCol[c], countInCol(c, this.draw.nbOut));
             if (c > colMin) {
-                iMax = Math.min(iMax, 2 * m_nMatchCol[c - 1]);
+                iMax = Math.min(iMax, 2 * nMatchCol[c - 1]);
             }
-            if (m_nMatchCol[c] < iMax) {
+            if (nMatchCol[c] < iMax) {
                 //Ajoute le match en question
-                m_nMatchCol[c]++;
+                nMatchCol[c]++;
                 nMatchRestant--;
 
                 //Reset les autres matches de gauche
-                this.fillMatchs(m_nMatchCol, nMatchRestant, c + 1);
+                this.fillMatchs(nMatchCol, nMatchRestant, c + 1);
                 return true;
             }
 
-            nMatchRestant += m_nMatchCol[c];
+            nMatchRestant += nMatchCol[c];
         }
         return false;
     }
 
     //Place les matches dans l'ordre
-    private buildMatches(oldDraw: Draw, m_nMatchCol: number[], players: Array<Player|number>): Draw { //ConstruitMatch
+    private buildMatches(oldDraw: OptionalId<Draw>, nMatchCol: number[], players: Array<Player|number>, prevGroup?: [number,number]): Draw { //ConstruitMatch
 
         const draw = this.draw = newDraw(this.event, oldDraw);
         draw.boxes = [];
 
-        const colMin = columnMin(draw.nbOut),
-            colMax = columnMax(draw.nbColumn, draw.nbOut);
+        const colMin = columnMin(draw.nbOut);
+        const colMax = columnMax(draw.nbColumn, draw.nbOut);
+        const max = positionMax(draw.nbColumn, draw.nbOut);
 
-        //Calcule OrdreInv
-        const pOrdreInv = this.listReverseOrder(draw);
+        const reverseOrder = this.listReverseOrder(draw);
 
         //Nombre de Tête de série
-        let nTeteSerie = draw.nbOut;
-        if (nTeteSerie === 1) {
-            nTeteSerie = countInCol((colMax - colMin) >> 1);
-        }
+        const nSeeded = draw.nbOut !== 1 ? draw.nbOut : countInCol((colMax - colMin) >> 1);
 
-        const max = positionMax(draw.nbColumn, draw.nbOut);
-        const pbMatch: boolean[] = new Array(max + 1);
+        const hasMatch: boolean[] = new Array(max + 1).fill(false);
 
-        let iJoueur = 0,
-            m = 0,
-            nj = 0;
-        let c = -1;
-        let o = 0
-        for (; o <= max; o++) {
-            const b = pOrdreInv[o];
+        let iPlayer = 0, nMatch = 0, nPlayer = 0, col = -1;
+        let ord = 0
+        for (; ord <= max; ord++) {
+            const b = reverseOrder[ord];
             if (b === -1) {
                 continue;
             }
-            if (column(b) !== c) {
-                c = column(b);
+            if (column(b) !== col) {
+                col = column(b);
 
-                m = m_nMatchCol[c] || 0;
-                nj = c > colMin ? 2 * m_nMatchCol[c - 1] - m : 0;
+                nMatch = nMatchCol[col] || 0;
+                nPlayer = col > colMin ? 2 * nMatchCol[col - 1] - nMatch : 0;
             }
 
             //fou les joueurs
             const posMatch = positionMatch(b);
-            if (nj > 0) {
-                if (pbMatch[posMatch]) {
-                    iJoueur++;
-                    nj--;
+            if (nPlayer > 0) {
+                if (hasMatch[posMatch]) {
+                    iPlayer++;
+                    nPlayer--;
 
                     const box = newBox(draw, this.event.matchFormat, b);
                     draw.boxes.push(box);
                 }
             } else {
                 //fou les matches
-                if (m > 0 && (c === colMin || pbMatch[posMatch])) {
-                    pbMatch[b] = true;
-                    m--;
+                if (nMatch > 0 && (col === colMin || hasMatch[posMatch])) {
+                    hasMatch[b] = true;
+                    nMatch--;
 
                     const match = newBox<Match>(draw, this.event.matchFormat, b);
                     match.score = '';
@@ -368,34 +361,34 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 }
             }
 
-            if (iJoueur >= players.length) {
+            if (iPlayer >= players.length) {
                 break;
             }
         }
 
         //fou les joueurs en commençant par les qualifiés entrants
-        iJoueur = 0;    //players.length - 1;
-        for (; o > 0; o--) {
-            const b = pOrdreInv[o];
+        iPlayer = 0;    //players.length - 1;
+        for (; ord > 0; ord--) {
+            const b = reverseOrder[ord];
             if (b === -1) {
                 continue;
             }
 
             //fou les joueurs
-            if (!pbMatch[b] && pbMatch[positionMatch(b)]) {
+            if (!hasMatch[b] && hasMatch[positionMatch(b)]) {
 
                 //Qualifiés entrants se rencontrent
-                let qualif = typeof players[iJoueur] === 'number' ? players[iJoueur] as number : 0;
+                let qualif = typeof players[iPlayer] === 'number' ? players[iPlayer] as number : 0;
                 if (qualif) {
                     const boxIn2 = this.findBox<PlayerIn>(positionOpponent(b));
                     if (boxIn2?.qualifIn) {
                         //2 Qualifiés entrants se rencontrent
-                        for (let t = iJoueur + 1; t >= nTeteSerie; t--) {
-                            if (isObject(players[t])) {
+                        for (let t = iPlayer + 1; t >= nSeeded; t--) {
+                            if (!(typeof players[t] === 'number')) {
                                 //switch
                                 const p = players[t];
                                 players[t] = qualif;
-                                players[iJoueur] = p;
+                                players[iPlayer] = p;
                                 qualif = 0;
                                 break;
                             }
@@ -406,11 +399,13 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 const boxIn = this.findBox<PlayerIn>(b);
                 if (boxIn) {
                     delete (boxIn as Partial<Match>).score; //not a match
-                    boxIn.order = iJoueur + 1; // TODO test
+                    boxIn.order = iPlayer + 1; // TODO test
                     if (qualif) {	//Qualifié entrant
-                        this.setPlayerIn(boxIn, qualif);
+                        const [match] = groupFindPlayerOut(this.event, prevGroup ?? [0,0], qualif);
+                        const playerId = match?.playerId;
+                        this.setPlayerIn(boxIn, qualif, playerId);
                     } else {	//Joueur
-                        this.putPlayer(boxIn, (players[iJoueur] as Player).id);
+                        this.putPlayer(boxIn, (players[iPlayer] as Player).id);
 
                         if ((!draw.minRank || !rank.isNC(draw.minRank))
                             || (!draw.maxRank || !rank.isNC(draw.maxRank))) {
@@ -421,7 +416,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                             } else {
                                 t = this.seededQ(b, draw.nbOut);
                             }
-                            if (t <= nTeteSerie) {
+                            if (t <= nSeeded) {
                                 const tt = findSeeded(this.event, draw, t);
                                 if (!tt.length || tt[0].id === oldDraw.id) {
                                     boxIn.seeded = t;
@@ -429,11 +424,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                             }
                         }
                     }
-                    iJoueur++;
+                    iPlayer++;
                 }
             }
 
-            if (iJoueur > players.length) {
+            if (iPlayer > players.length) {
                 break;
             }
         }
@@ -445,14 +440,15 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         if (draw.type !== FINAL) {
 
             //Find the first unused qualif number
-            const group = groupDraw(this.event, draw);
+            const group = groupDraw(this.event, draw.id);
             let i;
             if (group) {
-                const qualifOuts = findGroupQualifOuts(this.event, group).filter(([, d]) => d.id !== oldDraw.id).map(([q]) => q).sort();
+                const qualifOuts = findGroupQualifOuts(this.event, group)
+                    .filter(([, _, d]) => d.id !== oldDraw.id)
+                    .map(([q]) => q)
+                    .sort();
                 for (i = 1; i <= MAX_QUALIF; i++) {
-                    // const [,m] = groupFindPlayerOut(this.event, group, i);
-                    const m = qualifOuts.includes(i);
-                    if (!m) {
+                    if (!qualifOuts.includes(i)) {
                         break;
                     }
                 }
@@ -512,7 +508,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
-        const usedNumber = inNumber && inNumber !== QEMPTY && this.findPlayerIn(inNumber);
+        const usedNumber = inNumber !== undefined && inNumber !== QEMPTY && this.findPlayerIn(inNumber);
 
         const res = super.setPlayerIn(box, inNumber, playerId);
         if (res) {
@@ -539,7 +535,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
-        const nextGrp = nextGroup(this.event, this.draw);
+        const nextGrp = nextGroup(this.event, this.draw.id);
 
         //ASSERT(setPlayerOutOk(iBoite, outNumber));
 
@@ -548,7 +544,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             //Met à jour le tableau suivant
             let boxIn: PlayerIn | undefined;
             if (nextGrp && box.playerId && box.qualifOut) {
-                [,boxIn] = groupFindPlayerIn(this.event, nextGrp, outNumber);
+                [boxIn] = groupFindPlayerIn(this.event, nextGrp, outNumber);
                 if (boxIn) {
                     ASSERT(boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn)) {
@@ -574,7 +570,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         } else {	//Enlève un qualifié sortant
             if (nextGrp && box.playerId && box.qualifOut) {
                 //Met à jour le tableau suivant
-                const [,boxIn] = groupFindPlayerIn(this.event, nextGrp, box.qualifOut);
+                const [boxIn] = groupFindPlayerIn(this.event, nextGrp, box.qualifOut);
                 if (boxIn) {
                     ASSERT(!!boxIn.playerId && boxIn.playerId === box.playerId);
                     if (!this.removePlayer(boxIn, undefined, true)) {
