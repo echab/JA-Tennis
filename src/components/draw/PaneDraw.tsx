@@ -74,7 +74,9 @@ export const PaneDraw: Component = () => {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
             const newDraws = lib.generateDraw(GenerateType.PlusEchelonne, drawPlayers);
-            commandManager.add(updateDraws(evt, newDraws));
+            if (newDraws.length) {
+                commandManager.add(updateDraws(evt, newDraws));
+            }
         }
     }
 
@@ -84,7 +86,9 @@ export const PaneDraw: Component = () => {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
             const newDraws = lib.generateDraw(GenerateType.PlusEnLigne, drawPlayers);
-            commandManager.add(updateDraws(evt, newDraws));
+            if (newDraws.length) {
+                commandManager.add(updateDraws(evt, newDraws));
+            }
         }
     }
 
@@ -120,14 +124,15 @@ export const PaneDraw: Component = () => {
                         onClick={() => showDialog("draw")}
                     ><i class="icon2-info" /></button>
 
-                    <button class="p-2 rounded-full [&[aria-selected=true]]:bg-blue-200" title="Lock/unlock draw updates"
+                    <button class="p-2 rounded-full [&[aria-selected=true]]:bg-blue-200"
+                        title={`Lock/unlock draw updates (${draw()?.lock ?? BUILD})`}
                         aria-selected={draw()?.lock === PLAN}
                         onClick={lockDraw}
                     ><i class="icon2-locker" /></button>
 
-                    <Show when={draw()?.lock === BUILD}>
+                    <Show when={(draw()?.lock ?? BUILD) === BUILD}>
                         {/* eslint-disable-next-line no-bitwise */}
-                        <Show when={!((draw()?.type ?? BUILD) & PLAY)}>
+                        <Show when={!((draw()?.lock ?? BUILD) & PLAY)}>
                             <button class="p-2 rounded-full" title="Change the draw structure to be more progressive"
                                 onClick={generateLeft}
                             ><i class="icon2-draw-left" /></button>
@@ -153,8 +158,8 @@ export const PaneDraw: Component = () => {
         </div>
         <Show when={draw()}>
             <DrawDraw
-                event={event()!}
-                draw={draw()!}
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                event={event()!} draw={draw()!}
                 tournament={selection.tournament}
             />
         </Show>

@@ -1,13 +1,13 @@
 /* eslint-disable no-bitwise */
 import { DrawLibBase } from './drawLibBase';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent, positionOpponent1, positionOpponent2, positionTopCol, scanLeftBoxes } from './knockoutLib';
-import { by, byId } from '../util/find';
-import { defined, isObject } from '../util/object'
+import { by } from '../util/find';
+import { isObject } from '../util/object'
 import { rank } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
+import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, isMatch, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
 
@@ -77,18 +77,12 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    generateDraw( generate: GenerateType, registeredPlayersOrQ: Array<Player|number>): Draw[] {
-        let playersOrQ: Array<Player|number> = [];
-        let m_nMatchCol;
+    generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>): Draw[] {
+        let m_nMatchCol: number[];
         if (generate === GenerateType.Create) {   //from registred players
             m_nMatchCol = Array(MAX_COL).fill(0);
-
-            // const players: Array<Player|number> = getRegisteredPlayers(this.event, this.draw);
-
-            playersOrQ = registeredPlayersOrQ;
-
-            this.resetDraw(registeredPlayersOrQ.length);
-            this.fillMatchs(m_nMatchCol, registeredPlayersOrQ.length - this.draw.nbOut);
+            this.resetDraw(playersOrQ.length);
+            this.fillMatchs(m_nMatchCol, playersOrQ.length - this.draw.nbOut);
         } else {    //from existing players
             m_nMatchCol = this.countMatchs();
             if (generate === GenerateType.PlusEchelonne) {
@@ -100,11 +94,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                     return [];
                 }
             }
-            const registeredPlayers = registeredPlayersOrQ.filter((p): p is Player => typeof p !== 'number');
-
-            playersOrQ = this.getDrawPlayersOrQ()
-                .map((pq) => (typeof pq === 'number' ? pq : byId(registeredPlayers, pq)))
-                .filter(defined);
         }
 
         //Tri et Mélange les joueurs de même classement
@@ -319,28 +308,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         return false;
     }
 
-    // TODO same as findDrawPlayerOrQ
-    private getDrawPlayersOrQ(): Array<string|number> { //GetJoueursTableau
-
-        //Récupère les joueurs du tableau
-        const result: Array<string|number> = [];
-        for (const box of this.draw.boxes) {
-
-            const boxIn = box as PlayerIn | undefined;
-            if (!boxIn) {
-                continue;
-            }
-            //Récupérer les joueurs et les Qualifiés entrants
-            if (boxIn.qualifIn) {
-                result.push(boxIn.qualifIn);	//no qualifie entrant
-            } else if (this.isNewPlayer(boxIn) && boxIn.playerId) {
-                result.push(boxIn.playerId);	//no du joueur
-            }
-        }
-
-        return result;
-    }
-
     //Place les matches dans l'ordre
     private buildMatches(oldDraw: Draw, m_nMatchCol: number[], players: Array<Player|number>): Draw { //ConstruitMatch
 
@@ -351,19 +318,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             colMax = columnMax(draw.nbColumn, draw.nbOut);
 
         //Calcule OrdreInv
-        const pOrdreInv: number[] = [];
-        let c = colMin;
-        for (; c <= colMax; c++) {
-            const bottom = positionBottomCol(c),
-                top = positionTopCol(c);
-            for (let i = bottom; i <= top; i++) {
-                if (WITH_TDS_HAUTBAS) {
-                    pOrdreInv[this.orderQhb(i, draw.nbOut)] = i;
-                } else {
-                    pOrdreInv[this.orderQ(i, draw.nbOut)] = i;
-                }
-            }
-        }
+        const pOrdreInv = this.listReverseOrder(draw);
 
         //Nombre de Tête de série
         let nTeteSerie = draw.nbOut;
@@ -377,7 +332,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         let iJoueur = 0,
             m = 0,
             nj = 0;
-        c = -1;
+        let c = -1;
         let o = 0
         for (; o <= max; o++) {
             const b = pOrdreInv[o];
@@ -430,10 +385,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             if (!pbMatch[b] && pbMatch[positionMatch(b)]) {
 
                 //Qualifiés entrants se rencontrent
-                let qualif: number = 'number' === typeof players[iJoueur] ? players[iJoueur] as number : 0;
+                let qualif = typeof players[iJoueur] === 'number' ? players[iJoueur] as number : 0;
                 if (qualif) {
                     const boxIn2 = this.findBox<PlayerIn>(positionOpponent(b));
-                    if (boxIn2 && boxIn2.qualifIn) {
+                    if (boxIn2?.qualifIn) {
                         //2 Qualifiés entrants se rencontrent
                         for (let t = iJoueur + 1; t >= nTeteSerie; t--) {
                             if (isObject(players[t])) {
@@ -466,8 +421,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                             } else {
                                 t = this.seededQ(b, draw.nbOut);
                             }
-                            if (t <= nTeteSerie && !findSeeded(this.event, draw, t).length) {
-                                boxIn.seeded = t;
+                            if (t <= nTeteSerie) {
+                                const tt = findSeeded(this.event, draw, t);
+                                if (!tt.length || tt[0].id === oldDraw.id) {
+                                    boxIn.seeded = t;
+                                }
                             }
                         }
                     }
@@ -490,8 +448,10 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             const group = groupDraw(this.event, draw);
             let i;
             if (group) {
+                const qualifOuts = findGroupQualifOuts(this.event, group).filter(([, d]) => d.id !== oldDraw.id).map(([q]) => q).sort();
                 for (i = 1; i <= MAX_QUALIF; i++) {
-                    const [,m] = groupFindPlayerOut(this.event, group, i);
+                    // const [,m] = groupFindPlayerOut(this.event, group, i);
+                    const m = qualifOuts.includes(i);
                     if (!m) {
                         break;
                     }
@@ -552,11 +512,13 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
+        const usedNumber = inNumber && inNumber !== QEMPTY && this.findPlayerIn(inNumber);
+
         const res = super.setPlayerIn(box, inNumber, playerId);
         if (res) {
             if (inNumber) {	//Ajoute un qualifié entrant
                 //Qualifié entrant pas déjà pris
-                if (inNumber === QEMPTY || !this.findPlayerIn(inNumber)) {
+                if (!usedNumber) {
                     //Cache les boites de gauche
                     scanLeftBoxes(this.draw, box.position, true, (box) => {
                         box.hidden = true;  //TODOjs delete the box from draw.boxes
@@ -758,6 +720,26 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 t :			//La même tête de série se propage
                 1 + countInCol(column(i), nQualifie) - t;	//Nouvelle tête de série complémentaire
         }
+    }
+
+    private listReverseOrder({ nbColumn, nbOut }: Draw): number[] {
+        const result: number[] = [];
+
+        const colMax = columnMax(nbColumn, nbOut);
+
+        let c = columnMin(nbOut);
+        for (; c <= colMax; c++) {
+            const bottom = positionBottomCol(c),
+                top = positionTopCol(c);
+            for (let i = bottom; i <= top; i++) {
+                if (WITH_TDS_HAUTBAS) {
+                    result[this.orderQhb(i, nbOut)] = i;
+                } else {
+                    result[this.orderQ(i, nbOut)] = i;
+                }
+            }
+        }
+        return result;
     }
 
     //Ordre de remplissage des boites en partant de la droite

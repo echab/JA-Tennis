@@ -429,10 +429,9 @@ export function findDrawPlayerIds(draw: Draw, withQualifIn = true): Set<string> 
  * @returns an array of `Player`s or qualify `number`s which could be `QEMPTY`
  */
 export function findDrawPlayersOrQ(draw: Draw, players: Player[]): Array<Player | number> {
-    return (draw.boxes as PlayerIn[])
-        .map(({ qualifIn, playerId, order }) => order
-            ? qualifIn || (playerId ? byId(players, playerId) : undefined)
-            : undefined)
+    return draw.boxes
+        .filter((b): b is PlayerIn => !isMatch(b))
+        .map(({ qualifIn, playerId }) => qualifIn || (playerId ? byId(players, playerId) : undefined))
         .filter((q): q is Player | number => q !== undefined);
 }
 

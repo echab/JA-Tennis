@@ -236,8 +236,8 @@ const boxFields: Fields<PlayerIn & Match & { version: number }> = {
         replacer: (f: number, p: PlayerIn & Match) => {
             let result = f;
             if (p.hidden) { result |= 1; }
-            if (p.qualifIn !== undefined) { result |= (1 << 1) | (p.qualifIn << 3); }
-            if (p.qualifOut !== undefined) { result |= (2 << 1) | (p.qualifOut << 3); }
+            if (p.qualifIn !== undefined) { result |= (1 << 1) | ((p.qualifIn === QEMPTY ? 0 : p.qualifIn) << 3); }
+            if (p.qualifOut !== undefined) { result |= (2 << 1) | ((p.qualifOut === QEMPTY ? 0 : p.qualifOut) << 3); }
             if (p.seeded !== undefined) { result |= (3 << 1) | (p.seeded << 3); }
             if (p.receive) { result |= (1 << 8); }
             if (p.aware1) { result |= (p.aware1 << 9); }
