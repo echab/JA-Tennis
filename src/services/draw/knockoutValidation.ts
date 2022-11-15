@@ -1,6 +1,6 @@
 ﻿/* eslint-disable no-bitwise */
 import { columnMax, column, positionTopCol, positionOpponent1, positionMax, positionBottomCol } from './knockoutLib';
-import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
+import { findGroupQualifOuts, findPlayerIn, findPlayerOut, findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 import { indexOf, byId } from '../util/find';
 import { category, rank, score } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL, KNOCKOUT } from '../../domain/draw';
@@ -412,7 +412,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
                 //DONE 00/03/07: CTableau, qualifié entrant en double
                 let j: Box | undefined;
-                if (!draw.cont && (j = lib.findPlayerIn(e)) && (j.position !== b)) {
+                if (!draw.cont && (j = findPlayerIn(lib.draw, e)) && (j.position !== b)) {
                     result.push({ message: 'ERR_TAB_ENTRANT_DUP', draw, box: boxIn, player });
                 }
 
@@ -437,7 +437,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 //ASSERT(!isTypePoule || (b === iDiagonale(b)));	//Qs que dans diagonale des poules
 
                 //DONE 00/03/07: CTableau, qualifié sortant en double
-                const j = lib.findPlayerOut(e);
+                const j = findPlayerOut(lib.draw, e);
                 if (j && (j.position !== b)) {
                     result.push({ message: 'ERR_TAB_SORTANT_DUP', draw, box: match, player, detail: `Q${e}` });
                 }
@@ -490,7 +490,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         if (prevGroup) {
             const qualifOuts = findGroupQualifOuts(event, prevGroup)
                 .filter(([q]) => q !== QEMPTY);
-            const missing = qualifOuts.filter(([q]) => !lib.findPlayerIn(q)).map(([q]) => `Q${q}`);
+            const missing = qualifOuts.filter(([q]) => !findPlayerIn(lib.draw, q)).map(([q]) => `Q${q}`);
             if (missing.length) {
                 result.push({ message: 'ERR_TAB_SORTANT_PREC_NO', draw, detail: missing.join(' ') });
             }

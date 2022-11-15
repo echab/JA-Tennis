@@ -1,6 +1,6 @@
 import { getId, indexOf } from "./util/find";
 import { guid } from "./util/guid";
-import { Tournament, TEvent } from "../domain/tournament";
+import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";

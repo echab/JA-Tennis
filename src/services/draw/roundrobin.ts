@@ -1,6 +1,6 @@
 import type { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { Draw, Match, PlayerIn, QEMPTY, ROUNDROBIN } from '../../domain/draw';
+import { Draw, Match, PlayerIn, ROUNDROBIN } from '../../domain/draw';
 import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
 import { groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
@@ -99,45 +99,6 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    findPlayerIn(iQualifie: number): PlayerIn | undefined {
-
-        ASSERT(iQualifie >= 0);
-
-        if (!this.draw.boxes) {
-            return;
-        }
-
-        for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
-            const boxIn = this.draw.boxes[i] as PlayerIn;
-            if (!boxIn) {
-                continue;
-            }
-            const e = boxIn.qualifIn;
-            if (e === iQualifie || (!iQualifie && e)) {
-                return boxIn;
-            }
-
-        }
-    }
-
-    /** @override */
-    findPlayerOut(iQualifie: number): Match | undefined {
-
-        ASSERT(0 < iQualifie);
-
-        if (iQualifie === QEMPTY || !this.draw.boxes) {
-            return;
-        }
-
-        for (const box of this.draw.boxes) {
-            const boxOut = box as Match | undefined;
-            if (boxOut && boxOut.qualifOut === iQualifie) {
-                return boxOut;
-            }
-        }
-    }
-
-    /** @override */
     setPlayerOut(box: Match, outNumber?: number): boolean { //setPlayerOut
         // outNumber=0 => enlève qualifié
 
@@ -152,7 +113,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         if (outNumber) {	//Ajoute un qualifié sortant
             // //Met à jour le tableau suivant
             // if (nextgrp && box.playerId && box.qualifOut) {
-            //     const boxIn = this.findPlayerIn(outNumber);
+            //     const boxIn = findPlayerIn(this.draw, outNumber);
             //     if (boxIn) {
             //         ASSERT(boxIn.playerId === box.playerId);
             //         if (!this.removePlayer(boxIn)) {

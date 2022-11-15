@@ -3,7 +3,7 @@ import { guid } from "./util/guid";
 import { ASSERT, shuffle } from "../utils/tool";
 import { rank } from "./types";
 
-import { Box, BUILD, Draw, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../domain/draw";
+import { Box, Draw, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
 import { OptionalId } from "../domain/object";
 import { Command } from "./util/commandManager";
@@ -14,11 +14,6 @@ import { defined } from "./util/object";
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32;
-
-// modeBuild = BUILD;
-// modePlan = PLAN;
-// modePlay = Mode.Play;
-// modeLock = Mode.Lock;
 
 export function updateDraws(
     event: TEvent,
@@ -405,4 +400,29 @@ export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [numbe
         );
     }
     return result;
+}
+
+export function findPlayerIn(draw: OptionalId<Draw>, qualif: number): PlayerIn | undefined { //FindQualifieEntrant
+    ASSERT(0 <= qualif);
+
+    for (const boxIn of draw.boxes as PlayerIn[]) {
+        const e = boxIn.qualifIn;
+        if (e === qualif || (qualif === QEMPTY && e)) { // TODO? return first empty Q
+            return boxIn;
+        }
+    }
+}
+
+export function findPlayerOut(draw: OptionalId<Draw>, qualif: number): Match | undefined { //FindQualifieSortant
+    ASSERT(0 < qualif);
+
+    if (qualif === QEMPTY) {
+        return;
+    }
+
+    for (const match of draw.boxes as Match[]) {
+        if (match.qualifOut === qualif) {
+            return match;
+        }
+    }
 }

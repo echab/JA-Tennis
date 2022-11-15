@@ -26,9 +26,6 @@ export interface IDrawLib {
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean; //SetQualifieEntrant
     setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
 
-    findPlayerIn(inNumber: number): PlayerIn | undefined; //FindQualifieEntrant
-    findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
-
     computeScore(): boolean; //CalculeScore
     boxesOpponents(match: Match): { player1: PlayerIn; player2: PlayerIn };
 

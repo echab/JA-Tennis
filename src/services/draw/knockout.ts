@@ -6,13 +6,12 @@ import { rank } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
-import { findGroupQualifOuts, findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
+import { findGroupQualifOuts, findPlayerIn, findSeeded, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
 import { OptionalId } from '../../domain/object';
 
-const MIN_COL = 0,
-    MAX_COL = 9,
+const MAX_COL = 9,
     MAX_QUALIF = 32,
     WITH_TDS_HAUTBAS = true;
 
@@ -444,7 +443,8 @@ export class Knockout extends DrawLibBase implements IDrawLib {
             let i;
             if (group) {
                 const qualifOuts = findGroupQualifOuts(this.event, group)
-                    .filter(([, _, d]) => d.id !== oldDraw.id)
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    .filter(([, match, d]) => d.id !== oldDraw.id)
                     .map(([q]) => q)
                     .sort();
                 for (i = 1; i <= MAX_QUALIF; i++) {
@@ -508,7 +508,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean { //setPlayerIn
         // inNumber=0 => enlève qualifié
 
-        const usedNumber = inNumber !== undefined && inNumber !== QEMPTY && this.findPlayerIn(inNumber);
+        const usedNumber = inNumber !== undefined && inNumber !== QEMPTY && findPlayerIn(this.draw, inNumber);
 
         const res = super.setPlayerIn(box, inNumber, playerId);
         if (res) {
@@ -583,40 +583,6 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         return true;
-    }
-
-    /** @override */
-    findPlayerIn( iQualifie: number): PlayerIn | undefined {
-
-        ASSERT(0 <= iQualifie);
-
-        if (!this.draw.boxes) {
-            return;
-        }
-
-        for (let i = this.draw.boxes.length - 1; i >= 0; i--) {
-            const boxIn = this.draw.boxes[i] as PlayerIn;
-            if (!boxIn) {
-                continue;
-            }
-            const e = boxIn.qualifIn;
-            if (e === iQualifie || (!iQualifie && e)) {
-                return boxIn;
-            }
-        }
-    }
-
-    /** @override */
-    findPlayerOut( iQualifie: number): Match | undefined {
-
-        ASSERT(0 < iQualifie);
-
-        if (iQualifie === QEMPTY || !this.draw.boxes) {
-            return;
-        }
-
-        // TODO could have duplicates!
-        return by<Match>(this.draw.boxes as Match[], "qualifOut", iQualifie);
     }
 
     //private box1(match: Match): Box {

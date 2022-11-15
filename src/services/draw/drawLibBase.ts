@@ -2,7 +2,7 @@
 import { Draw, Box, Match, PlayerIn, QEMPTY, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import type { TEvent } from '../../domain/tournament';
-import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot } from '../drawService';
+import { nextGroup, groupFindPlayerOut, newBox, previousGroup, isMatch, isSlot, findPlayerIn } from '../drawService';
 import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
 import { ASSERT } from '../../utils/tool';
@@ -18,11 +18,6 @@ export abstract class DrawLibBase implements IDrawLib {
     abstract generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[];
 
     abstract setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
-
-    /** @deprecated TODO could be implement in drawService, not specific to knockout/roundrobin */
-    abstract findPlayerIn(inNumber: number): PlayerIn | undefined; //FindQualifieEntrant
-    /** @deprecated TODO could be implement in drawService, not specific to knockout/roundrobin */
-    abstract findPlayerOut(outNumber: number): Match | undefined; //FindQualifieSortant
 
     abstract computeScore(): boolean; //CalculeScore
     abstract boxesOpponents(match: Match): { player1: PlayerIn; player2: PlayerIn };
@@ -216,7 +211,7 @@ export abstract class DrawLibBase implements IDrawLib {
 
             //Qualifié entrant pas déjà pris
             if (inNumber === QEMPTY ||
-                !this.findPlayerIn(inNumber)) {
+                !findPlayerIn(this.draw, inNumber)) {
 
                 box.qualifIn = inNumber;
             }
