@@ -1,7 +1,6 @@
 import { Component, For, JSX, Show } from 'solid-js';
-import { A } from '@solidjs/router';
+import { A, type RouteSectionProps } from '@solidjs/router';
 import { selectDraw, selectEvent, selection, urlDraw, urlEvent } from '../util/selection';
-import { TEvent } from '../../domain/tournament';
 import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
 import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragdrop';
@@ -9,11 +8,10 @@ import { isSexeCompatible } from '../../services/tournamentService';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
 
-type Props = {
-    events: TEvent[];
+type Data = {
 }
 
-export const Events: Component<Props> = (props) => {
+export const Events: Component<RouteSectionProps<Data>> = (props) => {
 
     const drop_handler: JSX.EventHandlerUnion<HTMLDivElement, DragEvent> = (evt) => {
         evt.preventDefault();
@@ -39,7 +37,7 @@ export const Events: Component<Props> = (props) => {
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
         </div>
-        <For each={props.events} fallback={<div>No event</div>}>{(event) =>
+        <For each={selection.tournament.events} fallback={<div>No event</div>}>{(event) =>
             <div
                 aria-selected={event.id === selection.event?.id}
                 class="border-l-8 m-2"

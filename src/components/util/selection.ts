@@ -7,6 +7,7 @@ import { groupFindQ, isMatch } from "../../services/drawService";
 import { dayOf } from "../../services/planningService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
 import { minutes } from "../../utils/date";
+import { useParams } from "@solidjs/router";
 
 export interface SelectionItems {
     tournament: Tournament;
@@ -23,6 +24,8 @@ export interface SelectionItems {
 }
 
 const emptyTournament: Tournament = { version: 13, id: '', types: { name: '', versionTypes: -1 }, info: { name: '', slotLength: DEFAULT_SLOT_LENGTH }, players: [], events: [] };
+
+const END_SLASH = /\/+$/;
 
 export const [selection, setSelection] = createStore<SelectionItems>({
     tournament: emptyTournament,
@@ -155,18 +158,21 @@ export function drawById(idDraw: string, parent?: string | Tournament): {draw?: 
 }
 
 export function urlPlayer(player?: Player) {
-    return `/players/${player?.id ?? ''}`.replace(/\/+$/, '');
+    const params = useParams();
+    return `/${params.pane}/players/${player?.id ?? ''}`.replace(END_SLASH, '');
 }
 
 export function urlEvent(event?: TEvent) {
-    return `/draw/${event?.id ?? ''}`.replace(/\/+$/, '');
+    const params = useParams();
+    return `/${params.pane}/draw/${event?.id ?? ''}`.replace(END_SLASH, '');
 }
 
 export function urlDraw(draw?: Draw, event?: TEvent) {
     if (!event) {
         event = selection.event; // reactive default value
     }
-    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}`.replace(/\/+$/, '');
+    const params = useParams();
+    return `/${params.pane}/draw/${event?.id ?? ''}/${draw?.id ?? ''}`.replace(END_SLASH, '');
 }
 
 // TODO could return URL and preserve current search
@@ -190,12 +196,14 @@ export function urlBox(box?: PlayerIn | Match, draw?: Draw, event?: TEvent, tour
         playerId: box?.playerId
     };
 
-    return `/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`
+    const params = useParams();
+    return `/${params.pane}/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`
         .replace(/\/*$/, buildSearch(search));
 }
 
 export function urlDay(day?: number) {
-    return `/planning/${day ?? ''}`.replace(/\/+$/, '');
+    const params = useParams();
+    return `/${params.pane}/planning/${day ?? ''}`.replace(END_SLASH, '');
 }
 
 /** return current searchParam string like `?day=2&player=345` if parameters are present or '' */

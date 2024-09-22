@@ -36,7 +36,7 @@ export const DialogEvent: Component<Props> = (props) => {
 
     const matchFormats = matchFormat.list();
 
-    const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
+    const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
 
         // const formElems = (evt.target as HTMLFormElement).elements as unknown as Record<keyof TEvent, RadioNodeList>;

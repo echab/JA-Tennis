@@ -1,4 +1,4 @@
-import { A } from "@solidjs/router";
+import { A, useLocation, useNavigate } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
 import { mockTournament } from "../../assets/data";
 import { openFile, saveFile } from "../../services/file/file";

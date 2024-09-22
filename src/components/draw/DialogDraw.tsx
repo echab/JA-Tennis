@@ -81,7 +81,7 @@ export const DialogDraw: Component<Props> = (props) => {
             : countInCol(columnMax(form.nbColumn, form.nbOut), form.nbOut);
     }
 
-    const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
+    const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
 
         // const formElems = (evt.target as HTMLFormElement).elements as unknown as Record<keyof Draw, RadioNodeList>;

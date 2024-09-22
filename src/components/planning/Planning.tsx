@@ -1,4 +1,4 @@
-import { A, useNavigate, useParams, useSearchParams } from "@solidjs/router";
+import { A, useNavigate, useParams, useSearchParams, type RouteSectionProps } from "@solidjs/router";
 import { Component, createEffect, createMemo, For, Show } from "solid-js";
 import { Player } from "../../domain/player";
 import { Place } from "../../domain/tournament";
@@ -10,30 +10,29 @@ import { showDialog } from "../Dialogs";
 import { selection, selectDay, urlDay, selectPlace } from "../util/selection";
 import { PlanningSlot } from "./PlanningSlot";
 
-type Props = {
-    places: Place[];
-    players: Player[];
+type Data = {
     short?: boolean;
 }
 
-export const Planning: Component<Props> = (props) => {
+export const Planning: Component<RouteSectionProps<Data>> = (props) => {
 
-    const params = useParams<Params>();
     const [search, setSearch] = useSearchParams<Searchs>();
+
+    const short = props.data.short; // TODO detect we are into the SidePanel
 
     // change selection on url change
     createEffect(() => {
-        const day = parseInt(params.day ?? search.day ?? '0', 10);
+        const day = parseInt(props.params.day ?? search.day ?? '0', 10);
         selectDay(day);
-        // const place = params.place
-        //     ? props.places.find(({ name }) => name === params.place)
+        // const place = props.params.place
+        //     ? selection.tournament.places?.find(({ name }) => name === props.params.place)
         //     : undefined;
     });
 
     // change url on selection change
     const navigate = useNavigate();
     createEffect(() => {
-        if (props.short) {
+        if (short) {
             setSearch({ day: selection.day });
         } else {
             const url = urlDay(selection.day ?? 0);
@@ -74,7 +73,7 @@ export const Planning: Component<Props> = (props) => {
                     title="View the previous day of the tournament"
                 ><i class="icon2-left-arrow" /></span>
 
-                {/* {days()[selection.day ?? -1]?.toLocaleDateString(undefined, { dateStyle: props.short ? 'medium' : 'full' })} */}
+                {/* {days()[selection.day ?? -1]?.toLocaleDateString(undefined, { dateStyle: short ? 'medium' : 'full' })} */}
                 <select class="border-0"
                     value={selection.day}
                     onChange={(evt) => selectDay(parseInt(evt.currentTarget.value ?? '0', 10))}
@@ -95,7 +94,7 @@ export const Planning: Component<Props> = (props) => {
             </h3>
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
-            <Show when={props.short}>
+            <Show when={short}>
                 <A href={urlDay(selection.day)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</A>
             </Show>
         </div>
@@ -103,9 +102,9 @@ export const Planning: Component<Props> = (props) => {
         <ul class="grid gap-[2px]"
             style={{
                 'grid-template-rows': `[place] 1em repeat(${(hours.length + 1) * 12}, 1px`,
-                'grid-template-columns': `[hour] 2em repeat(${props.places.length + 1}, minmax(5em, 1fr))`
+                'grid-template-columns': `[hour] 2em repeat(${(selection.tournament.places?.length ?? 0) + 1}, minmax(5em, 1fr))`
             }} >
-            <For each={props.places}>{(place, i) =>
+            <For each={selection.tournament.places}>{(place, i) =>
                 <li class='row-[place]' style={{
                     'grid-column-start': i() + 2
                 }}>
@@ -123,7 +122,7 @@ export const Planning: Component<Props> = (props) => {
 
             <For each={daySlots()}>{(slot) =>
                 <PlanningSlot slot={slot} tournament={selection.tournament} style={{
-                    'grid-column': 2 + (slot.match.place ?? props.places.length),
+                    'grid-column': 2 + (slot.match.place ?? selection.tournament.places?.length ?? 0),
                     'grid-row': `${2 + Math.round( ((minutes(slot.match.date) ?? hourEnd * 60) - hourStart * 60)/ 5)}/span 18`,
                 }} />
             }</For>

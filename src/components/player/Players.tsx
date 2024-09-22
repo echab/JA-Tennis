@@ -1,9 +1,7 @@
 import { Component, createEffect, createSignal, For, Show } from 'solid-js';
-import { A, useNavigate, useParams } from '@solidjs/router';
+import { A, useNavigate, type RouteSectionProps } from '@solidjs/router';
 import { selection, selectPlayer, urlPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
-import type { TEvent } from '../../domain/tournament';
-import type { Params } from '../App';
 import { dragStart } from '../../services/util/dragdrop';
 import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
 import { findDrawPlayerIds } from '../../services/drawService';
@@ -11,22 +9,20 @@ import { getId } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
 
-type Props = {
-    players: Player[];
-    events: TEvent[];
+type Data = {
     short?: boolean;
 }
 
-export const Players: Component<Props> = (props) => {
+export const Players: Component<RouteSectionProps<Data>> = (props) => {
 
-    const params = useParams<Params>();
+    const short = !!props.data?.short; // TODO detect we are into the SidePanel
 
-    const [registred, setRegistred] = createSignal(props.short);
+    const [registred, setRegistred] = createSignal(short);
 
     // change selection on url change
     createEffect(() => {
-        const player = params.playerId
-            ? selection.tournament.players.find(({id}) => id === params.playerId)
+        const player = props.params.playerId
+            ? selection.tournament.players.find(({id}) => id === props.params.playerId)
             : undefined;
         selectPlayer(player);
     });
@@ -40,13 +36,13 @@ export const Players: Component<Props> = (props) => {
         }
     });
 
-    const eventById = Object.fromEntries(props.events.map((e) => [e.id, e]));
+    const eventById = Object.fromEntries(selection.tournament.events.map((e) => [e.id, e]));
 
     const drawPlayerIds = () => selection.draw ? findDrawPlayerIds(selection.draw) : new Set<string>();
 
     const drawRegisteredPlayerIds = () => new Set(
         selection.event && selection.draw
-            ? getRegisteredPlayers(props.players, selection.event, selection.draw.minRank, selection.draw.maxRank).map(getId)
+            ? getRegisteredPlayers(selection.tournament.players, selection.event, selection.draw.minRank, selection.draw.maxRank).map(getId)
             : []
     );
 
@@ -63,7 +59,7 @@ export const Players: Component<Props> = (props) => {
                 /> registered</label>
 
                 <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
-                <Show when={props.short}>
+                <Show when={short}>
                     <A href={urlPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
                 </Show>
             </div>
@@ -78,10 +74,9 @@ export const Players: Component<Props> = (props) => {
                         <th class="text-left font-normal">sexe</th>
                         <th class="text-left font-normal">name</th>
                         <th class="text-left font-normal">rank</th>
-                        <Show when={props.short}>
+                        <Show when={!short} fallback={
                             <th class="text-left font-normal">reg</th>
-                        </Show>
-                        <Show when={!props.short}>
+                        }>
                             <th class="text-left font-normal">club</th>
                             <th class="text-left font-normal">registrations</th>
                             <th class="text-left font-normal">phone</th>
@@ -90,7 +85,7 @@ export const Players: Component<Props> = (props) => {
                     </tr>
                 </thead>
                 <tbody ondragstart={dragStart}>
-                    <For each={props.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
+                    <For each={selection.tournament.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
                         <tr classList={{ info: player.id === selection.player?.id }}
                             onclick={[selectPlayer,player]}
                             draggable={true} data-type="player" data-id={player.id}
@@ -111,7 +106,7 @@ export const Players: Component<Props> = (props) => {
                                 {player.name} {player.firstname}
                             </td>
                             <td class="text-left">{player.rank}</td>
-                            <Show when={props.short}>
+                            <Show when={!short} fallback={
                                 <td class="text-left">
                                     <Show when={selection.event}><i
                                         classList={{
@@ -120,8 +115,7 @@ export const Players: Component<Props> = (props) => {
                                         }}
                                     /></Show>
                                 </td>
-                            </Show>
-                            <Show when={!props.short}>
+                            }>
                                 <td>
                                     {player.club}
                                 </td>

@@ -35,7 +35,7 @@ const MIN_COL = 2;
 const MAX_COL = 9;
 const MAX_COL_POULE = 22;
 
-export const jatFileType = {
+export const jatFileType: FilePickerAcceptType = {
     description: 'JA-Tennis document',
     accept: { 'binary/x-jat': ['.jat'] }
 };

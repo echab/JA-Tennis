@@ -28,7 +28,7 @@ export const DialogInfo: Component<Props> = (props) => {
 
     const { form, updateField, updateSubField } = useForm<TournamentInfo>(info ?? EMPTY);
 
-    const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
+    const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
 
         const club: TournamentInfo["club"] = {

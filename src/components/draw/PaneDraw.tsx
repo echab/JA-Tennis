@@ -1,8 +1,8 @@
 import { Component, createEffect, Show } from "solid-js";
-import { A, useNavigate, useParams } from "@solidjs/router";
+import { A, useNavigate, useParams, type RouteSectionProps } from "@solidjs/router";
 import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
-import { selection, drawById, selectBox, urlBox, update } from "../util/selection";
+import { selection, drawById, selectBox, urlBox, update, urlDraw } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
 import type { Params } from "../App";
 import { IconSexe } from "../misc/IconSexe";
@@ -11,18 +11,19 @@ import { drawLib, GenerateType } from "../../services/draw/drawLib";
 import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
 import { BUILD, PLAN, PLAY } from "../../domain/draw";
 
-export const PaneDraw: Component = () => {
+type Data = {
+}
 
-    const params = useParams<Params>();
+export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
 
-    const cur = () => drawById(params.drawId ?? '', params.eventId);
+    const cur = () => drawById(props.params.drawId ?? '', props.params.eventId);
     const event = () => cur().event;
     const draw = () => cur().draw;
 
     const drawIndex = () => {
         const evt = event();
-        return evt && params.drawId
-            ? indexOf(evt.draws ?? [], 'id', params.drawId)
+        return evt && props.params.drawId
+            ? indexOf(evt.draws ?? [], 'id', props.params.drawId)
             : -2;
     };
 
@@ -32,7 +33,7 @@ export const PaneDraw: Component = () => {
     // change selection on url change
     createEffect(() => {
         const evt = event(), drw = draw();
-        const pos = drw && params.boxPos ? +params.boxPos : NaN;
+        const pos = drw && props.params.boxPos ? +props.params.boxPos : NaN;
         if (evt && drw) {
             // console.log('effect: select box', pos, evt.id, drw.id);
             selectBox(evt, drw, drw.boxes.find(({ position }) => position === pos));
@@ -104,7 +105,7 @@ export const PaneDraw: Component = () => {
                         // onclick={() => selectDraw(event()!, prevDraw())}
                         // disabled={!prevDraw()}
                         classList={{ "pointer-events-none": !prevDraw() }}
-                        href={`/draw/${params.eventId}/${prevDraw()?.id}`} replace
+                        href={urlDraw(prevDraw(), event())} replace
                         title="View the previous draw of the event"
                     ><i class="icon2-left-arrow" /></A>
                     {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info" /></button> */}
@@ -112,7 +113,7 @@ export const PaneDraw: Component = () => {
                     <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50"
                         // onclick={() => selectDraw(event()!, nextDraw())}
                         // disabled={!nextDraw()}
-                        href={`/draw/${params.eventId}/${nextDraw()?.id}`} replace
+                        href={urlDraw(nextDraw(), event())} replace
                         classList={{ "pointer-events-none": !nextDraw() }}
                         title="View the next draw of the event"
                     ><i class="icon2-right-arrow" /></A>

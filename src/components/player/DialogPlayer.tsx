@@ -42,7 +42,7 @@ export const DialogPlayer: Component<Props> = (props) => {
     const ranks: RankString[] = rank.list();
     // const categories: CategoryString[] = category.list();
 
-    const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
+    const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
 
         const formElems = (evt.target as HTMLFormElement).elements as unknown as Record<keyof Player, RadioNodeList>;

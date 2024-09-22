@@ -4,5 +4,6 @@
     },
     "editor.quickSuggestions": {
         "strings": true
-    }
+    },
+    "eslint.useFlatConfig": true
 }

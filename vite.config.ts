@@ -1,15 +1,18 @@
 import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
-import devtoolsPlugin from "@solid-devtools/transform";
+import solid from 'vite-plugin-solid';
+import devtools from 'solid-devtools/vite';
+// import eslint from 'vite-plugin-eslint'
 
 export default defineConfig({
   plugins: [
-    devtoolsPlugin({
-      wrapStores: true,
-      // jsxLocation: true,
-      name: true, // Will automatically add names when creating signals, memos, stores, or mutables
+    solid({
+      // hot: false, // currently HMR breaks displaying components https://github.com/solidjs/solid-refresh/pull/41 will fix this
     }),
-    solidPlugin(),
+    devtools({
+      autoname: true, // Will automatically add names when creating signals, memos, stores, or mutables
+      locator: true,
+    }),
+    // eslint(),
   ],
   server: {
     port: 3000,

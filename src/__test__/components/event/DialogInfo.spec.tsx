@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import "../../setupJsdom";
-import { screen, render, fireEvent } from "solid-testing-library";
+import { screen, render, fireEvent } from '@solidjs/testing-library';
 import { DialogInfo } from '../../../components/tournament/DialogInfo';
 
 describe('DialogInfo', () => {

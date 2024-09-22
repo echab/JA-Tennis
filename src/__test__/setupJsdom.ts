@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { configure } from 'solid-testing-library'
+import { configure } from '@solidjs/testing-library'
 
 // waiting for showModal support by jsdom
 beforeAll(() => {

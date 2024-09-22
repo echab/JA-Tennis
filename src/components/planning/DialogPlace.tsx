@@ -27,7 +27,7 @@ export const DialogPlace: Component<Props> = (props) => {
 
     const { form, updateField } = useForm<Place>(place ?? EMPTY);
 
-    const submit: JSX.EventHandlerUnion<HTMLFormElement, Event & { submitter: HTMLElement; }> = (evt) => {
+    const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
 
         const result: Place = {

@@ -1,12 +1,19 @@
 /// <reference types="node" />
+/**
+ * @jest-environment node
+ */
 import type { Tournament } from "../../../domain/tournament";
 import { KNOCKOUT } from "../../../domain/draw";
 import { docFields } from "../../../services/file/jatSchema";
 import { createSerializer } from "../../../services/file/serializer";
 import { readFile } from 'node:fs/promises';
 
+// import path from "node:path";
+// import { fileURLToPath } from "node:url";
+// const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 beforeAll(() => {
-    jest.spyOn(console, 'warn').mockImplementation();
+    jest.spyOn(globalThis.console, 'warn').mockImplementation();
 });
 afterAll(() => {
     jest.restoreAllMocks();
