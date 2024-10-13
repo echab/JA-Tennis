@@ -4,6 +4,8 @@ import { addValidator } from "./validationService";
 //TODO implement as a configurable feature
 import typ from "./fft";
 
+// const typ = await import('./fft').then(mod => mod.default);
+
 // let p: Promise<{default:any}>;
 // const [typ] = createResource(() => (p || (p = import('./fft'))).then(mod => mod.default));
 

@@ -2,7 +2,7 @@ export type CategoryId = number;
 
 export interface Category {
     //currentYear: number;    //public for Spec
-    list(): Array<{id: number, name: string}>;
+    list(): Array<{id: CategoryId, name: string}>;
     name(category: CategoryId): string;
     isValid(category: CategoryId): boolean;
     isCompatible(eventCategory: CategoryId, playerCategory: CategoryId): boolean

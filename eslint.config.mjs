@@ -2,7 +2,7 @@
 import js from "@eslint/js";
 import solid from "eslint-plugin-solid/configs/typescript";
 import tsParser from "@typescript-eslint/parser";
-// import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
 // import tseslint from 'typescript-eslint';
 import globals from "globals";
 
@@ -34,6 +34,9 @@ export default [
         },
     },
     {
+        plugins: {
+            '@typescript-eslint': typescriptEslint,
+        },
         rules: {
             "arrow-parens": ["off", "as-needed"],
             "constructor-super": "error",
@@ -70,6 +73,11 @@ export default [
 
             "use-isnan": "error",
 
+            "no-unused-vars": "off",
+            "no-redeclare": "off",
+            "@typescript-eslint/no-unused-vars": ["error"],
+            "@typescript-eslint/no-redeclare": ["error"],
+
             // // List of [@typescript-eslint rules](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#supported-rules)
             // "@typescript-eslint/adjacent-overload-signatures": "error", // grouping same method names
             // "@typescript-eslint/array-type": ["error", {                // string[] instead of Array<string>
@@ -78,7 +86,7 @@ export default [
             // "@typescript-eslint/ban-types": "error",                    // bans types like String in favor of string
             // "@typescript-eslint/indent": "error",                       // consistent indentation
             // "@typescript-eslint/consistent-type-assertions": "error",   // needed for .tsx, bad = <Foo>bar, good = bar as Foo
-            // "@typescript-eslint/no-explicit-any": "error",              // don't use :any type
+            "@typescript-eslint/no-explicit-any": "error",              // don't use :any type
             // "@typescript-eslint/no-misused-new": "error",               // no constructors for interfaces or new for classes
             // "@typescript-eslint/no-parameter-properties": "error",      // no property definitions in class constructors
             // "@typescript-eslint/no-var-requires": "error",              // use import instead of require
