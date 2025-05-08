@@ -9,8 +9,8 @@ const validLibs: IValidation[] = [];
 // const [errorsDraw, setProblemsDraw] = createStore<{ [id: string]: DrawError[] }>({});
 // const [errorsPlayer, setProblemsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
 
-export function addValidator(validator: IValidation): void {
-    validLibs?.push(validator); // TODO validLibs is undefined in tests?!?
+export const addValidator = (validator: IValidation) => {
+    validLibs.push(validator); // TODO validLibs is undefined in tests?!?
 }
 
 export function validateTournament(tournament: Tournament) {

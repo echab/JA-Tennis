@@ -7,8 +7,8 @@
   "license": "ISC",
   "scripts": {
     "start": "vite",
-    "test": "jest",
-    "coverage": "jest --coverage",
+    "test": "vitest",
+    "coverage": "vitest --coverage",
     "lint": "eslint ./src",
     "build": "tsc && vite build",
     "serve": "vite preview"
@@ -22,16 +22,14 @@
     "dist"
   ],
   "dependencies": {
-    "@solidjs/router": "^0.14.5",
-    "solid-js": "^1.8.22"
+    "@solidjs/router": "^0.15.3",
+    "solid-js": "^1.9.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.0",
-    "@solidjs/testing-library": "^0.8.9",
+    "@solidjs/testing-library": "^0.8.10",
     "@tailwindcss/forms": "^0.5.9",
-    "@testing-library/jest-dom": "^6.5.0",
-    "@types/eslint__js": "^8.42.3",
-    "@types/jest": "^29.5.13",
+    "@testing-library/jest-dom": "^6.6.3",
     "@types/node": "^22.5.5",
     "@types/wicg-file-system-access": "^2023.10.5",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
@@ -39,36 +37,22 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.11.0",
     "eslint-plugin-solid": "^0.14.3",
-    "globals": "^15.9.0",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
+    "globals": "^16.1.0",
+    "jsdom": "^26.0.1",
     "postcss": "^8.4.47",
-    "solid-devtools": "^0.30.1",
-    "solid-jest": "^0.2.0",
+    "solid-devtools": "^0.34.0",
     "tailwindcss": "^3.4.12",
     "terser": "^5.33.0",
-    "ts-jest": "^29.2.5",
-
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.8",
-    "@babel/preset-typescript": "^7.23.3",
-    "@types/testing-library__jest-dom": "^5.14.9",
-    "babel-jest": "^29.7.0",
-    "babel-preset-jest": "^29.6.3",
-    "babel-preset-solid": "^1.8.9",
-    "jsdom": "^23.2.0",
-
-    "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.6.0",
-    "vite": "^5.4.7",
+    "vite": "^6.0.0",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-solid": "^2.10.2"
+    "vite-plugin-solid": "^2.11.6",
+    "vitest": "^3.0.0"
   },
-  "jest": {
-    "preset": "solid-jest/preset/browser",
-    "setupFilesAfterEnv": [
-      "<rootDir>/node_modules/@testing-library/jest-dom"
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
     ]
   }
 }

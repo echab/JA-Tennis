@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client", "jest", "@types/wicg-file-system-access"],
+    "types": ["vite/client", "@testing-library/jest-dom", "@types/wicg-file-system-access"],
     "noEmit": true,
     "isolatedModules": true,
 

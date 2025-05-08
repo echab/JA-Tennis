@@ -88,7 +88,7 @@ export const DialogMatch: Component<Props> = (props) => {
 
     return (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        <dialog ref={refDlg!} class="p-0">
+        <dialog ref={(el) => refDlg = el} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <span><i class='icon2-match' /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
                 {/* <small>{props.match.position}</small> */}

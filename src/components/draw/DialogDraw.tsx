@@ -129,7 +129,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
     return (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        <dialog ref={refDlg!} class="p-0">
+        <dialog ref={(el) => refDlg = el} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <span><i class='icon2-draw' /> <IconSexe sexe={props.event.sexe} double={props.event.typeDouble} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
                 <small>Id: {props.draw?.id}</small>

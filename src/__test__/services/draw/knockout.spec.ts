@@ -1,4 +1,5 @@
-import { Draw, KNOCKOUT } from "../../../domain/draw";
+import { describe, expect, it } from 'vitest';
+import { type Draw, KNOCKOUT } from "../../../domain/draw";
 import type { OptionalId } from "../../../domain/object";
 import type { Player } from "../../../domain/player";
 import type { TEvent } from "../../../domain/tournament";
