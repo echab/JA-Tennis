@@ -3,8 +3,13 @@ import { Draw } from "../domain/draw";
 import { Player } from "../domain/player";
 import { TEvent, Tournament } from "../domain/tournament";
 import { DrawProblem, IValidation, PlayerProblem } from "../domain/validation";
+import { knockoutValidation } from "./draw/knockoutValidation";
+import { roundrobinValidation } from "./draw/roundrobinValidation";
 
-const validLibs: IValidation[] = [];
+const validLibs: IValidation[] = [
+    knockoutValidation,
+    roundrobinValidation,
+];
 
 // const [errorsDraw, setProblemsDraw] = createStore<{ [id: string]: DrawError[] }>({});
 // const [errorsPlayer, setProblemsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});

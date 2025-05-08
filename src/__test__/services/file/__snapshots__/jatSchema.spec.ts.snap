@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`jatSchema should read binary tournament1.jat file version 13 1`] = `
+exports[`jatSchema > should read binary tournament1.jat file version 13 1`] = `
 {
   "events": [
     {
@@ -733,7 +733,7 @@ Soir et weekend.",
         -1,
       ],
       "birth": 2007,
-      "category": 80,
+      "category": 100,
       "dateMaj": 2022-11-03T11:00:00.000Z,
       "firstname": "Marie",
       "id": "10",
@@ -833,7 +833,7 @@ Soir et weekend.",
 }
 `;
 
-exports[`jatSchema should save tournament to array buffer 1`] = `
+exports[`jatSchema > should save tournament to array buffer 1`] = `
 Uint8Array [
   13,
   189,
