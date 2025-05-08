@@ -1,5 +1,3 @@
-import type { DataType } from "../../domain/types";
-
 /* eslint-disable no-bitwise */
 const decoder = new TextDecoder("iso-8859-1");
 // const decoder = new TextDecoder("windows-1252");
@@ -10,6 +8,7 @@ export type Serializer = ReturnType<typeof createSerializer>;
 
 export type Type = keyof Omit<Serializer, `${"_" | "read" | "write"}${string}` | "writing" | "seek">
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FieldParent<T extends Record<string, any> = any> = T & { version?: number };
 
 export type FnType<T> = (
@@ -47,7 +46,6 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     _view: new DataView(buffer.buffer),
     _classNames: [] as string[],
     _nMapCount: 1,
-    _types: {} as DataType,
     readBytes(n: number) {
         const r = this._buffer.slice(this._position, this._position + n);
         this._position += n;

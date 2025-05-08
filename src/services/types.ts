@@ -16,5 +16,5 @@ export async function loadType(type: string, version: number): Promise<DataType>
       return p;
     }
   }
-  throw new Error(`Unknown type "${type}"`);
+  throw new Error(`Unknown data type "${type}"`);
 }
