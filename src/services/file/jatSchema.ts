@@ -2,13 +2,13 @@
 import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn, QEMPTY, ROUNDROBIN } from "../../domain/draw";
 import { Player, SexeString, Team } from "../../domain/player";
 import { TEvent, Tournament, TournamentInfo } from "../../domain/tournament";
-import { ScoreString, type DataType } from "../../domain/types";
+import type { ScoreString, DataType } from "../../domain/types";
 import { atMidnight, atZeroHour } from "../../utils/date";
 import { ASSERT } from "../../utils/tool";
 import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
 import { isMatch } from "../drawService";
-import { defaultDrawName, type TournamentSerial } from "../tournamentService";
+import { defaultDrawName } from "../tournamentService";
 import { loadType } from "../types";
 import { by, byId, indexOf } from "../util/find";
 import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
@@ -390,16 +390,16 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
     },
     _categ3: { maxVersion: 3, type: "u8", reviver: (b) => [0, 1, 2, 3, 5, 7, 9, 11, 12, 13, 15, 17, 18][b], valid: () => false },
     _categ7: { maxVersion: 6, type: "u8", reviver: (b) => b * 10, valid: () => false },
-    category: { version: 7, type: "u8" },
-    // category: {
-    //     version: 7, type: "u8", reviver(this: JatSerializer, b) {
-    //         if (this._type?.name === "FFT") {
-    //             return categoryFFT.indexOf(b);
-    //         }
-    //         // TODO, from .ini, by types
-    //         return -1; // `category${b}`;
-    //     }
-    // },
+    category: {
+        version: 7, type: "u8",
+        reviver(this: JatSerializer, b) {
+            // const i = this._types!.category.list().findIndex(({id}) => b === id); // TODO category by type
+
+            // // TODO, from .ini, by types
+            // return -1; // `category${b}`;
+            return b;
+        },
+    },
     _bDouble: { type: "u8" },
     _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver: (c, p: FieldParent<TEvent>) => { p.maxRank = p.version && p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     maxRank: { version: 8, type: rankFields }, // TODO use version of FFT types instead of tableau.version
@@ -469,7 +469,7 @@ const infoFields: Fields<TournamentInfo & { version?: number }> = {
     _clubNo: { version: 3, maxVersion: 5, type: "u32" },
 } as const;
 
-export const docFields: Fields<TournamentSerial> = {
+export const docFields: Fields<Tournament> = {
     _init: {
         type(
             this: JatSerializer,
@@ -503,12 +503,7 @@ export const docFields: Fields<TournamentSerial> = {
             return t;
         },
     },
-    // _types: {
-    //     type: {},
-    //     // async reviver(this: JatSerializer, t, parent) {
-    //     //     return parent._types = this._types = await loadType(this._type!.name, this._type!.versionTypes);
-    //     // },
-    // },
+    _types: { type: {} },
     _start: {
         version: 12, type: "date",
         reviver: (d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; },

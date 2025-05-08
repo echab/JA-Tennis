@@ -1,5 +1,4 @@
 import { Tournament } from "../../domain/tournament";
-import { reviveTournament, type TournamentSerial } from "../tournamentService";
 import { docFields, jatFileType } from "./jatSchema";
 import { createSerializer } from "./serializer";
 
@@ -12,11 +11,10 @@ export async function openFile(): Promise<Tournament> {
         excludeAcceptAllOption: true,
         multiple: false,
     });
-    const doc = await readFile(fileHandle);
-    return reviveTournament(doc);
+    return readFile(fileHandle);
 }
 
-async function readFile(fileHandle: FileSystemFileHandle): Promise<TournamentSerial> {
+async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
     // console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
     // const { size, lastModifiedDate, type } = file;
