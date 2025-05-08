@@ -1,19 +1,17 @@
 /// <reference types="node" />
-/**
- * @jest-environment node
- */
+import { describe, expect, it, vi as jest } from 'vitest';
 import { KNOCKOUT } from "../../../domain/draw";
 import { docFields } from "../../../services/file/jatSchema";
 import { createSerializer } from "../../../services/file/serializer";
 import { readFile } from 'node:fs/promises';
-import { reviveTournament } from "../../../services/tournamentService";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { reviveTournament } from '../../../services/tournamentService';
 
-// import path from "node:path";
-// import { fileURLToPath } from "node:url";
-// const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 beforeAll(() => {
-    jest.spyOn(globalThis.console, 'warn').mockImplementation();
+    jest.spyOn(globalThis.console, 'warn').mockImplementation(() => {});
 });
 afterAll(() => {
     jest.restoreAllMocks();

@@ -3,14 +3,19 @@ import { Draw } from "../domain/draw";
 import { Player } from "../domain/player";
 import { TEvent, Tournament } from "../domain/tournament";
 import { DrawProblem, IValidation, PlayerProblem } from "../domain/validation";
+import { knockoutValidation } from "./draw/knockoutValidation";
+import { roundrobinValidation } from "./draw/roundrobinValidation";
 
-const validLibs: IValidation[] = [];
+const validLibs: IValidation[] = [
+    knockoutValidation,
+    roundrobinValidation,
+];
 
 // const [errorsDraw, setProblemsDraw] = createStore<{ [id: string]: DrawError[] }>({});
 // const [errorsPlayer, setProblemsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
 
-export function addValidator(validator: IValidation): void {
-    validLibs?.push(validator); // TODO validLibs is undefined in tests?!?
+export const addValidator = (validator: IValidation) => {
+    validLibs.push(validator); // TODO validLibs is undefined in tests?!?
 }
 
 export function validateTournament(tournament: Tournament) {

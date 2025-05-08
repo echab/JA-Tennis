@@ -1,4 +1,5 @@
 /** @jest-environment jsdom */
+import { describe, expect, it, vi as jest } from 'vitest';
 import "../../setupJsdom";
 import { screen, render, fireEvent } from '@solidjs/testing-library';
 import { DialogInfo } from '../../../components/tournament/DialogInfo';

@@ -87,8 +87,8 @@ export const DialogMatch: Component<Props> = (props) => {
     };
 
     return (
-        <dialog ref={refDlg!} class="p-0">
-            <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
+        <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
+            <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <span><i class='icon2-match' /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
                 {/* <small>{props.match.position}</small> */}
                 <button type="button" data-dismiss="modal" aria-hidden="true"
@@ -177,7 +177,7 @@ export const DialogMatch: Component<Props> = (props) => {
                         </div>
                     </fieldset>
                 </div>
-                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pb-4 pr-4 bg-gray-50 bg-opacity-60'>
+                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
                     <button type="submit"
                         //  disabled.bind="!!eventForm.$error.required"
                         class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"

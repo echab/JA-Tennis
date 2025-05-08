@@ -44,7 +44,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
                 style={{ "border-color": event.color ?? 'transparent' }}
                 onDrop={drop_handler} onDragOver={dragOver} data-type='event' data-id={event.id}
             >
-                <div class="flex justify-between items-center [&[aria-selected=true]]:bg-blue-200 bg-slate-200"
+                <div class="flex justify-between items-center aria-selected:bg-blue-200 bg-slate-200"
                     aria-selected={selection.event === event}
                 >
                     {/* <input type="checkbox" /> */}
@@ -70,7 +70,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
                             aria-selected={draw.id === selection.draw?.id}
                             classList={{ error: selection.drawProblems.has(`${draw.id}-${event.id}`) }}
                         >
-                            <A class="[&[aria-selected=true]]:bg-blue-200 block"
+                            <A class="aria-selected:bg-blue-200 block"
                                 classList={{ "mt-2": !draw.cont }}
                                 aria-selected={selection.draw?.id === draw.id}
                                 // onclick={() => selectDraw(event, draw)}

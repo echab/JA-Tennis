@@ -1,13 +1,12 @@
 import { createStore, NotWrappable, Part } from "solid-js/store";
-import type { CustomPartial, PickMutable, SetStoreFunction } from "solid-js/store/types/store";
 import { defined } from "../../services/util/object";
 
 // copied from private types in store.d.ts
 type W<T> = Exclude<T, NotWrappable>;
-type KeyOf<T> = number extends keyof T ? 0 extends 1 & T ? keyof T : [T] extends [never] ? never : [
-    T
-] extends [readonly unknown[]] ? number : keyof T : keyof T;
+type KeyOf<T> = number extends keyof T ? 0 extends 1 & T ? keyof T : [T] extends [never] ? never : [T] extends [readonly unknown[]] ? number : keyof T : keyof T;
 type MutableKeyOf<T> = KeyOf<T> & keyof PickMutable<T>;
+type PickMutable<T> = { [K in keyof T as (<U>() => U extends { [V in K]: T[V] } ? 1 : 2) extends <U>() => U extends { -readonly [V in K]: T[V] } ? 1 : 2 ? K : never]: T[K] };
+type CustomPartial<T> = T extends readonly unknown[] ? "0" extends keyof T ? { [K in Extract<keyof T, `${number}`>]?: T[K] } : { [x: number]: T[number] } : Partial<T>;
 
 // type FormFields = {
 //   name?: string;
@@ -66,10 +65,10 @@ export function useForm<FormFields extends object = Record<string, unknown>>(
     const updateSubField = <K1 extends MutableKeyOf<W<FormFields>>>(
         fieldName: Part<W<FormFields>, K1>,
         subFieldName: string,
-    // subFieldName: Part<
-    //   W<W<FormFields>[KeyOf<W<FormFields>>]>,
-    //   KeyOf<W<W<FormFields>[KeyOf<W<FormFields>>]>>
-    // >,
+        // subFieldName: Part<
+        //   W<W<FormFields>[KeyOf<W<FormFields>>]>,
+        //   KeyOf<W<W<FormFields>[KeyOf<W<FormFields>>]>>
+        // >,
     ) =>
         (event: Event) => {
             const inputElement = event.currentTarget as HTMLInputElement;
@@ -86,9 +85,9 @@ export function useForm<FormFields extends object = Record<string, unknown>>(
 
     const getCheckboxes = (radio: RadioNodeList): string[] => {
         const radios =
-      (radio.length
-          ? Array.from(radio)
-          : Array.of(radio)) as HTMLInputElement[];
+            (radio.length
+                ? Array.from(radio)
+                : Array.of(radio)) as HTMLInputElement[];
         return radios.map((e) => e.checked ? e.value : undefined).filter(defined);
     };
 

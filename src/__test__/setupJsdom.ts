@@ -1,3 +1,4 @@
+import { vi as jest } from 'vitest';
 import '@testing-library/jest-dom'
 import { configure } from '@solidjs/testing-library'
 

@@ -2,7 +2,7 @@ import { KNOCKOUT } from "../domain/draw";
 import { DEFAULT_SLOT_LENGTH, Tournament } from "../domain/tournament";
 import fftType from '../services/fft';
 
-export const emptyTournament = /* await reviveTournament */({ // TODO top await bug
+export const emptyTournament = /* await reviveTournament */({ // TODO top await bug, prevent dynamic import and bundle
     version: 13,
     id: "2",
     types: { name: 'FFT', versionTypes: 5 },
