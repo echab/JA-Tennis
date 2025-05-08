@@ -9,11 +9,13 @@ export type Serializer = ReturnType<typeof createSerializer>;
 export type Type = keyof Omit<Serializer, `${"_" | "read" | "write"}${string}` | "writing" | "seek">
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FieldParent<T extends Record<string, any> = any> = T & { version?: number };
+type _any = any;
+
+export type FieldParent<T extends Record<string, _any> = _any> = T & { version?: number };
 
 export type FnType<T> = (
     this: Serializer,
-    value: any, // for this.writing only
+    value: _any, // for this.writing only
     fields?: Field<T>,
     parent?: FieldParent,
     name?: string
@@ -22,16 +24,16 @@ export type FnType<T> = (
 export type Field<T> = {
     version?: number,
     maxVersion?: number,
-    type: Type | FnType<T> | Fields<any>,
-    def?: any,
+    type: Type | FnType<T> | Fields<_any>,
+    def?: _any,
     predicate?: (this: Serializer, parent: FieldParent) => boolean | number,
-    reviver?: (this: Serializer, v: any, parent: FieldParent) => T | Promise<T>,
-    replacer?: (this: Serializer, v: T | undefined, parent: FieldParent) => any,
-    valid?: (this: Serializer, v: any, parent?: FieldParent) => boolean,
-    itemType?: Type | FnType<any> | Fields<any> // TODO no any
+    reviver?: (this: Serializer, v: _any, parent: FieldParent) => T | Promise<T>,
+    replacer?: (this: Serializer, v: T | undefined, parent: FieldParent) => _any,
+    valid?: (this: Serializer, v: _any, parent?: FieldParent) => boolean,
+    itemType?: Type | FnType<_any> | Fields<_any> // TODO no any
 };
 
-export type Fields<T extends { version?: number }> = { [P in keyof T]: Field<T[P]> } & { [Q: `_${string}`]: Field<any> };
+export type Fields<T extends { version?: number }> = { [P in keyof T]: Field<T[P]> } & { [Q: `_${string}`]: Field<_any> };
 
 const wBigObjectTag = 0x7fff;
 const wClassTag = 0x8000;
@@ -56,16 +58,14 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._position += bytes.byteLength;
     },
     async readType<T>(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: string | FnType<T> | Fields<any>,
+        type: string | FnType<T> | Fields<_any>,
         field: Field<T>,
         parent: FieldParent,
         name?: string
     ): Promise<T> {
         this.writing = false;
         if (typeof type === 'string') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            let r = (this as any)[type];
+            let r = (this as _any)[type];
             if (type === 'array' || type === 'arrayb') {
                 r = await this.readArrayItems(r, field, parent, name);
             }
@@ -77,10 +77,8 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         }
     },
     writeType<T>(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        value: any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: string | FnType<T> | Fields<any>,
+        value: _any,
+        type: string | FnType<T> | Fields<_any>,
         field: Field<T>,
         parent: FieldParent,
         name?: string
@@ -91,8 +89,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
                 this[type] = value?.length ?? 0; // setter for the array length
                 this.writeArrayItems(value, field, parent, name);
             } else {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (this as any)[type] = value; // setter
+                (this as _any)[type] = value; // setter
             }
         } else if (typeof type === "function") {
             type.call(this, value, field, parent, name); // FnType
@@ -159,8 +156,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         for (const [fieldName, field] of Object.entries(fields)) {
             const r = await this.readField(field, result, fieldName);
             if (r !== undefined && !fieldName.startsWith('_')) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (result as any)[fieldName] = r;
+                (result as _any)[fieldName] = r;
             }
         }
         return result as unknown as T;
@@ -173,8 +169,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this.writing = true;
         const parent = { ...value, version: value?.version ?? parentVersion }; // by default, inherit version from parent
         for (const [fieldName, field] of Object.entries(fields)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const v = !fieldName.startsWith('_') && value ? (value as any)[fieldName] : undefined;
+            const v = !fieldName.startsWith('_') && value ? (value as _any)[fieldName] : undefined;
             this.writeField(v, field, parent, fieldName);
         }
     },
@@ -188,10 +183,11 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         const { itemType } = field;
         if (!itemType) { throw new Error("undefined field or itemType"); }
         const prev = this._arrayIndex;
-        const result = await Promise.all(Array(n).fill(0).map((_, i) => {
+        const result = Array(n).fill(0);
+        for (let i = 0; i < n; i++) {
             this._arrayIndex = i;
-            return this.readType(itemType, field, parent, name);
-        }));
+            result[i] = await this.readType(itemType, field, parent, name);
+        };
         this._arrayIndex = prev;
         return result;
     },
@@ -346,10 +342,10 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     get generateId() {
         return generateId();
     },
-    set generateId(id) {},
+    set generateId(id) { },
 
     get customData() { return undefined; },
-    set customData(d) {},
+    set customData(d) { },
 
     get schema() {
         // https://learn.microsoft.com/en-us/cpp/mfc/tn002-persistent-object-data-format?view=msvc-170

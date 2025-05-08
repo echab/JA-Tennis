@@ -34,7 +34,7 @@ importers:
         specifier: ^22.5.5
         version: 22.15.17
       '@types/wicg-file-system-access':
-        specifier: ^2023.10.5
+        specifier: ^2023.10.6
         version: 2023.10.6
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.6.0

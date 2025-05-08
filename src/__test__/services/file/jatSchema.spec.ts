@@ -56,7 +56,9 @@ describe("jatSchema", async () => {
         const result = await reader.readObject(docFields);
 
         expect(result.version).toBe(13);
-        expect(result).toMatchSnapshot();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _types, ...serialDoc } = result;
+        expect(serialDoc).toMatchSnapshot();
     });
 
     // it('should read binary tournament1.jat file into snapshot', async () => {

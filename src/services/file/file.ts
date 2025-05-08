@@ -40,7 +40,7 @@ export async function saveFile(doc: Tournament) {
     });
     const writable = await fileHandle.createWritable();
 
-    const writer = createSerializer(new Uint8Array(8192)); // TODO size
+    const writer = createSerializer(new Uint8Array(8192)); // TODO dynamic buffer size, or stream
     writer.writeObject(doc, docFields, docFields.version.def);
 
     await writable.write(writer._buffer);

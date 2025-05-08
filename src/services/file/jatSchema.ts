@@ -499,7 +499,11 @@ export const docFields: Fields<Tournament> = {
         }, def: { name: 'FFT', version: 1 },
         async reviver(this: JatSerializer, t, parent) {
             // this._type = t;
-            parent._types = this._types = await loadType(t.name, t.versionTypes);
+            this._types = parent._types = await loadType(t.name, t.versionTypes);
+            return t;
+        },
+        replacer(this: JatSerializer, t, parent) {
+            this._types = parent._types;
             return t;
         },
     },
