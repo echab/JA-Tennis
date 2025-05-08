@@ -1,4 +1,5 @@
 import { Match, Switch, type ParentComponent } from "solid-js";
+import { A, useLocation, useParams } from "@solidjs/router";
 import { errorCount } from "../services/validationService";
 import { Problems } from "./Problems";
 import { Events } from "./event/Events";
@@ -7,7 +8,6 @@ import { Tournaments } from "./tournament/Tournaments";
 import { Badge } from "./misc/Badge";
 import { selection } from "./util/selection";
 import { Planning } from "./planning/Planning";
-import { A, useLocation, useParams } from "@solidjs/router";
 import { Settings } from "./Settings";
 
 export const SidePanel: ParentComponent = () => {

@@ -77,7 +77,7 @@ export const DialogEvent: Component<Props> = (props) => {
     }
 
     return (
-        <dialog ref={(el) => refDlg = el} class="p-0">
+        <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <b><IconSexe sexe={props.event?.sexe} double={event?.typeDouble} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
                 <small>Id: {props.event?.id}</small>

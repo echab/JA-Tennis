@@ -41,7 +41,7 @@ export const DialogPlace: Component<Props> = (props) => {
     };
 
     return (
-        <dialog ref={(el) => refDlg = el} class="p-0">
+        <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-planning' /> Place</b>
                 <button type="button" data-dismiss="modal" aria-hidden="true"

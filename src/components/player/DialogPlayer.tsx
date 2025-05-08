@@ -88,7 +88,7 @@ export const DialogPlayer: Component<Props> = (props) => {
     }
 
     return (
-        <dialog ref={(el) => refDlg = el} class="p-0">
+        <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-player' /> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
                 <small>Id: {props.player?.id}</small>
