@@ -1,11 +1,10 @@
-import { A, useNavigate, useParams, useSearchParams, type RouteSectionProps } from "@solidjs/router";
+import { A, useNavigate, useSearchParams, type RouteSectionProps } from "@solidjs/router";
 import { Component, createEffect, createMemo, For, Show } from "solid-js";
-import { Player } from "../../domain/player";
-import { Place } from "../../domain/tournament";
+import type { Place } from "../../domain/tournament";
 import { matchesByDays } from "../../services/planningService";
 import { defined } from "../../services/util/object";
 import { DAYS, minutes } from "../../utils/date";
-import { Params, Searchs } from "../App";
+import { Searchs } from "../App";
 import { showDialog } from "../Dialogs";
 import { selection, selectDay, urlDay, selectPlace } from "../util/selection";
 import { PlanningSlot } from "./PlanningSlot";
@@ -17,8 +16,6 @@ type Data = {
 export const Planning: Component<RouteSectionProps<Data>> = (props) => {
 
     const [search, setSearch] = useSearchParams<Searchs>();
-
-    const short = props.data.short; // TODO detect we are into the SidePanel
 
     // change selection on url change
     createEffect(() => {
@@ -32,7 +29,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
     // change url on selection change
     const navigate = useNavigate();
     createEffect(() => {
-        if (short) {
+        if (props.data.short) {
             setSearch({ day: selection.day });
         } else {
             const url = urlDay(selection.day ?? 0);
@@ -66,14 +63,14 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
         <div class="flex justify-between items-center px-2">
             <h3>Planning
                 <span class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 "
-                    onclick={() => selectDay(prevDay())}
+                    onClick={() => selectDay(prevDay())}
                     // disabled={!prevDay()}
                     classList={{ "pointer-events-none": prevDay() === undefined }}
                     // href={urlDay(prevDay())} replace
                     title="View the previous day of the tournament"
                 ><i class="icon2-left-arrow" /></span>
 
-                {/* {days()[selection.day ?? -1]?.toLocaleDateString(undefined, { dateStyle: short ? 'medium' : 'full' })} */}
+                {/* {days()[selection.day ?? -1]?.toLocaleDateString(undefined, { dateStyle: props.data.short ? 'medium' : 'full' })} */}
                 <select class="border-0"
                     value={selection.day}
                     onChange={(evt) => selectDay(parseInt(evt.currentTarget.value ?? '0', 10))}
@@ -85,7 +82,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
                 </select>
 
                 <span class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 "
-                    onclick={() => selectDay(nextDay())}
+                    onClick={() => selectDay(nextDay())}
                     // disabled={!nextDay()}
                     classList={{ "pointer-events-none": nextDay() === undefined }}
                     // href={urlDay(nextDay())} replace
@@ -94,7 +91,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
             </h3>
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
-            <Show when={short}>
+            <Show when={props.data.short}>
                 <A href={urlDay(selection.day)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</A>
             </Show>
         </div>
@@ -108,7 +105,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
                 <li class='row-[place]' style={{
                     'grid-column-start': i() + 2
                 }}>
-                    <i class="icon2-info hover" onclick={[editPlace, place]} />
+                    <i class="icon2-info hover" onClick={[editPlace, place]} />
                     {place.name}
                 </li>
             }</For>
@@ -128,6 +125,6 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
             }</For>
         </ul>
 
-        <button type="button" onclick={[editPlace, null]} class="p-2 rounded-full" title='Add a place'>➕</button>
+        <button type="button" onClick={[editPlace, null]} class="p-2 rounded-full" title='Add a place'>➕</button>
     </>
 }

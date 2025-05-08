@@ -1,4 +1,4 @@
-import { MatchFormats, MatchFormat } from "../../domain/types";
+import type { MatchFormats, MatchFormat } from "../../domain/types";
 
 export class MatchFormatsFFT implements MatchFormats {
 

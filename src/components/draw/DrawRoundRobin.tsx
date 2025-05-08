@@ -46,7 +46,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
     >
         <tbody>
             <tr class="h-8">
-                <td class="w-32"></td>
+                <td class="w-32" />
                 <For each={rows()}>{(row) =>
                     <td class="w-32">
                         <DrawBox box={boxes().get(row[0])} players={props.tournament.players}

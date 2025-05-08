@@ -2,6 +2,7 @@ import { Box, Draw, FINAL, KNOCKOUT, Match, PlayerIn } from "../../domain/draw";
 import { OptionalId } from "../../domain/object";
 import type { Player } from "../../domain/player";
 import type { TEvent } from "../../domain/tournament";
+import type { DataType } from "../../domain/types";
 import { addValidator } from "../validationService";
 import { DrawLibBase } from "./drawLibBase";
 import { Knockout } from "./knockout";
@@ -21,7 +22,7 @@ export interface IDrawLib {
     resize(oldDraw?: Draw, nJoueur?: number): void;
     nbColumnForPlayers(nJoueur: number): number;
 
-    generateDraw(generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[];
+    generateDraw(types: DataType, generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[];
 
     setPlayerIn(box: PlayerIn, inNumber?: number, playerId?: string): boolean; //SetQualifieEntrant
     setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant

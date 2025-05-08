@@ -1,10 +1,25 @@
 import { KNOCKOUT } from "../domain/draw";
-import { Tournament } from "../domain/tournament";
+import { DEFAULT_SLOT_LENGTH, Tournament } from "../domain/tournament";
+import fftType from '../services/fft';
 
-export const mockTournament: Tournament = {
+export const emptyTournament = /* await reviveTournament */({ // TODO top await bug
+    version: 13,
+    id: "2",
+    types: { name: 'FFT', versionTypes: 5 },
+    _types: fftType,
+    info: {
+        name: '',
+        slotLength: DEFAULT_SLOT_LENGTH // minutes
+    },
+    players: [],
+    events: [],
+});
+
+export const mockTournament: Tournament = /* await reviveTournament */({
     version: 13,
     id: "1",
     types: { name: 'FFT', versionTypes: 5 },
+    _types: fftType,
     info: {
         name: "Test1",
         slotLength: 90 // minutes
@@ -75,4 +90,4 @@ export const mockTournament: Tournament = {
             ]
         }
     ],
-};
+});

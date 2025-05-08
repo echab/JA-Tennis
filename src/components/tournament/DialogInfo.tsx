@@ -80,10 +80,10 @@ export const DialogInfo: Component<Props> = (props) => {
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-ball' /> Tournament information</b>
                 <button type="button" data-dismiss="modal" aria-hidden="true"
-                    onclick={() => refDlg.close()}
+                    onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onsubmit={submit}>
+            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
                 <div class="p-4">
                     <div class="mb-1">
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
@@ -138,7 +138,7 @@ export const DialogInfo: Component<Props> = (props) => {
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
                             <input type="tel" value={form.club?.phone1 ?? ''} onChange={updateSubField("club", 'phone1')} class="w-4/12 p-1" />
-                            <span class="inline-block w-1/12"></span>
+                            <span class="inline-block w-1/12" />
                             <input type="tel" value={form.club?.phone2 ?? ''} onChange={updateSubField("club", 'phone2')} class="w-4/12 p-1" />
                         </div>
                         <div class="mb-1">
@@ -152,13 +152,13 @@ export const DialogInfo: Component<Props> = (props) => {
                                 <input id="adress" type="text" value={form.club?.adress1 ?? ''} onChange={updateSubField("club", 'adress1')} class="w-9/12 p-1" />
                             </div>
                             <div class="mb-1">
-                                <label class="inline-block w-3/12"></label>
+                                <label class="inline-block w-3/12" />
                                 <input type="text" value={form.club?.adress2 ?? ''} onChange={updateSubField("club", 'adress2')} class="w-9/12 p-1" />
                             </div>
                             <div class="mb-1">
-                                <label class="inline-block w-3/12"></label>
+                                <label class="inline-block w-3/12" />
                                 <input type="text" value={form.club?.zipCode ?? ''} onChange={updateSubField("club", 'zipCode')} class="w-2/12 p-1" />
-                                <span class="inline-block w-1/12"></span>
+                                <span class="inline-block w-1/12" />
                                 <input type="text" value={form.club?.city ?? ''} onChange={updateSubField("club", 'city')} class="w-6/12 p-1" />
                             </div>
                         </details>
@@ -174,7 +174,7 @@ export const DialogInfo: Component<Props> = (props) => {
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
                             <input type="tel" value={form.referee?.phone1 ?? ''} onChange={updateSubField("referee", 'phone1')} class="w-4/12 p-1" />
-                            <span class="inline-block w-1/12"></span>
+                            <span class="inline-block w-1/12" />
                             <input type="tel" value={form.referee?.phone2 ?? ''} onChange={updateSubField("referee", 'phone2')} class="w-4/12 p-1" />
                         </div>
                         <div class="mb-1">
@@ -188,13 +188,13 @@ export const DialogInfo: Component<Props> = (props) => {
                                 <input id="adress" type="text" value={form.referee?.adress1 ?? ''} onChange={updateSubField("referee", 'adress1')} class="w-9/12 p-1" />
                             </div>
                             <div class="mb-1">
-                                <label class="inline-block w-3/12"></label>
+                                <label class="inline-block w-3/12" />
                                 <input type="text" value={form.referee?.adress2 ?? ''} onChange={updateSubField("referee", 'adress2')} class="w-9/12 p-1" />
                             </div>
                             <div class="mb-1">
-                                <label class="inline-block w-3/12"></label>
+                                <label class="inline-block w-3/12" />
                                 <input type="text" value={form.referee?.zipCode ?? ''} onChange={updateSubField("referee", 'zipCode')} class="w-2/12 p-1" />
-                                <span class="inline-block w-1/12"></span>
+                                <span class="inline-block w-1/12" />
                                 <input type="text" value={form.referee?.city ?? ''} onChange={updateSubField("referee", 'city')} class="w-6/12 p-1" />
                             </div>
                         </details>
@@ -221,7 +221,7 @@ export const DialogInfo: Component<Props> = (props) => {
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         data-dismiss="modal" aria-hidden="true"
-                        onclick={() => refDlg.close()}
+                        onClick={() => refDlg.close()}
                     >Cancel</button>
                 </footer>
                 {/*{ eventForm.$error } */}

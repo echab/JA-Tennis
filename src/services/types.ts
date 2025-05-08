@@ -1,19 +1,20 @@
-import { Category, Licence, MatchFormats, Rank, Ranking, Score } from "../domain/types";
-import { addValidator } from "./validationService";
+import type { DataType } from '../domain/types';
 
-//TODO implement as a configurable feature
-import typ from "./fft";
+const cache = new Map<string, Promise<DataType>>();
 
-// const typ = await import('./fft').then(mod => mod.default);
-
-// let p: Promise<{default:any}>;
-// const [typ] = createResource(() => (p || (p = import('./fft'))).then(mod => mod.default));
-
-export const category: Category = new typ.Category();
-export const licence: Licence = new typ.Licence();
-export const matchFormat: MatchFormats = new typ.MatchFormats();
-export const rank: Rank = new typ.Rank();
-export const score: Score = new typ.Score();
-export const ranking: Ranking = new typ.Ranking(score);
-
-addValidator(typ.Validation);
+export async function loadType(type: string, version: number): Promise<DataType> {
+  const key = `${type}-${version}`;
+  let p = cache.get(key);
+  if (p) {
+    return p;
+  }
+  switch (type) {
+    case 'FFT': {
+      p = import('./fft/index') // TODO use version
+        .then((mod) => mod.default);
+      cache.set(key, p);
+      return p;
+    }
+  }
+  throw new Error(`Unknown type "${type}"`);
+}

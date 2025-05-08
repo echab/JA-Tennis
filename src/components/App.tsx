@@ -1,5 +1,5 @@
-import { Component, ErrorBoundary, type ParentComponent } from 'solid-js';
-import { Route, Router } from '@solidjs/router';
+import { Component, ErrorBoundary, Suspense, type ParentComponent } from 'solid-js';
+import { createAsync, Route, Router } from '@solidjs/router';
 import { commandManager } from '../services/util/commandManager';
 
 // import logo from './logo.svg';
@@ -10,10 +10,11 @@ import { PaneDraw } from './draw/PaneDraw';
 import { Players } from './player/Players';
 import { ErrorToast } from './misc/ErrorToast';
 import styles from './App.module.css';
-import { TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
+import { restoreTournament, TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
 import { Planning } from './planning/Planning';
 import { Home } from './Home';
 import '../assets/icons.css';
+import { mockTournament } from '../assets/data';
 
 export type Params = {
     playerId?: string;
@@ -31,12 +32,14 @@ export type Searchs = {
 export const App: Component = () => (
     <ErrorBoundary fallback={(err) => <ErrorToast message={err} />}>
         <TournamentsProvider>
-            <Router root={Main}>
-                <Route path={["/", "/:pane/"]} component={Home} />
-                <Route path="/:pane/draw/:eventId/:drawId?/:boxPos?" component={PaneDraw} />
-                <Route path="/:pane/players/:playerId?" component={Players} />
-                <Route path="/:pane/planning/:day?" component={Planning} />
-            </Router>
+            <Suspense fallback={'loading...'}>
+                <Router root={Main}>
+                    <Route path={["/", "/:pane/"]} component={Home} />
+                    <Route path="/:pane/draw/:eventId/:drawId?/:boxPos?" component={PaneDraw} />
+                    <Route path="/:pane/players/:playerId?" component={Players} />
+                    <Route path="/:pane/planning/:day?" component={Planning} />
+                </Router>
+            </Suspense>
         </TournamentsProvider>
     </ErrorBoundary>
 );
@@ -45,7 +48,9 @@ export const Main: ParentComponent = (props) => {
 
     const [tournaments] = useTournaments();
 
-    selectTournament(tournaments[0]);
+    const t = createAsync(() => restoreTournament(tournaments[0]), { initialValue: mockTournament});
+
+    selectTournament(t());
 
     // const paste = async () => {
     //     console.log('paste');

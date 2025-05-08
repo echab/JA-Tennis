@@ -7,7 +7,6 @@ import type { TEvent, Tournament } from '../../domain/tournament';
 import type { RankString } from '../../domain/types';
 import { deleteDraw, findGroupQualifOuts, groupDraw } from '../../services/drawService';
 import { getRegisteredPlayers, defaultDrawName } from '../../services/tournamentService';
-import { rank } from '../../services/types';
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
 import { selectDraw } from '../util/selection';
@@ -20,7 +19,6 @@ type Props = {
     event: TEvent;
     draw?: OptionalId<Draw>;
     tournament: Tournament;
-    // eslint-disable-next-line no-unused-vars
     onOk(event: TEvent, draws: Array<OptionalId<Draw>>): void;
     onClose(): void;
 }
@@ -36,6 +34,9 @@ export const DialogDraw: Component<Props> = (props) => {
     onCleanup(() => {
         refDlg.removeEventListener('close', props.onClose)
     })
+
+    const types = props.tournament._types;
+    const { rank } = types;
 
     const draw: OptionalId<Draw> | undefined = props.draw && { ...props.draw }; // clone, without reactivity
 
@@ -60,7 +61,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
     /** @returns registered players and entries numbers from previous draw */
     const registeredPlayersOrQ = (): Array<Player|number> => {
-        const players: Array<Player|number> = getRegisteredPlayers(props.tournament.players, props.event, form.minRank, form.maxRank);
+        const players: Array<Player|number> = getRegisteredPlayers(props.tournament._types, props.tournament.players, props.event, form.minRank, form.maxRank);
         const prevDraw = props.event.draws.at(-1);
         if (prevDraw) {
             const [iStart, iNext] = groupDraw(props.event, prevDraw.id);
@@ -109,7 +110,7 @@ export const DialogDraw: Component<Props> = (props) => {
             const lib = drawLib(props.event, result[0]);
             // const lastGroup = groups(props.event).slice(-2);
             const lastGroup = groupDraw(props.event, props.event.draws.at(-1)?.id);
-            result = lib.generateDraw(GenerateType.Create, registeredPlayersOrQ(), lastGroup);
+            result = lib.generateDraw(types, GenerateType.Create, registeredPlayersOrQ(), lastGroup);
         }
 
         props.onOk(props.event, result);
@@ -128,16 +129,15 @@ export const DialogDraw: Component<Props> = (props) => {
     }
 
     return (
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         <dialog ref={refDlg!} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <span><i class='icon2-draw' /> <IconSexe sexe={props.event.sexe} double={props.event.typeDouble} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
                 <small>Id: {props.draw?.id}</small>
                 <button type="button" data-dismiss="modal" aria-hidden="true"
-                    onclick={() => refDlg.close()}
+                    onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onsubmit={submit}>
+            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
                 <div class="p-4">
                     <input id="id" type="hidden" value={form.id} />
                     <div class="mb-1">
@@ -170,8 +170,8 @@ export const DialogDraw: Component<Props> = (props) => {
                     </div>
 
                     <div class="mb-1">
-                        <span class="inline-block w-3/12 text-right pr-3"></span>
-                        <label><input type="checkbox" checked={form.cont} onchange={updateField('cont')}
+                        <span class="inline-block w-3/12 text-right pr-3" />
+                        <label><input type="checkbox" checked={form.cont} onChange={updateField('cont')}
                             disabled={isFirstDraw}
                         /> Same group as previous draw</label>
                     </div>
@@ -179,8 +179,8 @@ export const DialogDraw: Component<Props> = (props) => {
                     <fieldset>
                         <legend>Dimensions:</legend>
                         <div class="mb-1">
-                            <span class="inline-block w-3/12 text-right pr-3"></span>
-                            <label><input type="checkbox" checked={form.lock === PLAN} value={PLAN} onchange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
+                            <span class="inline-block w-3/12 text-right pr-3" />
+                            <label><input type="checkbox" checked={form.lock === PLAN} value={PLAN} onChange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
                         </div>
                         <div class="mb-1">
                             <label for="nbIn" class="inline-block w-3/12 text-right pr-3">Entries:</label>
@@ -215,13 +215,13 @@ export const DialogDraw: Component<Props> = (props) => {
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         value="Delete" disabled={!form.id}
-                        onclick={deleteAndClose}
+                        onClick={deleteAndClose}
                     >✖ Delete
                     </button>
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         data-dismiss="modal" aria-hidden="true"
-                        onclick={() => refDlg.close()}
+                        onClick={() => refDlg.close()}
                     >Cancel</button>
                 </footer>
                 {/*{ eventForm.$error } */}

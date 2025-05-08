@@ -1,4 +1,4 @@
-import { Category, CategoryId } from "../../domain/types";
+import type { Category, CategoryId } from "../../domain/types";
 
 type Categ = { id: CategoryId, name: string, ageMax?: number; ageMin?: number };
 

@@ -1,3 +1,5 @@
+import type { DataType } from "../../domain/types";
+
 /* eslint-disable no-bitwise */
 const decoder = new TextDecoder("iso-8859-1");
 // const decoder = new TextDecoder("windows-1252");
@@ -24,7 +26,7 @@ export type Field<T> = {
     type: Type | FnType<T> | Fields<any>,
     def?: any,
     predicate?: (this: Serializer, parent: FieldParent) => boolean | number,
-    reviver?: (this: Serializer, v: any, parent: FieldParent) => T,
+    reviver?: (this: Serializer, v: any, parent: FieldParent) => T | Promise<T>,
     replacer?: (this: Serializer, v: T | undefined, parent: FieldParent) => any,
     valid?: (this: Serializer, v: any, parent?: FieldParent) => boolean,
     itemType?: Type | FnType<any> | Fields<any> // TODO no any
@@ -45,6 +47,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     _view: new DataView(buffer.buffer),
     _classNames: [] as string[],
     _nMapCount: 1,
+    _types: {} as DataType,
     readBytes(n: number) {
         const r = this._buffer.slice(this._position, this._position + n);
         this._position += n;
@@ -54,19 +57,19 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         this._buffer.set(bytes, this._position);
         this._position += bytes.byteLength;
     },
-    readType<T>(
+    async readType<T>(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         type: string | FnType<T> | Fields<any>,
         field: Field<T>,
         parent: FieldParent,
         name?: string
-    ) {
+    ): Promise<T> {
         this.writing = false;
         if (typeof type === 'string') {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let r = (this as any)[type];
             if (type === 'array' || type === 'arrayb') {
-                r = this.readArrayItems(r, field, parent, name);
+                r = await this.readArrayItems(r, field, parent, name);
             }
             return r;
         } else if (typeof type === "function") {
@@ -99,11 +102,11 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             this.writeObject(value, type, parent?.version);
         }
     },
-    readField<T>(
+    async readField<T>(
         field: Field<T>,
         parent: FieldParent,
         name: string
-    ): T | undefined {
+    ): Promise<T | undefined> {
         this.writing = false;
         const { version, maxVersion, predicate, type, def, valid, reviver } = field;
         if ((maxVersion || version) && !parent.version) {
@@ -113,7 +116,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             && (!predicate || predicate.call(this, parent))) {
             let r: T;
             if (!version || version <= (parent.version ?? 99)) {
-                r = this.readType(type, field, parent, name);
+                r = await this.readType(type, field, parent, name);
             } else {
                 r = typeof def === 'function' ? def() : def;
             }
@@ -123,7 +126,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
                 }
             }
             if (typeof reviver === 'function') {
-                r = reviver.call(this, r, parent);
+                r = await reviver.call(this, r, parent);
             }
             return r;
         }
@@ -149,14 +152,14 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
             }
         }
     },
-    readObject<T extends { version?: number }>(
+    async readObject<T extends { version?: number }>(
         fields: Fields<T>,
         parentVersion = NaN
-    ): T {
+    ): Promise<T> {
         this.writing = false;
         const result = { version: parentVersion }; // by default, inherit version from parent
         for (const [fieldName, field] of Object.entries(fields)) {
-            const r = this.readField(field, result, fieldName);
+            const r = await this.readField(field, result, fieldName);
             if (r !== undefined && !fieldName.startsWith('_')) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (result as any)[fieldName] = r;
@@ -178,19 +181,19 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
         }
     },
 
-    readArrayItems<T>(
+    async readArrayItems<T>(
         n: number,
         field: Field<T>,
         parent: FieldParent,
         name?: string
-    ): T[] {
+    ): Promise<T[]> {
         const { itemType } = field;
         if (!itemType) { throw new Error("undefined field or itemType"); }
         const prev = this._arrayIndex;
-        const result = Array(n).fill(0).map((_, i) => {
+        const result = await Promise.all(Array(n).fill(0).map((_, i) => {
             this._arrayIndex = i;
             return this.readType(itemType, field, parent, name);
-        });
+        }));
         this._arrayIndex = prev;
         return result;
     },
@@ -345,11 +348,9 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     get generateId() {
         return generateId();
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     set generateId(id) {},
 
-    get customData() { return; },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    get customData() { return undefined; },
     set customData(d) {},
 
     get schema() {

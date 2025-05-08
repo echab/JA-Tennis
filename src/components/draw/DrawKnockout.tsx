@@ -138,7 +138,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     </Show>
                                     <Show when={box && isMatch(box)}>
                                         <span title="Edit the match"
-                                            onclick={() => {
+                                            onClick={() => {
                                                 selectBox(props.event, props.draw, box);
                                                 showDialog("match");
                                             }}>
@@ -175,7 +175,7 @@ export const DrawKnockout: Component<Props> = (props) => {
 
                                         <Show when={isRight && props.draw.type !== FINAL}>
                                             <i class="icon2-qualif-out hover" title="Edit qualified out"
-                                                onclick={() => {
+                                                onClick={() => {
                                                     selectBox(props.event, props.draw, box);
                                                     // showDialog("qualif");
                                                 }}

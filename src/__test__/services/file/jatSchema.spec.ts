@@ -2,11 +2,11 @@
 /**
  * @jest-environment node
  */
-import type { Tournament } from "../../../domain/tournament";
 import { KNOCKOUT } from "../../../domain/draw";
 import { docFields } from "../../../services/file/jatSchema";
 import { createSerializer } from "../../../services/file/serializer";
 import { readFile } from 'node:fs/promises';
+import { reviveTournament } from "../../../services/tournamentService";
 
 // import path from "node:path";
 // import { fileURLToPath } from "node:url";
@@ -19,8 +19,8 @@ afterAll(() => {
     jest.restoreAllMocks();
 });
 
-describe("jatSchema", () => {
-    const tournament2: Tournament = {
+describe("jatSchema", async () => {
+    const tournament2 = await reviveTournament({
         version: 13,
         id: '701',
         info: { name: 'Tournament 1', slotLength: 90 },
@@ -47,7 +47,7 @@ describe("jatSchema", () => {
                 ]
             }
         ]
-    };
+    });
 
     it('should read binary tournament1.jat file version 13', async () => {
         const b = await readFile(`${__dirname}/tournament1.jat`);
@@ -55,7 +55,7 @@ describe("jatSchema", () => {
 
         const reader = createSerializer(new Uint8Array(buf));
 
-        const result = reader.readObject(docFields);
+        const result = await reader.readObject(docFields);
 
         expect(result.version).toBe(13);
         expect(result).toMatchSnapshot();
@@ -75,13 +75,13 @@ describe("jatSchema", () => {
         expect(buf).toMatchSnapshot();
     });
 
-    it('should save and reload same tournament', () => {
+    it('should save and reload same tournament', async () => {
         const writer = createSerializer(new Uint8Array(8192)); // TODO size
         writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
         const reader = createSerializer(buf);
-        const result = reader.readObject(docFields);
+        const result = await reader.readObject(docFields);
 
         expect(result.version).toBe(13);
         expect(result).toMatchObject(tournament2);
@@ -92,7 +92,7 @@ describe("jatSchema", () => {
         const expected = new Uint8Array(b.buffer);
 
         const reader = createSerializer(new Uint8Array(b.buffer));
-        const doc = reader.readObject(docFields);
+        const doc = await reader.readObject(docFields);
 
         const writer = createSerializer(new Uint8Array(expected.length * 2)); // TODO size
         writer.writeObject(doc, docFields);

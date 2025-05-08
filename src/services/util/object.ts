@@ -77,3 +77,10 @@ export function onlyDefined<T extends {}>(obj: T): T | undefined {
     }
     return obj;
 }
+
+export function replacerPrivateField<T>(key: string, value: T): T | undefined {
+    if (key.startsWith('_')) {
+        return undefined;
+    }
+    return value;
+}

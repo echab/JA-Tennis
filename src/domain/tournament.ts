@@ -1,6 +1,6 @@
 import type { Draw, Match, PlayerIn } from "./draw";
 import type { Player, SexeString } from "./player";
-import type { CategoryId, RankString } from "./types";
+import type { CategoryId, DataType, RankString } from "./types";
 
 export interface Tournament {
     version: number; // 13
@@ -14,6 +14,7 @@ export interface Tournament {
         versionTypes: number; // 5
         data?: unknown;
     };
+    _types: DataType;
 
     players: Player[];
 

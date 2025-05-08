@@ -36,7 +36,6 @@ export const Dialogs: Component = () => {
         </Case>
         <Case when={dialog() === "place" && selection.place}>
             <DialogPlace
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 place={selection.place!}
                 onOk={commandManager.wrap(updatePlace)}
                 onClose={() => showDialog()}
@@ -44,13 +43,13 @@ export const Dialogs: Component = () => {
         </Case>
         <Case when={dialog() === "event"}>
             <DialogEvent
+                _types={selection.tournament._types}
                 event={selection.event}
                 onOk={commandManager.wrap(updateEvent)}
                 onClose={() => showDialog()}
             />
         </Case>
         <Case when={dialog() === "draw"}>
-            {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
             <DialogDraw event={selection.event!} draw={selection.draw}
                 tournament={selection.tournament}
 
@@ -59,7 +58,6 @@ export const Dialogs: Component = () => {
             />
         </Case>
         <Case when={dialog() === "match" && selection.event && selection.draw}>
-            {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
             <DialogMatch event={selection.event!} draw={selection.draw!} tournament={selection.tournament}
                 match={selection.box as Match}
 

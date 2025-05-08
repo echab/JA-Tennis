@@ -3,7 +3,7 @@ import { Player } from "./player";
 import { TEvent, Tournament } from "./tournament";
 
 export interface IValidation {
-    validatePlayer?(player: Player): PlayerProblem[];
+    validatePlayer?(tournament: Tournament, player: Player): PlayerProblem[];
     validateDraw?(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[];
     //validateDay(): boolean;   //VerifieJour
 }

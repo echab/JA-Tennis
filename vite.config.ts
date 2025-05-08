@@ -6,7 +6,7 @@ import devtools from 'solid-devtools/vite';
 export default defineConfig({
   plugins: [
     solid({
-      // hot: false, // currently HMR breaks displaying components https://github.com/solidjs/solid-refresh/pull/41 will fix this
+      hot: false, // currently HMR breaks displaying components https://github.com/solidjs/solid-refresh/pull/41 will fix this
     }),
     devtools({
       autoname: true, // Will automatically add names when creating signals, memos, stores, or mutables
@@ -19,7 +19,7 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    // sourcemap: true,
-    // minify: false,
+    // sourcemap: true, // debug
+    minify: false, // debug
   },
 });

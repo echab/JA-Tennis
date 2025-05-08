@@ -42,7 +42,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
 
     const drawRegisteredPlayerIds = () => new Set(
         selection.event && selection.draw
-            ? getRegisteredPlayers(selection.tournament.players, selection.event, selection.draw.minRank, selection.draw.maxRank).map(getId)
+            ? getRegisteredPlayers(selection.tournament._types, selection.tournament.players, selection.event, selection.draw.minRank, selection.draw.maxRank).map(getId)
             : []
     );
 
@@ -58,7 +58,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                     onChange={({target}) => setRegistred((target as HTMLInputElement).checked)}
                 /> registered</label>
 
-                <button type="button" onclick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
+                <button type="button" onClick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
                 <Show when={short}>
                     <A href={urlPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
                 </Show>
@@ -84,10 +84,10 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                         </Show>
                     </tr>
                 </thead>
-                <tbody ondragstart={dragStart}>
+                <tbody onDragStart={dragStart}>
                     <For each={selection.tournament.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
                         <tr classList={{ info: player.id === selection.player?.id }}
-                            onclick={[selectPlayer,player]}
+                            onClick={[selectPlayer,player]}
                             draggable={true} data-type="player" data-id={player.id}
                         >
                             <td>
@@ -99,7 +99,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                                 {/* <small>{player.id}</small> */}
                             </td>
                             <td class="text-left">
-                                <i class="icon2-info hover" onclick={[editPlayer,player]}/>
+                                <i class="icon2-info hover" onClick={[editPlayer,player]}/>
                                 <IconSexe sexe={player.sexe} />
                             </td>
                             <td class="text-left">
@@ -137,8 +137,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                         </tr>
                     }</For>
                     <tr>
-                        <td colSpan={4}>
-                        </td>
+                        <td colSpan={4} />
                     </tr>
                 </tbody>
             </table>

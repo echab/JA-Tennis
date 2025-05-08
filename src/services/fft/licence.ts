@@ -1,4 +1,4 @@
-import { Licence } from "../../domain/types";
+import type { Licence } from "../../domain/types";
 
 const reLicence = /^([0-9]{7})([A-HJ-NPR-Z]?)$/;
 const keys = "ABCDEFGHJKLMNPRSTUVWXYZ"; // without I,O and Q

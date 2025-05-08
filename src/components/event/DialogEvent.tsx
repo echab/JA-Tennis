@@ -1,9 +1,8 @@
 import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
 import { OptionalId } from '../../domain/object';
 import { TEvent } from '../../domain/tournament';
-import { RankString } from '../../domain/types';
+import { RankString, type DataType } from '../../domain/types';
 import { deleteEvent } from '../../services/eventService';
-import { rank, category, matchFormat } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
 import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
@@ -11,6 +10,7 @@ import { useForm } from '../util/useForm';
 const EMPTY: OptionalId<TEvent> = { name: '', sexe: 'H', category: -1, maxRank: 'NC', draws: [] };
 
 type Props = {
+    _types: DataType;
     event?: OptionalId<TEvent>;
     onOk: (event: OptionalId<TEvent>) => void;
     onClose: () => void;
@@ -27,6 +27,8 @@ export const DialogEvent: Component<Props> = (props) => {
     onCleanup(() => {
         refDlg.removeEventListener('close', props.onClose)
     })
+
+    const { rank, category, matchFormat } = props._types;
 
     const event: OptionalId<TEvent> | undefined = props.event && { ...props.event }; // clone, without reactivity
 
@@ -77,16 +79,15 @@ export const DialogEvent: Component<Props> = (props) => {
     }
 
     return (
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         <dialog ref={refDlg!} class="p-0">
             <header class="flex justify-between sticky top-0 bg-slate-300 p-1">
                 <b><IconSexe sexe={props.event?.sexe} double={event?.typeDouble} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
                 <small>Id: {props.event?.id}</small>
                 <button type="button" data-dismiss="modal" aria-hidden="true"
-                    onclick={() => refDlg.close()}
+                    onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onsubmit={submit}>
+            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
                 <div class="p-4">
                     <input id="id" type="hidden" value={form.id} />
 
@@ -163,7 +164,7 @@ export const DialogEvent: Component<Props> = (props) => {
                     <div class="mb-1">
                         <label for="matchFormat" class="inline-block w-3/12 text-right pr-3">Match format:</label>
                         <select id="matchFormat" value={form.matchFormat} onChange={updateField('matchFormat')} class="w-9/12 p-1">
-                            <option></option>
+                            <option />
                             <For each={matchFormats}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
                         </select>
                     </div>
@@ -203,13 +204,13 @@ export const DialogEvent: Component<Props> = (props) => {
                >✖ Delete</button> */}
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         value="Delete" disabled={!form.id}
-                        onclick={deleteAndClose}
+                        onClick={deleteAndClose}
                     >✖ Delete
                     </button>
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         data-dismiss="modal" aria-hidden="true"
-                        onclick={() => refDlg.close()}
+                        onClick={() => refDlg.close()}
                     >Cancel</button>
                 </footer>
                 {/*{ eventForm.$error } */}

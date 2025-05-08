@@ -1,4 +1,4 @@
-import { Ranking, Score } from '../../domain/types';
+import type { Ranking, Score } from '../../domain/types';
 import { ScoreDeltaFFT} from './score';
 
 export class RankingFFT implements Ranking {

@@ -14,7 +14,7 @@ export async function openFile(): Promise<Tournament> {
     return readFile(fileHandle);
 }
 
-async function readFile(fileHandle: any): Promise<Tournament> {
+async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
     // console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
     // const { size, lastModifiedDate, type } = file;
@@ -25,7 +25,7 @@ async function readFile(fileHandle: any): Promise<Tournament> {
     const value = new Uint8Array(buffer);
 
     const reader = createSerializer(value);
-    const doc = reader.readObject(docFields);
+    const doc = await reader.readObject(docFields);
     console.log(doc);
 
     fileName = fileHandle.name;

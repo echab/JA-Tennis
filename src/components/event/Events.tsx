@@ -11,7 +11,7 @@ import { IconSexe } from '../misc/IconSexe';
 type Data = {
 }
 
-export const Events: Component<RouteSectionProps<Data>> = (props) => {
+export const Events: Component<RouteSectionProps<Data>> = () => {
 
     const drop_handler: JSX.EventHandlerUnion<HTMLDivElement, DragEvent> = (evt) => {
         evt.preventDefault();
@@ -29,7 +29,7 @@ export const Events: Component<RouteSectionProps<Data>> = (props) => {
             <h3>Draws</h3>
 
             <button type="button" class="rounded-full p-2 hover"
-                onclick={() => {
+                onClick={() => {
                     selectEvent(undefined);
                     showDialog("event");
                 }}
@@ -42,14 +42,14 @@ export const Events: Component<RouteSectionProps<Data>> = (props) => {
                 aria-selected={event.id === selection.event?.id}
                 class="border-l-8 m-2"
                 style={{ "border-color": event.color ?? 'transparent' }}
-                ondrop={drop_handler} ondragover={dragOver} data-type='event' data-id={event.id}
+                onDrop={drop_handler} onDragOver={dragOver} data-type='event' data-id={event.id}
             >
                 <div class="flex justify-between items-center [&[aria-selected=true]]:bg-blue-200 bg-slate-200"
                     aria-selected={selection.event === event}
                 >
                     {/* <input type="checkbox" /> */}
                     <A href={urlEvent(event)} replace>
-                        <i class="icon2-info hover" onclick={() => { selectEvent(event); showDialog("event"); }}/>
+                        <i class="icon2-info hover" onClick={() => { selectEvent(event); showDialog("event"); }}/>
                         {/* <small>{event.id} </small> */}
                         <IconSexe sexe={event.sexe} double={event.typeDouble} />
                         <span>{event.name}</span>
@@ -57,7 +57,7 @@ export const Events: Component<RouteSectionProps<Data>> = (props) => {
                     </A>
 
                     <button type="button" class="rounded-full p-[.125rem] px-1 hover" title="Add a draw"
-                        onclick={() => {
+                        onClick={() => {
                             selectDraw(event, undefined);
                             showDialog("draw");
                         }}
@@ -77,7 +77,7 @@ export const Events: Component<RouteSectionProps<Data>> = (props) => {
                                 href={urlDraw(draw, event)} replace
                             >
                                 <i class="icon2-info hover"
-                                    onclick={() => {
+                                    onClick={() => {
                                         selectDraw(event, draw);
                                         showDialog("draw");
                                     }}
@@ -102,7 +102,7 @@ export const Events: Component<RouteSectionProps<Data>> = (props) => {
         }</For>
 
         <button type="button" class="rounded-full p-1"
-            onclick={() => {
+            onClick={() => {
                 selectEvent(undefined);
                 showDialog("event");
             }}

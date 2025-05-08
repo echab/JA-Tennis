@@ -14,7 +14,7 @@ type BoxProps = {
 export const DrawBox: Component<BoxProps> = (props) => {
     const b = props.box;
     if (!b) {
-        return <div></div>
+        return <div />
     }
     const p = byId(props.players, b.playerId);
 

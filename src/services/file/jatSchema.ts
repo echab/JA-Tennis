@@ -9,7 +9,7 @@ import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
 import { isMatch } from "../drawService";
 import { defaultDrawName } from "../tournamentService";
-import { category, licence, rank } from "../types";
+import { loadType } from "../types";
 import { by, byId, indexOf } from "../util/find";
 import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
 
@@ -51,6 +51,7 @@ function buildTeamName(teamIds: string[], players: Player[]): string {
 
 function rankFields<T extends string>(this: Serializer & { _curSexe?: number }, s: T): T {
     // _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
+    const { rank } = this._types!;
     if (!this.writing) {
         const b = this.i8;
 
@@ -106,7 +107,7 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     },
     licence: {
         predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "u32",
-        reviver: (l) => l ? `${String(l).padStart(7, '0')}${licence.getKey(String(l).padStart(7, '0')) ?? ''}` : undefined,
+        reviver(this: Serializer, l) { return l ? `${String(l).padStart(7, '0')}${this._types.licence.getKey(String(l).padStart(7, '0')) ?? ''}` : undefined; },
         replacer: (s) => s ? parseInt(s, 10) : 0
     },
     name: { predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "bstr" },
@@ -119,11 +120,11 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     phone2: { type: "bstr", reviver: optionalString },
     email: { version: 5, type: "bstr", reviver: optionalString },
     birth: {
-        type: "date", reviver: (d: Date | number | undefined, p: Player) => {
+        type: "date", reviver(this: Serializer, d: Date | number | undefined, p: Player) {
             // TODO: compute Categorie from birthDate
             // const age = d && Math.round(new Date().getFullYear() - (typeof d === 'string' ? +d : d.getFullYear()));
             // p.category = age && `categ${age}`;
-            p.category = d ? category.ofDate(d).id : undefined;
+            p.category = d ? this._types.category.ofDate(d).id : undefined;
             return d;
         }
     },
@@ -387,7 +388,7 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
     _categ7: { maxVersion: 6, type: "u8", reviver: (b) => b * 10, valid: () => false },
     category: { version: 7, type: "u8" },
     // category: {
-    //     version: 7, type: "u8", reviver(this: Serializer & { _type?: { name: string } }, b) {
+    //     version: 7, type: "u8", reviver(this: Serializer & { _type?: { name: string, version: number } }, b) {
     //         if (this._type?.name === "FFT") {
     //             return categoryFFT.indexOf(b);
     //         }
@@ -492,8 +493,16 @@ export const docFields: Fields<Tournament> = {
             versionTypes: { version: 9, type: "u8", def: 1, valid: (v) => v <= 5 },
             data: { version: 10, type: "customData" },
         }, def: { name: 'FFT', version: 1 },
-        reviver(this: Serializer & { _type?: { name: string } }, t) {
+        reviver(this: Serializer & { _type?: { name: string, version: number } }, t) {
             this._type = t;
+            return t;
+        },
+    },
+    _types: {
+        type: {},
+        async reviver(this: Serializer & { _type?: { name: string, version: number } }, t) {
+            this._type = t;
+            this._types = await loadType(t.name, t.version);
             return t;
         },
     },

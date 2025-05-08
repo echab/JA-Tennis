@@ -1,5 +1,6 @@
 ﻿import { isDate, isObject} from '../services/util/object';
 
+// TODO deepClone
 export function copy(source: any, destination?: any) {
     if (!destination) {
         destination = source;

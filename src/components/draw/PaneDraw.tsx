@@ -1,10 +1,9 @@
 import { Component, createEffect, Show } from "solid-js";
-import { A, useNavigate, useParams, type RouteSectionProps } from "@solidjs/router";
+import { A, useNavigate, type RouteSectionProps } from "@solidjs/router";
 import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
 import { selection, drawById, selectBox, urlBox, update, urlDraw } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
-import type { Params } from "../App";
 import { IconSexe } from "../misc/IconSexe";
 import { commandManager } from "../../services/util/commandManager";
 import { drawLib, GenerateType } from "../../services/draw/drawLib";
@@ -64,7 +63,7 @@ export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
         if (evt && drw) {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
-            const newDraws = lib.generateDraw(GenerateType.Mix, drawPlayers);
+            const newDraws = lib.generateDraw(selection.tournament._types, GenerateType.Mix, drawPlayers);
             commandManager.add(updateDraws(evt, newDraws));
         }
     };
@@ -74,7 +73,7 @@ export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
         if (evt && drw) {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
-            const newDraws = lib.generateDraw(GenerateType.PlusEchelonne, drawPlayers);
+            const newDraws = lib.generateDraw(selection.tournament._types, GenerateType.PlusEchelonne, drawPlayers);
             if (newDraws.length) {
                 commandManager.add(updateDraws(evt, newDraws));
             }
@@ -86,7 +85,7 @@ export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
         if (evt && drw) {
             const lib = drawLib(evt, drw);
             const drawPlayers = findDrawPlayersOrQ(drw, selection.tournament.players);
-            const newDraws = lib.generateDraw(GenerateType.PlusEnLigne, drawPlayers);
+            const newDraws = lib.generateDraw(selection.tournament._types, GenerateType.PlusEnLigne, drawPlayers);
             if (newDraws.length) {
                 commandManager.add(updateDraws(evt, newDraws));
             }
@@ -159,7 +158,6 @@ export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
         </div>
         <Show when={draw()}>
             <DrawDraw
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 event={event()!} draw={draw()!}
                 tournament={selection.tournament}
             />

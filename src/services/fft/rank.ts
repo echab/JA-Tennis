@@ -1,4 +1,4 @@
-import { Rank, RankString, RankGroupString } from "../../domain/types";
+import type { Rank, RankString, RankGroupString } from "../../domain/types";
 
 export class RankFFT implements Rank {
 

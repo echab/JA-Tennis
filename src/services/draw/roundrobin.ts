@@ -8,6 +8,7 @@ import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
 import { positionOpponent1, iDiagonalePos, positionFirstIn, positionLastIn, positionResize, seedPositionOpponent1, seedPositionOpponent2 } from './roundrobinLib';
 import { guid } from '../util/guid';
+import type { DataType } from '../../domain/types';
 
 const MIN_COL = 0,
     MAX_COL_POULE = 22,
@@ -196,7 +197,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    generateDraw(generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[] {
+    generateDraw(types: DataType, generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[] {
         const refDraw = this.draw;
 
         const [groupStart] = groupDraw(this.event, refDraw.id);
@@ -208,7 +209,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         const players: Array<Player|number> = playersOrQ;
 
         //Tri et Mélange les joueurs de même classement
-        sortPlayers(players);
+        sortPlayers(types, players);
 
         const event = this.event;
 
@@ -231,7 +232,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
                     draw.id = guid('d');
                 }
             } else {
-                draw = newDraw(event, refDraw);
+                draw = newDraw(types, event, refDraw);
                 draw.cont = true;
             }
             draw.boxes = [];

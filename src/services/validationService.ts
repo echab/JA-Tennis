@@ -23,7 +23,7 @@ export function validateTournament(tournament: Tournament) {
         });
 
         tournament.players.forEach((player) => {
-            const errors = validatePlayer(player);
+            const errors = validatePlayer(tournament, player);
             if (errors.length) {
                 sel.playerProblems.set(player.id, errors);
             } else {
@@ -51,14 +51,19 @@ export function validateTournament(tournament: Tournament) {
     });
 }
 
-export function validatePlayer(player: Player): PlayerProblem[] {
+export function validatePlayer(tournament: Tournament, player: Player): PlayerProblem[] {
     const result: PlayerProblem[] = [];
     for (const lib of validLibs) {
         const fn = lib.validatePlayer;
         if (fn) {
-            result.splice(-1, 0, ...fn(player));
+            result.splice(-1, 0, ...fn(tournament, player));
         }
     }
+
+    if (tournament._types.validation.validatePlayer) {
+        result.splice(-1, 0, ...tournament._types.validation.validatePlayer(tournament, player));
+    }
+
     result.forEach(({ message, player, detail }) => {
         console.warn(`Validation error on ${player.name}${detail ? ` (${detail})` : ''} : ${message}`);
     });
@@ -74,6 +79,11 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
             result.splice(-1, 0, ...fn(tournament, event, draw));
         }
     }
+
+    if (tournament._types.validation.validateDraw) {
+        result.splice(-1, 0, ...tournament._types.validation.validateDraw(tournament, event, draw));
+    }
+
     // result.forEach(({ message, draw, box, player, detail }) => {
     //   console.warn(`Validation error on ${draw.name}${box && player ? ` for ${player.name}` : ''}${detail ? ` (${detail})` : ''} : ${message}`);
     // });
