@@ -9,10 +9,11 @@ import { Dialogs } from './Dialogs';
 import { PaneDraw } from './draw/PaneDraw';
 import { Players } from './player/Players';
 import { ErrorToast } from './misc/ErrorToast';
-import styles from './App.module.css';
 import { TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
 import { Planning } from './planning/Planning';
 import { Home } from './Home';
+
+import styles from './App.module.css';
 import '../assets/icons.css';
 
 export type Params = {
@@ -73,7 +74,7 @@ export const Main: ParentComponent = (props) => {
     return <>
         <Dialogs />
         <div class={styles.App}>
-            <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-gradient-to-l from-slate-500 to-slate-800 print:hidden">
+            <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-linear-to-l from-slate-500 to-slate-800 print:hidden">
                 <span><i class="icon2-ball" /> JA-Tennis</span>
                 <div>
                     <button type="button" class="border-2 border-zinc-500" disabled={!commandManager.canUndo} onClick={() => commandManager.undo()} title={`Undo ${commandManager.undoNames(1)?.[0] ?? ''}`}>↶ Undo</button>

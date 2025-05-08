@@ -4,17 +4,19 @@
 import { defineConfig } from 'vite';
 import solid from 'vite-plugin-solid';
 import devtools from 'solid-devtools/vite';
+import tailwindcss from "@tailwindcss/vite";
 // import eslint from 'vite-plugin-eslint'
 
 export default defineConfig({
   plugins: [
     solid({
-      // hot: false, // currently HMR breaks displaying components https://github.com/solidjs/solid-refresh/pull/41 will fix this
+      // hot: false,
     }),
     devtools({
       autoname: true, // Will automatically add names when creating signals, memos, stores, or mutables
       locator: true,
     }),
+    tailwindcss(),
     // eslint(),
   ],
   server: {

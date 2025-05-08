@@ -1,6 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms' {
+  strategy: 'base';
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 body {
   --fore: black;
@@ -64,10 +76,17 @@ i.glyphicon {
   transform: skewY(20deg);
 } */
 
-/* dialog {
+dialog {
+  position: absolute;
+  top: 1em;
+  left: 50vw;
+  transform: translateX(-50%);
+  border-radius: 5px;
+  /*
   color: --fore;
   background-color: --back;
-} */
+  */
+}
 
 /* fieldset {
   border-right: none;

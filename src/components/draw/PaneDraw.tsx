@@ -125,7 +125,7 @@ export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
                         onClick={() => showDialog("draw")}
                     ><i class="icon2-info" /></button>
 
-                    <button class="p-2 rounded-full [&[aria-selected=true]]:bg-blue-200"
+                    <button class="p-2 rounded-full aria-selected:bg-blue-200"
                         title={`Lock/unlock draw updates (${draw()?.lock ?? BUILD})`}
                         aria-selected={draw()?.lock === PLAN}
                         onClick={lockDraw}

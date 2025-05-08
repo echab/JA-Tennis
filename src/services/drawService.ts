@@ -395,7 +395,6 @@ export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [numbe
         result.push(...
         (draw.boxes as PlayerIn[])
             .filter(({qualifIn}) => qualifIn !== undefined)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map<[PlayerIn, Draw]>((playerIn) => [playerIn, draw])
         );
     }
