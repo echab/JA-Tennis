@@ -1,11 +1,14 @@
 import { createEffect } from "solid-js";
 import { createStore, SetStoreFunction, Store } from "solid-js/store";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type any_ = any;
+
 export type Options = {
     /** reviver for `JSON.parse` */
-    reviver?: (this: any, key: string, value: any) => any,
+    reviver?: (this: any_, key: string, value: any_) => any_,
     /** replacer for `JSON.stringify` */
-    replacer?: (this: any, key: string, value: any) => any,
+    replacer?: (this: any_, key: string, value: any_) => any_,
     space?: string | number,
 }
 

@@ -7,7 +7,6 @@ const EMPTY: TournamentInfo = { name: '', slotLength: 90 };
 
 type Props = {
     info: TournamentInfo;
-    // eslint-disable-next-line no-unused-vars
     onOk: (info: TournamentInfo) => void;
     onClose: () => void;
 }

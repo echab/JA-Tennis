@@ -8,6 +8,9 @@ type MutableKeyOf<T> = KeyOf<T> & keyof PickMutable<T>;
 type PickMutable<T> = { [K in keyof T as (<U>() => U extends { [V in K]: T[V] } ? 1 : 2) extends <U>() => U extends { -readonly [V in K]: T[V] } ? 1 : 2 ? K : never]: T[K] };
 type CustomPartial<T> = T extends readonly unknown[] ? "0" extends keyof T ? { [K in Extract<keyof T, `${number}`>]?: T[K] } : { [x: number]: T[number] } : Partial<T>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type any_ = any;
+
 // type FormFields = {
 //   name?: string;
 //   surname?: string;
@@ -73,13 +76,13 @@ export function useForm<FormFields extends object = Record<string, unknown>>(
         (event: Event) => {
             const inputElement = event.currentTarget as HTMLInputElement;
             if (inputElement.type === "checkbox" || inputElement.type === "radio") {
-                setForm(fieldName, { [subFieldName]: !!inputElement.checked } as any);
+                setForm(fieldName, { [subFieldName]: !!inputElement.checked } as any_);
             } else if (inputElement.type === "number") {
-                setForm(fieldName, { [subFieldName]: inputElement.valueAsNumber } as any);
+                setForm(fieldName, { [subFieldName]: inputElement.valueAsNumber } as any_);
             } else if (inputElement.type === "date") {
-                setForm(fieldName, { [subFieldName]: inputElement.valueAsDate } as any);
+                setForm(fieldName, { [subFieldName]: inputElement.valueAsDate } as any_);
             } else {
-                setForm(fieldName, { [subFieldName]: inputElement.value } as any);
+                setForm(fieldName, { [subFieldName]: inputElement.value } as any_);
             }
         };
 

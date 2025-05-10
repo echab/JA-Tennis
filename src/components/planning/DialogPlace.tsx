@@ -6,7 +6,6 @@ const EMPTY: Place = { name: '', avail: [] };
 
 type Props = {
     place: Place;
-    // eslint-disable-next-line no-unused-vars
     onOk: (place: Place) => void;
     onClose: () => void;
 }

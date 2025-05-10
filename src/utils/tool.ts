@@ -1,6 +1,7 @@
 ﻿import { isDate, isObject} from '../services/util/object';
 
-// TODO deepClone
+// TODO structuredClone
+/*
 export function copy(source: any, destination?: any) {
     if (!destination) {
         destination = source;
@@ -30,6 +31,7 @@ export function copy(source: any, destination?: any) {
     }
     return destination;
 }
+//*/
 
 export function shuffle<T>(array: T[], from = 0, toExlusive = array.length): T[] {
     const n = toExlusive - from;
