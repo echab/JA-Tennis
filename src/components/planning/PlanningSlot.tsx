@@ -24,7 +24,7 @@ const SlotPlayer: Component<PlayerProps> = (props) => <>
         <i class="icon2-player hover cursor-pointer" title={`Edit the ${props.player?.teamIds ? 'team' : 'player'}`}
             onClick={() => {
                 selectPlayer(props.player);
-                showDialog("player");
+                showDialog({ name: "player" });
             }}
         />
     </Show>
@@ -65,7 +65,7 @@ export const PlanningSlot: Component<Props> = (props) => {
         <span class="cursor-pointer" title="Edit the match"
             onClick={() => {
                 selectBox(props.slot.event, props.slot.draw, match);
-                showDialog("match");
+                showDialog({ name: "match" });
             }}
         >
             <i class="icon2-match hover2"/>

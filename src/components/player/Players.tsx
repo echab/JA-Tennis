@@ -46,7 +46,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
             : []
     );
 
-    const editPlayer = (player?: Player) => { selectPlayer(player); showDialog("player"); };
+    const editPlayer = (player?: Player) => { selectPlayer(player); showDialog({ name: "player" }); };
 
     return (
         <>

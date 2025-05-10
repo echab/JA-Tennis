@@ -39,7 +39,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
         }
     });
 
-    const editPlace = (place: Place) => { selectPlace(place); showDialog("place"); };
+    const editPlace = (place: Place) => { selectPlace(place); showDialog({ name: "place" }); };
 
     const start = () => selection.tournament.info.start;
 

@@ -34,26 +34,26 @@ export function createCommandManager(maxHistory = 100) {
         },
 
         /**
-     * Add a command to be undone on the stack. Act is already called into the command
-     *
-     * Example:
-     * ```ts
-     *   const increment = (counter: { count: number }, nb = 1): Command => {
-     *     const prevCount = counter.count;
-     *     const act = () => {
-     *       counter.count += nb;
-     *     };
-     *     act(); // here the command is called
-     *     return {
-     *        name: "increment",
-     *        act,
-     *        undo() { counter.count = prevCount; }
-     *     };
-     *   };
-     *   // ...
-     *   cmdManager.add(increment(counter));
-     * ```
-     */
+         * Add a command to be undone on the stack. Act is already called into the command
+         *
+         * Example:
+         * ```ts
+         *   const increment = (counter: { count: number }, nb = 1): Command => {
+         *     const prevCount = counter.count;
+         *     const act = () => {
+         *       counter.count += nb;
+         *     };
+         *     act(); // here the command is called
+         *     return {
+         *        name: "increment",
+         *        act,
+         *        undo() { counter.count = prevCount; }
+         *     };
+         *   };
+         *   // ...
+         *   cmdManager.add(increment(counter));
+         * ```
+         */
         add(action: Command) {
             if (currentTransaction) {
                 currentTransaction.commands.push(action);

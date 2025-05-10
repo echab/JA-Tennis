@@ -1,8 +1,8 @@
 import { guid } from "./util/guid";
 import { shuffle } from "../utils/tool";
-import { loadType } from "./types";
+import { loadType, TYPES } from "./types";
 import type { Player } from "../domain/player";
-import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH } from "../domain/tournament";
+import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH, type TypeName } from "../domain/tournament";
 import type { DataType, RankString } from "../domain/types";
 import type { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
@@ -10,12 +10,12 @@ import { Draw, FINAL } from "../domain/draw";
 import { reviverDates } from "../utils/date";
 import { deserializeTournament, serializeTournament } from "../components/tournament/TournamentsStore";
 
-export type TournamentSerial = Omit<Tournament, '_types'> & { _types ?: DataType };
+export type TournamentSerial = Omit<Tournament, '_types'> & { _types?: DataType };
 
 export async function reviveTournament(tournament: TournamentSerial): Promise<Tournament> {
     try {
         tournament._types = await loadType(tournament.types.name, tournament.types.versionTypes);
-    } catch(ex) {
+    } catch (ex) {
         console.error(ex);
     }
     return tournament as Tournament;
@@ -85,16 +85,31 @@ export async function save(tournament: Tournament, url?: string) {
 
 // =====
 
-export async function newTournament(source?: Tournament): Promise<Tournament> {
-    const tournament: Tournament = source ? { ...source } : await reviveTournament({
-        version: 13,
-        id: guid("T"),
-        types: { name: 'FFT', versionTypes: 5 },
-        info: { name: "", slotLength: DEFAULT_SLOT_LENGTH },
-        players: [],
-        events: [],
-    });
-    return tournament;
+export function createTournament(onOk: (newTournament: Tournament) => void) {
+    return (infoAndType: TournamentInfo & Partial<TypeName>): Command => {
+        const { _typeName, ...info } = infoAndType;
+        const prev = selection.tournament;
+
+        const act = () => update(async (sel) => {
+            sel.tournament = await reviveTournament({
+                version: 13,
+                id: guid("T"),
+                types: { name: _typeName!, versionTypes: TYPES[_typeName!].defaultVersion },
+                info,
+                players: [],
+                events: [],
+            });
+            onOk(sel.tournament);
+        });
+        act();
+
+        const undo = () => update((sel) => {
+            sel.tournament = prev;
+            onOk(prev);
+        });
+
+        return { name: 'New tournament', act, undo };
+    };
 }
 
 export function updateInfo(info: TournamentInfo): Command {

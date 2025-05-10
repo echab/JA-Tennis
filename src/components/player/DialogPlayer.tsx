@@ -58,7 +58,7 @@ export const DialogPlayer: Component<Props> = (props) => {
             birth: form.birth !== undefined ? typeof form.birth === 'number' ? form.birth : new Date(form.birth) : undefined,
             club: form.club?.trim() || undefined,
             licence: form.licence?.trim() || undefined,
-            registration: getCheckboxes(formElems.registration),
+            registration: formElems.registration ? getCheckboxes(formElems.registration) : [],
             adress1: form.adress1?.trim() || undefined,
             adress2: form.adress2?.trim() || undefined,
             zipCode: form.zipCode?.trim() || undefined,

@@ -121,7 +121,7 @@ export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
             <Show when={event() && draw()}>
                 <div class="bg-white bg-opacity-80 print:hidden">
                     <button class="p-2 rounded-full" title="Edit draw information"
-                        onClick={() => showDialog("draw")}
+                        onClick={() => showDialog({ name: "draw" })}
                     ><i class="icon2-info" /></button>
 
                     <button class="p-2 rounded-full aria-selected:bg-blue-200"

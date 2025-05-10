@@ -2,11 +2,11 @@ import { A } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
 import { mockTournament } from "../../assets/data";
 import { openFile, saveFile } from "../../services/file/file";
-import { newTournament } from "../../services/tournamentService";
 import { showDialog } from "../Dialogs";
 import { selection, selectTournament } from "../util/selection";
 import { restoreTournament, storeTournament, useTournaments } from "./TournamentsStore";
 import { dateLocal } from "../../utils/date";
+import type { Tournament } from "../../domain/tournament";
 
 const MAX_MRU = 10;
 
@@ -15,16 +15,24 @@ export const Tournaments: Component = () => {
     const [tournaments, setTournaments] = useTournaments();
 
     const newItem = async () => {
-    // TODO select new tournament only on dialog OK
-        const t = await newTournament();
-        setTournaments((ts) => [storeTournament(t), ...ts.slice(0,MAX_MRU)]);
-        selectTournament(t);
-        showDialog("info");
+        showDialog({
+            name: "new",
+            onOk(t: Tournament) {
+                const t2 = storeTournament(t);
+                const i = tournaments.findIndex((v) => v.id === t2.id);
+                if (i !== -1) {
+                    setTournaments((ts) => ts.slice(i, MAX_MRU));
+                } else {
+                    setTournaments((ts) => [t2, ...ts.slice(0, MAX_MRU)]);
+                }
+                selectTournament(t);
+            },
+        });
     };
 
     const loadFile = async () => {
         const t = await openFile();
-        setTournaments((ts) => [storeTournament(t), ...ts.slice(0,MAX_MRU)]);
+        setTournaments((ts) => [storeTournament(t), ...ts.slice(0, MAX_MRU)]);
         selectTournament(t);
     };
 
@@ -50,7 +58,7 @@ export const Tournaments: Component = () => {
     return <div class="p-2">
         <h3>Tournmanent</h3>
         <span>
-            <button type="button" onClick={[showDialog, "info"]}><i class="icon2-info" /></button>
+            <button type="button" onClick={[showDialog, { name: "info" }]}><i class="icon2-info" /></button>
             {selection.tournament.info.name}
         </span>
 

@@ -1,12 +1,13 @@
 import { Component, JSX, onMount, onCleanup, Show } from 'solid-js';
-import { TournamentInfo } from '../../domain/tournament';
+import { TournamentInfo, type TypeName } from '../../domain/tournament';
 import { atMidnight, atZeroHour } from '../../utils/date';
 import { useForm } from '../util/useForm';
+import { TYPES } from '../../services/types';
 
-const EMPTY: TournamentInfo = { name: '', slotLength: 90 };
+const EMPTY: TournamentInfo & Partial<TypeName> = { name: '', slotLength: 90, _typeName: 'FFT' };
 
 type Props = {
-    info: TournamentInfo;
+    info: TournamentInfo & Partial<TypeName>;
     onOk: (info: TournamentInfo) => void;
     onClose: () => void;
 }
@@ -23,9 +24,9 @@ export const DialogInfo: Component<Props> = (props) => {
         refDlg.removeEventListener('close', props.onClose)
     })
 
-    const info: TournamentInfo | undefined = props.info && { ...props.info }; // clone, without reactivity
+    const info: (TournamentInfo & Partial<TypeName>) | undefined = props.info && { ...props.info }; // clone, without reactivity
 
-    const { form, updateField, updateSubField } = useForm<TournamentInfo>(info ?? EMPTY);
+    const { form, updateField, updateSubField } = useForm<TournamentInfo & Partial<TypeName>>(info ?? EMPTY);
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
@@ -54,7 +55,9 @@ export const DialogInfo: Component<Props> = (props) => {
             email: form.referee?.email?.trim() || undefined,
         };
 
-        const result: TournamentInfo = {
+        const result: TournamentInfo & Partial<TypeName> = {
+            _typeName: form._typeName,
+
             name: form.name.trim(),
 
             start: form.start && atZeroHour(new Date(form.start)) || undefined,
@@ -87,6 +90,17 @@ export const DialogInfo: Component<Props> = (props) => {
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
                         <input id="name" type="text" autofocus required class="w-9/12 p-1"
                             value={form.name} onChange={updateField("name")} />
+                        {/*<span class="error" show.bind="eventForm.name.$error.required">Required!</span> */}
+                    </div>
+
+                    <div class="mb-1">
+                        <label for="_typeName" class="inline-block w-3/12 text-right pr-3">Type:</label>
+                        <select id="_typeName" required class="w-9/12 p-1"
+                            disabled={!props.info._new}
+                            value={form._typeName} onChange={updateField("_typeName")}>
+                            {/* eslint-disable-next-line solid/prefer-for */}
+                            {Object.values(TYPES).map((t) => <option value={t.code}>{t.code} - {t.name}</option>)}
+                        </select>
                         {/*<span class="error" show.bind="eventForm.name.$error.required">Required!</span> */}
                     </div>
 

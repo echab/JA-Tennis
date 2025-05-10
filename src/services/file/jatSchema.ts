@@ -9,7 +9,7 @@ import { drawLib } from "../draw/drawLib";
 import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
 import { isMatch } from "../drawService";
 import { defaultDrawName } from "../tournamentService";
-import { loadType } from "../types";
+import { loadType, TYPES } from "../types";
 import { by, byId, indexOf } from "../util/find";
 import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
 
@@ -493,7 +493,7 @@ export const docFields: Fields<Tournament> = {
     id: { version: 13, type: "u16", def: generateId, reviver: (id: number) => id ? String(id) : generateId() },
     types: {
         version: 9, type: {
-            name: { version: 9, type: "bstr", def: 'FFT', valid: (t) => t === 'FFT' },
+            name: { version: 9, type: "bstr", def: 'FFT', valid: (t) => t in TYPES },
             versionTypes: { version: 9, type: "u8", def: 1, valid: (v) => v <= 5 },
             data: { version: 10, type: "customData" },
         }, def: { name: 'FFT', version: 1 },

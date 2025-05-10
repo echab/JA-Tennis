@@ -31,7 +31,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
             <button type="button" class="rounded-full p-2 hover"
                 onClick={() => {
                     selectEvent(undefined);
-                    showDialog("event");
+                    showDialog({ name: "event" });
                 }}
             >➕ Add an event</button>
 
@@ -49,7 +49,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
                 >
                     {/* <input type="checkbox" /> */}
                     <A href={urlEvent(event)} replace>
-                        <i class="icon2-info hover" onClick={() => { selectEvent(event); showDialog("event"); }}/>
+                        <i class="icon2-info hover" onClick={() => { selectEvent(event); showDialog({ name: "event" }); }}/>
                         {/* <small>{event.id} </small> */}
                         <IconSexe sexe={event.sexe} double={event.typeDouble} />
                         <span>{event.name}</span>
@@ -59,7 +59,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
                     <button type="button" class="rounded-full p-[.125rem] px-1 hover" title="Add a draw"
                         onClick={() => {
                             selectDraw(event, undefined);
-                            showDialog("draw");
+                            showDialog({ name: "draw" });
                         }}
                     >➕ Draw</button>
                 </div>
@@ -79,7 +79,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
                                 <i class="icon2-info hover"
                                     onClick={() => {
                                         selectDraw(event, draw);
-                                        showDialog("draw");
+                                        showDialog({ name: "draw" });
                                     }}
                                 />
                                 {/* <small>{draw.id} </small> */}
@@ -104,7 +104,7 @@ export const Events: Component<RouteSectionProps<Data>> = () => {
         <button type="button" class="rounded-full p-1"
             onClick={() => {
                 selectEvent(undefined);
-                showDialog("event");
+                showDialog({ name: "event" });
             }}
         >➕ Add an event</button>
     </>

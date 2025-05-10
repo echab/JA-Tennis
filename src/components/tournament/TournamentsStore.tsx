@@ -10,6 +10,7 @@ import { mockTournament } from "../../assets/data";
 // TODO store tournaments as binary, to avoid deep reactivity, and initTournament on load
 type StoredTournament = {
     name: string;
+    id: string,
     date: Date;
     content: string; // JSON.stringify
 }
@@ -48,6 +49,7 @@ export function deserializeTournament(data: string): Promise<Tournament> {
 export function storeTournament(tournament: Tournament): StoredTournament {
     return {
         name: tournament.info.name,
+        id: tournament.id,
         date: new Date(Date.now()),
         content: serializeTournament(tournament),
     };

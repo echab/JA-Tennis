@@ -27,6 +27,11 @@ export interface Tournament {
 
 export const DEFAULT_SLOT_LENGTH = 90;
 
+export type TypeName = {
+    _new: boolean,
+    _typeName: string;
+}
+
 export interface TournamentInfo {
     name: string;
 

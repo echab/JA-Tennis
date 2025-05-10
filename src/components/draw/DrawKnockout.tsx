@@ -135,7 +135,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                         <span title="Edit the match"
                                             onClick={() => {
                                                 selectBox(props.event, props.draw, box);
-                                                showDialog("match");
+                                                showDialog({ name: "match" });
                                             }}>
                                             <i class="icon2-match hover2" />
                                             <Show when={box?.note}><i class='icon2-note'/></Show>
