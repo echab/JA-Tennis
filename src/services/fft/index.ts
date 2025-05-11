@@ -1,17 +1,27 @@
-import { CategoryFFT as Category } from './category';
-import { LicenceFFT as Licence } from './licence';
-import { MatchFormatsFFT as MatchFormats } from './matchFormat';
-import { RankFFT as Rank } from './rank';
-import { RankingFFT as Ranking } from './ranking';
-import { ScoreFFT as Score } from './score';
-import { FFTValidation as Validation } from './fftValidation';
+import { CategoryFFT } from './category';
+import { LicenceFFT } from './licence';
+import { MatchFormatsFFT } from './matchFormat';
+import { RankFFT } from './rank';
+import { RankingFFT } from './ranking';
+import { ScoreFFT } from './score';
+import { FFTValidation } from './fftValidation';
+import type { DataType } from '../../domain/types';
 
-export default {
-    Category,
-    Licence,
-    MatchFormats,
-    Rank,
-    Ranking,
-    Score,
-    Validation,
+const category = new CategoryFFT();
+const licence = new LicenceFFT();
+const matchFormat = new MatchFormatsFFT();
+const rank = new RankFFT();
+const score = new ScoreFFT();
+const ranking = new RankingFFT(score);
+
+const dataType: DataType = {
+    category,
+    licence,
+    matchFormat,
+    rank,
+    score,
+    ranking,
+    validation: FFTValidation,
 };
+
+export default dataType;

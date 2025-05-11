@@ -4,9 +4,7 @@ import { configure } from '@solidjs/testing-library'
 
 // waiting for showModal support by jsdom
 beforeAll(() => {
-    // eslint-disable-next-line no-unused-vars
     HTMLDialogElement.prototype.showModal = jest.fn(function mock(this: HTMLDialogElement) { this.open = true; });
-    // eslint-disable-next-line no-unused-vars
     HTMLDialogElement.prototype.close = jest.fn(function mock(this: HTMLDialogElement) { this.open = false; });
 });
 

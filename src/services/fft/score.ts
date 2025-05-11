@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { Score } from "../../domain/types";
+import type { Score } from "../../domain/types";
 
 const reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
 

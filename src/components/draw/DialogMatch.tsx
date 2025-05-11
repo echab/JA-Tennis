@@ -2,7 +2,6 @@ import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
 import { Draw, Match } from '../../domain/draw';
 import { drawLib } from '../../services/draw/drawLib';
 import { TEvent, Tournament } from '../../domain/tournament';
-import { matchFormat } from '../../services/types';
 import { useForm } from '../util/useForm';
 import { byId } from '../../services/util/find';
 import { dateTimeLocal } from '../../utils/date';
@@ -12,7 +11,6 @@ type Props = {
     draw: Draw;
     match: Match;
     tournament: Tournament;
-    // eslint-disable-next-line no-unused-vars
     onOk: (event: TEvent, draw: Draw, match: Match) => void;
     onClose: () => void;
 }
@@ -28,6 +26,8 @@ export const DialogMatch: Component<Props> = (props) => {
     onCleanup(() => {
         refDlg.removeEventListener('close', props.onClose)
     })
+
+    const { matchFormat } = props.tournament._types;
 
     const lib = drawLib(props.event, props.draw);
 
@@ -92,10 +92,10 @@ export const DialogMatch: Component<Props> = (props) => {
                 <span><i class='icon2-match' /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
                 {/* <small>{props.match.position}</small> */}
                 <button type="button" data-dismiss="modal" aria-hidden="true"
-                    onclick={() => refDlg.close()}
+                    onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onsubmit={submit}>
+            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
                 <div class="p-4">
                     {/* <input id="id" type="hidden" value={form.id} /> */}
 
@@ -126,7 +126,7 @@ export const DialogMatch: Component<Props> = (props) => {
                     </div>
 
                     <div class="mb-1">
-                        <span class="inline-block w-3/12"></span>
+                        <span class="inline-block w-3/12" />
                         <label><input type="checkbox" checked={form.canceled} onChange={updateField("canceled")} /> Gives up</label>
                         <label class="pl-3"><input type="checkbox" checked={form.vainqDef} onChange={updateField("vainqDef")} /> Defaulting winner</label>
                     </div>
@@ -145,7 +145,7 @@ export const DialogMatch: Component<Props> = (props) => {
                         <div class="mb-1">
                             <label for="place" class="inline-block w-3/12 text-right pr-3">Court:</label>
                             <select id="place" value={form.place} onChange={updateField('place')} class="w-6/12 p-1">
-                                <option value={-1}></option>
+                                <option value={-1} />
                                 <For each={props.tournament.places}>{(place, i) => <option value={i()}>{place.name}</option>}</For>
                             </select>
                         </div>
@@ -166,14 +166,14 @@ export const DialogMatch: Component<Props> = (props) => {
                         <div class="mb-1">
                             <label for="matchFormat" class="inline-block w-3/12 text-right pr-3">Match format:</label>
                             <select id="matchFormat" value={form.matchFormat} onChange={updateField('matchFormat')} class="w-9/12 p-1">
-                                <option></option>
+                                <option />
                                 <For each={matchFormats}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
                             </select>
                         </div>
 
                         <div class="flex mb-1">
                             <label class="inline-block w-3/12 text-right pr-3"><i class="icon2-note" /> Note:</label>
-                            <textarea value={form.note ?? ''} onChange={updateField('note')} class="w-9/12 p-1"></textarea>
+                            <textarea value={form.note ?? ''} onChange={updateField('note')} class="w-9/12 p-1" />
                         </div>
                     </fieldset>
                 </div>
@@ -186,7 +186,7 @@ export const DialogMatch: Component<Props> = (props) => {
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         data-dismiss="modal" aria-hidden="true"
-                        onclick={() => refDlg.close()}
+                        onClick={() => refDlg.close()}
                     >Cancel</button>
                 </footer>
                 {/*{ eventForm.$error } */}

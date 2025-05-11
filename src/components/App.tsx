@@ -1,4 +1,4 @@
-import { Component, ErrorBoundary, type ParentComponent } from 'solid-js';
+import { Component, createEffect, ErrorBoundary, Suspense, type ParentComponent } from 'solid-js';
 import { Route, Router } from '@solidjs/router';
 import { commandManager } from '../services/util/commandManager';
 
@@ -9,7 +9,7 @@ import { Dialogs } from './Dialogs';
 import { PaneDraw } from './draw/PaneDraw';
 import { Players } from './player/Players';
 import { ErrorToast } from './misc/ErrorToast';
-import { TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
+import { restoreTournament, TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
 import { Planning } from './planning/Planning';
 import { Home } from './Home';
 
@@ -32,21 +32,25 @@ export type Searchs = {
 export const App: Component = () => (
     <ErrorBoundary fallback={(err) => <ErrorToast message={err} />}>
         <TournamentsProvider>
-            <Router root={Main}>
-                <Route path={["/", "/:pane/"]} component={Home} />
-                <Route path="/:pane/draw/:eventId/:drawId?/:boxPos?" component={PaneDraw} />
-                <Route path="/:pane/players/:playerId?" component={Players} />
-                <Route path="/:pane/planning/:day?" component={Planning} />
-            </Router>
+            <Suspense fallback={'loading...'}>
+                <Router root={Main}>
+                    <Route path={["/", "/:pane/"]} component={Home} />
+                    <Route path="/:pane/draw/:eventId/:drawId?/:boxPos?" component={PaneDraw} />
+                    <Route path="/:pane/players/:playerId?" component={Players} />
+                    <Route path="/:pane/planning/:day?" component={Planning} />
+                </Router>
+            </Suspense>
         </TournamentsProvider>
     </ErrorBoundary>
 );
 
 export const Main: ParentComponent = (props) => {
 
-    const [tournaments] = useTournaments();
+    const [storedTournaments] = useTournaments();
 
-    selectTournament(tournaments[0]);
+    createEffect(() => {
+        restoreTournament(storedTournaments[0]).then(selectTournament); // TODO solid2: async effect
+    });
 
     // const paste = async () => {
     //     console.log('paste');
@@ -86,7 +90,7 @@ export const Main: ParentComponent = (props) => {
                     <button type="button" onclick={paste} ><i class='icon2-paste'/> Paste</button> */}
                 </div>
                 <div>
-                    selection: player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
+                    selection: tournament={selection.tournament.id} player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
                 </div>
             </header>
             <div class="flex">

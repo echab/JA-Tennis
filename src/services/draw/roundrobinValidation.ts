@@ -13,7 +13,6 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         result.splice(-1,0,...validateMatches(draw));
     }
 
-
     return result;
 }
 

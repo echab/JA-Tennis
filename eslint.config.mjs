@@ -27,9 +27,10 @@ export default [
                 // tsconfigRootDir: import.meta.dirname,
             },
             globals: {
-                ...globals.browser,
                 ...Object.fromEntries(Object.entries(globals.node).map(([key]) => [key, "off"])),
+                ...globals.browser,
                 ...globals.jest,
+                ...{ FilePickerAcceptType: false }, // wicg-file-system-access
             },
         },
     },

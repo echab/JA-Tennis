@@ -1,6 +1,6 @@
 import type { Draw, Match, PlayerIn } from "./draw";
 import type { Player, SexeString } from "./player";
-import type { CategoryId, RankString } from "./types";
+import type { CategoryId, DataType, RankString } from "./types";
 
 export interface Tournament {
     version: number; // 13
@@ -14,6 +14,7 @@ export interface Tournament {
         versionTypes: number; // 5
         data?: unknown;
     };
+    _types: DataType;
 
     players: Player[];
 
@@ -25,6 +26,11 @@ export interface Tournament {
 }
 
 export const DEFAULT_SLOT_LENGTH = 90;
+
+export type TypeName = {
+    _new: boolean,
+    _typeName: string;
+}
 
 export interface TournamentInfo {
     name: string;

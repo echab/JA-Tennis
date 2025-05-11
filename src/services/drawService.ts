@@ -1,7 +1,6 @@
 import { byId, indexOf } from "./util/find";
 import { guid } from "./util/guid";
 import { ASSERT, shuffle } from "../utils/tool";
-import { rank } from "./types";
 
 import { Box, Draw, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../domain/draw";
 import { TEvent } from "../domain/tournament";
@@ -11,6 +10,7 @@ import { selection, update } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
 import { Player } from "../domain/player";
 import { defined } from "./util/object";
+import type { DataType } from "../domain/types";
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32;
@@ -91,7 +91,7 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
     return { name: `Match result ${match.position}`, act, undo }; // TODO
 }
 
-export function newDraw(parent: TEvent, source?: OptionalId<Draw>, after?: Draw): Draw {
+export function newDraw({ rank }: DataType, parent: TEvent, source?: OptionalId<Draw>, after?: Draw): Draw {
     const draw: Draw = {
         id: guid("d"),
         name: "",
@@ -377,7 +377,6 @@ export function findGroupQualifOuts(event: TEvent, [groupStart, groupEnd]: [numb
         result.push(...
         (draw.boxes as Match[])
             .filter(({qualifOut}) => qualifOut !== undefined)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map<[number, Match, Draw]>((match) => [match.qualifOut!, match, draw])
         );
     }

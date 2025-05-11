@@ -6,7 +6,6 @@ import type { Tournament } from '../../domain/tournament';
 import type { RankString } from '../../domain/types';
 import { deletePlayer } from '../../services/playerService';
 import { isSexeCompatible } from '../../services/tournamentService';
-import { rank, category } from '../../services/types';
 import { commandManager } from '../../services/util/commandManager';
 import { byId } from '../../services/util/find';
 import { dateLocal } from '../../utils/date';
@@ -35,6 +34,8 @@ export const DialogPlayer: Component<Props> = (props) => {
         refDlg.removeEventListener('close', props.onClose)
     })
 
+    const { rank, category } = props.tournament._types;
+
     const player: OptionalId<Player> | undefined = props.player && { ...props.player }; // clone, without reactivity
 
     const { form, updateField, getCheckboxes } = useForm<OptionalId<Player>>(player ?? EMPTY);
@@ -57,7 +58,7 @@ export const DialogPlayer: Component<Props> = (props) => {
             birth: form.birth !== undefined ? typeof form.birth === 'number' ? form.birth : new Date(form.birth) : undefined,
             club: form.club?.trim() || undefined,
             licence: form.licence?.trim() || undefined,
-            registration: getCheckboxes(formElems.registration),
+            registration: formElems.registration ? getCheckboxes(formElems.registration) : [],
             adress1: form.adress1?.trim() || undefined,
             adress2: form.adress2?.trim() || undefined,
             zipCode: form.zipCode?.trim() || undefined,
@@ -93,10 +94,10 @@ export const DialogPlayer: Component<Props> = (props) => {
                 <b><i class='icon2-player' /> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
                 <small>Id: {props.player?.id}</small>
                 <button type="button" data-dismiss="modal" aria-hidden="true"
-                    onclick={() => refDlg.close()}
+                    onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onsubmit={submit}>
+            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
                 <div class="p-4">
                     <input id="id" type="hidden" value={form.id} />
                     <div class="flex space-x-6">
@@ -204,20 +205,20 @@ export const DialogPlayer: Component<Props> = (props) => {
                                 <input id="adress" type="text" value={form.adress1 ?? ''} onChange={updateField('adress1')} class="w-9/12 p-1" />
                             </div>
                             <div class="mb-1">
-                                <label class="inline-block w-3/12"></label>
+                                <label class="inline-block w-3/12" />
                                 <input type="text" value={form.adress2 ?? ''} onChange={updateField('adress2')} class="w-9/12 p-1" />
                             </div>
                             <div class="mb-1">
-                                <label class="inline-block w-3/12"></label>
+                                <label class="inline-block w-3/12" />
                                 <input type="text" value={form.zipCode ?? ''} onChange={updateField('zipCode')} class="w-2/12 p-1" />
-                                <span class="inline-block w-1/12"></span>
+                                <span class="inline-block w-1/12" />
                                 <input type="text" value={form.city ?? ''} onChange={updateField('city')} class="w-6/12 p-1" />
                             </div>
                         </details>
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Phones:</label>
                             <input type="tel" value={form.phone1 ?? ''} onChange={updateField('phone1')} class="w-4/12 p-1" />
-                            <span class="inline-block w-1/12"></span>
+                            <span class="inline-block w-1/12" />
                             <input type="tel" value={form.phone2 ?? ''} onChange={updateField('phone2')} class="w-4/12 p-1" />
                         </div>
                         <div class="mb-1">
@@ -230,7 +231,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                     <fieldset class="border-2"><legend>Comment</legend>
                         <div class="flex">
                             <label class="inline-block w-3/12 text-right pr-3">Note:</label>
-                            <textarea value={form.comment ?? ''} onChange={updateField('comment')} class="w-9/12 p-1"></textarea>
+                            <textarea value={form.comment ?? ''} onChange={updateField('comment')} class="w-9/12 p-1" />
                         </div>
                     </fieldset>
                 </div>
@@ -243,13 +244,13 @@ export const DialogPlayer: Component<Props> = (props) => {
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         value="Delete" disabled={!form.id}
-                        onclick={deleteAndClose}
+                        onClick={deleteAndClose}
                     >✖ Delete
                     </button>
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         data-dismiss="modal" aria-hidden="true"
-                        onclick={() => refDlg.close()}
+                        onClick={() => refDlg.close()}
                     >Cancel</button>
                 </footer>
                 {/*<fieldset class="border-2">

@@ -1,3 +1,5 @@
+import type { IValidation } from "./validation";
+
 export type CategoryId = number;
 
 export interface Category {
@@ -62,4 +64,14 @@ export type ScoreString = string;
 
 export interface Score {
     isValid(score: ScoreString): boolean;
+}
+
+export interface DataType {
+    category: Category;
+    licence: Licence;
+    matchFormat: MatchFormats;
+    rank: Rank;
+    score: Score;
+    ranking: Ranking;
+    validation: IValidation;
 }

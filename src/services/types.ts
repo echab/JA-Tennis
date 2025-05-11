@@ -1,19 +1,34 @@
-import { Category, Licence, MatchFormats, Rank, Ranking, Score } from "../domain/types";
-import { addValidator } from "./validationService";
+import type { DataType } from '../domain/types';
 
-//TODO implement as a configurable feature
-import typ from "./fft";
+const cache = new Map<string, Promise<DataType>>();
 
-// const typ = await import('./fft').then(mod => mod.default);
+type Module = { default: DataType };
 
-// let p: Promise<{default:any}>;
-// const [typ] = createResource(() => (p || (p = import('./fft'))).then(mod => mod.default));
+type TypeType = {
+  code: string,
+  name: string,
+  defaultVersion: number,
+  loader(version: number): Promise<Module>,
+}
 
-export const category: Category = new typ.Category();
-export const licence: Licence = new typ.Licence();
-export const matchFormat: MatchFormats = new typ.MatchFormats();
-export const rank: Rank = new typ.Rank();
-export const score: Score = new typ.Score();
-export const ranking: Ranking = new typ.Ranking(score);
+export const TYPES: Record<string, TypeType> = {
+  FFT: { code: 'FFT', name: 'Federation Française de Tennis', defaultVersion: 5, loader: (version: number) => import('./fft/index') },
+  FFTT: { code: 'FFTT', name: 'Federation Française de Tennis de Table', defaultVersion: 1, loader: (version: number) => import('./fftt/index') },
+};
 
-addValidator(typ.Validation);
+export async function loadType(type: string, version: number): Promise<DataType> {
+  const key = `${type}-${version}`;
+  let p = cache.get(key);
+  if (p) {
+    return p;
+  }
+
+  const loader = TYPES[type]?.loader;
+  if (!loader) {
+    throw new Error(`Unknown data type "${type}"`);
+  }
+  p = loader(version).then((mod) => mod.default);
+
+  cache.set(key, p);
+  return p;
+}

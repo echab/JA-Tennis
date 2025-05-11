@@ -32,8 +32,8 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    // sourcemap: true,
-    // minify: false,
+    // sourcemap: true, // debug
+    minify: false, // debug
   },
   resolve: {
     conditions: ['development', 'browser'],

@@ -2,9 +2,8 @@
 import { columnMax, column, positionTopCol, positionOpponent1, positionMax, positionBottomCol } from './knockoutLib';
 import { findGroupQualifOuts, findPlayerIn, findPlayerOut, findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 import { indexOf, byId } from '../util/find';
-import { category, rank, score } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL, KNOCKOUT } from '../../domain/draw';
-import { RankString } from '../../domain/types';
+import { RankString, type DataType } from '../../domain/types';
 import { TEvent, Tournament } from '../../domain/tournament';
 import { isRegistred, isSexeCompatible } from '../tournamentService';
 import { MINUTES } from '../../utils/date';
@@ -17,7 +16,7 @@ const MAX_TETESERIE = 32,
     MAX_QUALIF = 32,
     MAX_MATCHJOUR = 16;
 
-function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
+function validateGroup({ rank }: DataType, event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
     if (draw.cont) {
@@ -67,7 +66,6 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
             .sort((a, b) => a - b);
         if (qualifOuts.length) {
             const missing: string[] = [];
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (let e = 1; e <= qualifOuts.at(-1)!; e++) {
                 if (!qualifOuts.includes(e)) {
                     missing.push(`Q${e}`);
@@ -82,7 +80,7 @@ function validateGroup(event: TEvent, draw: Draw): DrawProblem[] {
     return result;
 }
 
-function validateMatches(draw: Draw): DrawProblem[] {
+function validateMatches(types: DataType, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
     return result;
@@ -90,6 +88,7 @@ function validateMatches(draw: Draw): DrawProblem[] {
 
 function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
+    const { rank, category, score } = tournament._types;
     const players = tournament.players;
     let nqe = 0;
     let nqs = 0;
@@ -136,9 +135,9 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         result.push({ message: 'ERR_TAB_CLASSLIM_OVR', draw });
     }
 
-    result.splice(-1, 0, ...validateGroup(event, draw));
+    result.splice(-1, 0, ...validateGroup(tournament._types, event, draw));
 
-    result.splice(-1, 0, ...validateMatches(draw));
+    result.splice(-1, 0, ...validateMatches(tournament._types, draw));
 
     const colMax = columnMax(draw.nbColumn, draw.nbOut);
     const pClastMaxCol: RankString[] = new Array(colMax + 1);

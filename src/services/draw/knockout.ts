@@ -2,7 +2,6 @@
 import { DrawLibBase } from './drawLibBase';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent, positionOpponent1, positionOpponent2, positionTopCol, scanLeftBoxes } from './knockoutLib';
 import { by } from '../util/find';
-import { rank } from '../types';
 import { Draw, Box, Match, PlayerIn, QEMPTY, FINAL } from '../../domain/draw';
 import { GenerateType, IDrawLib } from './drawLib';
 import type { Player } from '../../domain/player';
@@ -10,6 +9,7 @@ import { findGroupQualifOuts, findPlayerIn, findSeeded, groupDraw, groupFindPlay
 import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
 import { OptionalId } from '../../domain/object';
+import type { DataType } from '../../domain/types';
 
 const MAX_COL = 9,
     MAX_QUALIF = 32,
@@ -76,7 +76,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     /** @override */
-    generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[] {
+    generateDraw(types: DataType, generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[] {
         let nMatchCol: number[];
         if (generate === GenerateType.Create) {   //from registred players
             nMatchCol = Array(MAX_COL).fill(0);
@@ -96,9 +96,9 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         }
 
         //Tri et Mélange les joueurs de même classement
-        sortPlayers(playersOrQ);
+        sortPlayers(types, playersOrQ);
 
-        const draw = this.buildMatches(this.draw, nMatchCol, playersOrQ, prevGroup);
+        const draw = this.buildMatches(types, this.draw, nMatchCol, playersOrQ, prevGroup);
         return [draw];
     }
 
@@ -308,9 +308,11 @@ export class Knockout extends DrawLibBase implements IDrawLib {
     }
 
     //Place les matches dans l'ordre
-    private buildMatches(oldDraw: OptionalId<Draw>, nMatchCol: number[], players: Array<Player|number>, prevGroup?: [number,number]): Draw { //ConstruitMatch
+    private buildMatches(types: DataType, oldDraw: OptionalId<Draw>, nMatchCol: number[], players: Array<Player|number>, prevGroup?: [number,number]): Draw { //ConstruitMatch
 
-        const draw = this.draw = newDraw(this.event, oldDraw);
+        const { rank } = types;
+
+        const draw = this.draw = newDraw(types, this.event, oldDraw);
         draw.boxes = [];
 
         const colMin = columnMin(draw.nbOut);

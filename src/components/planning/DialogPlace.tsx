@@ -6,7 +6,6 @@ const EMPTY: Place = { name: '', avail: [] };
 
 type Props = {
     place: Place;
-    // eslint-disable-next-line no-unused-vars
     onOk: (place: Place) => void;
     onClose: () => void;
 }
@@ -45,10 +44,10 @@ export const DialogPlace: Component<Props> = (props) => {
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-planning' /> Place</b>
                 <button type="button" data-dismiss="modal" aria-hidden="true"
-                    onclick={() => refDlg.close()}
+                    onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onsubmit={submit}>
+            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
                 <div class="p-4">
                     <div class="mb-1">
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
@@ -84,7 +83,7 @@ export const DialogPlace: Component<Props> = (props) => {
 
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
                         data-dismiss="modal" aria-hidden="true"
-                        onclick={() => refDlg.close()}
+                        onClick={() => refDlg.close()}
                     >Cancel</button>
                 </footer>
                 {/*{ eventForm.$error } */}

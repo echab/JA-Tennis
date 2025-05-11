@@ -6,6 +6,7 @@ import type { TEvent } from "../../../domain/tournament";
 import { GenerateType } from "../../../services/draw/drawLib";
 import { Knockout } from "../../../services/draw/knockout";
 import { findDrawPlayersOrQ } from "../../../services/drawService";
+import { loadType } from "../../../services/types";
 
 const EVENT: TEvent = { id: 'E0', name: 'event1', sexe: 'H', category: 11, maxRank: '15/1', draws: [] };
 
@@ -16,7 +17,9 @@ const PLAYER2: Player = { id: "J2", name: "Bernard", sexe: "H", rank: "30/5", re
 const PLAYER3: Player = { id: "J3", name: "Claude", sexe: "H", rank: "30/4", registration: [] };
 // const PLAYER4: Player = { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: [] };
 
-describe("Knockout lib service", () => {
+describe("Knockout lib service", async () => {
+    const types = await loadType('FFT', 5);
+
     describe("generateDraw create", () => {
         const draw1: Draw = {
             ...DRAW, nbColumn: 3, nbOut: 1, boxes: [
@@ -28,7 +31,7 @@ describe("Knockout lib service", () => {
             const event1: TEvent = { ...EVENT }; // no draw
             const lib = new Knockout(event1, draw1);
 
-            const draws = lib.generateDraw(GenerateType.Create, [PLAYER1, PLAYER2, PLAYER3]);
+            const draws = lib.generateDraw(types, GenerateType.Create, [PLAYER1, PLAYER2, PLAYER3]);
 
             expect(draws.length).toBe(1);
             expect(draws[0].boxes /*.map(mainFields) */).toStrictEqual([
@@ -44,7 +47,7 @@ describe("Knockout lib service", () => {
             const event1: TEvent = { ...EVENT }; // no draw
             const lib = new Knockout(event1, draw1);
 
-            const draws = lib.generateDraw(GenerateType.Create, [1, PLAYER2, PLAYER3]);
+            const draws = lib.generateDraw(types, GenerateType.Create, [1, PLAYER2, PLAYER3]);
 
             expect(draws.length).toBe(1);
             expect(draws[0].boxes /*.map(mainFields) */).toStrictEqual([
@@ -67,7 +70,7 @@ describe("Knockout lib service", () => {
             const newDraw: OptionalId<Draw> = { type: KNOCKOUT, name:'draw 2', minRank:'NC', maxRank: '30/1', nbColumn: 2, nbOut:1, boxes:[] };
             const lib = new Knockout(event1, newDraw);
 
-            const draws = lib.generateDraw(GenerateType.Create, [1, PLAYER2, PLAYER3], [0, 1]);
+            const draws = lib.generateDraw(types, GenerateType.Create, [1, PLAYER2, PLAYER3], [0, 1]);
 
             expect(draws.length).toBe(1);
             expect(draws[0].boxes /*.map(mainFields) */).toStrictEqual([
@@ -105,7 +108,7 @@ describe("Knockout lib service", () => {
             const drawPlayers = findDrawPlayersOrQ(draw2, [PLAYER1, PLAYER2, PLAYER3]);
             expect(drawPlayers).toStrictEqual([PLAYER3, 2, PLAYER2, 1]);
 
-            const draws = lib.generateDraw(GenerateType.Mix, drawPlayers);
+            const draws = lib.generateDraw(types, GenerateType.Mix, drawPlayers);
 
             expect(draws.length).toBe(1);
             expect(draws[0].boxes /*.map(mainFields) */).toStrictEqual([

@@ -12,6 +12,9 @@ interface Transaction extends Command {
     commands: Command[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type any_ = any;
+
 /*
 commandManager.add(incrementCounter(quinnCounter, "inc1"));
 
@@ -26,31 +29,31 @@ export function createCommandManager(maxHistory = 100) {
     let currentTransaction: Transaction | undefined;
     let nTransaction = 0;
     return {
-        wrap<T extends any[]>(fn: (...args: T) => Command) {
+        wrap<T extends any_[]>(fn: (...args: T) => Command) {
             return (...args: T) => this.add(fn.call(null, ...args));
         },
 
         /**
-     * Add a command to be undone on the stack. Act is already called into the command
-     *
-     * Example:
-     * ```ts
-     *   const increment = (counter: { count: number }, nb = 1): Command => {
-     *     const prevCount = counter.count;
-     *     const act = () => {
-     *       counter.count += nb;
-     *     };
-     *     act(); // here the command is called
-     *     return {
-     *        name: "increment",
-     *        act,
-     *        undo() { counter.count = prevCount; }
-     *     };
-     *   };
-     *   // ...
-     *   cmdManager.add(increment(counter));
-     * ```
-     */
+         * Add a command to be undone on the stack. Act is already called into the command
+         *
+         * Example:
+         * ```ts
+         *   const increment = (counter: { count: number }, nb = 1): Command => {
+         *     const prevCount = counter.count;
+         *     const act = () => {
+         *       counter.count += nb;
+         *     };
+         *     act(); // here the command is called
+         *     return {
+         *        name: "increment",
+         *        act,
+         *        undo() { counter.count = prevCount; }
+         *     };
+         *   };
+         *   // ...
+         *   cmdManager.add(increment(counter));
+         * ```
+         */
         add(action: Command) {
             if (currentTransaction) {
                 currentTransaction.commands.push(action);
@@ -181,30 +184,30 @@ export function createCommandManager(maxHistory = 100) {
 /** same as `keyof T` but without symbol */
 type KeyOf<T> = Extract<keyof T, string|number>
 
-export function setItem<T extends Record<string, any>>(obj: T, field: KeyOf<T>, value: any): Command {
+export function setItem<T extends Record<string, any_>>(obj: T, field: KeyOf<T>, value: any_): Command {
     if (typeof field === "number" && field < 0) {
         throw new Error('Index out of range');
     }
-    const prev = (obj as any)[field];
+    const prev = (obj as any_)[field];
     const act = () => {
         if (value === undefined) {
-            delete (obj as any)[field];
+            delete (obj as any_)[field];
         } else {
-            (obj as any)[field] = value;
+            (obj as any_)[field] = value;
         }
     }
     act();
     const undo = () => {
         if (prev === undefined) {
-            delete (obj as any)[field];
+            delete (obj as any_)[field];
         } else {
-            (obj as any)[field] = prev;
+            (obj as any_)[field] = prev;
         }
     }
     return { name: `Set ${String(field)}`, act, undo };
 }
 
-export function insertItem<T>(obj: any[], pos: number, item: T): Command {
+export function insertItem<T>(obj: any_[], pos: number, item: T): Command {
     if (pos > obj.length || pos < -obj.length) {
         throw new Error("Index out of range");
     }
@@ -234,6 +237,6 @@ export function removeItem<T>(obj: T[], pos: number, name = 'Remove'): Command {
 }
 
 export function removeItemById<T extends {id: string}>(obj: T[], id: string, name = 'Remove'): Command {
-    const i = indexOf(obj, "id" as any, id, 'Item id not found');
+    const i = indexOf(obj, "id" as any_, id, 'Item id not found');
     return removeItem(obj, i, name);
 }

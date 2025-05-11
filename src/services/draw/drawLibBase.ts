@@ -7,15 +7,15 @@ import { drawLib, GenerateType, IDrawLib } from './drawLib';
 import { by } from '../util/find';
 import { ASSERT } from '../../utils/tool';
 import { OptionalId } from '../../domain/object';
+import type { DataType } from '../../domain/types';
 
 export abstract class DrawLibBase implements IDrawLib {
 
-    // eslint-disable-next-line @typescript-eslint/no-parameter-properties
     constructor(public event: TEvent, public draw: OptionalId<Draw>) {}
 
     abstract nbColumnForPlayers( nJoueur: number): number;
     abstract resize( oldDraw?: Draw, nJoueur?: number): void;
-    abstract generateDraw( generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[];
+    abstract generateDraw(types: DataType, generate: GenerateType, playersOrQ: Array<Player|number>, prevGroup?: [number,number]): Draw[];
 
     abstract setPlayerOut(box: Match, outNumber?: number): boolean; //SetQualifieSortant
 

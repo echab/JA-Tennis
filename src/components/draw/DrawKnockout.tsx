@@ -106,12 +106,9 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     tabIndex={0}
                                     onkeydown={handleKey}
                                 >
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
 
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.order && box.order > 0}><small class="pr-1">{box!.order}</small></Show>
                                     <Show when={box && isMatch(box)}><small class="pr-1">m</small></Show>
 
@@ -122,9 +119,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     }>
                                         <span class="nom inline-block border-l-2 border-gray-500 pl-1">{player?.name} requalified<br />{otherName(box)} withdraws</span>
                                     </Show>
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.order && box.order > 0 && player?.rank}><span class="classement">{player!.rank}</span></Show>
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                                     <br />
                                     <Show when={box?.order && box.order > 0}>
@@ -138,9 +133,9 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     </Show>
                                     <Show when={box && isMatch(box)}>
                                         <span title="Edit the match"
-                                            onclick={() => {
+                                            onClick={() => {
                                                 selectBox(props.event, props.draw, box);
-                                                showDialog("match");
+                                                showDialog({ name: "match" });
                                             }}>
                                             <i class="icon2-match hover2" />
                                             <Show when={box?.note}><i class='icon2-note'/></Show>
@@ -165,17 +160,14 @@ export const DrawKnockout: Component<Props> = (props) => {
                                         </Show> */}
                                         <Show when={box?.score || box?.wo} fallback={
                                             <>
-                                                {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                                 <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
-                                                {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                                 <Show when={box?.place !== undefined}> <span class="place">{props.tournament.places?.[box!.place!]?.name ?? ''}</span></Show>
                                             </>
-                                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                        }><span class="score">{`${box!.score}${box?.wo ? ' WO' : ''}`}</span></Show>
+                                        }><span class="score">{`${box?.score}${box?.wo ? ' WO' : ''}`}</span></Show>
 
                                         <Show when={isRight && props.draw.type !== FINAL}>
                                             <i class="icon2-qualif-out hover" title="Edit qualified out"
-                                                onclick={() => {
+                                                onClick={() => {
                                                     selectBox(props.event, props.draw, box);
                                                     // showDialog("qualif");
                                                 }}

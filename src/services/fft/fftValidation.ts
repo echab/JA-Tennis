@@ -9,7 +9,7 @@ import { drawLib } from '../draw/drawLib';
 import type { DrawProblem, IValidation, PlayerProblem } from '../../domain/validation';
 import { column, positionMax } from '../draw/knockoutLib';
 
-function validatePlayer(player: Player): PlayerProblem[] {
+function validatePlayer(tournament: Tournament, player: Player): PlayerProblem[] {
     const result: PlayerProblem[] = [];
 
     // if (player.sexe === 'F') {

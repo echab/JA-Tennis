@@ -11,8 +11,8 @@ const validLibs: IValidation[] = [
     roundrobinValidation,
 ];
 
-// const [errorsDraw, setProblemsDraw] = createStore<{ [id: string]: DrawError[] }>({});
-// const [errorsPlayer, setProblemsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
+// const [drawProblems, setDrawProblems] = createStore<{ [id: string]: DrawError[] }>({}, { name: 'drawProblems' });
+// const [playerProblems, setPlayerProblems] = createStore<{ [id: string]: PlayerError[] }>({}, { name: 'playerProblems' });
 
 export const addValidator = (validator: IValidation) => {
     validLibs.push(validator); // TODO validLibs is undefined in tests?!?
@@ -28,7 +28,7 @@ export function validateTournament(tournament: Tournament) {
         });
 
         tournament.players.forEach((player) => {
-            const errors = validatePlayer(player);
+            const errors = validatePlayer(tournament, player);
             if (errors.length) {
                 sel.playerProblems.set(player.id, errors);
             } else {
@@ -56,14 +56,19 @@ export function validateTournament(tournament: Tournament) {
     });
 }
 
-export function validatePlayer(player: Player): PlayerProblem[] {
+export function validatePlayer(tournament: Tournament, player: Player): PlayerProblem[] {
     const result: PlayerProblem[] = [];
     for (const lib of validLibs) {
         const fn = lib.validatePlayer;
         if (fn) {
-            result.splice(-1, 0, ...fn(player));
+            result.splice(-1, 0, ...fn(tournament, player));
         }
     }
+
+    if (tournament._types.validation.validatePlayer) {
+        result.splice(-1, 0, ...tournament._types.validation.validatePlayer(tournament, player));
+    }
+
     result.forEach(({ message, player, detail }) => {
         console.warn(`Validation error on ${player.name}${detail ? ` (${detail})` : ''} : ${message}`);
     });
@@ -79,6 +84,11 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
             result.splice(-1, 0, ...fn(tournament, event, draw));
         }
     }
+
+    if (tournament._types.validation.validateDraw) {
+        result.splice(-1, 0, ...tournament._types.validation.validateDraw(tournament, event, draw));
+    }
+
     // result.forEach(({ message, draw, box, player, detail }) => {
     //   console.warn(`Validation error on ${draw.name}${box && player ? ` for ${player.name}` : ''}${detail ? ` (${detail})` : ''} : ${message}`);
     // });
@@ -86,13 +96,13 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
 }
 
 // export function hasErrorBox(box: Box, drawId: string): boolean {
-//   const c = box && errorsDraw[drawId];
+//   const c = box && drawProblems[drawId];
 //   const e = c && by(c, "position", box.position);
 //   return !!e;
 // }
 
 // export function getErrorBox(box: Box, drawId: string): DrawError | undefined {
-//   const c = box && errorsDraw[drawId];
+//   const c = box && drawProblems[drawId];
 //   if (c) {
 //     return by(c, "position", box.position);
 //   }
