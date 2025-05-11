@@ -1,4 +1,4 @@
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
 import { emptyTournament } from "../../assets/data";
 import { openFile, saveFile } from "../../services/file/file";
@@ -14,10 +14,13 @@ export const Tournaments: Component = () => {
 
     const [tournaments, setTournaments] = useTournaments();
 
+    const navigate = useNavigate();
+
     const newItem = async () => {
         showDialog({
             name: "new",
             onOk(t: Tournament) {
+                navigate('/tournament/');
                 const tStored = storeTournament(t);
                 const i = tournaments.findIndex((v) => v.id === tStored.id);
                 if (i !== -1) {
@@ -31,6 +34,7 @@ export const Tournaments: Component = () => {
 
     const loadFile = async () => {
         const t = await openFile();
+        navigate('/tournament/');
         setTournaments((ts) => [storeTournament(t), ...ts.slice(0, MAX_MRU)]);
     };
 
@@ -39,11 +43,13 @@ export const Tournaments: Component = () => {
     };
 
     const clearStorage = () => {
+        navigate('/tournament/');
         // localStorage.removeItem('jat');
         setTournaments([storeTournament(emptyTournament())]);
     };
 
     const selectItem = async (index: number) => {
+        // navigate('/tournament/'); // the A link already navigate properly
         // move the selected tournament on top of the list
         setTournaments((ts) => {
             const t = ts.splice(index, 1);
@@ -61,8 +67,8 @@ export const Tournaments: Component = () => {
         <div>
             <button type="button" onClick={newItem} class="p-2 rounded-full">➕New tournament</button>
 
-            <button type="button" onClick={loadFile} class="p-2 rounded-full">💾 Open file</button>
-            <button type="button" onClick={saveTheFile} class="p-2 rounded-full">💾 Save file</button>
+            <button type="button" onClick={loadFile} class="p-2 rounded-full"><i class="icon2-open" /> Open file</button>
+            <button type="button" onClick={saveTheFile} class="p-2 rounded-full"><i class="icon2-save" /> Save file</button>
             <button type="button" onClick={clearStorage} class="p-2 rounded-full">❌ Clear storage</button>
         </div>
 

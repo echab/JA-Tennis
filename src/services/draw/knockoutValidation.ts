@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-bitwise */
+/* eslint-disable no-bitwise */
 import { columnMax, column, positionTopCol, positionOpponent1, positionMax, positionBottomCol } from './knockoutLib';
 import { findGroupQualifOuts, findPlayerIn, findPlayerOut, findSeeded, groupDraw, groupFindPlayerOut, isMatch, isPlayerIn, nextGroup, previousGroup } from '../drawService';
 import { indexOf, byId } from '../util/find';
@@ -135,9 +135,9 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
         result.push({ message: 'ERR_TAB_CLASSLIM_OVR', draw });
     }
 
-    result.splice(-1, 0, ...validateGroup(tournament._types, event, draw));
+    result.push(...validateGroup(tournament._types, event, draw));
 
-    result.splice(-1, 0, ...validateMatches(tournament._types, draw));
+    result.push(...validateMatches(tournament._types, draw));
 
     const colMax = columnMax(draw.nbColumn, draw.nbOut);
     const pClastMaxCol: RankString[] = new Array(colMax + 1);
@@ -244,7 +244,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 }
 
             } else {
-                ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut)); //Pas de match colonne de gauche
+                ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut), 'No match on left column'); //Pas de match colonne de gauche
 
                 if (!match.playerId) {
                     result.push({ message: 'ERR_SCORE_VAINQ_NO', draw, box: match });

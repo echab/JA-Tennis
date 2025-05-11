@@ -61,12 +61,12 @@ export function validatePlayer(tournament: Tournament, player: Player): PlayerPr
     for (const lib of validLibs) {
         const fn = lib.validatePlayer;
         if (fn) {
-            result.splice(-1, 0, ...fn(tournament, player));
+            result.push(...fn(tournament, player));
         }
     }
 
     if (tournament._types.validation.validatePlayer) {
-        result.splice(-1, 0, ...tournament._types.validation.validatePlayer(tournament, player));
+        result.push(...tournament._types.validation.validatePlayer(tournament, player));
     }
 
     result.forEach(({ message, player, detail }) => {
@@ -81,12 +81,12 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
     for (const lib of validLibs) {
         const fn = lib.validateDraw;
         if (fn) {
-            result.splice(-1, 0, ...fn(tournament, event, draw));
+            result.push(...fn(tournament, event, draw));
         }
     }
 
     if (tournament._types.validation.validateDraw) {
-        result.splice(-1, 0, ...tournament._types.validation.validateDraw(tournament, event, draw));
+        result.push(...tournament._types.validation.validateDraw(tournament, event, draw));
     }
 
     // result.forEach(({ message, draw, box, player, detail }) => {

@@ -74,12 +74,11 @@ export function positionOpponents(pos: number): { pos1: number; pos2: number } {
     };
 }
 
-export function scanLeftBoxes(
+export function* scanLeftBoxes(
     draw: OptionalId<Draw>,
     position: number,
     evenWithPlayer: boolean,
-    callback: (box: Box, pos: number) => void
-): void { //iBoiteDeGauche
+): Generator<Box> { //iBoiteDeGauche
 
     //formule de décalage à gauche:
     //
@@ -106,7 +105,7 @@ export function scanLeftBoxes(
                 return;
             }
             if(!!box.playerId || evenWithPlayer) {
-                callback(box, b);
+                yield box;
                 break;
             }
         }

@@ -17,14 +17,14 @@ export async function openFile(): Promise<Tournament> {
 async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
     // console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
-    // const { size, lastModifiedDate, type } = file;
-    // console.log('size=', size, 'lastModifiedDate=', lastModifiedDate);
+    const { size, lastModified, type } = file;
+    console.log(`name=${fileHandle.name} size=${size} lastModified=${new Date(lastModified).toISOString()} type=${type}`);
     // const content = await file.stream();
     // for await (const value of streamAsyncIterator(content)) {
     const buffer = await file.arrayBuffer();
     const value = new Uint8Array(buffer);
 
-    const reader = createSerializer(value);
+    const reader = createSerializer(value, new Date(file.lastModified)); // File parameter for streaming
     const doc = await reader.readObject(docFields);
     console.log(doc);
 

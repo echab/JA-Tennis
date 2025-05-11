@@ -518,15 +518,15 @@ export class Knockout extends DrawLibBase implements IDrawLib {
                 //Qualifié entrant pas déjà pris
                 if (!usedNumber) {
                     //Cache les boites de gauche
-                    scanLeftBoxes(this.draw, box.position, true, (box) => {
-                        box.hidden = true;  //TODOjs delete the box from draw.boxes
-                    });
+                    for (const b of scanLeftBoxes(this.draw, box.position, true)) {
+                        b.hidden = true;  //TODOjs delete the box from draw.boxes
+                    }
                 }
             } else {
                 //Réaffiche les boites de gauche
-                scanLeftBoxes(this.draw, box.position, true, (box) => {
-                    delete box.hidden;
-                });
+                for (const b of scanLeftBoxes(this.draw, box.position, true)) {
+                    delete b.hidden;
+                }
             }
         }
 

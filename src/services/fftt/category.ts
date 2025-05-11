@@ -31,48 +31,44 @@ const _category: Categ[] = [
 ];
 const _categoryById = new Map(_category.map((c) => [c.id, c]));
 
-export class CategoryFFTT implements Category {
+export const categoryFFTT: Category = {
 
     // http://www.fft.fr/sites/default/files/pdf/153-231_rs_nov2011.pdf
 
-    //private _beginOfTime = new Date(0);
-    currentYear: number; //for Spec
-
-    //    this.refDate = function( date) {
-    //        refDate = date;
-    //    }
-
-    constructor() {
-        const now = new Date();
-        const refDate = new Date(now.getFullYear(), 9, 1);    //1er Octobre
-        this.currentYear = now.getFullYear() + (now > refDate ? 1 : 0);
-    }
-
     name(category: CategoryId): string {
         return _categoryById.get(category)?.name ?? '';
-    }
+    },
 
     list(): Array<{ id: number, name: string }> {
         return _category;
-    }
+    },
 
     isValid(category: CategoryId): boolean {
         return _categoryById.has(category);
-    }
+    },
 
     compare(category1: CategoryId, category2: CategoryId): number {
         return category1 - category2;
-    }
+    },
 
-    /** Date or year */
-    getAge(date: Date | number): number {
-        //const age = (new Date(refDate - date)).getFullYear() - _beginOfTime.getFullYear() -1;
-        const age = this.currentYear - (typeof date === "number" ? date : date.getFullYear());
+    /**
+     * @param date Date or year
+     * @param refDate
+     */
+    getAge(date: Date | number, refDate: Date): number {
+        const seasonStart = new Date(refDate.getFullYear(), 9, 1); // 1er Octobre
+        const refYear = refDate.getFullYear() + (refDate > seasonStart ? 1 : 0);
+
+        const age = refYear - (typeof date === "number" ? date : date.getFullYear());
         return age;
-    }
+    },
 
-    ofDate(date: Date | number): { id: CategoryId, name: string } {
-        const age = this.getAge(date);
+    /**
+     * @param date Date or year
+     * @param refDate
+     */
+    ofDate(date: Date | number, refDate: Date): { id: CategoryId, name: string } {
+        const age = this.getAge(date, refDate);
         let prev = { id: -1, name: '' };
         for (const categ of _category) {
             if (categ.ageMax && categ.ageMax < age) {
@@ -89,7 +85,11 @@ export class CategoryFFTT implements Category {
             return categ;
         }
         return prev; // never
-    }
+    },
+
+    isJunior(category: CategoryId): boolean {
+        return category < SENIOR;
+    },
 
     isCompatible(eventCategory: CategoryId, playerCategory: CategoryId): boolean {
 
@@ -130,5 +130,5 @@ export class CategoryFFTT implements Category {
         //	return playerCategory.isVide() || isVide()
         //		(playerCategory.AgeMin() <= AgeMax()
         //		&& AgeMin() <= playerCategory.AgeMax() );
-    }
+    },
 }

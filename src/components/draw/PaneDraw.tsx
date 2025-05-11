@@ -13,7 +13,7 @@ import { BUILD, PLAN, PLAY } from "../../domain/draw";
 type Data = {
 }
 
-export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
+export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) => {
 
     const cur = () => drawById(props.params.drawId ?? '', props.params.eventId);
     const event = () => cur().event;

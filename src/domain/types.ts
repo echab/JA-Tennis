@@ -4,16 +4,17 @@ export type CategoryId = number;
 
 export interface Category {
     //currentYear: number;    //public for Spec
-    list(): Array<{id: CategoryId, name: string}>;
+    list(): Array<{ id: CategoryId, name: string }>;
     name(category: CategoryId): string;
     isValid(category: CategoryId): boolean;
-    isCompatible(eventCategory: CategoryId, playerCategory: CategoryId): boolean
+    isCompatible(eventCategory: CategoryId, playerCategory: CategoryId): boolean;
+    isJunior(category: CategoryId): boolean;
 
     /** @param date or year */
-    ofDate(date: Date | number): {id: CategoryId, name: string};
+    ofDate(date: Date | number, refDate: Date): { id: CategoryId, name: string };
 
     /** @param date or year */
-    getAge(date: Date | number): number;
+    getAge(date: Date | number, refDate: Date): number;
 
     compare(category1: CategoryId, category2: CategoryId): number;
 }

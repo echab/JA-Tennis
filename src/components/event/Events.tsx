@@ -11,7 +11,7 @@ import { IconSexe } from '../misc/IconSexe';
 type Data = {
 }
 
-export const Events: Component<RouteSectionProps<Data>> = () => {
+export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
 
     const drop_handler: JSX.EventHandlerUnion<HTMLDivElement, DragEvent> = (evt) => {
         evt.preventDefault();

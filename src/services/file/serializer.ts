@@ -40,7 +40,7 @@ const wClassTag = 0x8000;
 const wNewClassTag = 0xffff;
 // const dwBigClassTag = 0x80000000;
 
-export const createSerializer = (buffer: Uint8Array, position = 0) => ({
+export const createSerializer = (buffer: Uint8Array, fileDate?: Date, position = 0) => ({
     writing: false,
     _position: position,
     _buffer: buffer,
@@ -48,6 +48,7 @@ export const createSerializer = (buffer: Uint8Array, position = 0) => ({
     _view: new DataView(buffer.buffer),
     _classNames: [] as string[],
     _nMapCount: 1,
+    _fileDate: fileDate,
     readBytes(n: number) {
         const r = this._buffer.slice(this._position, this._position + n);
         this._position += n;

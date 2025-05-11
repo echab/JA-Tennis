@@ -13,7 +13,7 @@ type Data = {
     short?: boolean;
 }
 
-export const Planning: Component<RouteSectionProps<Data>> = (props) => {
+export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) => {
 
     const [search, setSearch] = useSearchParams<Searchs>();
 
@@ -29,7 +29,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
     // change url on selection change
     const navigate = useNavigate();
     createEffect(() => {
-        if (props.data.short) {
+        if (props.data?.short) {
             setSearch({ day: selection.day });
         } else {
             const url = urlDay(selection.day ?? 0);
@@ -91,7 +91,7 @@ export const Planning: Component<RouteSectionProps<Data>> = (props) => {
             </h3>
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
-            <Show when={props.data.short}>
+            <Show when={props.data?.short}>
                 <A href={urlDay(selection.day)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</A>
             </Show>
         </div>

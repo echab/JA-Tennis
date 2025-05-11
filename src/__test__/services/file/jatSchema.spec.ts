@@ -47,11 +47,13 @@ describe("jatSchema", async () => {
         ]
     });
 
+    const refDate = new Date('2025-05-11');
+
     it('should read binary tournament1.jat file version 13', async () => {
         const b = await readFile(`${__dirname}/tournament1.jat`);
         const buf = b.buffer;
 
-        const reader = createSerializer(new Uint8Array(buf));
+        const reader = createSerializer(new Uint8Array(buf), refDate);
 
         const result = await reader.readObject(docFields);
 
@@ -68,7 +70,7 @@ describe("jatSchema", async () => {
     // });
 
     it('should save tournament to array buffer', () => {
-        const writer = createSerializer(new Uint8Array(8192)); // TODO size
+        const writer = createSerializer(new Uint8Array(8192), refDate); // TODO size
         writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
@@ -76,11 +78,11 @@ describe("jatSchema", async () => {
     });
 
     it('should save and reload same tournament', async () => {
-        const writer = createSerializer(new Uint8Array(8192)); // TODO size
+        const writer = createSerializer(new Uint8Array(8192), refDate); // TODO size
         writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
-        const reader = createSerializer(buf);
+        const reader = createSerializer(buf, refDate);
         const result = await reader.readObject(docFields);
 
         expect(result.version).toBe(13);
@@ -91,10 +93,10 @@ describe("jatSchema", async () => {
         const b = await readFile(`${__dirname}/tournament1.jat`);
         const expected = new Uint8Array(b.buffer);
 
-        const reader = createSerializer(new Uint8Array(b.buffer));
+        const reader = createSerializer(new Uint8Array(b.buffer), refDate);
         const doc = await reader.readObject(docFields);
 
-        const writer = createSerializer(new Uint8Array(expected.length * 2)); // TODO size
+        const writer = createSerializer(new Uint8Array(expected.length * 2), refDate); // TODO size
         writer.writeObject(doc, docFields);
         const result = writer._buffer.slice(0, writer._position);
 

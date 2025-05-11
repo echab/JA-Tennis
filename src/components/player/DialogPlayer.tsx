@@ -43,6 +43,8 @@ export const DialogPlayer: Component<Props> = (props) => {
     const ranks: RankString[] = rank.list();
     // const categories: CategoryString[] = category.list();
 
+    const refDate = props.tournament.info.start ?? new Date(Date.now());
+
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
 
@@ -169,7 +171,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                             <label class="inline-block w-3/12 text-right pr-3">Birth:</label>
                             {/* TODO? support year only */}
                             <input name="birth" type="date" value={dateLocal(form.birth) ?? ''} onChange={updateField('birth')} class="p-1" />
-                            <span class="ml-2">{form.birth && category.ofDate(form.birth).name}</span>
+                            <span class="ml-2">{form.birth && category.ofDate(form.birth, refDate).name}</span>
                         </div>
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Club:</label>

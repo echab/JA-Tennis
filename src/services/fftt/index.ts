@@ -1,4 +1,4 @@
-import { CategoryFFTT } from './category';
+import { categoryFFTT } from './category';
 import { LicenceFFTT } from './licence';
 import { matchFormatsFFTT } from './matchFormat';
 import { RankFFTT } from './rank';
@@ -7,14 +7,13 @@ import { ScoreFFTT } from './score';
 import { FFTTValidation } from './ffttValidation';
 import type { DataType } from '../../domain/types';
 
-const category = new CategoryFFTT();
 const licence = new LicenceFFTT();
 const rank = new RankFFTT();
 const score = new ScoreFFTT();
 const ranking = new RankingFFTT(score);
 
 const dataType: DataType = {
-    category,
+    category: categoryFFTT,
     licence,
     matchFormat: matchFormatsFFTT,
     rank,

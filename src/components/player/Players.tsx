@@ -13,11 +13,10 @@ type Data = {
     short?: boolean;
 }
 
-export const Players: Component<RouteSectionProps<Data>> = (props) => {
+export const Players: Component<RouteSectionProps<Data | undefined>> = (props) => {
 
-    const short = !!props.data?.short; // TODO detect we are into the SidePanel
-
-    const [registred, setRegistred] = createSignal(short);
+    // eslint-disable-next-line solid/reactivity
+    const [registred, setRegistred] = createSignal(!!props.data?.short); // no reactivity, props.data.short is static
 
     // change selection on url change
     createEffect(() => {
@@ -59,7 +58,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                 /> registered</label>
 
                 <button type="button" onClick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
-                <Show when={short}>
+                <Show when={props.data?.short}>
                     <A href={urlPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
                 </Show>
             </div>
@@ -74,10 +73,11 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                         <th class="text-left font-normal">sexe</th>
                         <th class="text-left font-normal">name</th>
                         <th class="text-left font-normal">rank</th>
-                        <Show when={!short} fallback={
+                        <Show when={!props.data?.short} fallback={
                             <th class="text-left font-normal">reg</th>
                         }>
                             <th class="text-left font-normal">club</th>
+                            <th class="text-left font-normal">category</th>
                             <th class="text-left font-normal">registrations</th>
                             <th class="text-left font-normal">phone</th>
                             <th class="text-left font-normal">email</th>
@@ -106,7 +106,7 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                                 {player.name} {player.firstname}
                             </td>
                             <td class="text-left">{player.rank}</td>
-                            <Show when={!short} fallback={
+                            <Show when={!props.data?.short} fallback={
                                 <td class="text-left">
                                     <Show when={selection.event}><i
                                         classList={{
@@ -118,6 +118,9 @@ export const Players: Component<RouteSectionProps<Data>> = (props) => {
                             }>
                                 <td>
                                     {player.club}
+                                </td>
+                                <td>
+                                    {player.category && selection.tournament._types.category.name(player.category)}
                                 </td>
                                 <td>
                                     <For each={player.registration}>{(eventId, i) =>

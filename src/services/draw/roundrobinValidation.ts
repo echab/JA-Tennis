@@ -8,9 +8,9 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
     if (draw.type === ROUNDROBIN || draw.type === ROUNDROBIN_RETURN) {
 
-        result.splice(-1,0,...validatePoule(draw));
+        result.push(...validatePoule(draw));
 
-        result.splice(-1,0,...validateMatches(draw));
+        result.push(...validateMatches(draw));
     }
 
     return result;

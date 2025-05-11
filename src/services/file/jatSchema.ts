@@ -6,8 +6,8 @@ import type { ScoreString, DataType } from "../../domain/types";
 import { atMidnight, atZeroHour } from "../../utils/date";
 import { ASSERT } from "../../utils/tool";
 import { drawLib } from "../draw/drawLib";
-import { column, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
-import { isMatch } from "../drawService";
+import { column, columnMax, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
+import { isMatch, isPlayerIn } from "../drawService";
 import { defaultDrawName } from "../tournamentService";
 import { loadType, TYPES } from "../types";
 import { by, byId, indexOf } from "../util/find";
@@ -37,6 +37,7 @@ const MAX_COL_POULE = 22;
 
 type JatSerializer = Serializer & {
     _types?: DataType,
+    _refDate?: Date,
     _curSexe?: number,
     _playerRegs?: Record<string, number>,
     _teamNames?: Record<string, string | undefined>,
@@ -131,7 +132,7 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
             // TODO: compute Categorie from birthDate
             // const age = d && Math.round(new Date().getFullYear() - (typeof d === 'string' ? +d : d.getFullYear()));
             // p.category = age && `categ${age}`;
-            p.category = d ? this._types!.category.ofDate(d).id : undefined;
+            p.category = d ? this._types!.category.ofDate(d, this._refDate!).id : undefined;
             return d;
         }
     },
@@ -160,7 +161,11 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     club: { type: "bstr", reviver: optionalString },
     registration: {
         type: "u32", replacer(this: JatSerializer, reg, p: Player) {
-            return this._playerRegs?.[p.id];
+            if (!this.writing) {
+                return reg;
+            } else {
+                return this._playerRegs?.[p.id];
+            }
         }
     },
     _partenaire: { version: 2, type: "u16", replacer: () => 0xffff },
@@ -338,19 +343,30 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
 
                 // hide boxes on left off entering players
                 // const hideBox = (box: Box, b: number) => box.hidden = true;
-                const deleteBox = (box: Box) => {
-                    if (box.playerId) {
-                        console.warn('cleanup draw', p.id, p.name, `box.pos=${box.position}`, 'player=', box.playerId);
-                    } else {
-                        const b = indexOf(p.boxes, "position", box.position);
-                        delete p.boxes[b];
+                for (const box of p.boxes) {
+                    if (isPlayerIn(box)) {
+                        for (const leftBox of scanLeftBoxes(p, box.position, false)) {
+                            if (leftBox.playerId) {
+                                console.warn(`cleanup draw ${p.id} ${p.name} box.pos=${leftBox.position} player=${leftBox.playerId}`);
+                            } else {
+                                const b = indexOf(p.boxes, "position", leftBox.position);
+                                delete p.boxes[b];
+                            }
+                        }
                     }
                 }
-                p.boxes.forEach((box: PlayerIn) => {
-                    if (box.order) {
-                        scanLeftBoxes(p, box.position, false, deleteBox);
+
+                // remove matchs on left column
+                if (p.type === KNOCKOUT || p.type === FINAL) {
+                    const leftCol = columnMax(p.nbColumn, p.nbOut);
+                    const pMin = positionBottomCol(leftCol, p.nbOut);
+                    for( const box of p.boxes) {
+                        if (box.position >= pMin && isMatch(box)) {
+                            console.warn(`cleanup draw ${p.id} ${p.name} box.pos=${box.position} remove match on left column`);
+                            delete (box as Partial<Match>).score;
+                        }
                     }
-                });
+                }
 
                 // TODO init joueur QS
                 // if (draw.type & TABLEAU_POULE) {
@@ -420,21 +436,23 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
                 delete this._curSexe; // clean-up
 
                 if (!event.name) {
-                    event.name = `${event.typeDouble ? 'Double ' : 'Simple '}${{ H: 'Messieurs', F: 'Dames', M: 'Mixte' }[event.sexe]}${event.consolation ? ' consolation' : ''}`;
+                    const isJunior = this._types!.category.isJunior(event.category);
+                    const categName = this._types!.category.name(event.category);
+                    event.name = `${event.typeDouble ? 'Double ' : 'Simple '}${{ H: isJunior ? 'Boys' : 'Men', F: isJunior ? 'Girls' : 'Women', M: 'Mixte' }[event.sexe]} ${categName}${event.consolation ? ' consolation' : ''}`;
                 }
 
                 // cleanup draws.boxes
-                event.draws.forEach((draw: Draw) => {
+                for( const draw of  event.draws) {
                     const lib = drawLib(event as TEvent, draw);
-                    draw.boxes.forEach((box) => {
+                    for (const box of draw.boxes) {
                         if (isMatch(box)) {
                             const { player1, player2 } = lib.boxesOpponents(box);
                             if (!player1 || !player2) {
                                 delete (box as Partial<Match>).score; // not a match
                             }
                         }
-                    });
-                });
+                    }
+                }
             } else {
                 // TODO
             }
@@ -510,7 +528,11 @@ export const docFields: Fields<Tournament> = {
     _types: { type: {} },
     _start: {
         version: 12, type: "date",
-        reviver: (d: Date | undefined, p: Tournament & { _start?: Date }) => { p._start = d ? atZeroHour(d) : undefined; },
+        reviver(this: JatSerializer, d: Date | undefined, p: Tournament & { _start?: Date }) {
+            p._start = d ? atZeroHour(d) : undefined;
+
+            this._refDate = atZeroHour(d ?? new Date(this._fileDate ?? Date.now()));
+        },
         replacer: (_, p: Tournament) => p.info.start
     },
     _end: {
@@ -574,6 +596,23 @@ export const docFields: Fields<Tournament> = {
                 if (!doc.info.end && doc._end) {
                     doc.info.end = atMidnight(doc._end);
                     delete doc._end;
+                }
+
+                // fix duplicated ids
+                const eventIDs = new Set<string>();
+                for (const ev of doc.events) {
+                    while (eventIDs.has(ev.id)) {
+                        ev.id = generateId();
+                    }
+                    eventIDs.add(ev.id);
+
+                    const drawIDs = new Set<string>();
+                    for (const d of ev.draws) {
+                        while (drawIDs.has(d.id)) {
+                            d.id = generateId();
+                        }
+                        drawIDs.add(d.id);
+                    }
                 }
 
                 // once all players and events are loaded
