@@ -20,7 +20,7 @@ export function createLocalStore<T extends object>(
     const localState = localStorage.getItem(name);
     const [state, setState] = createStore<T>(
         localState ? JSON.parse(localState, options?.reviver) : init
-    );
+    , { name: 'localStore' });
     createEffect(() => {
         localStorage.setItem(name, JSON.stringify(state, options?.replacer, options?.space));
     });

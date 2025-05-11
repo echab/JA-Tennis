@@ -19,8 +19,6 @@ const context = createContext<[StoredTournament[], SetStoreFunction<StoredTourna
     [[], () => {}], // no-op store
 );
 
-// const mockEntry = storeTournament(mockTournament);
-
 export const TournamentsProvider: ParentComponent = (props) => {
     /** Store of tournaments */
     const tournamentsStore = createLocalStore<StoredTournament[]>("jat", [storeTournament(mockTournament)]);

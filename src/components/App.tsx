@@ -1,5 +1,5 @@
-import { Component, ErrorBoundary, Suspense, type ParentComponent } from 'solid-js';
-import { createAsync, Route, Router } from '@solidjs/router';
+import { Component, createEffect, ErrorBoundary, Suspense, type ParentComponent } from 'solid-js';
+import { Route, Router } from '@solidjs/router';
 import { commandManager } from '../services/util/commandManager';
 
 // import logo from './logo.svg';
@@ -15,7 +15,6 @@ import { Home } from './Home';
 
 import styles from './App.module.css';
 import '../assets/icons.css';
-import { mockTournament } from '../assets/data';
 
 export type Params = {
     playerId?: string;
@@ -47,11 +46,11 @@ export const App: Component = () => (
 
 export const Main: ParentComponent = (props) => {
 
-    const [tournaments] = useTournaments();
+    const [storedTournaments] = useTournaments();
 
-    const t = createAsync(() => restoreTournament(tournaments[0]), { initialValue: mockTournament});
-
-    selectTournament(t());
+    createEffect(() => {
+        restoreTournament(storedTournaments[0]).then(selectTournament); // TODO solid2: async effect
+    });
 
     // const paste = async () => {
     //     console.log('paste');
@@ -91,7 +90,7 @@ export const Main: ParentComponent = (props) => {
                     <button type="button" onclick={paste} ><i class='icon2-paste'/> Paste</button> */}
                 </div>
                 <div>
-                    selection: player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
+                    selection: tournament={selection.tournament.id} player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
                 </div>
             </header>
             <div class="flex">

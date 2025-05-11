@@ -7,10 +7,10 @@ export const Home:Component = () => {
   const location = useLocation();
 
   if (location.pathname === '/') {
-      navigate('/tournament/', { replace: true });
+    navigate('/tournament/', { replace: true });
   }
 
-return (
+  return (
     <div>Hello</div>
   );
 }

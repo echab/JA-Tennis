@@ -39,7 +39,7 @@ export function atZeroHour(date: Date): Date {
  */
 export function atMidnight(date: Date): Date {
     // copy date parts of the timestamps, discarding the time parts.
-    return  new Date(atZeroHour(date).getTime() + DAYS - 1);
+    return new Date(atZeroHour(date).getTime() + DAYS - 1);
 }
 
 /** @returns a date formatted `yyyy-mm-ddThh:mm` compatible with `<input type="datetime-local" />` */
@@ -49,14 +49,14 @@ export function dateTimeLocal(date?: Date | string): string | undefined {
         return undefined;
     }
     if (typeof date === 'string') {
-        return date.substring(0,16);
+        return date.substring(0, 16);
     }
 
     // using local time zone
     const yyyy = date.toLocaleDateString(undefined, { year: "numeric" });
     const MM = date.toLocaleDateString(undefined, { month: "2-digit" });
     const dd = date.toLocaleDateString(undefined, { day: "2-digit" });
-    const time = date.toLocaleTimeString('en-GB', { timeStyle:'short' }); // 20:45
+    const time = date.toLocaleTimeString('en-GB', { timeStyle: 'short' }); // 20:45
     return `${yyyy}-${MM}-${dd}T${time}`;
 }
 
@@ -67,7 +67,7 @@ export function dateLocal(date?: Date | string | number): string | undefined {
         return undefined;
     }
     if (typeof date === 'string') {
-        return date.substring(0,8);
+        return date.substring(0, 10);
     }
     if (typeof date === 'number') {
         return String(date); // year only

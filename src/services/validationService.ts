@@ -11,8 +11,8 @@ const validLibs: IValidation[] = [
     roundrobinValidation,
 ];
 
-// const [errorsDraw, setProblemsDraw] = createStore<{ [id: string]: DrawError[] }>({});
-// const [errorsPlayer, setProblemsPlayer] = createStore<{ [id: string]: PlayerError[] }>({});
+// const [drawProblems, setDrawProblems] = createStore<{ [id: string]: DrawError[] }>({}, { name: 'drawProblems' });
+// const [playerProblems, setPlayerProblems] = createStore<{ [id: string]: PlayerError[] }>({}, { name: 'playerProblems' });
 
 export const addValidator = (validator: IValidation) => {
     validLibs.push(validator); // TODO validLibs is undefined in tests?!?
@@ -96,13 +96,13 @@ export function validateDraw(tournament: Tournament, event: TEvent, draw: Draw):
 }
 
 // export function hasErrorBox(box: Box, drawId: string): boolean {
-//   const c = box && errorsDraw[drawId];
+//   const c = box && drawProblems[drawId];
 //   const e = c && by(c, "position", box.position);
 //   return !!e;
 // }
 
 // export function getErrorBox(box: Box, drawId: string): DrawError | undefined {
-//   const c = box && errorsDraw[drawId];
+//   const c = box && drawProblems[drawId];
 //   if (c) {
 //     return by(c, "position", box.position);
 //   }

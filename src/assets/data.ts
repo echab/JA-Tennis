@@ -1,23 +1,26 @@
 import { KNOCKOUT } from "../domain/draw";
 import { DEFAULT_SLOT_LENGTH, Tournament } from "../domain/tournament";
+import { guid } from "../services/util/guid";
 import fftType from '../services/fft';
 
-export const emptyTournament = /* await reviveTournament */({ // TODO top await bug, prevent dynamic import and bundle
-    version: 13,
-    id: "2",
-    types: { name: 'FFT', versionTypes: 5 },
-    _types: fftType,
-    info: {
-        name: '',
-        slotLength: DEFAULT_SLOT_LENGTH // minutes
-    },
-    players: [],
-    events: [],
-});
+export function emptyTournament() {
+    return /* await reviveTournament */({ // TODO top await bug, prevent dynamic import and bundle
+        version: 13,
+        id: guid('T'),
+        types: { name: 'FFT', versionTypes: 5 },
+        _types: fftType,
+        info: {
+            name: 'no name',
+            slotLength: DEFAULT_SLOT_LENGTH // minutes
+        },
+        players: [],
+        events: [],
+    });
+}
 
 export const mockTournament: Tournament = /* await reviveTournament */({
     version: 13,
-    id: "1",
+    id: "T1",
     types: { name: 'FFT', versionTypes: 5 },
     _types: fftType,
     info: {
@@ -25,9 +28,9 @@ export const mockTournament: Tournament = /* await reviveTournament */({
         slotLength: 90 // minutes
     },
     players: [
-        { id: "J0", name: "Albert", firstname:"René", sexe: "H", rank: "NC", registration: ["E0"], club:'TROC' },
-        { id: "J1", name: "Bernard", firstname:"et Bianca", sexe: "H", rank: "NC", registration: ["E0"] },
-        { id: "J2", name: "Claude", firstname:"Mickaël", sexe: "H", rank: "30/4", registration: [] },
+        { id: "J0", name: "Albert", firstname: "René", sexe: "H", rank: "NC", registration: ["E0"], club: 'TROC' },
+        { id: "J1", name: "Bernard", firstname: "et Bianca", sexe: "H", rank: "NC", registration: ["E0"] },
+        { id: "J2", name: "Claude", firstname: "Mickaël", sexe: "H", rank: "30/4", registration: [] },
         { id: "J4", name: "Daniel", sexe: "H", rank: "30/3", registration: ["E0"] },
         { id: "J5", name: "Eloïse", sexe: "F", rank: "30/2", registration: ["E0", "E1"] },
         { id: "J6", name: "Françoise", sexe: "F", rank: "NC", registration: ["E1"] },
@@ -53,12 +56,12 @@ export const mockTournament: Tournament = /* await reviveTournament */({
                     nbColumn: 2,
                     nbOut: 2,
                     boxes: [
-                        { position: 6, playerId: "J0", qualifIn:1, order:2 },
+                        { position: 6, playerId: "J0", qualifIn: 1, order: 2 },
                         { position: 2, date: new Date("2022-10-09T16:30"), qualifOut: 1, score: '' },
-                        { position: 5, playerId: "J1", order:3 },
-                        { position: 4, qualifIn:2, order:4 },
-                        { position: 1, score:'', qualifOut:2 },
-                        { position: 3, playerId: "J2", seeded:1, order:1 },
+                        { position: 5, playerId: "J1", order: 3 },
+                        { position: 4, qualifIn: 2, order: 4 },
+                        { position: 1, score: '', qualifOut: 2 },
+                        { position: 3, playerId: "J2", seeded: 1, order: 1 },
                     ],
                 },
                 // {

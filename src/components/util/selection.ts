@@ -27,10 +27,10 @@ export interface SelectionItems {
 const END_SLASH = /\/+$/;
 
 export const [selection, setSelection] = createStore<SelectionItems>({
-    tournament: emptyTournament,
+    tournament: emptyTournament(),
     playerProblems: new Map(),
     drawProblems: new Map(),
-});
+}, { name: 'selection' });
 
 export function selectTournament(tournament: Tournament) {
     update((sel) => {

@@ -2,7 +2,7 @@ import { guid } from "./util/guid";
 import { shuffle } from "../utils/tool";
 import { loadType, TYPES } from "./types";
 import type { Player } from "../domain/player";
-import { Tournament, TournamentInfo, TEvent, DEFAULT_SLOT_LENGTH, type TypeName } from "../domain/tournament";
+import { Tournament, TournamentInfo, TEvent, type TypeName } from "../domain/tournament";
 import type { DataType, RankString } from "../domain/types";
 import type { Command } from "./util/commandManager";
 import { selection, update } from "../components/util/selection";
