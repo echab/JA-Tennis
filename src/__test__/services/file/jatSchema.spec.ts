@@ -1,20 +1,20 @@
 /// <reference types="node" />
-import { describe, expect, it, vi as jest } from 'vitest';
-import { KNOCKOUT } from "../../../domain/draw";
-import { docFields } from "../../../services/file/jatSchema";
-import { createSerializer } from "../../../services/file/serializer";
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { reviveTournament } from '../../../services/tournamentService';
+import { KNOCKOUT } from "../../../domain/draw.ts";
+import { docFields } from "../../../services/file/jatSchema.ts";
+import { createSerializer } from "../../../services/file/serializer.ts";
+import { reviveTournament } from '../../../services/tournamentService.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 beforeAll(() => {
-    jest.spyOn(globalThis.console, 'warn').mockImplementation(() => {});
+    vi.spyOn(globalThis.console, 'warn').mockImplementation(() => {});
 });
 afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
 });
 
 describe("jatSchema", async () => {

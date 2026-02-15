@@ -12,7 +12,7 @@ export default [
     // ...tseslint.configs.recommended,
     // ...tseslint.configs.recommendedTypeChecked,
     {
-        ignores: ["**/*.config.js", "**/*.config.ts", "**/.eslintrc.js"],
+        ignores: ["**/*.config.js", "**/*.config.ts"],
     },
     {
         files: ["**/*.{ts,tsx}"],

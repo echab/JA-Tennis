@@ -1,22 +1,29 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    // General
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client", "@testing-library/jest-dom", "@types/wicg-file-system-access"],
+    "target": "ESNext",
+    "allowImportingTsExtensions": true,
     "noEmit": true,
+
+    // Modules
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "dom", "dom.iterable"],
+
+    // Type checking & safety
+    "strict": true,
+    "types": ["vite/client", "@testing-library/jest-dom", "@types/wicg-file-system-access"],
 
     // "declaration": true,
-    "lib": ["ESNext", "dom", "dom.iterable"],
     // "removeComments": true,
     // "sourceMap": true,
     // "experimentalDecorators": true,
+
     "outDir": "./dist"
   },
   "include": [

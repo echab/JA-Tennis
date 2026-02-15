@@ -1,37 +1,34 @@
-/** @jest-environment jsdom */
-import { describe, expect, it, vi as jest } from 'vitest';
-import "../../setupJsdom";
-import { screen, render, fireEvent } from '@solidjs/testing-library';
-import { DialogInfo } from '../../../components/tournament/DialogInfo';
+/** @vitest-environment happy-dom */
+import { describe, expect, it, test, vi } from 'vitest';
+import { render, fireEvent } from '@solidjs/testing-library';
+import "../../setupTestDOM.ts";
+import { DialogInfo } from '../../../components/tournament/DialogInfo.tsx';
 
 describe('DialogInfo', () => {
 
     const info = { name: 'My tournament', slotLength: 60 } as const;
-    const onOk = jest.fn();
-    const onClose = jest.fn();
+    const onOk = vi.fn();
+    const onClose = vi.fn();
 
-    it('no change', () => {
-        onOk.mockClear();
+    test('no change', () => {
+        const { getByRole } = render(() => <DialogInfo info={info} onOk={onOk} onClose={onClose} />);
+        const buttonOk = getByRole<HTMLButtonElement>('button', { name: /OK/ });
 
-        render(() => <DialogInfo info={info} onOk={onOk} onClose={onClose} />);
-
-        // const buttonOk = await screen.findByRole('button', {name:/OK/});
-        fireEvent.click(screen.getByRole('button', { name: /OK/ }));
+        fireEvent.click(buttonOk);
 
         expect(onOk).toBeCalledTimes(1);
         expect(onOk).toBeCalledWith(expect.objectContaining({ name: 'My tournament', slotLength: 60 }));
     });
 
     it('changes name', () => {
-        onOk.mockClear();
+        const { getByRole, getAllByRole } = render(() => <DialogInfo info={info} onOk={onOk} onClose={onClose} />);
+        const inputName = getAllByRole<HTMLInputElement>('textbox', { name: /name:/i })[0];
+        const buttonOk = getByRole<HTMLButtonElement>('button', { name: /OK/ });
 
-        render(() => <DialogInfo info={info} onOk={onOk} onClose={onClose} />);
-
-        const inputName = screen.getAllByRole('textbox', { name: /name:/i })[0] as HTMLInputElement;
         fireEvent.change(inputName, { target: { value: "New name" } });
         expect(inputName.value).toBe("New name");
 
-        screen.getByRole('button', { name: /OK/ }).click();
+        fireEvent.click(buttonOk);
 
         // await waitFor(() => {
         expect(onOk).toBeCalledTimes(1);

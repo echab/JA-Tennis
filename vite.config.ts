@@ -1,4 +1,4 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 /// <reference types="vite/client" />
 
 import { defineConfig } from 'vite';
@@ -7,10 +7,10 @@ import devtools from 'solid-devtools/vite';
 import tailwindcss from "@tailwindcss/vite";
 // import eslint from 'vite-plugin-eslint'
 
-export default defineConfig({
+export default defineConfig((env) => ({
   plugins: [
     solid({
-      // hot: false,
+      hot: env.mode !== 'test', // no HMR for tests
     }),
     devtools({
       autoname: true, // Will automatically add names when creating signals, memos, stores, or mutables
@@ -23,12 +23,21 @@ export default defineConfig({
     port: 3001,
   },
   test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: ['node_modules/@testing-library/jest-dom/vitest'], // to import DOM matchers
-    // if you have few tests, try commenting this
-    // out to improve performance:
-    isolate: false,
+    // environment: 'happy-dom',
+    // globals: true,
+    // setupFiles: ['node_modules/@testing-library/jest-dom/vitest'], // to import DOM matchers
+    // restoreMocks: true,
+    // mockReset: true,
+    clearMocks: true,
+
+    // if you have few tests, try commenting this out to improve performance:
+    // isolate: false,
+
+    server: {
+      deps: {
+        inline: [/@solidjs\/router/], // https://github.com/solidjs/vite-plugin-solid/issues/157
+      },
+    },
   },
   build: {
     target: 'esnext',
@@ -38,4 +47,4 @@ export default defineConfig({
   resolve: {
     conditions: ['development', 'browser'],
   },
-});
+}));
