@@ -6,11 +6,12 @@
   "author": "Eloi Chabaud",
   "license": "ISC",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "test": "vitest",
     "coverage": "vitest --coverage",
-    "lint": "eslint ./src",
-    "build": "tsc && vite build",
+    "lint": "oxlint ./src",
+    "typecheck": "tsc --noEmit",
+    "build": "vite build",
     "serve": "vite preview"
   },
   "type": "module",
@@ -22,36 +23,29 @@
     "dist"
   ],
   "dependencies": {
-    "@solidjs/router": "^0.15.4",
-    "solid-js": "^1.9.11"
+    "@solidjs/router": "^1.0.0",
+    "solid-js": "^1.9.15"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@solidjs/testing-library": "^0.8.10",
     "@tailwindcss/forms": "^0.5.11",
-    "@tailwindcss/vite": "^4.1.18",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@types/node": "^25.2.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^25.9.6",
     "@types/wicg-file-system-access": "^2023.10.7",
-    "@typescript-eslint/eslint-plugin": "^8.55.0",
-    "@typescript-eslint/parser": "^8.55.0",
-    "eslint": "^10.0.0",
-    "eslint-plugin-solid": "^0.14.5",
-    "globals": "^17.3.0",
-    "happy-dom": "^20.6.1",
+    "eslint-plugin-solid": "^0.18.0",
+    "happy-dom": "^20.14.5",
+    "oxlint": "^1.82.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "solid-devtools": "^0.34.5",
-    "tailwindcss": "^4.1.18",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0",
-    "vite": "^7.3.1",
-    "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-solid": "^2.11.10",
-    "vitest": "^4.0.18"
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.0",
+    "vite-plugin-solid": "^2.11.14",
+    "vitest": "^5.0.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@tailwindcss/oxide",
-      "esbuild"
+      "@tailwindcss/oxide"
     ]
   }
 }

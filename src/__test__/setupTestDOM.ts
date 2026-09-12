@@ -1,5 +1,5 @@
 // import { beforeAll, beforeEach, vi } from 'vitest';
-import '@testing-library/jest-dom/vitest'
+// import '@testing-library/jest-dom/vitest'
 import { configure } from '@solidjs/testing-library'
 
 // // waiting for showModal support by jsdom https://github.com/jsdom/jsdom/issues/3294

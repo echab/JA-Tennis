@@ -40,7 +40,7 @@ const wClassTag = 0x8000;
 const wNewClassTag = 0xffff;
 // const dwBigClassTag = 0x80000000;
 
-export const createSerializer = (buffer: Uint8Array, fileDate?: Date, position = 0) => ({
+export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Date, position = 0) => ({
     writing: false,
     _position: position,
     _buffer: buffer,
@@ -54,7 +54,7 @@ export const createSerializer = (buffer: Uint8Array, fileDate?: Date, position =
         this._position += n;
         return r;
     },
-    writeBytes(bytes: Uint8Array) {
+    writeBytes(bytes: Uint8Array<ArrayBuffer>) {
         this._buffer.set(bytes, this._position);
         this._position += bytes.byteLength;
     },

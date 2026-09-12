@@ -23,12 +23,8 @@ export default defineConfig((env) => ({
     port: 3001,
   },
   test: {
-    // environment: 'happy-dom',
-    // globals: true,
+    environment: 'happy-dom',
     // setupFiles: ['node_modules/@testing-library/jest-dom/vitest'], // to import DOM matchers
-    // restoreMocks: true,
-    // mockReset: true,
-    clearMocks: true,
 
     // if you have few tests, try commenting this out to improve performance:
     // isolate: false,

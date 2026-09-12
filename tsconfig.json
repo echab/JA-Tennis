@@ -17,7 +17,7 @@
 
     // Type checking & safety
     "strict": true,
-    "types": ["vite/client", "@testing-library/jest-dom", "@types/wicg-file-system-access"],
+    "types": ["vite/client", "@types/wicg-file-system-access"], // "@testing-library/jest-dom"
 
     // "declaration": true,
     // "removeComments": true,
