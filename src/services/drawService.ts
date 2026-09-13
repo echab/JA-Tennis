@@ -2,13 +2,13 @@ import { byId, indexOf } from "./util/find";
 import { guid } from "./util/guid";
 import { ASSERT, shuffle } from "../utils/tool";
 
-import { Box, Draw, KNOCKOUT, Match, PlayerIn, QEMPTY } from "../domain/draw";
-import { TEvent } from "../domain/tournament";
-import { OptionalId } from "../domain/object";
-import { Command } from "./util/commandManager";
-import { selection, update } from "../components/util/selection";
+import { type Box, type Draw, KNOCKOUT, type Match, type PlayerIn, QEMPTY } from "../domain/draw";
+import type { TEvent } from "../domain/tournament";
+import type { OptionalId } from "../domain/object";
+import type { Command } from "./util/commandManager";
+import { selection, setSelection } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
-import { Player } from "../domain/player";
+import type { Player } from "../domain/player";
 import { defined } from "./util/object";
 import type { DataType } from "../domain/types";
 
@@ -29,7 +29,7 @@ export function updateDraws(
     // const prev = id ? { ...event.draws[i] } : undefined; // clone
     const prev = id ? event.draws[i] : undefined;
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.event = event;
         sel.draw = d;
         if (!id) {
@@ -40,7 +40,7 @@ export function updateDraws(
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.event = event;
         sel.draw = prev;
         if (prev) {
@@ -64,7 +64,7 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
 
     const prevBoxQ = groupFindQ(event, draw, match);
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.event = event;
         sel.draw = draw;
         sel.box = sel.draw.boxes[i];
@@ -77,7 +77,7 @@ export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.event = event;
         sel.draw = draw;
         sel.box = sel.draw.boxes[i];
@@ -126,14 +126,14 @@ export function deleteDraw(drawId: string): Command {
     );
     const prevDraw = event.draws[i];
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.event = event;
         sel.event.draws.splice(i, 1);
         sel.draw = event.draws.at(i);
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.event = event;
         sel.event.draws.splice(i, 0, prevDraw);
         sel.draw = prevDraw;
@@ -174,13 +174,13 @@ export function newBox<T extends Box = Box>(
 // }
 
 /** A match, with a score field */
-export function isMatch(box: Box): box is Match {
-    return box && (box as Match).score !== undefined;
+export function isMatch(box: PlayerIn | Match | undefined): box is Match {
+    return box !== undefined && (box as Match).score !== undefined;
 }
 
 /** A input player, without a score field */
-export function isPlayerIn(box: Box): box is PlayerIn {
-    return box && (box as Match).score !== undefined;
+export function isPlayerIn(box: PlayerIn | Match | undefined): box is PlayerIn {
+    return box !== undefined && (box as Match).score !== undefined;
 }
 
 export function _updateQualif(event: TEvent, draw: Draw): void {

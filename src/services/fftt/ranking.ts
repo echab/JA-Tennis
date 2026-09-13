@@ -6,7 +6,7 @@ export class RankingFFTT implements Ranking {
     // private _serviceScore: ScoreFFTT;
 
     constructor(
-        score: Score) {
+        _score: Score) {
         // this._serviceScore = score as ScoreFFTT;
     }
 

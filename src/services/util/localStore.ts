@@ -1,5 +1,4 @@
-import { createEffect } from "solid-js";
-import { createStore, SetStoreFunction, Store } from "solid-js/store";
+import { createEffect, createStore, Store, StoreSetter } from "solid-js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type any_ = any;
@@ -16,12 +15,12 @@ export function createLocalStore<T extends object>(
     name: string,
     init: T,
     options?: Options
-): [Store<T>, SetStoreFunction<T>] {
+): [Store<T>, StoreSetter<T>] {
     const localState = localStorage.getItem(name);
     const [state, setState] = createStore<T>(
         localState ? JSON.parse(localState, options?.reviver) : init
     , { name: 'localStore' });
-    createEffect(() => {
+    createEffect(() => state, (state) => {
         localStorage.setItem(name, JSON.stringify(state, options?.replacer, options?.space));
     });
     return [state, setState];

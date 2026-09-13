@@ -1,5 +1,5 @@
-import { Component } from 'solid-js';
-import { Draw } from '../../domain/draw';
+import type { Component } from 'solid-js';
+import type { Draw } from '../../domain/draw';
 
 type Props = {
     draws: Draw[];

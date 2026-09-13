@@ -1,17 +1,21 @@
-import { Component, For, JSX, Show } from 'solid-js';
-import { A, type RouteSectionProps } from '@solidjs/router';
-import { selectDraw, selectEvent, selection, urlDraw, urlEvent } from '../util/selection';
+import { type Component, For, Show } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { useLocation, type RouteSectionProps } from '@solidjs/router';
+import { selectDraw, selectEvent, selection } from '../util/selection';
 import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
 import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragdrop';
 import { isSexeCompatible } from '../../services/tournamentService';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
+import { Router } from '../../router';
 
 type Data = {
 }
 
 export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
+
+    const location = useLocation();
 
     const drop_handler: JSX.EventHandlerUnion<HTMLDivElement, DragEvent> = (evt) => {
         evt.preventDefault();
@@ -39,24 +43,24 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
         </div>
         <For each={selection.tournament.events} fallback={<div>No event</div>}>{(event) =>
             <div
-                aria-selected={event.id === selection.event?.id}
+                aria-selected={event.id === selection.event?.id ? 'true' : 'false'}
                 class="border-l-8 m-2"
                 style={{ "border-color": event.color ?? 'transparent' }}
                 onDrop={drop_handler} onDragOver={dragOver} data-type='event' data-id={event.id}
             >
                 <div class="flex justify-between items-center aria-selected:bg-blue-200 bg-slate-200"
-                    aria-selected={selection.event === event}
+                    aria-selected={selection.event === event ? 'true' : 'false'}
                 >
                     {/* <input type="checkbox" /> */}
-                    <A href={urlEvent(event)} replace>
+                    <a href={Router.paths.draw(event.id)(location.query)} replace>
                         <i class="icon2-info hover" onClick={() => { selectEvent(event); showDialog({ name: "event" }); }}/>
                         {/* <small>{event.id} </small> */}
                         <IconSexe sexe={event.sexe} double={event.typeDouble} />
                         <span>{event.name}</span>
                         {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
-                    </A>
+                    </a>
 
-                    <button type="button" class="rounded-full p-[.125rem] px-1 hover" title="Add a draw"
+                    <button type="button" class="rounded-full p-0.5 px-1 hover" title="Add a draw"
                         onClick={() => {
                             selectDraw(event, undefined);
                             showDialog({ name: "draw" });
@@ -66,15 +70,13 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
 
                 <div>
                     <For each={event.draws}>{(draw) =>
-                        <div class="draws px-1"
-                            aria-selected={draw.id === selection.draw?.id}
-                            classList={{ error: selection.drawProblems.has(`${draw.id}-${event.id}`) }}
+                        <div class={["draws px-1", { error: selection.drawProblems.has(`${draw.id}-${event.id}`) }]}
+                            aria-selected={draw.id === selection.draw?.id ? 'true' : 'false'}
                         >
-                            <A class="aria-selected:bg-blue-200 block"
-                                classList={{ "mt-2": !draw.cont }}
-                                aria-selected={selection.draw?.id === draw.id}
+                            <a class={["aria-selected:bg-blue-200 block", { "mt-2": !draw.cont }]}
+                                aria-selected={selection.draw?.id === draw.id ? 'true' : 'false'}
                                 // onclick={() => selectDraw(event, draw)}
-                                href={urlDraw(draw, event)} replace
+                                href={Router.paths.draw(event.id)(draw.id)(location.query)} replace
                             >
                                 <i class="icon2-info hover"
                                     onClick={() => {
@@ -91,7 +93,7 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
                                 <span class="float-right hover">&Gt;</span>
 
                                 {/* <span class=" float-right hover" onClick={() => commandManager.wrap(() => deleteDraw(draw.id))}><i class="icon2-cross" /></span> */}
-                            </A>
+                            </a>
                         </div>
                     }</For>
                 </div>

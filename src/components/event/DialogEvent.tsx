@@ -1,7 +1,8 @@
-import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
-import { OptionalId } from '../../domain/object';
-import { TEvent } from '../../domain/tournament';
-import { RankString, type DataType } from '../../domain/types';
+import { type Component, For, onSettled, untrack } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import type { OptionalId } from '../../domain/object';
+import type { TEvent } from '../../domain/tournament';
+import type { DataType } from '../../domain/types';
 import { deleteEvent } from '../../services/eventService';
 import { commandManager } from '../../services/util/commandManager';
 import { IconSexe } from '../misc/IconSexe';
@@ -19,24 +20,19 @@ type Props = {
 export const DialogEvent: Component<Props> = (props) => {
     let refDlg: HTMLDialogElement;
 
-    onMount(() => {
+    const event = untrack(() => (props.event && { ...props.event })); // clone
+
+    onSettled(() => {
         refDlg.addEventListener('close', props.onClose)
         refDlg.showModal();
+        return () => {
+            refDlg.removeEventListener('close', props.onClose)
+        };
     });
 
-    onCleanup(() => {
-        refDlg.removeEventListener('close', props.onClose)
-    })
+    const { rank, category, matchFormat } = untrack(() => ({ ...props._types }));
 
-    const { rank, category, matchFormat } = props._types;
-
-    const event: OptionalId<TEvent> | undefined = props.event && { ...props.event }; // clone, without reactivity
-
-    const { form, updateField } = useForm<OptionalId<TEvent>>(event ?? EMPTY);
-
-    const ranks: RankString[] = rank.list();
-
-    const matchFormats = matchFormat.list();
+    const { form, updateField } = useForm<OptionalId<TEvent>>(() => event ?? EMPTY);
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
@@ -81,13 +77,13 @@ export const DialogEvent: Component<Props> = (props) => {
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <b><IconSexe sexe={props.event?.sexe} double={event?.typeDouble} />{props.event ? `Edit event ${props.event?.name ?? ''}` : 'New event'}</b>
-                <small>Id: {props.event?.id}</small>
-                <button type="button" data-dismiss="modal" aria-hidden="true"
+                <b><IconSexe sexe={event?.sexe} double={event?.typeDouble} />{event ? `Edit event ${event?.name ?? ''}` : 'New event'}</b>
+                <small>Id: {event?.id}</small>
+                <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
+            <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     <input id="id" type="hidden" value={form.id} />
 
@@ -125,17 +121,17 @@ export const DialogEvent: Component<Props> = (props) => {
                         <label>
                             <input value='H' type="radio" required class='mr-1'
                                 checked={form.sexe === 'H'} onChange={updateField("sexe")} />
-                            <i classList={{"icon2-male":!form.typeDouble, "icon2-double-male":form.typeDouble}}/> Male
+                            <i class={{"icon2-male":!form.typeDouble, "icon2-double-male":!!form.typeDouble}}/> Male
                         </label>
                         <label>
                             <input value='F' type="radio" required class='mr-1'
                                 checked={form.sexe === 'F'} onChange={updateField("sexe")} />
-                            <i classList={{"icon2-female":!form.typeDouble, "icon2-double-female":form.typeDouble}}/> Female
+                            <i class={{"icon2-female":!form.typeDouble, "icon2-double-female":!!form.typeDouble}}/> Female
                         </label>
                         <label>
                             <input value='M' type="radio" required class='mr-1'
                                 checked={form.sexe === 'M'} onChange={updateField("sexe")} />
-                            <i classList={{"icon2-mixte":!form.typeDouble, "icon2-double-mixte":form.typeDouble}}/> Mixte
+                            <i class={{"icon2-mixte":!form.typeDouble, "icon2-double-mixte":!!form.typeDouble}}/> Mixte
                         </label>
                     </div>
 
@@ -148,7 +144,7 @@ export const DialogEvent: Component<Props> = (props) => {
                     <div class="mb-1">
                         <label for="maxRank" class="inline-block w-3/12 text-right pr-3">Max rank:</label>
                         <select id="maxRank" value={form.maxRank} onChange={updateField('maxRank')} class="w-3/12 p-1">
-                            <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                            <For each={rank.list()}>{(rank) => <option>{rank}</option>}</For>
                         </select>
                     </div>
 
@@ -165,7 +161,7 @@ export const DialogEvent: Component<Props> = (props) => {
                         <label for="matchFormat" class="inline-block w-3/12 text-right pr-3">Match format:</label>
                         <select id="matchFormat" value={form.matchFormat} onChange={updateField('matchFormat')} class="w-9/12 p-1">
                             <option />
-                            <For each={matchFormats}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
+                            <For each={matchFormat.list()}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
                         </select>
                     </div>
 
@@ -186,12 +182,6 @@ export const DialogEvent: Component<Props> = (props) => {
                     }</For>
                 </div>
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="submit"
-                        //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
-                    >OK
-                    </button>
-
                     {/* <button
                   disabled={!event?.id}
                   onclick={() => {
@@ -202,16 +192,22 @@ export const DialogEvent: Component<Props> = (props) => {
                   }
                   }}
                >✖ Delete</button> */}
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
                         value="Delete" disabled={!form.id}
                         onClick={deleteAndClose}
                     >✖ Delete
                     </button>
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
-                        data-dismiss="modal" aria-hidden="true"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                        data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
+
+                    <button type="submit"
+                        //  disabled.bind="!!eventForm.$error.required"
+                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                    >OK
+                    </button>
                 </footer>
                 {/*{ eventForm.$error } */}
             </form>

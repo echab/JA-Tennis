@@ -1,12 +1,14 @@
-import { A } from "@solidjs/router";
-import { Component, createSignal, For } from "solid-js";
+import { type Component, createSignal, For } from "solid-js";
+import { useLocation } from "@solidjs/router";
 import { DrawProblem } from "../domain/validation";
 import { validateTournament } from "../services/validationService";
 import { IconSexe } from "./misc/IconSexe";
-import { drawById, selection, urlBox, urlDraw, urlPlayer } from "./util/selection";
+import { drawById, selection } from "./util/selection";
+import { Router } from "../router";
 
 export const Problems: Component = () => {
     const [selectedDraw, setSelectedDraw] = createSignal(false);
+    const location = useLocation();
 
     return (<>
         <div class="flex justify-between items-center px-2">
@@ -18,12 +20,12 @@ export const Problems: Component = () => {
             <button onClick={() => validateTournament(selection.tournament)}><i class="icon2-refresh" /></button>
         </div>
         <ul>
-            <For each={[...selection.playerProblems.entries()]}>{([playerId, errors]) => (
+            <For each={[...selection.playerProblems.entries()]}>{([_playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
-                        <A href={urlPlayer(player)} replace noScroll>
+                        <a href={Router.paths.players(player.id)(location.query, location.hash)} replace noScroll>
                             {message}: {player.name}{detail ? ` (${detail})` : ''}
-                        </A>
+                        </a>
                     </li>
                 )}</For>
             )}</For>
@@ -39,16 +41,16 @@ export const Problems: Component = () => {
                             <h4 class="bg-slate-300 border-l-8"
                                 style={{ "border-color": event?.color ?? 'transparent' }}
                             >
-                                <A href={urlDraw(draw, event)} replace>
+                                <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(location.query, location.hash)} replace>
                                     <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {draw?.name || eventdrawId}
-                                </A>
+                                </a>
                             </h4>
                             <ul>
                                 <For each={errors}>{({message, detail, player, box}) => (
                                     <li>
-                                        <A href={urlBox(box, draw, event, selection.tournament, true)} replace noScroll>
+                                        <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(box?.position ?? '')(location.query)} replace noScroll>
                                             {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
-                                        </A>
+                                        </a>
                                     </li>
                                 )}</For>
                             </ul>

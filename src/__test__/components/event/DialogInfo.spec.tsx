@@ -16,8 +16,8 @@ describe('DialogInfo', () => {
 
         fireEvent.click(buttonOk);
 
-        expect(onOk).toBeCalledTimes(1);
-        expect(onOk).toBeCalledWith(expect.objectContaining({ name: 'My tournament', slotLength: 60 }));
+        expect(onOk).toHaveBeenCalledTimes(1);
+        expect(onOk).toHaveBeenCalledWith(expect.objectContaining({ name: 'My tournament', slotLength: 60 }));
     });
 
     it('changes name', () => {
@@ -31,8 +31,8 @@ describe('DialogInfo', () => {
         fireEvent.click(buttonOk);
 
         // await waitFor(() => {
-        expect(onOk).toBeCalledTimes(1);
-        expect(onOk).toBeCalledWith(expect.objectContaining({ name: 'New name' }));
+        expect(onOk).toHaveBeenCalledTimes(1);
+        expect(onOk).toHaveBeenCalledWith(expect.objectContaining({ name: 'New name' }));
         // });
     });
 });

@@ -1,5 +1,5 @@
-import { useParams } from "@solidjs/router";
-import { createStore, produce } from "solid-js/store";
+import { createStore } from "solid-js";
+import { useLocation } from "@solidjs/router";
 import type { Draw, Match, PlayerIn } from "../../domain/draw";
 import type { Player } from "../../domain/player";
 import type { Place, TEvent, Tournament } from "../../domain/tournament";
@@ -9,6 +9,7 @@ import { dayOf } from "../../services/planningService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
 import { minutes } from "../../utils/date";
 import { emptyTournament } from "../../assets/data";
+import { Router } from "../../router";
 
 export interface SelectionItems {
     tournament: Tournament;
@@ -24,16 +25,14 @@ export interface SelectionItems {
     drawProblems: Map<string, DrawProblem[]>;
 }
 
-const END_SLASH = /\/+$/;
-
-export const [selection, setSelection] = createStore<SelectionItems>({
-    tournament: emptyTournament(),
+export const [selection, setSelection] = createStore<SelectionItems>(async () => ({
+    tournament: await emptyTournament(),
     playerProblems: new Map(),
     drawProblems: new Map(),
-}, { name: 'selection' });
+}), {}, { name: 'selection' });
 
 export function selectTournament(tournament: Tournament) {
-    update((sel) => {
+    setSelection((sel) => {
         sel.tournament = tournament;
         sel.player = undefined;
         sel.event = undefined;
@@ -58,25 +57,25 @@ export function selectTournament(tournament: Tournament) {
 }
 
 export function selectPlayer(player?: Player): void {
-    update((sel) => {
+    setSelection((sel) => {
         sel.player = player;
     });
 }
 
 export function selectDay(day?: number): void {
-    update((sel) => {
+    setSelection((sel) => {
         sel.day = isFinite(day ?? NaN) ? day : undefined;
     });
 }
 
 export function selectPlace(place?: Place): void {
-    update((sel) => {
+    setSelection((sel) => {
         sel.place = place;
     });
 }
 
 export function selectEvent(event?: TEvent): void {
-    update((sel) => {
+    setSelection((sel) => {
         sel.event = event;
         sel.draw = undefined;
         sel.box = undefined;
@@ -88,7 +87,7 @@ export function selectDraw(event?: TEvent, draw?: Draw): void {
     if (event) {
         if (draw && draw.id !== selection.draw?.id) {
             // first unselect the previous one // TODO: should not be necessary
-            update((sel) => {
+            setSelection((sel) => {
                 sel.event = event;
                 sel.draw = undefined;
                 sel.box = undefined;
@@ -98,7 +97,7 @@ export function selectDraw(event?: TEvent, draw?: Draw): void {
     } else {
         draw = undefined;
     }
-    update((sel) => {
+    setSelection((sel) => {
         sel.event = event;
         sel.draw = draw;
         sel.box = undefined;
@@ -108,7 +107,7 @@ export function selectDraw(event?: TEvent, draw?: Draw): void {
 
 export function selectBox(event: TEvent, draw: Draw, box?: PlayerIn | Match): void {
     // TODO should navigate, effect?
-    update((sel) => {
+    setSelection((sel) => {
         sel.event = event;
         sel.draw = draw;
         sel.box = box;
@@ -117,7 +116,7 @@ export function selectBox(event: TEvent, draw: Draw, box?: PlayerIn | Match): vo
 }
 
 export function selectByError(error: PlayerProblem | DrawProblem) {
-    update((sel) => {
+    setSelection((sel) => {
         if (isDrawError(error)) {
             const { draw, event } = drawById(error.draw.id)
             sel.event = event;
@@ -133,10 +132,6 @@ export function isPlayerError(error: PlayerProblem | DrawProblem): error is Play
 }
 export function isDrawError(error: PlayerProblem | DrawProblem): error is DrawProblem {
     return !!(error as DrawProblem).draw;
-}
-
-export function update(fn: (originalSelection: SelectionItems) => void) {
-    setSelection(produce(fn));
 }
 
 /** find a draw from id which could be a composed like `idDraw-idEvent` */
@@ -156,66 +151,21 @@ export function drawById(idDraw: string, parent?: string | Tournament): { draw?:
     return { draw, event };
 }
 
-export function urlPlayer(player?: Player) {
-    const params = useParams();
-    return `/${params.pane}/players/${player?.id ?? ''}`.replace(END_SLASH, '');
-}
-
-export function urlEvent(event?: TEvent) {
-    const params = useParams();
-    return `/${params.pane}/draw/${event?.id ?? ''}`.replace(END_SLASH, '');
-}
-
-export function urlDraw(draw?: Draw, event?: TEvent) {
-    if (!event) {
-        event = selection.event; // reactive default value
-    }
-    const params = useParams();
-    return `/${params.pane}/draw/${event?.id ?? ''}/${draw?.id ?? ''}`.replace(END_SLASH, '');
-}
-
 // TODO could return URL and preserve current search
-export function urlBox(box?: PlayerIn | Match, draw?: Draw, event?: TEvent, tournament?: Tournament, scroll?: boolean) {
-    if (!tournament) {
-        tournament = selection.tournament;
-    }
-    if (!event) {
-        event = selection.event; // reactive default value
-    }
-    if (!draw) {
-        draw = selection.draw; // reactive default value
-    }
+export function urlBox(box: PlayerIn | Match | undefined, draw: Draw, event: TEvent, tournament: Tournament, scroll?: boolean) {
+
+    const location = useLocation();
 
     const search = box && isMatch(box) ? {
+        ...location.query,
         day: dayOf(box.date, tournament.info),
         hour: minutes(box.date),
         place: box.place,
         playerId: box.playerId,
     } : {
+        ...location.query,
         playerId: box?.playerId
     };
 
-    const params = useParams();
-    return `/${params.pane}/draw/${event?.id ?? ''}/${draw?.id ?? ''}/${box ? scroll ? `${box.position}#pos${box.position}` : box.position : ''}`
-        .replace(/\/*$/, buildSearch(search));
-}
-
-export function urlDay(day?: number) {
-    const params = useParams();
-    return `/${params.pane}/planning/${day ?? ''}`.replace(END_SLASH, '');
-}
-
-/** return current searchParam string like `?day=2&player=345` if parameters are present or '' */
-function buildSearch(params?: Record<string, string | number | undefined>): string {
-    // const [searchParams] = useSearchParams<Searchs>();
-    const searchParams = location.search;
-    const search = new URLSearchParams(searchParams);
-    if (params) {
-        for (const [name, value] of Object.entries(params)) {
-            if (value !== undefined) {
-                search.set(name, String(value));
-            }
-        }
-    }
-    return search.entries().next() ? `?${search}` : '';
+    return Router.paths.draw(event.id)(draw.id)(box?.position ?? '')(search, scroll && box?.position ? `pos${box.position}` : '');
 }

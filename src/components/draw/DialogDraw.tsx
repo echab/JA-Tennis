@@ -1,10 +1,10 @@
-import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
-import { Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
+import { type Component, For, onSettled, untrack } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { type Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
-import type { RankString } from '../../domain/types';
 import { deleteDraw, findGroupQualifOuts, groupDraw } from '../../services/drawService';
 import { getRegisteredPlayers, defaultDrawName } from '../../services/tournamentService';
 import { useForm } from '../util/useForm';
@@ -12,8 +12,6 @@ import { commandManager } from '../../services/util/commandManager';
 import { selectDraw } from '../util/selection';
 import { IconSexe } from '../misc/IconSexe';
 import { columnMax, countInCol } from '../../services/draw/knockoutLib';
-
-const EMPTY: OptionalId<Draw> = { name: '', type: KNOCKOUT, minRank: '', maxRank: '', nbColumn: 3, nbOut: 1, boxes: [] };
 
 type Props = {
     event: TEvent;
@@ -26,32 +24,35 @@ type Props = {
 export const DialogDraw: Component<Props> = (props) => {
     let refDlg: HTMLDialogElement;
 
-    onMount(() => {
+    onSettled(() => {
         refDlg.addEventListener('close', props.onClose)
         refDlg.showModal();
+        return () => {
+            refDlg.removeEventListener('close', props.onClose)
+        };
     });
 
-    onCleanup(() => {
-        refDlg.removeEventListener('close', props.onClose)
-    })
+    const draw = untrack(() => (props.draw && { ...props.draw }));  // clone
 
-    const types = props.tournament._types;
-    const { rank } = types;
+    const event = untrack(() => ({ ...props.event }));
 
-    const draw: OptionalId<Draw> | undefined = props.draw && { ...props.draw }; // clone, without reactivity
+    const _types = untrack(() => ({ ...props.tournament._types }));
 
-    const isFirstDraw = !props.event.draws.length || draw?.id === props.event.draws[0].id;
+    const isFirstDraw = () => !props.event.draws.length || draw?.id === props.event.draws[0].id;
 
-    const { form, setForm, updateField } = useForm<OptionalId<Draw>>(draw ?? EMPTY);
-
-    const ranks: RankString[] = rank.list();
-
-    if (!props.draw) {
-    // new draw
-        const prevRank = props.event.draws.at(-1)?.maxRank;
-        const minRank = prevRank ? rank.next(prevRank) : rank.first();
-        setForm({ minRank, maxRank: props.event.maxRank });
-    }
+    const { form, updateField } = useForm<OptionalId<Draw>>(() => {
+        if (draw) { return draw; }
+        // new draw
+        const prevRank = event.draws.at(-1)?.maxRank;
+        const minRank = prevRank ? _types.rank.next(prevRank) : _types.rank.first();
+        return {
+            name: '',
+            type: KNOCKOUT,
+            minRank,
+            maxRank: event.maxRank,
+            nbColumn: 3, nbOut: 1, boxes: []
+        };
+    });
 
     const drawTypes: Array<{ value: number; label: string; }> = [];
     drawTypes[KNOCKOUT] = { value: KNOCKOUT, label: "Knock out" };
@@ -61,12 +62,12 @@ export const DialogDraw: Component<Props> = (props) => {
 
     /** @returns registered players and entries numbers from previous draw */
     const registeredPlayersOrQ = (): Array<Player|number> => {
-        const players: Array<Player|number> = getRegisteredPlayers(props.tournament._types, props.tournament.players, props.event, form.minRank, form.maxRank);
-        const prevDraw = props.event.draws.at(-1);
+        const players: Array<Player|number> = getRegisteredPlayers(_types, props.tournament.players, event, form.minRank, form.maxRank);
+        const prevDraw = event.draws.at(-1);
         if (prevDraw) {
-            const [iStart, iNext] = groupDraw(props.event, prevDraw.id);
+            const [iStart, iNext] = groupDraw(event, prevDraw.id);
             if (iStart < iNext) {
-                const qualifs = findGroupQualifOuts(props.event, [iStart, iNext]);
+                const qualifs = findGroupQualifOuts(event, [iStart, iNext]);
                 if (qualifs.length) {
                     return players.concat(qualifs.map(([q]) => q));
                 }
@@ -107,13 +108,13 @@ export const DialogDraw: Component<Props> = (props) => {
         }];
 
         if ((evt.submitter as HTMLButtonElement).value === 'generate') {
-            const lib = drawLib(props.event, result[0]);
-            // const lastGroup = groups(props.event).slice(-2);
-            const lastGroup = groupDraw(props.event, props.event.draws.at(-1)?.id);
-            result = lib.generateDraw(types, GenerateType.Create, registeredPlayersOrQ(), lastGroup);
+            const lib = drawLib(event, result[0]);
+            // const lastGroup = groups(event).slice(-2);
+            const lastGroup = groupDraw(event, event.draws.at(-1)?.id);
+            result = lib.generateDraw(_types, GenerateType.Create, registeredPlayersOrQ(), lastGroup);
         }
 
-        props.onOk(props.event, result);
+        props.onOk(event, result);
 
         refDlg.close();
     // props.onClose();
@@ -122,7 +123,7 @@ export const DialogDraw: Component<Props> = (props) => {
     const deleteAndClose = () => {
         if (draw?.id) {
             commandManager.add(deleteDraw(draw.id));
-            selectDraw(props.event, undefined);
+            selectDraw(event, undefined);
             refDlg.close();
             // props.onClose();
         }
@@ -131,13 +132,13 @@ export const DialogDraw: Component<Props> = (props) => {
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <span><i class='icon2-draw' /> <IconSexe sexe={props.event.sexe} double={props.event.typeDouble} />{props.event.name} - <b>{props.draw ? `Edit draw ${props.draw?.name ?? ''}` : 'New draw'}</b></span>
-                <small>Id: {props.draw?.id}</small>
-                <button type="button" data-dismiss="modal" aria-hidden="true"
+                <span><i class='icon2-draw' /> <IconSexe sexe={event.sexe} double={event.typeDouble} />{event.name} - <b>{draw ? `Edit draw ${draw?.name ?? ''}` : 'New draw'}</b></span>
+                <small>Id: {draw?.id}</small>
+                <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
+            <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     <input id="id" type="hidden" value={form.id} />
                     <div class="mb-1">
@@ -159,12 +160,12 @@ export const DialogDraw: Component<Props> = (props) => {
                     <div class="mb-1">
                         <label for="minRank" class="inline-block w-3/12 text-right pr-3">Rank, from:</label>
                         <select id="minRank" value={form.minRank} onChange={updateField('minRank')} class="w-2/12 p-1">
-                            <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                            <For each={_types.rank.list()}>{(rank) => <option>{rank}</option>}</For>
                         </select>
 
                         <label for="maxRank" class="inline-block w-2/12 text-right pr-3">to:</label>
                         <select id="maxRank" value={form.maxRank} onChange={updateField('maxRank')} class="w-2/12 p-1">
-                            <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                            <For each={_types.rank.list()}>{(rank) => <option>{rank}</option>}</For>
                         </select>
                         <label class="pl-3">{registeredPlayersOrQ().length} registered</label>
                     </div>
@@ -172,7 +173,7 @@ export const DialogDraw: Component<Props> = (props) => {
                     <div class="mb-1">
                         <span class="inline-block w-3/12 text-right pr-3" />
                         <label><input type="checkbox" checked={form.cont} onChange={updateField('cont')}
-                            disabled={isFirstDraw}
+                            disabled={isFirstDraw()}
                         /> Same group as previous draw</label>
                     </div>
 
@@ -202,27 +203,27 @@ export const DialogDraw: Component<Props> = (props) => {
 
                 </div>
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="submit" value="generate"
-                        //  disabled={!!drawForm.$error.required}
-                        class="rounded-md border border-transparent bg-indigo-200 py-2 px-4 min-w-[6rem]">
-                        <i class="icon2-draw-generate" /> Generate
-                    </button>
-                    <button type="submit"
-                        //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
-                    >OK
-                    </button>
-
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
                         value="Delete" disabled={!form.id}
                         onClick={deleteAndClose}
                     >✖ Delete
                     </button>
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
-                        data-dismiss="modal" aria-hidden="true"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                        data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
+
+                    <button type="submit" value="generate"
+                        //  disabled={!!drawForm.$error.required}
+                        class="rounded-md border border-transparent bg-indigo-200 py-2 px-4 min-w-24">
+                        <i class="icon2-draw-generate" /> Generate
+                    </button>
+                    <button type="submit"
+                        //  disabled.bind="!!eventForm.$error.required"
+                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                    >OK
+                    </button>
                 </footer>
                 {/*{ eventForm.$error } */}
             </form>

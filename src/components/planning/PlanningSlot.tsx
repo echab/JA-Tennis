@@ -1,7 +1,7 @@
-import { A } from "@solidjs/router";
-import { Component, JSX, Show } from "solid-js";
-import { Player } from "../../domain/player";
-import { Slot, Tournament } from "../../domain/tournament";
+import { type Component, Show, untrack } from "solid-js";
+import type { JSX } from '@solidjs/web';
+import type { Player } from "../../domain/player";
+import type { Slot, Tournament } from "../../domain/tournament";
 import { byId } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
 import { selectBox, selectPlayer, urlBox } from "../util/selection";
@@ -13,7 +13,7 @@ type PlayerProps = {
 }
 
 const SlotPlayer: Component<PlayerProps> = (props) => <>
-    <i classList={{
+    <i class={{
         'icon2-planning-no': !props.aware,
         'icon2-responder': props.aware === 1,
         'icon2-aware': props.aware === 2,
@@ -37,17 +37,17 @@ type Props = {
 }
 
 export const PlanningSlot: Component<Props> = (props) => {
-    const player1 = props.slot.player1; // TODO loose reactivity?
-    const player2 = props.slot.player2;
-    const match = props.slot.match;
 
-    const p1 = byId(props.tournament.players, player1?.playerId);
-    const p2 = byId(props.tournament.players, player2?.playerId);
+    const { player1, player2, match } = untrack(() => props.slot);
+
+    const [p1, p2] = untrack(() => [
+        byId(props.tournament.players, player1?.playerId),
+        byId(props.tournament.players, player2?.playerId)
+    ]);
 
     return <li
-        class="bg-slate-300 border-l-8"
+        class={["bg-slate-300 border-l-8", { 'crossed-out': !!match.playerId }]}
         style={{ "border-color": props.slot.event?.color ?? 'transparent', ...props.style }}
-        classList={{ 'crossed-out': !!match.playerId }}
         title={`${props.slot.event.name} - ${props.slot.draw.name}`}
         id={`${match.position}-${props.slot.draw.id}-${props.slot.event.id}`}
     >
@@ -59,9 +59,9 @@ export const PlanningSlot: Component<Props> = (props) => {
         {/* ({match.date!.toLocaleString()}) */}
         {/* {match.date!.toLocaleDateString()} */}
         {/* - {match.place} */}
-        <A href={urlBox(match, props.slot.draw, props.slot.event, props.tournament)} title="View in draw" class="hover">
+        <a href={urlBox(match, props.slot.draw, props.slot.event, props.tournament)} title="View in draw" class="hover">
             <i class="icon2-draw"/>
-        </A>
+        </a>
         <span class="cursor-pointer" title="Edit the match"
             onClick={() => {
                 selectBox(props.slot.event, props.slot.draw, match);

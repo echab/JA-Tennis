@@ -2,23 +2,21 @@
 /// <reference types="vite/client" />
 
 import { defineConfig } from 'vite';
-import solid from 'vite-plugin-solid';
-import devtools from 'solid-devtools/vite';
+import solid from '@solidjs/vite-plugin';
 import tailwindcss from "@tailwindcss/vite";
 // import eslint from 'vite-plugin-eslint'
 
 export default defineConfig((env) => ({
   plugins: [
     solid({
+      start: true,
       hot: env.mode !== 'test', // no HMR for tests
-    }),
-    devtools({
-      autoname: true, // Will automatically add names when creating signals, memos, stores, or mutables
-      locator: true,
+      diagnostics: false,
     }),
     tailwindcss(),
     // eslint(),
   ],
+  base: './',
   server: {
     port: 3001,
   },
@@ -28,19 +26,13 @@ export default defineConfig((env) => ({
 
     // if you have few tests, try commenting this out to improve performance:
     // isolate: false,
-
-    server: {
-      deps: {
-        inline: [/@solidjs\/router/], // https://github.com/solidjs/vite-plugin-solid/issues/157
-      },
-    },
   },
   build: {
     target: 'esnext',
     // sourcemap: true, // debug
     minify: false, // debug
   },
-  resolve: {
-    conditions: ['development', 'browser'],
-  },
+  // resolve: {
+  //   conditions: ['development', 'browser'],
+  // },
 }));

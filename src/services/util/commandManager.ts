@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { indexOf } from "./find";
 
 export interface Command {
@@ -68,6 +68,7 @@ export function createCommandManager(maxHistory = 100) {
 
                 history.push(action);
                 setPosition((pos) => pos + 1);
+                flush();
             }
         },
 
@@ -94,6 +95,7 @@ export function createCommandManager(maxHistory = 100) {
             while (position() >= 0 && nb-- > 0) {
                 history[position()].undo();
                 setPosition((pos) => pos - 1);
+                flush();
             }
         },
 
@@ -113,6 +115,7 @@ export function createCommandManager(maxHistory = 100) {
             }
             while (position() < history.length - 1 && nb-- > 0) {
                 setPosition((pos) => pos + 1);
+                flush();
                 history[position()].act();
             }
         },
@@ -120,6 +123,7 @@ export function createCommandManager(maxHistory = 100) {
         clear() {
             history.splice(0);
             setPosition(-1);
+            flush();
         },
 
         transaction(name: string, fn: () => void) {

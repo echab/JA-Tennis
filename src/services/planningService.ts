@@ -1,9 +1,9 @@
-import { selection, update } from "../components/util/selection";
-import { Place, Slot, Tournament } from "../domain/tournament";
+import { selection, setSelection } from "../components/util/selection";
+import type { Place, Slot, Tournament } from "../domain/tournament";
 import { DAYS } from "../utils/date";
 import { drawLib } from "./draw/drawLib";
 import { isMatch } from "./drawService";
-import { Command } from "./util/commandManager";
+import type { Command } from "./util/commandManager";
 
 const MAX_JOUR = 42;
 const MAX_TIME = MAX_JOUR * DAYS;
@@ -11,12 +11,12 @@ const MAX_TIME = MAX_JOUR * DAYS;
 export function updatePlace(place: Place): Command {
     const prev = selection.place && { ...selection.place };
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.place = place;
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.place = prev;
     });
 

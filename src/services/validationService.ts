@@ -1,8 +1,8 @@
-﻿import { drawById, SelectionItems, update } from "../components/util/selection";
-import { Draw } from "../domain/draw";
-import { Player } from "../domain/player";
-import { TEvent, Tournament } from "../domain/tournament";
-import { DrawProblem, IValidation, PlayerProblem } from "../domain/validation";
+﻿import { drawById, type SelectionItems, setSelection } from "../components/util/selection";
+import type { Draw } from "../domain/draw";
+import type { Player } from "../domain/player";
+import type { TEvent, Tournament } from "../domain/tournament";
+import type { DrawProblem, IValidation, PlayerProblem } from "../domain/validation";
 import { knockoutValidation } from "./draw/knockoutValidation";
 import { roundrobinValidation } from "./draw/roundrobinValidation";
 
@@ -19,7 +19,7 @@ export const addValidator = (validator: IValidation) => {
 }
 
 export function validateTournament(tournament: Tournament) {
-    update((sel) => {
+    setSelection((sel) => {
     // cleanup errors from deleted players
         [...sel.playerProblems.keys()].forEach((playerId) => {
             if (tournament.players.find(({id}) => id === playerId)) {

@@ -1,6 +1,6 @@
 import { Component, createEffect, createSignal, For, Show } from 'solid-js';
-import { A, useNavigate, type RouteSectionProps } from '@solidjs/router';
-import { selection, selectPlayer, urlPlayer } from '../util/selection';
+import { useLocation, type RouteSectionProps } from '@solidjs/router';
+import { selection, selectPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
 import { dragStart } from '../../services/util/dragdrop';
 import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
@@ -8,6 +8,7 @@ import { findDrawPlayerIds } from '../../services/drawService';
 import { getId } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
+import { Router } from '../../router';
 
 type Data = {
     short?: boolean;
@@ -15,27 +16,28 @@ type Data = {
 
 export const Players: Component<RouteSectionProps<Data | undefined>> = (props) => {
 
-    // eslint-disable-next-line solid/reactivity
-    const [registred, setRegistred] = createSignal(!!props.data?.short); // no reactivity, props.data.short is static
+    const location = useLocation();
+
+    const [registred, setRegistred] = createSignal(() => !!props.data?.short);
 
     // change selection on url change
-    createEffect(() => {
-        const player = props.params.playerId
-            ? selection.tournament.players.find(({id}) => id === props.params.playerId)
+    createEffect(() => ({ playerId: props.params.playerId, players: selection.tournament.players}), ({ playerId, players }) => {
+        const player = playerId
+            ? players.find(({id}) => id === playerId)
             : undefined;
         selectPlayer(player);
     });
 
-    // change url on selection change
-    const navigate = useNavigate();
-    createEffect(() => {
-        const url = urlPlayer(selection.player);
-        if (location.pathname.startsWith(urlPlayer()) && location.pathname !== url) {
-            navigate(url, { replace: true });
-        }
-    });
+    // // change url on selection change
+    // const navigate = useNavigate();
+    // createEffect(() => ({ player: selection.player, pathname: location.pathname, pane: params.pane }), ({ player, pathname, pane }) => {
+    //     const url = Router.paths.players(player)(location.query);
+    //     if (pathname.startsWith(Router.paths.players(location.query)) && pathname !== url) {
+    //         navigate(url, { replace: true });
+    //     }
+    // });
 
-    const eventById = Object.fromEntries(selection.tournament.events.map((e) => [e.id, e]));
+    const eventById = (id: string) => selection.tournament.events.find((e) => e.id === id);
 
     const drawPlayerIds = () => selection.draw ? findDrawPlayerIds(selection.draw) : new Set<string>();
 
@@ -59,7 +61,7 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
 
                 <button type="button" onClick={[editPlayer,null]} class="p-2 rounded-full" title='Add player'>➕</button>
                 <Show when={props.data?.short}>
-                    <A href={urlPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</A>
+                    <a href={Router.paths.players(location.query)} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</a>
                 </Show>
             </div>
             <table class="table table-hover table-condensed w-auto mx-2">
@@ -86,9 +88,9 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
                 </thead>
                 <tbody onDragStart={dragStart}>
                     <For each={selection.tournament.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
-                        <tr classList={{ info: player.id === selection.player?.id }}
+                        <tr class={{ info: player.id === selection.player?.id }}
                             onClick={[selectPlayer,player]}
-                            draggable={true} data-type="player" data-id={player.id}
+                            draggable="true" data-type="player" data-id={player.id}
                         >
                             <td>
                                 <input type="checkbox"
@@ -109,7 +111,7 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
                             <Show when={!props.data?.short} fallback={
                                 <td class="text-left">
                                     <Show when={selection.event}><i
-                                        classList={{
+                                        class={{
                                             "icon2-checkmark": (!selection.draw && isRegistred(selection.event!, player)) || drawPlayerIds().has(player.id),
                                             "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
                                         }}
@@ -124,7 +126,7 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
                                 </td>
                                 <td>
                                     <For each={player.registration}>{(eventId, i) =>
-                                        <span>{(i() ? ', ' : '') + eventById[eventId]?.name}</span>
+                                        <span>{(i() ? ', ' : '') + eventById(eventId)?.name}</span>
                                     }</For>
                                 </td>
                                 <td>
@@ -140,7 +142,7 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
                         </tr>
                     }</For>
                     <tr>
-                        <td colSpan={4} />
+                        <td colspan={4} />
                     </tr>
                 </tbody>
             </table>

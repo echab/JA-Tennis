@@ -1,7 +1,7 @@
-import { selection, update } from "../components/util/selection";
+import { selection, setSelection } from "../components/util/selection";
 import type { OptionalId } from "../domain/object";
 import type { Player } from "../domain/player";
-import { TEvent } from "../domain/tournament";
+import type { TEvent } from "../domain/tournament";
 import { removeValue } from "./util/array";
 import type { Command } from "./util/commandManager";
 import { indexOf } from "./util/find";
@@ -20,7 +20,7 @@ export function updatePlayer(
     // const prev = id ? { ...selection.tournament.players[i] } : undefined; // clone
     const prev = id ? selection.tournament.players[i] : undefined;
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         if (!id) {
             sel.tournament.players.push(p);
         } else {
@@ -30,7 +30,7 @@ export function updatePlayer(
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         if (prev) {
             sel.tournament.players[i] = prev;
         } else {
@@ -61,7 +61,7 @@ export function deletePlayer(
         )
     );
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.tournament.players.splice(i, 1);
         for (const { e, d, b } of prevBoxes) {
             sel.tournament.events[e].draws[d].boxes[b].playerId = "";
@@ -70,7 +70,7 @@ export function deletePlayer(
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.tournament.players.splice(i, 0, prevPlayer);
         for (const { e, d, b } of prevBoxes) {
             sel.tournament.events[e].draws[d].boxes[b].playerId = playerId;
@@ -94,7 +94,7 @@ export function registerPlayer(
     // TODO check compatibility
     // isSexeCompatible(event, player.sexe)
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         const p = sel.tournament.players[iPlayer];
         if (register) {
             if (!p.registration.includes(eventId)) {
@@ -107,7 +107,7 @@ export function registerPlayer(
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         const p = sel.tournament.players[iPlayer];
         p.registration = [...prev]; // clone again?
         sel.player = p;

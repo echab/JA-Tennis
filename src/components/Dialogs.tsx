@@ -1,4 +1,4 @@
-import { Component, createSignal, Match as Case, Switch } from "solid-js";
+import { type Component, createSignal, Match as Case, Switch } from "solid-js";
 import { commandManager } from "../services/util/commandManager";
 import { DialogInfo } from "./tournament/DialogInfo";
 import { DialogPlayer } from "./player/DialogPlayer";
@@ -10,10 +10,10 @@ import { updateDraws, updateMatch } from "../services/drawService";
 import { updateEvent } from "../services/eventService";
 import { DialogDraw } from "./draw/DialogDraw";
 import { DialogMatch } from "./draw/DialogMatch";
-import { Match } from "../domain/draw";
 import { DialogPlace } from "./planning/DialogPlace";
 import { updatePlace } from "../services/planningService";
 import type { Tournament } from "../domain/tournament";
+import type { Match } from "../domain/draw";
 
 export type DialogName = 'new' | 'info' | 'place' | 'player' | 'event' | 'draw' | 'match';
 export type DialogProps<T> = {

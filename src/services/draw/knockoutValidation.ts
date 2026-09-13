@@ -13,7 +13,7 @@ import { ASSERT } from '../../utils/tool';
 import { dayOf, matchesByDays } from '../planningService';
 
 const MAX_TETESERIE = 32,
-    MAX_QUALIF = 32,
+    // MAX_QUALIF = 32,
     MAX_MATCHJOUR = 16;
 
 function validateGroup({ rank }: DataType, event: TEvent, draw: Draw): DrawProblem[] {
@@ -80,7 +80,7 @@ function validateGroup({ rank }: DataType, event: TEvent, draw: Draw): DrawProbl
     return result;
 }
 
-function validateMatches(types: DataType, draw: Draw): DrawProblem[] {
+function validateMatches(_types: DataType, _draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
     return result;

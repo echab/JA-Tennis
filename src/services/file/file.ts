@@ -49,28 +49,28 @@ export async function saveFile(doc: Tournament) {
     await writable.close();
 }
 
-function streamAsyncIterator(stream: ReadableStream, flags?: { mode: "byob" }) {
-    // Get a lock on the stream:
-    const reader = stream.getReader(); // stream.getReader(flags);
-
-    return {
-        next() {
-            // Stream reads already resolve with {done, value}, so
-            // we can just call read:
-            return reader.read();
-        },
-        return() {
-            // Release the lock if the iterator terminates.
-            reader.releaseLock();
-            return {};
-        },
-        // for-await calls this on whatever it's passed, so
-        // iterators tend to return themselves.
-        [Symbol.asyncIterator]() {
-            return this;
-        }
-    };
-}
+// function streamAsyncIterator(stream: ReadableStream, _flags?: { mode: "byob" }) {
+//     // Get a lock on the stream:
+//     const reader = stream.getReader(); // stream.getReader(flags);
+//
+//     return {
+//         next() {
+//             // Stream reads already resolve with {done, value}, so
+//             // we can just call read:
+//             return reader.read();
+//         },
+//         return() {
+//             // Release the lock if the iterator terminates.
+//             reader.releaseLock();
+//             return {};
+//         },
+//         // for-await calls this on whatever it's passed, so
+//         // iterators tend to return themselves.
+//         [Symbol.asyncIterator]() {
+//             return this;
+//         }
+//     };
+// }
 
 /* TODO
     document.getElementById('btnOpen').addEventListener('click', openFile);

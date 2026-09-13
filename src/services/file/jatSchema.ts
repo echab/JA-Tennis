@@ -15,9 +15,9 @@ import { FieldParent, Fields, FnType, generateId, Serializer } from "./serialize
 
 const DAY = 24 * 3600 * 1000; // YEAR = DAY * 365.25;
 const MAX_JOUR = 42;
-const MAX_JOUEUR = 1300;
-const MAX_COURT = 16;
-const MAX_MATCHJOUR = 16;
+// const MAX_JOUEUR = 1300;
+// const MAX_COURT = 16;
+// const MAX_MATCHJOUR = 16;
 
 const EQUIPE_MASK = 4;
 const DOUBLE_MASK_OLD = 8;
@@ -28,9 +28,9 @@ const NC = 19 * 60;
 const TABLEAU_POULE = 2;
 // const TABLEAU_POULE_AR = 3;
 
-const MAX_EPREUVE = 15;
-const MAX_TABLEAU = 15;
-const MAX_BOITE = 511;
+// const MAX_EPREUVE = 15;
+// const MAX_TABLEAU = 15;
+// const MAX_BOITE = 511;
 const MIN_COL = 2;
 const MAX_COL = 9;
 const MAX_COL_POULE = 22;

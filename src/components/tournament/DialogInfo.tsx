@@ -1,5 +1,6 @@
-import { Component, JSX, onMount, onCleanup, Show } from 'solid-js';
-import { TournamentInfo, type TypeName } from '../../domain/tournament';
+import { type Component, onSettled, Show, untrack } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import type { TournamentInfo, TypeName } from '../../domain/tournament';
 import { atMidnight, atZeroHour } from '../../utils/date';
 import { useForm } from '../util/useForm';
 import { TYPES } from '../../services/types';
@@ -15,18 +16,17 @@ type Props = {
 export const DialogInfo: Component<Props> = (props) => {
     let refDlg: HTMLDialogElement;
 
-    onMount(() => {
+    onSettled(() => {
         refDlg.addEventListener('close', props.onClose)
         refDlg.showModal();
+        return () => {
+            refDlg.removeEventListener('close', props.onClose)
+        };
     });
 
-    onCleanup(() => {
-        refDlg.removeEventListener('close', props.onClose)
-    })
+    const info = untrack<TournamentInfo & Partial<TypeName>>(() => props.info && { ...props.info }); // clone
 
-    const info: (TournamentInfo & Partial<TypeName>) | undefined = props.info && { ...props.info }; // clone, without reactivity
-
-    const { form, updateField, updateSubField } = useForm<TournamentInfo & Partial<TypeName>>(info ?? EMPTY);
+    const { form, updateField, updateSubField } = useForm<TournamentInfo & Partial<TypeName>>(() => info ?? EMPTY);
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
@@ -80,11 +80,11 @@ export const DialogInfo: Component<Props> = (props) => {
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-ball' /> Tournament information</b>
-                <button type="button" data-dismiss="modal" aria-hidden="true"
+                <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
+            <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     <div class="mb-1">
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
@@ -214,27 +214,28 @@ export const DialogInfo: Component<Props> = (props) => {
                 </div>
                 <hr />
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="submit"
-                        //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
-                    >OK
-                    </button>
-
                     {/* <button
-            disabled={!event?.id}
-            onclick={() => {
-              if (event?.id) {
-                commandManager.add(deleteEvent(event.id));
-                refDlg.returnValue = 'Delete'
-                refDlg.close();
-              }
-            }}
-          >✖ Delete</button> */}
+                        disabled={!event?.id}
+                        onclick={() => {
+                        if (event?.id) {
+                            commandManager.add(deleteEvent(event.id));
+                            refDlg.returnValue = 'Delete'
+                            refDlg.close();
+                        }
+                        }}
+                    >✖ Delete</button> */}
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
-                        data-dismiss="modal" aria-hidden="true"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                        data-dismiss="modal"
+                        // aria-hidden="true"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
+
+                    <button type="submit"
+                        //  disabled.bind="!!eventForm.$error.required"
+                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                    >OK
+                    </button>
                 </footer>
                 {/*{ eventForm.$error } */}
             </form>

@@ -100,7 +100,7 @@ export abstract class DrawLibBase implements IDrawLib {
     // }
 
     //Programme un joueur, gagnant d'un match ou (avec bForce) report d'un qualifié entrant
-    putPlayer(box: Box, playerId: string, boxQ?: Box, bForce?: boolean): boolean {   //MetJoueur
+    putPlayer(box: Box, playerId: string, boxQ?: Box, _bForce?: boolean): boolean {   //MetJoueur
 
         //ASSERT(MetJoueurOk(box, iJoueur, bForce));
 
@@ -283,7 +283,7 @@ export abstract class DrawLibBase implements IDrawLib {
         return true;
     }
 
-    putTick(box: Box, tick: Box): boolean {   //MetPointage
+    putTick(_box: Box, _tick: Box): boolean {   //MetPointage
         //ASSERT(MetPointageOk(box, tick));
 
         //TODO
@@ -295,7 +295,7 @@ export abstract class DrawLibBase implements IDrawLib {
     }
 
     //Déprogramme un joueur, enlève le gagnant d'un match ou (avec bForce) enlève un qualifié entrant
-    removePlayer(box: Box, boxQ?: Box, bForce?: boolean): boolean {   //EnleveJoueur
+    removePlayer(box: Box, boxQ?: Box, _bForce?: boolean): boolean {   //EnleveJoueur
 
         if (isMatch(box)) {
             if (!box.playerId && !box.score) {

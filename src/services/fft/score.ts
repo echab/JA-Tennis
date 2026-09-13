@@ -46,7 +46,7 @@ const MAX_SET = 5;
 export class ScoreDeltaFFT {
     m_Jeu: Array<{ j1: number; j2: number; }>;
 
-    constructor(score: string, fm: string) {
+    constructor(score: string, _fm: string) {
         const sets = score.matchAll(/\b(\d+\/\d+)\b/g);
         this.m_Jeu = [...sets].map((m) => ({j1: parseInt(m[1]), j2: parseInt(m[2])}) );
         return;
@@ -60,7 +60,7 @@ export class ScoreDeltaFFT {
         return i - 1;
     }
 
-    deltaSet(bVainqueur: boolean /*, BOOL bEquipe */): number {
+    deltaSet(_bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw new Error("Not implemented");
         // let n = 0;
         // for (let i = 0; i < MAX_SET && (this.m_Jeu[i].j1 || this.m_Jeu[i].j2); i++) {
@@ -145,7 +145,7 @@ export class ScoreDeltaFFT {
         // return dSet;
     }
 
-    deltaJeu(bVainqueur: boolean /*, BOOL bEquipe */): number {
+    deltaJeu(_bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw new Error("Not implemented");
 
         // let n = 0;
@@ -231,7 +231,7 @@ export class ScoreDeltaFFT {
         // return dJeu;
     }
 
-    deltaPoint(bVainqueur: boolean /*, BOOL bEquipe */): number {
+    deltaPoint(_bVainqueur: boolean /*, BOOL bEquipe */): number {
         throw new Error("Not implemented");
 
         // let n = 0;

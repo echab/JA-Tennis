@@ -12,8 +12,8 @@ type TypeType = {
 }
 
 export const TYPES: Record<string, TypeType> = {
-  FFT: { code: 'FFT', name: 'Federation Française de Tennis', defaultVersion: 5, loader: (version: number) => import('./fft/index') },
-  FFTT: { code: 'FFTT', name: 'Federation Française de Tennis de Table', defaultVersion: 1, loader: (version: number) => import('./fftt/index') },
+  FFT: { code: 'FFT', name: 'Federation Française de Tennis', defaultVersion: 5, loader: (_version: number) => import('./fft/index') },
+  FFTT: { code: 'FFTT', name: 'Federation Française de Tennis de Table', defaultVersion: 1, loader: (_version: number) => import('./fftt/index') },
 };
 
 export async function loadType(type: string, version: number): Promise<DataType> {

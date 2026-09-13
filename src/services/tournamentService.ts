@@ -2,11 +2,11 @@ import { guid } from "./util/guid";
 import { shuffle } from "../utils/tool";
 import { loadType, TYPES } from "./types";
 import type { Player } from "../domain/player";
-import { Tournament, TournamentInfo, TEvent, type TypeName } from "../domain/tournament";
+import type { Tournament, TournamentInfo, TEvent, TypeName } from "../domain/tournament";
 import type { DataType, RankString } from "../domain/types";
 import type { Command } from "./util/commandManager";
-import { selection, update } from "../components/util/selection";
-import { Draw, FINAL } from "../domain/draw";
+import { selection, setSelection } from "../components/util/selection";
+import { type Draw, FINAL } from "../domain/draw";
 import { reviverDates } from "../utils/date";
 import { deserializeTournament, serializeTournament } from "../components/tournament/TournamentsStore";
 
@@ -90,8 +90,8 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
         const { _typeName, ...info } = infoAndType;
         const prev = selection.tournament;
 
-        const act = () => update(async (sel) => {
-            sel.tournament = await reviveTournament({
+        const act = async () => {
+            const newOne = await reviveTournament({
                 version: 13,
                 id: guid("T"),
                 types: { name: _typeName!, versionTypes: TYPES[_typeName!].defaultVersion },
@@ -99,11 +99,15 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
                 players: [],
                 events: [],
             });
-            onOk(sel.tournament);
-        });
-        act();
+            setSelection((sel) => {
+                sel.tournament = newOne;
+                sel.event = sel.player = sel.place = sel.draw = undefined;
+            });
+            onOk(newOne);
+        };
+        act(); // TODO? await
 
-        const undo = () => update((sel) => {
+        const undo = () => setSelection((sel) => {
             sel.tournament = prev;
             onOk(prev);
         });
@@ -115,12 +119,12 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
 export function updateInfo(info: TournamentInfo): Command {
     const prev = { ...selection.tournament.info };
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.tournament.info = info;
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.tournament.info = prev;
     });
 

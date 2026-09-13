@@ -1,4 +1,5 @@
-import { Component, JSX, onMount, onCleanup } from 'solid-js';
+import { type Component, onSettled, untrack } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 import type { Place } from '../../domain/tournament';
 import { useForm } from '../util/useForm';
 
@@ -13,18 +14,17 @@ type Props = {
 export const DialogPlace: Component<Props> = (props) => {
     let refDlg: HTMLDialogElement;
 
-    onMount(() => {
+    onSettled(() => {
         refDlg.addEventListener('close', props.onClose)
         refDlg.showModal();
+        return () => {
+            refDlg.removeEventListener('close', props.onClose)
+        };
     });
 
-    onCleanup(() => {
-        refDlg.removeEventListener('close', props.onClose)
-    })
+    const place = untrack(() => props.place && { ...props.place }); // clone
 
-    const place: Place | undefined = props.place && { ...props.place }; // clone, without reactivity
-
-    const { form, updateField } = useForm<Place>(place ?? EMPTY);
+    const { form, updateField } = useForm<Place>(() => place ?? EMPTY);
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
@@ -43,11 +43,11 @@ export const DialogPlace: Component<Props> = (props) => {
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <b><i class='icon2-planning' /> Place</b>
-                <button type="button" data-dismiss="modal" aria-hidden="true"
+                <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
+            <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     <div class="mb-1">
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
@@ -64,27 +64,27 @@ export const DialogPlace: Component<Props> = (props) => {
                 </div>
                 <hr />
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="submit"
-                        //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
-                    >OK
-                    </button>
-
                     {/* <button
-                  disabled={!event?.id}
-                  onclick={() => {
-                  if (event?.id) {
-                     commandManager.add(deletePlace(event.id));
-                     refDlg.returnValue = 'Delete'
-                     refDlg.close();
-                  }
-                  }}
-               >✖ Delete</button> */}
+                        disabled={!event?.id}
+                        onclick={() => {
+                        if (event?.id) {
+                            commandManager.add(deletePlace(event.id));
+                            refDlg.returnValue = 'Delete'
+                            refDlg.close();
+                        }
+                        }}
+                    >✖ Delete</button> */}
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
-                        data-dismiss="modal" aria-hidden="true"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                        data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
+
+                    <button type="submit"
+                        //  disabled.bind="!!eventForm.$error.required"
+                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                    >OK
+                    </button>
                 </footer>
                 {/*{ eventForm.$error } */}
             </form>

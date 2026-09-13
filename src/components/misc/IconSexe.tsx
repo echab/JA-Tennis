@@ -7,12 +7,12 @@ type Props = {
 }
 
 export const IconSexe: Component<Props> = (props) => (
-    <i classList={{
+    <i class={{
         'icon2-male': props.sexe === 'H' && !props.double,
         'icon2-female': props.sexe === 'F' && !props.double,
         'icon2-mixte': props.sexe === 'M' && !props.double,
-        'icon2-double-male': props.sexe === 'H' && props.double,
-        'icon2-double-female': props.sexe === 'F' && props.double,
-        'icon2-double-mixte': props.sexe === 'M' && props.double,
+        'icon2-double-male': props.sexe === 'H' && !!props.double,
+        'icon2-double-female': props.sexe === 'F' && !!props.double,
+        'icon2-double-mixte': props.sexe === 'M' && !!props.double,
     }}/>
 )

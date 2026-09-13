@@ -10,9 +10,9 @@ import { positionOpponent1, iDiagonalePos, positionFirstIn, positionLastIn, posi
 import { guid } from '../util/guid';
 import type { DataType } from '../../domain/types';
 
-const MIN_COL = 0,
-    MAX_COL_POULE = 22,
-    MAX_JOUEUR = 8191,
+const // MIN_COL = 0,
+    // MAX_COL_POULE = 22,
+    // MAX_JOUEUR = 8191,
     MAX_TABLEAU = 63;
 
 /**
@@ -346,7 +346,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         //    }
         //}
 
-        return true;
+        // return true;
     }
 
     isNewPlayer(/* box: Box */): boolean {

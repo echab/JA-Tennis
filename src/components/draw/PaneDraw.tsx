@@ -1,19 +1,22 @@
-import { Component, createEffect, Show } from "solid-js";
-import { A, useNavigate, type RouteSectionProps } from "@solidjs/router";
+import { type Component, Show } from "solid-js";
+import { useLocation, type RouteSectionProps } from "@solidjs/router";
 import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
-import { selection, drawById, selectBox, urlBox, update, urlDraw } from "../util/selection";
+import { selection, drawById, setSelection } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
 import { IconSexe } from "../misc/IconSexe";
 import { commandManager } from "../../services/util/commandManager";
 import { drawLib, GenerateType } from "../../services/draw/drawLib";
 import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
 import { BUILD, PLAN, PLAY } from "../../domain/draw";
+import { Router } from "../../router";
 
 type Data = {
 }
 
 export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) => {
+
+    const location = useLocation();
 
     const cur = () => drawById(props.params.drawId ?? '', props.params.eventId);
     const event = () => cur().event;
@@ -29,29 +32,28 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
     const prevDraw = () => event()?.draws[drawIndex() - 1];
     const nextDraw = () => event()?.draws[drawIndex() + 1];
 
-    // change selection on url change
-    createEffect(() => {
-        const evt = event(), drw = draw();
-        const pos = drw && props.params.boxPos ? +props.params.boxPos : NaN;
-        if (evt && drw) {
-            // console.log('effect: select box', pos, evt.id, drw.id);
-            selectBox(evt, drw, drw.boxes.find(({ position }) => position === pos));
-        }
-    });
+    // // change selection on url change
+    // createEffect(() => ({ evt: event(), drw: draw(), findBoxes: draw()?.boxes.find, boxPos: props.params.boxPos}), ({ evt, drw, findBoxes, boxPos }) => {
+    //     if (evt && drw && findBoxes) {
+    //         const pos = boxPos ? +boxPos : NaN;
+    //         // console.log('effect: select box', pos, evt.id, drw.id);
+    //         selectBox(evt, drw, findBoxes(({ position }) => position === pos));
+    //     }
+    // });
 
-    // change url on selection change
-    const navigate = useNavigate();
-    createEffect(() => {
-        const url = urlBox(selection.box); // TODO using default params don't work?
-        // if (location.pathname.startsWith(urlBox()) && location.pathname !== url) {
-        if (location.pathname !== url) {
-            // console.log('effect: navigate from', location.pathname, 'to', url);
-            navigate(url, { replace: true });
-        }
-    });
+    // // change url on selection change
+    // const navigate = useNavigate();
+    // createEffect(() => ({ box: selection.box, draw: selection.draw, event: selection.event, tournament: selection.tournament }), ({ box, draw, event, tournament }) => {
+    //     const url = urlBox(box, draw, event, tournament);
+    //     // if (location.pathname.startsWith(urlBox()) && location.pathname !== url) {
+    //     if (location.pathname !== url) {
+    //         // console.log('effect: navigate from', location.pathname, 'to', url);
+    //         navigate(url, { replace: true });
+    //     }
+    // });
 
     const lockDraw = () => {
-        update((sel) => {
+        setSelection((sel) => {
             if (sel.draw) {
                 sel.draw.lock = sel.draw.lock === PLAN ? BUILD : PLAN;
             }
@@ -100,22 +102,22 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
                 <IconSexe sexe={event()?.sexe} double={event()?.typeDouble} />
                 {event()?.name}
                 <Show when={draw()}>
-                    <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 "
+                    <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ",
+                        { "pointer-events-none": !prevDraw() }]}
                         // onclick={() => selectDraw(event()!, prevDraw())}
                         // disabled={!prevDraw()}
-                        classList={{ "pointer-events-none": !prevDraw() }}
-                        href={urlDraw(prevDraw(), event())} replace
+                        href={Router.paths.draw(event()?.id ?? '')(prevDraw()?.id ?? '')(location.query)} replace
                         title="View the previous draw of the event"
-                    ><i class="icon2-left-arrow" /></A>
+                    ><i class="icon2-left-arrow" /></a>
                     {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info" /></button> */}
                     <span class="inline-block min-w-[5em]">{draw()?.name}</span>
-                    <A class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50"
+                    <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50",
+                        { "pointer-events-none": !nextDraw() }]}
                         // onclick={() => selectDraw(event()!, nextDraw())}
                         // disabled={!nextDraw()}
-                        href={urlDraw(nextDraw(), event())} replace
-                        classList={{ "pointer-events-none": !nextDraw() }}
+                        href={Router.paths.draw(event()?.id ?? '')(nextDraw()?.id ?? '')(location.query)} replace
                         title="View the next draw of the event"
-                    ><i class="icon2-right-arrow" /></A>
+                    ><i class="icon2-right-arrow" /></a>
                 </Show>
             </h4>
             <Show when={event() && draw()}>
@@ -126,7 +128,7 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
 
                     <button class="p-2 rounded-full aria-selected:bg-blue-200"
                         title={`Lock/unlock draw updates (${draw()?.lock ?? BUILD})`}
-                        aria-selected={draw()?.lock === PLAN}
+                        aria-selected={draw()?.lock === PLAN ? 'true' : 'false'}
                         onClick={lockDraw}
                     ><i class="icon2-locker" /></button>
 

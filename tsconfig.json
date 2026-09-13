@@ -2,7 +2,7 @@
   "compilerOptions": {
     // General
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
+    "jsxImportSource": "@solidjs/web",
     "target": "ESNext",
     "allowImportingTsExtensions": true,
     "noEmit": true,
@@ -22,7 +22,6 @@
     // "declaration": true,
     // "removeComments": true,
     // "sourceMap": true,
-    // "experimentalDecorators": true,
 
     "outDir": "./dist"
   },

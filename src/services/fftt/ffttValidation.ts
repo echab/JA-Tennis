@@ -1,7 +1,7 @@
 ﻿// FFTT validation services
 
 import { by, byId } from '../util/find';
-import { Draw, PlayerIn, FINAL } from '../../domain/draw';
+import { Draw, FINAL } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import { findSeeded, isMatch, isPlayerIn } from '../drawService';
 import type { TEvent, Tournament } from '../../domain/tournament';
@@ -9,7 +9,7 @@ import { drawLib } from '../draw/drawLib';
 import type { DrawProblem, IValidation, PlayerProblem } from '../../domain/validation';
 import { column, positionMax } from '../draw/knockoutLib';
 
-function validatePlayer(tournament: Tournament, player: Player): PlayerProblem[] {
+function validatePlayer(_tournament: Tournament, _player: Player): PlayerProblem[] {
     const result: PlayerProblem[] = [];
 
     // if (player.sexe === 'F') {

@@ -1,10 +1,9 @@
-import { Component, For } from 'solid-js';
-import { PlayerIn, Draw, Match, ROUNDROBIN } from '../../domain/draw';
+import { type Component, For } from 'solid-js';
+import type { PlayerIn, Draw, Match } from '../../domain/draw';
 import { mapBy } from '../../services/util/find';
-import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
-import './Draw.css';
 import { DrawBox } from './DrawBox';
+import './Draw.css';
 
 type Props = {
     event: TEvent,
@@ -15,8 +14,6 @@ type Props = {
 export const DrawRoundRobin: Component<Props> = (props) => {
 
     const boxes = () => mapBy<PlayerIn & Match>(props.draw.boxes as Match[], 'position');
-
-    const simple = props.draw.type === ROUNDROBIN
 
     //for round robin, fill the list of rows/columns for the view
     const rows = () => {
@@ -50,7 +47,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
                 <For each={rows()}>{(row) =>
                     <td class="w-32">
                         <DrawBox box={boxes().get(row[0])} players={props.tournament.players}
-                            // if.bind="!simple"
+                            // if.bind={props.draw.type !== ROUNDROBIN}
                         />
                     </td>
                 }</For>
@@ -60,12 +57,12 @@ export const DrawRoundRobin: Component<Props> = (props) => {
                     }</For>
                 </td>
             </tr>
-            <For each={rows()}>{(row, iRow) =>
+            <For each={rows()}>{(row) =>
                 <tr class="h-8">
-                    <For each={row}>{(col, iCol) =>
-                        <td classList={{ diag: isDiag(col) }}>
+                    <For each={row}>{(col) =>
+                        <td class={{ diag: isDiag(col) }}>
                             <DrawBox box={boxes().get(col)} players={props.tournament.players}
-                                //  if.bind="!simple"
+                                //  if.bind={props.draw.type !== ROUNDROBIN}
                             />
                         </td>
                     }</For>
@@ -76,7 +73,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
     </table>
 }
 
-type BoxProps = {
-    box?: PlayerIn & Match;
-    players: Player[];
-}
+// type BoxProps = {
+//     box?: PlayerIn & Match;
+//     players: Player[];
+// }

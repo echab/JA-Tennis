@@ -1,7 +1,7 @@
 ﻿import { Draw, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { DrawProblem } from '../../domain/validation';
-import { isMatch, isPlayerIn } from '../drawService';
+// import { isMatch, isPlayerIn } from '../drawService';
 
 function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
@@ -16,7 +16,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     return result;
 }
 
-function validatePoule(draw: Draw): DrawProblem[] {
+function validatePoule(_draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
 
     //TODOjs
@@ -66,8 +66,8 @@ function validateMatches(draw: Draw): DrawProblem[] {
 
     //Match avec deux joueurs gagné par un des deux joueurs
     for (const box of draw.boxes) {
-        const boxIn = isPlayerIn(box) ? box : undefined;
-        const match = isMatch(box) ? box : undefined;
+        // const boxIn = isPlayerIn(box) ? box : undefined;
+        // const match = isMatch(box) ? box : undefined;
 
         //ASSERT(-1 <= box.playerId && box.playerId < pDoc.m_nJoueur);
         //Joueur inscrit au tableau ?

@@ -1,9 +1,9 @@
 import { getId, indexOf } from "./util/find";
 import { guid } from "./util/guid";
-import { TEvent } from "../domain/tournament";
-import { OptionalId } from "../domain/object";
-import { Command } from "./util/commandManager";
-import { selection, update } from "../components/util/selection";
+import type { TEvent } from "../domain/tournament";
+import type { OptionalId } from "../domain/object";
+import type { Command } from "./util/commandManager";
+import { selection, setSelection } from "../components/util/selection";
 import { removeValue } from "./util/array";
 
 /** Add a new event or update an existing event (with id) */
@@ -19,7 +19,7 @@ export function updateEvent(
     // const prev = id ? { ...selection.tournament.events[i] } : undefined; // clone
     const prev = id ? selection.tournament.events[i] : undefined;
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         if (!id) {
             sel.tournament.events.push(e);
         } else {
@@ -30,7 +30,7 @@ export function updateEvent(
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         if (prev) {
             sel.tournament.events[i] = prev;
         } else {
@@ -57,7 +57,7 @@ export function deleteEvent(eventId: string): Command {
     );
     const byRegistered = ({id}: {id: string}) => registeredPlayerIds.has(id);
 
-    const act = () => update((sel) => {
+    const act = () => setSelection((sel) => {
         sel.tournament.events.splice(i, 1);
         sel.tournament.players
         // .filter(({id}) => registeredPlayers.has(id))
@@ -67,7 +67,7 @@ export function deleteEvent(eventId: string): Command {
     });
     act();
 
-    const undo = () => update((sel) => {
+    const undo = () => setSelection((sel) => {
         sel.tournament.events.splice(i, 0, prevEvent);
         sel.tournament.players
             .filter(byRegistered)

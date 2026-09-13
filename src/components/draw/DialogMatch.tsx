@@ -1,4 +1,5 @@
-import { Component, For, JSX, onMount, onCleanup } from 'solid-js';
+import { type Component, For, onSettled, snapshot, untrack } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 import { Draw, Match } from '../../domain/draw';
 import { drawLib } from '../../services/draw/drawLib';
 import { TEvent, Tournament } from '../../domain/tournament';
@@ -18,35 +19,31 @@ type Props = {
 export const DialogMatch: Component<Props> = (props) => {
     let refDlg: HTMLDialogElement;
 
-    onMount(() => {
+    onSettled(() => {
         refDlg.addEventListener('close', props.onClose)
         refDlg.showModal();
+        return () => {
+            refDlg.removeEventListener('close', props.onClose)
+        };
     });
 
-    onCleanup(() => {
-        refDlg.removeEventListener('close', props.onClose)
-    })
-
-    const { matchFormat } = props.tournament._types;
-
-    const lib = drawLib(props.event, props.draw);
-
-    const { player1: box1, player2: box2 } = lib.boxesOpponents(props.match);
-
-    const match: Match = { ...props.match }; // clone, without reactivity
+    const match: Match = untrack(() => ({ ...props.match })); // clone
     match.score ??= '';
 
-    const player1 = byId(props.tournament.players, box1.playerId);
-    const player2 = byId(props.tournament.players, box2.playerId);
+    const lib = untrack(() => drawLib(snapshot(props.event), snapshot(props.draw)));
+    const { player1: box1, player2: box2 } = lib.boxesOpponents(match);
 
-    const { form, updateField } = useForm(match);
+    const [player1, player2] = untrack(() => [
+        byId(props.tournament.players, box1.playerId),
+        byId(props.tournament.players, box2.playerId),
+    ]);
+
+    const { form, updateField } = useForm(() => match);
 
     const otherPlayerId = (id: string) => id === box1.playerId ? box2.playerId : box1.playerId;
     const winnerId = () => match.playerId
         ? form.vainqDef ? otherPlayerId(match.playerId) : match.playerId
         : '';
-
-    const matchFormats = matchFormat.list();
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
@@ -91,11 +88,11 @@ export const DialogMatch: Component<Props> = (props) => {
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
                 <span><i class='icon2-match' /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
                 {/* <small>{props.match.position}</small> */}
-                <button type="button" data-dismiss="modal" aria-hidden="true"
+                <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
+            <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     {/* <input id="id" type="hidden" value={form.id} /> */}
 
@@ -104,7 +101,7 @@ export const DialogMatch: Component<Props> = (props) => {
                         <label><input type="radio" name="winner" class="p-1 mr-1" autofocus
                             checked={winnerId() === player1?.id} value={player1?.id} onChange={updateField("playerId")}
                         />
-                        {player1?.name} {player1?.rank}</label>
+                            {player1?.name} {player1?.rank}</label>
                         <br />
                         <span class="inline-block w-3/12 text-right pr-3">
                             {/* <label><input type="radio" name="winner"
@@ -114,7 +111,7 @@ export const DialogMatch: Component<Props> = (props) => {
                         <label><input type="radio" name="winner" class="p-1 mr-1"
                             checked={winnerId() === player2?.id} value={player2?.id} onChange={updateField("playerId")}
                         />
-                        {player2?.name} {player2?.rank}</label>
+                            {player2?.name} {player2?.rank}</label>
                     </div>
 
                     <div class="mb-1">
@@ -167,7 +164,7 @@ export const DialogMatch: Component<Props> = (props) => {
                             <label for="matchFormat" class="inline-block w-3/12 text-right pr-3">Match format:</label>
                             <select id="matchFormat" value={form.matchFormat} onChange={updateField('matchFormat')} class="w-9/12 p-1">
                                 <option />
-                                <For each={matchFormats}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
+                                <For each={props.tournament._types.matchFormat.list()}>{(f, i) => <option value={i()}>{f.name}</option>}</For>
                             </select>
                         </div>
 
@@ -178,16 +175,16 @@ export const DialogMatch: Component<Props> = (props) => {
                     </fieldset>
                 </div>
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="submit"
-                        //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
-                    >OK
-                    </button>
-
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
-                        data-dismiss="modal" aria-hidden="true"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                        data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
+
+                    <button type="submit"
+                        //  disabled.bind="!!eventForm.$error.required"
+                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                    >OK
+                    </button>
                 </footer>
                 {/*{ eventForm.$error } */}
             </form>

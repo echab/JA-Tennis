@@ -1,13 +1,14 @@
-import { A, useNavigate, useSearchParams, type RouteSectionProps } from "@solidjs/router";
 import { Component, createEffect, createMemo, For, Show } from "solid-js";
+import { useLocation, useSearchParams, type RouteSectionProps } from "@solidjs/router";
 import type { Place } from "../../domain/tournament";
 import { matchesByDays } from "../../services/planningService";
 import { defined } from "../../services/util/object";
 import { DAYS, minutes } from "../../utils/date";
-import { Searchs } from "../App";
+import { Searchs } from "../../App";
 import { showDialog } from "../Dialogs";
-import { selection, selectDay, urlDay, selectPlace } from "../util/selection";
+import { selection, selectDay, selectPlace } from "../util/selection";
 import { PlanningSlot } from "./PlanningSlot";
+import { Router } from "../../router";
 
 type Data = {
     short?: boolean;
@@ -15,29 +16,29 @@ type Data = {
 
 export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) => {
 
-    const [search, setSearch] = useSearchParams<Searchs>();
+    const location = useLocation();
+    const [search, _setSearch] = useSearchParams<Searchs>();
 
     // change selection on url change
-    createEffect(() => {
-        const day = parseInt(props.params.day ?? search.day ?? '0', 10);
+    createEffect(() => ({ day: parseInt(props.params.day ?? search.day ?? '0', 10)}), ({ day }) => {
         selectDay(day);
         // const place = props.params.place
         //     ? selection.tournament.places?.find(({ name }) => name === props.params.place)
         //     : undefined;
     });
 
-    // change url on selection change
-    const navigate = useNavigate();
-    createEffect(() => {
-        if (props.data?.short) {
-            setSearch({ day: selection.day });
-        } else {
-            const url = urlDay(selection.day ?? 0);
-            if (location.pathname.startsWith(urlDay()) && location.pathname !== url) {
-                navigate(url, { replace: true });
-            }
-        }
-    });
+    // // change url on selection change
+    // const navigate = useNavigate();
+    // createEffect(() => ({ short: props.data?.short, day: selection.day, pathname: location.pathname }), ({ short, day, pathname }) => {
+    //     if (short) {
+    //         setSearch({ day });
+    //     } else {
+    //         const url = Router.paths.planning(day ?? 0)(location.query);
+    //         if (pathname.startsWith(Router.paths.planning(location.query)) && pathname !== url) {
+    //             navigate(url, { replace: true });
+    //         }
+    //     }
+    // });
 
     const editPlace = (place: Place) => { selectPlace(place); showDialog({ name: "place" }); };
 
@@ -62,10 +63,10 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
     return <>
         <div class="flex justify-between items-center px-2">
             <h3>Planning
-                <span class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 "
+                <span class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ", 
+                    { "pointer-events-none": prevDay() === undefined }]}
                     onClick={() => selectDay(prevDay())}
                     // disabled={!prevDay()}
-                    classList={{ "pointer-events-none": prevDay() === undefined }}
                     // href={urlDay(prevDay())} replace
                     title="View the previous day of the tournament"
                 ><i class="icon2-left-arrow" /></span>
@@ -81,10 +82,10 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
                     }</For>
                 </select>
 
-                <span class="p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 "
+                <span class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ",
+                    { "pointer-events-none": nextDay() === undefined }]}
                     onClick={() => selectDay(nextDay())}
                     // disabled={!nextDay()}
-                    classList={{ "pointer-events-none": nextDay() === undefined }}
                     // href={urlDay(nextDay())} replace
                     title="View the next day of the tournament"
                 ><i class="icon2-right-arrow" /></span>
@@ -92,11 +93,11 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
             <Show when={props.data?.short}>
-                <A href={urlDay(selection.day)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</A>
+                <a href={Router.paths.planning(selection.day ?? '')(location.query)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
             </Show>
         </div>
 
-        <ul class="grid gap-[2px]"
+        <ul class="grid gap-0.5"
             style={{
                 'grid-template-rows': `[place] 1em repeat(${(hours.length + 1) * 12}, 1px`,
                 'grid-template-columns': `[hour] 2em repeat(${(selection.tournament.places?.length ?? 0) + 1}, minmax(5em, 1fr))`

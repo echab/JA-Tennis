@@ -1,4 +1,4 @@
-﻿import { isDate, isObject} from '../services/util/object';
+﻿// import { isDate, isObject} from '../services/util/object';
 
 // TODO structuredClone
 /*
@@ -73,7 +73,7 @@ export function hashById<T extends { id: string }>(array: T[]): { [id: string]: 
 
 export function ASSERT(b: boolean, message?: string): void {
     if (!b) {
-        debugger;
+        debugger; // eslint-disable-line no-debugger
         throw new Error(message || 'Assertion is false');
     }
 }

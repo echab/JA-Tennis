@@ -1,18 +1,14 @@
-import { A, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
-import { emptyTournament } from "../../assets/data";
 import { openFile, saveFile } from "../../services/file/file";
 import { showDialog } from "../Dialogs";
 import { selection } from "../util/selection";
-import { storeTournament, useTournaments } from "./TournamentsStore";
+import { clearStoredTournaments, listStoredTournaments, restoreTournament, storeTournament } from "./TournamentsStore";
 import { dateLocal } from "../../utils/date";
 import type { Tournament } from "../../domain/tournament";
-
-const MAX_MRU = 10;
+import { Router } from "../../router";
 
 export const Tournaments: Component = () => {
-
-    const [tournaments, setTournaments] = useTournaments();
 
     const navigate = useNavigate();
 
@@ -20,41 +16,30 @@ export const Tournaments: Component = () => {
         showDialog({
             name: "new",
             onOk(t: Tournament) {
-                navigate('/tournament/');
-                const tStored = storeTournament(t);
-                const i = tournaments.findIndex((v) => v.id === tStored.id);
-                if (i !== -1) {
-                    setTournaments((ts) => ts.slice(i, MAX_MRU));
-                } else {
-                    setTournaments((ts) => [tStored, ...ts.slice(0, MAX_MRU)]);
-                }
+                storeTournament(t);
+                navigate(Router.paths({ pane: 'tournament' }));
             },
         });
     };
 
     const loadFile = async () => {
         const t = await openFile();
-        navigate('/tournament/');
-        setTournaments((ts) => [storeTournament(t), ...ts.slice(0, MAX_MRU)]);
+        storeTournament(t);
+        navigate(Router.paths({ pane: 'tournament' }));
     };
 
     const saveTheFile = async () => {
         await saveFile(selection.tournament);
     };
 
-    const clearStorage = () => {
-        navigate('/tournament/');
-        // localStorage.removeItem('jat');
-        setTournaments([storeTournament(emptyTournament())]);
+    const clearStorage = async () => {
+        clearStoredTournaments();
+        navigate(Router.paths({ pane: 'tournament' }));
     };
 
-    const selectItem = async (index: number) => {
-        // navigate('/tournament/'); // the A link already navigate properly
+    const selectItem = async (id: string) => {
         // move the selected tournament on top of the list
-        setTournaments((ts) => {
-            const t = ts.splice(index, 1);
-            return [...t, ...ts];
-        });
+        await restoreTournament(id);
     }
 
     return <div class="p-2">
@@ -74,11 +59,11 @@ export const Tournaments: Component = () => {
 
         <h3>Last tournaments:</h3>
         <ul>
-            <For each={tournaments}>{(tournament, i) => (
+            <For each={listStoredTournaments()}>{(tournament, i) => (
                 <Show when={i() > 0}>
-                    <li><A href="/tournament/" onClick={[selectItem, i()]}>
+                    <li><a href="/?pane=tournament" onClick={() => selectItem(tournament.id)}>
                         {tournament.name} ({dateLocal(tournament.date)}) #{tournament.id}
-                    </A></li>
+                    </a></li>
                 </Show>
             )}</For>
         </ul>

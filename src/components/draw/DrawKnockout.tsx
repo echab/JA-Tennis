@@ -1,12 +1,13 @@
 /* eslint-disable no-bitwise */
+import { type Component, For, Show } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { useParams } from '@solidjs/router';
 import type { TEvent, Tournament } from '../../domain/tournament';
-import type { Params } from '../App';
-import { Component, For, JSX, Show } from 'solid-js';
+import type { Params } from '../../App';
 import { selectBox, urlBox } from '../util/selection';
-import { PlayerIn, Draw, Match, BUILD, FINAL } from '../../domain/draw';
+import { type PlayerIn, type Draw, type Match, BUILD, FINAL } from '../../domain/draw';
 import { by, byId, mapBy } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
-import { A, useParams } from '@solidjs/router';
 import { isMatch } from '../../services/drawService';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent1, positionTopCol } from '../../services/draw/knockoutLib';
 import { drawLib } from '../../services/draw/drawLib';
@@ -92,19 +93,19 @@ export const DrawKnockout: Component<Props> = (props) => {
             <For each={lines()}>{(l) =>
                 <tr>
                     <For each={cols(l)}>{({ odd, even, rowspan, box, player, isRight }) =>
-                        <td rowspan={rowspan} classList={{
+                        <td rowspan={rowspan} class={{
                             even, odd, qs: isRight
                         }}>
                             <Show when={props.draw.lock === BUILD || even || odd}>
                                 {/* TODO <DrawBox box={b} players={props.tournament.players} /> */}
-                                <A class="boite joueur block print:border-none print:bg-transparent"
-                                    classList={{ selected: !!params.boxPos && +params.boxPos === box?.position }}
+                                <a class={["boite joueur block print:border-none print:bg-transparent",
+                                    { selected: !!params.boxPos && +params.boxPos === box?.position }]}
                                     // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                                     // onclick={() => navigate(urlBox(box), {replace:true})}
-                                    href={urlBox(box)} replace noScroll={true}
+                                    href={urlBox(box, props.draw, props.event, props.tournament)} replace noScroll
                                     id={`pos${box?.position}`}
-                                    tabIndex={0}
-                                    onkeydown={handleKey}
+                                    tabindex={0}
+                                    onKeyDown={handleKey}
                                 >
                                     <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
                                     <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
@@ -141,15 +142,15 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             <Show when={box?.note}><i class='icon2-note'/></Show>
                                         </span>
 
-                                        <i classList={{
-                                            'icon2-planning-no': box && (!box.date && !box.score && !box.wo),
+                                        <i class={{
+                                            'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
                                         }} />
 
                                         {/* <Show when={box?.date}>
-                                            <i classList={{
+                                            <i class={{
                                                 // 'icon2-planning':  !!box?.date,
                                                 // 'hover':  !!box?.date,
-                                                'icon2-planning-no': box && (!box.date && !box.score && !box.wo),
+                                                'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
                                             }}
                                             title="View in planning"
                                             onclick={(evt) => {
@@ -175,7 +176,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                         </Show>
                                         <Show when={box?.vainqDef}><br/><br/></Show>
                                     </Show>
-                                </A>
+                                </a>
                             </Show>
                         </td>
                     }</For>

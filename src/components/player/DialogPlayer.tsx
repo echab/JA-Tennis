@@ -1,17 +1,17 @@
-import { A } from '@solidjs/router';
-import { Component, For, JSX, onMount, onCleanup, Show } from 'solid-js';
+import { type Component, For, onSettled, Show, untrack } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { useLocation } from '@solidjs/router';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
 import type { Tournament } from '../../domain/tournament';
-import type { RankString } from '../../domain/types';
 import { deletePlayer } from '../../services/playerService';
 import { isSexeCompatible } from '../../services/tournamentService';
 import { commandManager } from '../../services/util/commandManager';
 import { byId } from '../../services/util/find';
 import { dateLocal } from '../../utils/date';
 import { IconSexe } from '../misc/IconSexe';
-import { urlPlayer } from '../util/selection';
 import { useForm } from '../util/useForm';
+import { Router } from '../../router';
 
 const EMPTY: OptionalId<Player> = { name: '', sexe: 'H', rank: 'NC', registration: [] };
 
@@ -25,25 +25,23 @@ type Props = {
 export const DialogPlayer: Component<Props> = (props) => {
     let refDlg: HTMLDialogElement;
 
-    onMount(() => {
+    const location = useLocation();
+
+    onSettled(() => {
         refDlg.addEventListener('close', props.onClose)
         refDlg.showModal();
+        return () => {
+            refDlg.removeEventListener('close', props.onClose)
+        };
     });
 
-    onCleanup(() => {
-        refDlg.removeEventListener('close', props.onClose)
-    })
+    const player = untrack(() => (props.player && { ...props.player }));  // clone
 
-    const { rank, category } = props.tournament._types;
+    const { rank, category } = untrack(() => ({ ...props.tournament._types }));
 
-    const player: OptionalId<Player> | undefined = props.player && { ...props.player }; // clone, without reactivity
+    const { form, updateField, getCheckboxes } = useForm<OptionalId<Player>>(() => player ?? EMPTY);
 
-    const { form, updateField, getCheckboxes } = useForm<OptionalId<Player>>(player ?? EMPTY);
-
-    const ranks: RankString[] = rank.list();
-    // const categories: CategoryString[] = category.list();
-
-    const refDate = props.tournament.info.start ?? new Date(Date.now());
+    const refDate = () => props.tournament.info.start ?? new Date(Date.now());
 
     const submit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = (evt) => {
         evt.preventDefault();
@@ -93,13 +91,13 @@ export const DialogPlayer: Component<Props> = (props) => {
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <b><i class='icon2-player' /> {props.player ? `Edit ${props.player.teamIds ? 'team' : 'player'} ${props.player?.name ?? ''}` : 'New player'}</b>
-                <small>Id: {props.player?.id}</small>
-                <button type="button" data-dismiss="modal" aria-hidden="true"
+                <b><i class='icon2-player' /> {player ? `Edit ${player.teamIds ? 'team' : 'player'} ${player?.name ?? ''}` : 'New player'}</b>
+                <small>Id: {player?.id}</small>
+                <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
                 >&times;</button>
             </header>
-            <form method="dialog" class="w-[32rem]" onSubmit={submit}>
+            <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     <input id="id" type="hidden" value={form.id} />
                     <div class="flex space-x-6">
@@ -138,7 +136,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                                     return <li>{
                                         teamPlayer
                                             ? <span>
-                                                <A href={urlPlayer(teamPlayer)}><i class="icon2-info" /></A>
+                                                <a href={Router.paths.players(teamPlayer.id)(location.query)}><i class="icon2-info" /></a>
                                                 <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
                                             </span>
                                             : `#${playerId}`
@@ -157,11 +155,11 @@ export const DialogPlayer: Component<Props> = (props) => {
                             <span class="p-1">{form.rank}</span>
                         }>
                             <select id="rank" value={form.rank} onChange={updateField('rank')} class="w-2/12 p-1">
-                                <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                                <For each={rank.list()}>{(rank) => <option>{rank}</option>}</For>
                             </select>
                             <label for="rank2" class="inline-block w-3/12 text-right pr-3">Double:</label>
                             <select id="rank2" value={form.rank2} onChange={updateField('rank')} class="w-2/12 p-1">
-                                <For each={ranks}>{(rank) => <option>{rank}</option>}</For>
+                                <For each={rank.list()}>{(rank) => <option>{rank}</option>}</For>
                             </select>
                         </Show>
                     </div>
@@ -171,7 +169,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                             <label class="inline-block w-3/12 text-right pr-3">Birth:</label>
                             {/* TODO? support year only */}
                             <input name="birth" type="date" value={dateLocal(form.birth) ?? ''} onChange={updateField('birth')} class="p-1" />
-                            <span class="ml-2">{form.birth && category.ofDate(form.birth, refDate).name}</span>
+                            <span class="ml-2">{form.birth && category.ofDate(form.birth, refDate()).name}</span>
                         </div>
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">Club:</label>
@@ -238,22 +236,22 @@ export const DialogPlayer: Component<Props> = (props) => {
                     </fieldset>
                 </div>
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="submit"
-                        //  disabled.bind="!!playerForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-[6rem]"
-                    >OK
-                    </button>
-
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
                         value="Delete" disabled={!form.id}
                         onClick={deleteAndClose}
                     >✖ Delete
                     </button>
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-[6rem]"
-                        data-dismiss="modal" aria-hidden="true"
+                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                        data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
+
+                    <button type="submit"
+                        //  disabled.bind="!!playerForm.$error.required"
+                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                    >OK
+                    </button>
                 </footer>
                 {/*<fieldset class="border-2">
                   <legend>Coordinate</legend>
@@ -262,7 +260,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                       <label>
                           Rank:
                   <select type="text" value={form.rank ?? ''} onChange={updateField('rank')} >
-                      <option repeat.for="value of ranks">{value}</option>
+                      <option repeat.for="value of rank.list()">{value}</option>
                   </select></label>
                   </div>
               </fieldset> */}

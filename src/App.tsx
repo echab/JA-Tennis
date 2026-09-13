@@ -1,20 +1,14 @@
-import { Component, createEffect, ErrorBoundary, Suspense, type ParentComponent } from 'solid-js';
-import { Route, Router } from '@solidjs/router';
-import { commandManager } from '../services/util/commandManager';
-
-// import logo from './logo.svg';
-import { selection, selectTournament } from './util/selection';
-import { SidePanel } from './SidePanel';
-import { Dialogs } from './Dialogs';
-import { PaneDraw } from './draw/PaneDraw';
-import { Players } from './player/Players';
-import { ErrorToast } from './misc/ErrorToast';
-import { restoreTournament, TournamentsProvider, useTournaments } from './tournament/TournamentsStore';
-import { Planning } from './planning/Planning';
-import { Home } from './Home';
+import { type VoidComponent, onSettled, Errored, Loading, type ParentComponent } from 'solid-js';
+import { Router } from './router';
+import { commandManager } from './services/util/commandManager';
+import { selection, selectTournament } from './components/util/selection';
+import { SidePanel } from './components/SidePanel';
+import { Dialogs } from './components/Dialogs';
+import { ErrorToast } from './components/misc/ErrorToast';
+import { restoreTournament } from './components/tournament/TournamentsStore';
 
 import styles from './App.module.css';
-import '../assets/icons.css';
+import './index.css';
 
 export type Params = {
     playerId?: string;
@@ -25,31 +19,25 @@ export type Params = {
 }
 
 export type Searchs = {
+    pane: 'tournament' | 'events' | 'players' | 'planning' | 'problems' | 'settings',
     // playerId?: string;
     day?: string;
 }
 
-export const App: Component = () => (
-    <ErrorBoundary fallback={(err) => <ErrorToast message={err} />}>
-        <TournamentsProvider>
-            <Suspense fallback={'loading...'}>
-                <Router root={Main}>
-                    <Route path={["/", "/:pane/"]} component={Home} />
-                    <Route path="/:pane/draw/:eventId/:drawId?/:boxPos?" component={PaneDraw} />
-                    <Route path="/:pane/players/:playerId?" component={Players} />
-                    <Route path="/:pane/planning/:day?" component={Planning} />
-                </Router>
-            </Suspense>
-        </TournamentsProvider>
-    </ErrorBoundary>
+const App: VoidComponent = () => (
+    <Errored fallback={(err) => <ErrorToast message={String(err())} />}>
+        <Loading fallback={'loading...'}>
+            <Router>
+                {(props) => <Main {...props} />}
+            </Router>
+        </Loading>
+    </Errored>
 );
 
-export const Main: ParentComponent = (props) => {
+const Main: ParentComponent = (props) => {
 
-    const [storedTournaments] = useTournaments();
-
-    createEffect(() => {
-        restoreTournament(storedTournaments[0]).then(selectTournament); // TODO solid2: async effect
+    onSettled(() => {
+        restoreTournament().then(selectTournament); // TODO solid2: async effect
     });
 
     // const paste = async () => {
@@ -102,3 +90,5 @@ export const Main: ParentComponent = (props) => {
         </div>
     </>
 }
+
+export default App;
