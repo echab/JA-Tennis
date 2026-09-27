@@ -23,25 +23,25 @@
     "dist"
   ],
   "dependencies": {
-    "@solidjs/router": "^2.0.0-next.24",
-    "@solidjs/web": "2.0.0-rc.8",
-    "solid-js": "2.0.0-rc.8"
+    "@solidjs/router": "^2.0.0-next.30",
+    "@solidjs/web": "2.0.0-rc.10",
+    "solid-js": "2.0.0-rc.10"
   },
   "devDependencies": {
     "@solidjs/testing-library": "^1.0.0-beta.3",
-    "@solidjs/vite-plugin": "3.0.0-next.43",
+    "@solidjs/vite-plugin": "3.0.0-next.46",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^25.9.6",
+    "@types/node": "^26",
     "@types/wicg-file-system-access": "^2023.10.7",
     "eslint-plugin-solid": "^0.18.0",
     "happy-dom": "^20.14.5",
-    "oxlint": "^1.82.0",
-    "oxlint-tsgolint": "^7.0.2001",
+    "oxlint": "^1.85.0",
+    "oxlint-tsgolint": "^7.0.2003",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3",
-    "vite": "^8.3.0",
-    "vitest": "^5.0.0"
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

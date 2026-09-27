@@ -47,7 +47,7 @@ export function matchesByDays(tournament: Tournament): Slot[][] {
 
     const dayCount = Math.floor((end.getTime() - start.getTime()) / DAYS + 1);
 
-    const result: Slot[][] = Array(dayCount).fill(0).map(() => []);
+    const result = Array.from<unknown, Slot[]>({ length: dayCount }, () => []);
 
     for (const event of tournament.events) {
         for (const draw of event.draws) {

@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, For, Show } from 'solid-js';
+import { Component, createSignal, For, onSettled, Show } from 'solid-js';
 import { useLocation, type RouteSectionProps } from '@solidjs/router';
 import { selection, selectPlayer } from '../util/selection';
 import type { Player } from '../../domain/player';
@@ -18,10 +18,11 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
 
     const location = useLocation();
 
-    const [registred, setRegistred] = createSignal(() => !!props.data?.short);
+    const [registred, setRegistred] = createSignal(() => !!props.data?.short, { name: 'registered'});
 
-    // change selection on url change
-    createEffect(() => ({ playerId: props.params.playerId, players: selection.tournament.players}), ({ playerId, players }) => {
+    // inir selection with url
+    onSettled(() => {
+        const playerId = props.params.playerId, players = selection.tournament.players;
         const player = playerId
             ? players.find(({id}) => id === playerId)
             : undefined;
@@ -87,7 +88,9 @@ export const Players: Component<RouteSectionProps<Data | undefined>> = (props) =
                     </tr>
                 </thead>
                 <tbody onDragStart={dragStart}>
-                    <For each={selection.tournament.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))} fallback={<tr><td colspan="3">No player</td></tr>}>{(player) =>
+                    <For each={selection.tournament.players.filter((p) => !registred() || !selection.event || (selection.event && p.registration.includes(selection.event.id)))}
+                        fallback={<tr><td colspan="3">No player</td></tr>}
+                    >{(player) =>
                         <tr class={{ info: player.id === selection.player?.id }}
                             onClick={[selectPlayer,player]}
                             draggable="true" data-type="player" data-id={player.id}

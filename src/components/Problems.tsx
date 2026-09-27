@@ -7,7 +7,7 @@ import { drawById, selection } from "./util/selection";
 import { Router } from "../router";
 
 export const Problems: Component = () => {
-    const [selectedDraw, setSelectedDraw] = createSignal(false);
+    const [selectedDraw, setSelectedDraw] = createSignal(false, { name: 'pb:selectedDraw' });
     const location = useLocation();
 
     return (<>
@@ -23,7 +23,7 @@ export const Problems: Component = () => {
             <For each={[...selection.playerProblems.entries()]}>{([_playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
-                        <a href={Router.paths.players(player.id)(location.query, location.hash)} replace noScroll>
+                        <a href={Router.paths.players(player.id)(location.query, location.hash)} replace noscroll>
                             {message}: {player.name}{detail ? ` (${detail})` : ''}
                         </a>
                     </li>
@@ -48,7 +48,7 @@ export const Problems: Component = () => {
                             <ul>
                                 <For each={errors}>{({message, detail, player, box}) => (
                                     <li>
-                                        <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(box?.position ?? '')(location.query)} replace noScroll>
+                                        <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(box?.position ?? '')(location.query)} replace noscroll>
                                             {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
                                         </a>
                                     </li>

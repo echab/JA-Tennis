@@ -1,4 +1,4 @@
-import { Component, createEffect, createMemo, For, Show } from "solid-js";
+import { Component, createMemo, For, onSettled, Show } from "solid-js";
 import { useLocation, useSearchParams, type RouteSectionProps } from "@solidjs/router";
 import type { Place } from "../../domain/tournament";
 import { matchesByDays } from "../../services/planningService";
@@ -19,8 +19,9 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
     const location = useLocation();
     const [search, _setSearch] = useSearchParams<Searchs>();
 
-    // change selection on url change
-    createEffect(() => ({ day: parseInt(props.params.day ?? search.day ?? '0', 10)}), ({ day }) => {
+    // init selection with url
+    onSettled(() => {
+        const day = parseInt(props.params.day ?? search.day ?? '0', 10);
         selectDay(day);
         // const place = props.params.place
         //     ? selection.tournament.places?.find(({ name }) => name === props.params.place)
@@ -58,7 +59,7 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
     const nextDay = () => selection.day !== undefined && selection.day + 1 < slots().length ? selection.day + 1 : undefined;
 
     const hourStart = 8, hourEnd = 23;
-    const hours = Array(hourEnd - hourStart).fill(0).map((_, i) => `${hourStart + i}h `);
+    const hours = Array.from({ length: hourEnd - hourStart }, (_, i) => `${hourStart + i}h `);
 
     return <>
         <div class="flex justify-between items-center px-2">

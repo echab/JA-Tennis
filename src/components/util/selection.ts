@@ -29,7 +29,7 @@ export const [selection, setSelection] = createStore<SelectionItems>(async () =>
     tournament: await emptyTournament(),
     playerProblems: new Map(),
     drawProblems: new Map(),
-}), {}, { name: 'selection' });
+}), {}, { shallow: false, name: 'selectionStore' });
 
 export function selectTournament(tournament: Tournament) {
     setSelection((sel) => {

@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { type Component, For, Show } from 'solid-js';
+import { type Component, For, Repeat, Show } from 'solid-js';
 import type { JSX } from '@solidjs/web';
 import { useParams } from '@solidjs/router';
 import type { TEvent, Tournament } from '../../domain/tournament';
@@ -23,10 +23,7 @@ export const DrawKnockout: Component<Props> = (props) => {
 
     const params = useParams<Params>();
 
-    const lines = () => {
-        const nLine = countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
-        return Array(nLine).fill(0).map((_, i) => i);
-    }
+    const nLine = () => countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
 
     const cols = (l: number) => {
         const result = [];
@@ -90,7 +87,7 @@ export const DrawKnockout: Component<Props> = (props) => {
 
     return <table class="tableau">
         <tbody>
-            <For each={lines()}>{(l) =>
+            <Repeat count={nLine()}>{(l) =>
                 <tr>
                     <For each={cols(l)}>{({ odd, even, rowspan, box, player, isRight }) =>
                         <td rowspan={rowspan} class={{
@@ -102,7 +99,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     { selected: !!params.boxPos && +params.boxPos === box?.position }]}
                                     // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                                     // onclick={() => navigate(urlBox(box), {replace:true})}
-                                    href={urlBox(box, props.draw, props.event, props.tournament)} replace noScroll
+                                    href={urlBox(box, props.draw, props.event, props.tournament)} replace noscroll
                                     id={`pos${box?.position}`}
                                     tabindex={0}
                                     onKeyDown={handleKey}
@@ -181,7 +178,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                         </td>
                     }</For>
                 </tr>
-            }</For>
+            }</Repeat>
         </tbody>
     </table>
 }

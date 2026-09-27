@@ -129,7 +129,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
 
         let b: number, c2: number | undefined, n: number, bColSansMatch: boolean;
 
-        const nMatchCol: number[] = new Array(MAX_COL);
+        const nMatchCol: number[] = Array.from({ length: MAX_COL });
 
         //Compte le nombre de joueurs entrants ou qualifié de la colonne
         const colMin = columnMin(this.draw.nbOut);
@@ -324,7 +324,7 @@ export class Knockout extends DrawLibBase implements IDrawLib {
         //Nombre de Tête de série
         const nSeeded = draw.nbOut !== 1 ? draw.nbOut : countInCol((colMax - colMin) >> 1);
 
-        const hasMatch: boolean[] = new Array(max + 1).fill(false);
+        const hasMatch = Array.from({ length: max + 1 }, () => false);
 
         let iPlayer = 0, nMatch = 0, nPlayer = 0, col = -1;
         let ord = 0

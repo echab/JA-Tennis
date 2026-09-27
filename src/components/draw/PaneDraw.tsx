@@ -1,8 +1,8 @@
-import { type Component, Show } from "solid-js";
+import { type Component, onSettled, Show } from "solid-js";
 import { useLocation, type RouteSectionProps } from "@solidjs/router";
 import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
-import { selection, drawById, setSelection } from "../util/selection";
+import { selection, drawById, setSelection, selectBox } from "../util/selection";
 import { DrawDraw } from "./DrawDraw";
 import { IconSexe } from "../misc/IconSexe";
 import { commandManager } from "../../services/util/commandManager";
@@ -32,14 +32,14 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
     const prevDraw = () => event()?.draws[drawIndex() - 1];
     const nextDraw = () => event()?.draws[drawIndex() + 1];
 
-    // // change selection on url change
-    // createEffect(() => ({ evt: event(), drw: draw(), findBoxes: draw()?.boxes.find, boxPos: props.params.boxPos}), ({ evt, drw, findBoxes, boxPos }) => {
-    //     if (evt && drw && findBoxes) {
-    //         const pos = boxPos ? +boxPos : NaN;
-    //         // console.log('effect: select box', pos, evt.id, drw.id);
-    //         selectBox(evt, drw, findBoxes(({ position }) => position === pos));
-    //     }
-    // });
+    // init selection from url
+    onSettled(() => { const evt = event(), drw = draw(), findBoxes = drw?.boxes.find, boxPos = props.params.boxPos;
+        if (evt && drw && findBoxes) {
+            const pos = boxPos ? +boxPos : NaN;
+            // console.log('effect: select box', pos, evt.id, drw.id);
+            selectBox(evt, drw, findBoxes(({ position }) => position === pos));
+        }
+    });
 
     // // change url on selection change
     // const navigate = useNavigate();

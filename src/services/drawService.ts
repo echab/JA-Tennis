@@ -38,6 +38,17 @@ export function updateDraws(
             sel.event.draws[i] = d;
         }
     });
+    // const newSel = {
+    //     ...selection,
+    //     event: {
+    //         ...event,
+    //         draws: i === -1
+    //             ? [...event.draws, d]
+    //             : event.draws.map((dd,ii) => ii === i ? d : dd),
+    //     },
+    //     draw: d,
+    // };
+    // const act = () => setSelection(reconcile(newSel));
     act();
 
     const undo = () => setSelection((sel) => {

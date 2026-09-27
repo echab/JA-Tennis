@@ -25,7 +25,7 @@ export const commandManager = createCommandManager(100);
 
 export function createCommandManager(maxHistory = 100) {
     const history: Command[] = [];
-    const [position, setPosition] = createSignal(-1);
+    const [position, setPosition] = createSignal(-1, { name: 'cmd.position' });
     let currentTransaction: Transaction | undefined;
     let nTransaction = 0;
     return {

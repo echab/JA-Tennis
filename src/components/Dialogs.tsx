@@ -21,7 +21,7 @@ export type DialogProps<T> = {
     onOk?(data: T): void,
 };
 
-export const [dialog, showDialog] = createSignal<DialogProps<unknown>>();
+export const [dialog, showDialog] = createSignal<DialogProps<unknown> | undefined>(undefined, { name: 'dialog' });
 
 export const Dialogs: Component = () => {
     return <Switch>

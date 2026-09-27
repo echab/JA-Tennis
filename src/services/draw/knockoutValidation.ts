@@ -140,7 +140,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
     result.push(...validateMatches(tournament._types, draw));
 
     const colMax = columnMax(draw.nbColumn, draw.nbOut);
-    const pClastMaxCol: RankString[] = new Array(colMax + 1);
+    const pClastMaxCol = Array.from<RankString>({ length: colMax + 1 });
     pClastMaxCol[colMax] = 'NC';    //pClastMaxCol[colMax].Start(); pClastMaxCol[colMax].Next();
 
     //Match avec deux joueurs gagné par un des deux joueurs

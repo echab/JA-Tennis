@@ -186,7 +186,7 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
 
 const scoreFields: FnType<ScoreString> = function(value: string, f, p: PlayerIn & Match) {
     if (!this.writing) {
-        const games = Array(5).fill(0).map(() => {
+        const games = Array.from({ length: 5 }, () => {
             const b = this.u8;
             return [b & 0xf, (b >> 4) & 0xf]; // {j1:4, j2:4}
         }).filter(([g1, g2]) => g1 !== 0 || g2 !== 0)
@@ -319,7 +319,7 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
         },
         replacer: (b: Array<PlayerIn | Match> | undefined, p: Draw) => {
             const nBox = p.type & ROUNDROBIN ? p.nbColumn * (p.nbColumn + 1) : positionMax(p.nbColumn, p.nbOut) + 1;
-            return Array(nBox).fill(0).map((_, i) => {
+            return Array.from({ length: nBox }, (_, i) => {
                 const box = b && by(b, 'position', i);
                 return box ?? { position: i };
             });

@@ -53,10 +53,6 @@ export function shuffle<T>(array: T[], from = 0, toExlusive = array.length): T[]
     return array;
 }
 
-export function filledArray(size: number, value=0): number[] {
-    return Array(size).fill(value);
-}
-
 export function hashById<T extends { id: string }>(array: T[]): { [id: string]: T } {
     if (!array) {
         return {};
