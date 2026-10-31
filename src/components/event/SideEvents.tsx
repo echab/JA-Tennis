@@ -1,7 +1,7 @@
 import { type Component, For, Show } from 'solid-js';
 import type { JSX } from '@solidjs/web';
-import { useLocation, type RouteSectionProps } from '@solidjs/router';
-import { selectDraw, selectEvent, selection } from '../util/selection';
+import { useLocation } from '@solidjs/router';
+import { selectDraw, selection, selTournament } from '../util/selection';
 import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
 import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragdrop';
@@ -10,10 +10,10 @@ import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
 import { Router } from '../../router';
 
-type Data = {
+type Props = {
 }
 
-export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
+export const SideEvents: Component<Props> = () => {
 
     const location = useLocation();
 
@@ -34,14 +34,14 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
 
             <button type="button" class="rounded-full p-2 hover"
                 onClick={() => {
-                    selectEvent(undefined);
+                    selectDraw(undefined);
                     showDialog({ name: "event" });
                 }}
             >➕ Add an event</button>
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
         </div>
-        <For each={selection.tournament.events} fallback={<div>No event</div>}>{(event) =>
+        <For each={selTournament.events} fallback={<div>No event</div>}>{(event) =>
             <div
                 aria-selected={event.id === selection.event?.id ? 'true' : 'false'}
                 class="border-l-8 m-2"
@@ -53,7 +53,10 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
                 >
                     {/* <input type="checkbox" /> */}
                     <a href={Router.paths.draw(event.id)(location.query)} replace>
-                        <i class="icon2-info hover" onClick={() => { selectEvent(event); showDialog({ name: "event" }); }}/>
+                        <i class="icon2-info hover" onClick={() => {
+                            selectDraw(event.id);
+                            showDialog({ name: "event" });
+                        }}/>
                         {/* <small>{event.id} </small> */}
                         <IconSexe sexe={event.sexe} double={event.typeDouble} />
                         <span>{event.name}</span>
@@ -62,7 +65,7 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
 
                     <button type="button" class="rounded-full p-0.5 px-1 hover" title="Add a draw"
                         onClick={() => {
-                            selectDraw(event, undefined);
+                            selectDraw(event.id, undefined);
                             showDialog({ name: "draw" });
                         }}
                     >➕ Draw</button>
@@ -80,7 +83,7 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
                             >
                                 <i class="icon2-info hover"
                                     onClick={() => {
-                                        selectDraw(event, draw);
+                                        selectDraw(event.id, draw.id);
                                         showDialog({ name: "draw" });
                                     }}
                                 />
@@ -105,7 +108,7 @@ export const Events: Component<RouteSectionProps<Data | undefined>> = () => {
 
         <button type="button" class="rounded-full p-1"
             onClick={() => {
-                selectEvent(undefined);
+                selectDraw(undefined);
                 showDialog({ name: "event" });
             }}
         >➕ Add an event</button>

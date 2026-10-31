@@ -122,8 +122,8 @@ export const DialogDraw: Component<Props> = (props) => {
 
     const deleteAndClose = () => {
         if (draw?.id) {
-            commandManager.add(deleteDraw(draw.id));
-            selectDraw(event, undefined);
+            commandManager.add(deleteDraw(event.id, draw.id));
+            selectDraw(event.id, undefined);
             refDlg.close();
             // props.onClose();
         }

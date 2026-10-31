@@ -11,6 +11,9 @@ type PickMutable<T> = { [K in keyof T as (<U>() => U extends { [V in K]: T[V] } 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type any_ = any;
 
+type NoArray<T> = Extract<T, readonly unknown[]> extends never ? unknown : never;
+type StoreInit<T> = (() => T | Promise<T> | AsyncIterable<T>) & NoArray<T>;
+
 // type FormFields = {
 //   name?: string;
 //   surname?: string;
@@ -33,10 +36,10 @@ type any_ = any;
 //   console.log(`submitting ${JSON.stringify(dataToSubmit)}`);
 // };
 
-export function useForm<FormFields extends object = Record<string, string | number | boolean | Date>>(
-    initFieldsGetter: () => FormFields,
+export function useForm<FormFields extends {} = Record<string, string | number | boolean | Date>>(
+    initFieldsGetter: StoreInit<FormFields>,
 ) {
-    const [form, setForm] = createStore<FormFields>(initFieldsGetter, {});
+    const [form, setForm] = createStore(initFieldsGetter, null, { name: 'formStore' });
     // Object.entries(initFields).forEach(([k,v]) => updateField)
 
     const clearField = (fieldName: keyof FormFields) => {

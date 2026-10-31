@@ -1,14 +1,17 @@
-import { type VoidComponent, onSettled, Errored, Loading, type ParentComponent } from 'solid-js';
+import { type VoidComponent, onSettled, Loading, type ParentComponent, DEV } from 'solid-js';
 import { Router } from './router';
 import { commandManager } from './services/util/commandManager';
-import { selection, selectTournament } from './components/util/selection';
+import { selection, selectTournament, selTournament } from './components/util/selection';
 import { SidePanel } from './components/SidePanel';
 import { Dialogs } from './components/Dialogs';
-import { ErrorToast } from './components/misc/ErrorToast';
+// import { ErrorToast } from './components/misc/ErrorToast';
 import { restoreTournament } from './components/tournament/TournamentsStore';
 
 import styles from './App.module.css';
 import './index.css';
+
+import { installDiagnosticsBridge } from "@solidjs/diagnostics/browser";
+DEV && installDiagnosticsBridge();
 
 export type Params = {
     playerId?: string;
@@ -25,13 +28,13 @@ export type Searchs = {
 }
 
 const App: VoidComponent = () => (
-    <Errored fallback={(err) => <ErrorToast message={String(err())} />}>
+    // <Errored fallback={(err) => <ErrorToast message={String(err())} />}>
         <Loading fallback={'loading...'}>
             <Router>
                 {(props) => <Main {...props} />}
             </Router>
         </Loading>
-    </Errored>
+    // </Errored>
 );
 
 const Main: ParentComponent = (props) => {
@@ -78,7 +81,7 @@ const Main: ParentComponent = (props) => {
                     <button type="button" onclick={paste} ><i class='icon2-paste'/> Paste</button> */}
                 </div>
                 <div>
-                    selection: tournament={selection.tournament.id} player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
+                    selection: tournament={selTournament.id} player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
                 </div>
             </header>
             <div class="flex">

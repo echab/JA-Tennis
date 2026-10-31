@@ -37,7 +37,11 @@ body {
 button {
   padding: .5em;
   border-color: transparent;
+  &[disabled] {
+    opacity: .4;
+  }
 }
 button:not([disabled]):hover {
-  background-color: #ddd;
+  cursor: pointer;
+  background-color: #ddd5;
 }

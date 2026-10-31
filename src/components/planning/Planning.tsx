@@ -1,62 +1,40 @@
-import { Component, createMemo, For, onSettled, Show } from "solid-js";
-import { useLocation, useSearchParams, type RouteSectionProps } from "@solidjs/router";
-import type { Place } from "../../domain/tournament";
+import { type Component, createMemo, For, Show } from "solid-js";
+import { useLocation, useNavigate } from "@solidjs/router";
 import { matchesByDays } from "../../services/planningService";
 import { defined } from "../../services/util/object";
 import { DAYS, minutes } from "../../utils/date";
-import { Searchs } from "../../App";
 import { showDialog } from "../Dialogs";
-import { selection, selectDay, selectPlace } from "../util/selection";
+import { selectPlace, selTournament } from "../util/selection";
 import { PlanningSlot } from "./PlanningSlot";
 import { Router } from "../../router";
 
-type Data = {
+type Props = {
     short?: boolean;
+    day?: number,
+    urlNewDate: (day: number) => string,
 }
 
-export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) => {
+export const Planning: Component<Props> = (props) => {
 
     const location = useLocation();
-    const [search, _setSearch] = useSearchParams<Searchs>();
+    const navigate = useNavigate();
 
-    // init selection with url
-    onSettled(() => {
-        const day = parseInt(props.params.day ?? search.day ?? '0', 10);
-        selectDay(day);
-        // const place = props.params.place
-        //     ? selection.tournament.places?.find(({ name }) => name === props.params.place)
-        //     : undefined;
-    });
+    const editPlace = (iPlace?: number) => { selectPlace(iPlace); showDialog({ name: "place" }); };
 
-    // // change url on selection change
-    // const navigate = useNavigate();
-    // createEffect(() => ({ short: props.data?.short, day: selection.day, pathname: location.pathname }), ({ short, day, pathname }) => {
-    //     if (short) {
-    //         setSearch({ day });
-    //     } else {
-    //         const url = Router.paths.planning(day ?? 0)(location.query);
-    //         if (pathname.startsWith(Router.paths.planning(location.query)) && pathname !== url) {
-    //             navigate(url, { replace: true });
-    //         }
-    //     }
-    // });
+    const start = () => selTournament.info.start;
 
-    const editPlace = (place: Place) => { selectPlace(place); showDialog({ name: "place" }); };
-
-    const start = () => selection.tournament.info.start;
-
-    const slots = createMemo(() => matchesByDays(selection.tournament));
-    // const slots = () => matchesByDays(selection.tournament);
+    const slots = createMemo(() => matchesByDays(selTournament), { name: 'planningSlots'});
+    // const slots = () => matchesByDays(selTournament);
 
     const days = () => slots().map((_, i) => {
         const d0 = start();
         return d0 ? new Date(d0.getTime() + i * DAYS) : undefined
     }).filter(defined);
 
-    const daySlots = () => selection.day !== undefined ? slots()[selection.day] : [];
+    const daySlots = () => props.day !== undefined ? slots()[props.day] : [];
 
-    const prevDay = () => selection.day ? selection.day - 1 : undefined;
-    const nextDay = () => selection.day !== undefined && selection.day + 1 < slots().length ? selection.day + 1 : undefined;
+    const prevDay = () => props.day ? props.day - 1 : undefined;
+    const nextDay = () => props.day !== undefined && props.day + 1 < slots().length ? props.day + 1 : undefined;
 
     const hourStart = 8, hourEnd = 23;
     const hours = Array.from({ length: hourEnd - hourStart }, (_, i) => `${hourStart + i}h `);
@@ -64,18 +42,16 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
     return <>
         <div class="flex justify-between items-center px-2">
             <h3>Planning
-                <span class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ", 
+                <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ", 
                     { "pointer-events-none": prevDay() === undefined }]}
-                    onClick={() => selectDay(prevDay())}
-                    // disabled={!prevDay()}
-                    // href={urlDay(prevDay())} replace
+                    href={props.urlNewDate(prevDay() ?? 0)} replace
                     title="View the previous day of the tournament"
-                ><i class="icon2-left-arrow" /></span>
+                ><i class="icon2-left-arrow" /></a>
 
                 {/* {days()[selection.day ?? -1]?.toLocaleDateString(undefined, { dateStyle: props.data.short ? 'medium' : 'full' })} */}
                 <select class="border-0"
-                    value={selection.day}
-                    onChange={(evt) => selectDay(parseInt(evt.currentTarget.value ?? '0', 10))}
+                    value={props.day}
+                    onChange={(evt) => navigate(props.urlNewDate(parseInt(evt.currentTarget.value ?? '0', 10)), { replace: true })}
                 >
                     <For each={days()}>{(day, i) =>
                         // <option value={i()}>{day.toLocaleDateString(undefined, { dateStyle: 'full' })}</option>
@@ -83,31 +59,29 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
                     }</For>
                 </select>
 
-                <span class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ",
+                <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ",
                     { "pointer-events-none": nextDay() === undefined }]}
-                    onClick={() => selectDay(nextDay())}
-                    // disabled={!nextDay()}
-                    // href={urlDay(nextDay())} replace
+                    href={props.urlNewDate(nextDay() ?? 0)} replace
                     title="View the next day of the tournament"
-                ><i class="icon2-right-arrow" /></span>
+                ><i class="icon2-right-arrow" /></a>
             </h3>
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
-            <Show when={props.data?.short}>
-                <a href={Router.paths.planning(selection.day ?? '')(location.query)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
+            <Show when={props.short}>
+                <a href={Router.paths.planning(props.day ?? '')(location.query)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
             </Show>
         </div>
 
         <ul class="grid gap-0.5"
             style={{
                 'grid-template-rows': `[place] 1em repeat(${(hours.length + 1) * 12}, 1px`,
-                'grid-template-columns': `[hour] 2em repeat(${(selection.tournament.places?.length ?? 0) + 1}, minmax(5em, 1fr))`
+                'grid-template-columns': `[hour] 2em repeat(${(selTournament.places?.length ?? 0) + 1}, minmax(5em, 1fr))`
             }} >
-            <For each={selection.tournament.places}>{(place, i) =>
+            <For each={selTournament.places}>{(place, i) =>
                 <li class='row-[place]' style={{
                     'grid-column-start': i() + 2
                 }}>
-                    <i class="icon2-info hover" onClick={[editPlace, place]} />
+                    <i class="icon2-info hover" onClick={[editPlace, i]} />
                     {place.name}
                 </li>
             }</For>
@@ -120,8 +94,8 @@ export const Planning: Component<RouteSectionProps<Data | undefined>> = (props) 
             }</For>
 
             <For each={daySlots()}>{(slot) =>
-                <PlanningSlot slot={slot} tournament={selection.tournament} style={{
-                    'grid-column': 2 + (slot.match.place ?? selection.tournament.places?.length ?? 0),
+                <PlanningSlot slot={slot} tournament={selTournament} style={{
+                    'grid-column': 2 + (slot.match.place ?? selTournament.places?.length ?? 0),
                     'grid-row': `${2 + Math.round( ((minutes(slot.match.date) ?? hourEnd * 60) - hourStart * 60)/ 5)}/span 18`,
                 }} />
             }</For>

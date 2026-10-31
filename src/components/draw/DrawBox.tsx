@@ -2,45 +2,42 @@ import { Component, Show } from 'solid-js';
 import { selection } from '../util/selection';
 import type { Match, PlayerIn } from '../../domain/draw';
 import type { Player } from '../../domain/player';
-import { byId } from '../../services/util/find';
 import { isMatch } from '../../services/drawService';
 import './Draw.css';
 
 type BoxProps = {
     box?: PlayerIn & Match;
-    players: Player[];
+    player?: Player;
 }
 
 export const DrawBox: Component<BoxProps> = (props) => {
-    return <Show when={props.box} fallback={<div />}>{(b) => {
+    return <Show when={props.box} keyed fallback={<div />}>{(box) => {
 
-        const p = byId(props.players, b().playerId);
-
-        const match = isMatch(b());
+        const match = isMatch(box);
         return <div
             class={["boite joueur",
             {
                 match,
                 inPlayer: !match,
-                played: match && !!(b() as Match).score,
-                hidden: !!b().hidden,
-                selected: b().position === selection.box?.position,
+                played: match && !!box.score,
+                hidden: !!box.hidden,
+                selected: box.position === selection.box?.position,
                 // error:
             }]}
             // title={error ? error.message +' '+ error.detail : ''}
             // onclick={selectBox(event, draw, box)}
         >
-            <Show when={b().qualifIn}><span class="qe">Q{b().qualifIn === -1 ? '?' : b().qualifIn}</span></Show>
-            <Show when={b().seeded}><span class="ts">{b().seeded}</span></Show>
-            <span class="nom">{p?.name ?? ''}</span>
-            <Show when={b().order && p?.rank}><span class="classement">{p!.rank}</span></Show>
-            <Show when={b().qualifOut}><span class="qs">Q{b().qualifOut}</span></Show>
+            <Show when={box.qualifIn}><span class="qe">Q{box.qualifIn === -1 ? '?' : box.qualifIn}</span></Show>
+            <Show when={box.seeded}><span class="ts">{box.seeded}</span></Show>
+            <span class="nom">{props.player?.name ?? ''}</span>
+            <Show when={box.order && props.player?.rank}><span class="classement">{props.player!.rank}</span></Show>
+            <Show when={box.qualifOut}><span class="qs">Q{box.qualifOut}</span></Show>
             <br />
-            <Show when={b().order} fallback={
-                <Show when={b().score} fallback={
-                    <Show when={b().date}><span class="date">{b().date?.toLocaleString()}</span></Show>
-                }><span class="score">{b().score}</span></Show>
-            }><span class="club">{p?.club ?? ''}</span></Show>
+            <Show when={box.order} fallback={
+                <Show when={() => box.score} fallback={
+                    <Show when={box.date}><span class="date">{box.date?.toLocaleString()}</span></Show>
+                }><span class="score">{box.score}</span></Show>
+            }><span class="club">{props.player?.club ?? ''}</span></Show>
         </div>;
         }}
     </Show>

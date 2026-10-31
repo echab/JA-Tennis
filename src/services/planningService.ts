@@ -11,9 +11,12 @@ const MAX_TIME = MAX_JOUR * DAYS;
 export function updatePlace(place: Place): Command {
     const prev = selection.place && { ...selection.place };
 
-    const act = () => setSelection((sel) => {
-        sel.place = place;
-    });
+    const act = () => {
+        //TODO setTournament((t) => {});
+        setSelection((sel) => {
+            sel.place = place;
+        });
+    };
     act();
 
     const undo = () => setSelection((sel) => {

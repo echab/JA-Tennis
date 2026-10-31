@@ -1,5 +1,5 @@
 import { createStore } from "solid-js";
-import { useLocation } from "@solidjs/router";
+import type { SearchParams } from "@solidjs/router";
 import type { Draw, Match, PlayerIn } from "../../domain/draw";
 import type { Player } from "../../domain/player";
 import type { Place, TEvent, Tournament } from "../../domain/tournament";
@@ -10,9 +10,45 @@ import { validateDraw, validatePlayer } from "../../services/validationService";
 import { minutes } from "../../utils/date";
 import { emptyTournament } from "../../assets/data";
 import { Router } from "../../router";
+import { byId } from "../../services/util/find";
+
+// create a store for the tournament to use reconcile() on load
+export const [selTournament, setTournament] = createStore<Tournament>(emptyTournament, null, { name: 'selTournament'});
+
+export function setTournamentEvent(eventId: string, cb: (event: TEvent) => void) {
+    setTournament((t) => {
+        const evt = t.events.find((e) => e.id === eventId);
+        if (evt) {
+            cb(evt);
+        }
+    });
+}
+
+export function setTournamentDraw(eventId: string, drawId: string, cb: (draw: Draw) => void) {
+    setTournament((t) => {
+        const evt = t.events.find((e) => e.id === eventId);
+        if (evt) {
+            const draw = evt.draws.find((d) => d.id === drawId);
+            if (draw) {            
+                cb(draw);
+            }
+        }
+    });
+}
+
+export function setTournamentBox(eventId: string, drawId: string, i: number, cb: (boxes: Array<PlayerIn | Match>, i: number) => void) {
+    setTournament((t) => {
+        const evt = t.events.find((e) => e.id === eventId);
+        if (evt) {
+            const draw = evt.draws.find((d) => d.id === drawId);
+            if (draw) {            
+                cb(draw.boxes, i);
+            }
+        }
+    });
+}
 
 export interface SelectionItems {
-    tournament: Tournament;
     player?: Player;
     event?: TEvent;
     draw?: Draw;
@@ -25,15 +61,15 @@ export interface SelectionItems {
     drawProblems: Map<string, DrawProblem[]>;
 }
 
-export const [selection, setSelection] = createStore<SelectionItems>(async () => ({
-    tournament: await emptyTournament(),
+export const [selection, setSelection] = createStore<SelectionItems>({
     playerProblems: new Map(),
     drawProblems: new Map(),
-}), {}, { shallow: false, name: 'selectionStore' });
+}, { shallow: true, name: 'selectionStore' });
 
 export function selectTournament(tournament: Tournament) {
+    setTournament(() => tournament);
+
     setSelection((sel) => {
-        sel.tournament = tournament;
         sel.player = undefined;
         sel.event = undefined;
         sel.draw = undefined;
@@ -43,22 +79,23 @@ export function selectTournament(tournament: Tournament) {
         sel.place = undefined;
 
         sel.playerProblems = new Map(
-            tournament.players.map<[string, PlayerProblem[]]>((player) => [player.id, validatePlayer(tournament, player)])
+            tournament.players.map((player) => [player.id, validatePlayer(tournament, player)] as const)
                 .filter(([, err]) => err.length)
         );
         // sel.drawProblems.clear();
         sel.drawProblems = new Map(
             tournament.events.flatMap((event) => event.draws
-                .map<[string, DrawProblem[]]>((draw) => [`${draw.id}-${event.id}`, validateDraw(tournament, event, draw)])
+                .map((draw) => [`${draw.id}-${event.id}`, validateDraw(tournament, event, draw)] as const)
                 .filter(([, err]) => err.length)
             )
         );
     });
 }
 
-export function selectPlayer(player?: Player): void {
+export function selectPlayer(playerId?: string): void {
     setSelection((sel) => {
-        sel.player = player;
+        // sel.player = selTournament.players.find((p) => p.id === playerId);
+        sel.player = byId(selTournament.players, playerId);
     });
 }
 
@@ -68,50 +105,28 @@ export function selectDay(day?: number): void {
     });
 }
 
-export function selectPlace(place?: Place): void {
+export function selectPlace(i?: number): void {
     setSelection((sel) => {
-        sel.place = place;
+        sel.place = selTournament.places?.[i ?? -1];
     });
 }
 
-export function selectEvent(event?: TEvent): void {
+export function selectDraw(eventId?: string, drawId?: string): void {
     setSelection((sel) => {
-        sel.event = event;
-        sel.draw = undefined;
+        // const { draw, event } = drawById(drawId, eventId);
+        sel.event = selTournament.events.find((e) => e.id === eventId);
+        sel.draw = drawId ? sel.event?.draws.find((d) => d.id === drawId) : undefined;
         sel.box = undefined;
         sel.boxQ = undefined;
     });
 }
 
-export function selectDraw(event?: TEvent, draw?: Draw): void {
-    if (event) {
-        if (draw && draw.id !== selection.draw?.id) {
-            // first unselect the previous one // TODO: should not be necessary
-            setSelection((sel) => {
-                sel.event = event;
-                sel.draw = undefined;
-                sel.box = undefined;
-                sel.boxQ = undefined;
-            });
-        }
-    } else {
-        draw = undefined;
-    }
+export function selectBox(eventId?: string, drawId?: string, boxPos?: number): void {
     setSelection((sel) => {
-        sel.event = event;
-        sel.draw = draw;
-        sel.box = undefined;
-        sel.boxQ = undefined;
-    });
-}
-
-export function selectBox(event: TEvent, draw: Draw, box?: PlayerIn | Match): void {
-    // TODO should navigate, effect?
-    setSelection((sel) => {
-        sel.event = event;
-        sel.draw = draw;
-        sel.box = box;
-        sel.boxQ = box ? groupFindQ(event, draw, box) : undefined;
+        const evt = sel.event = eventId ? selTournament.events.find((e) => e.id === eventId) : undefined;
+        const drw = sel.draw = drawId ? evt?.draws.find((d) => d.id === drawId) : undefined;
+        const box = sel.box = boxPos ? drw?.boxes.find((b) => b.position === boxPos) : undefined;
+        sel.boxQ = box && evt && drw ? groupFindQ(evt, drw, box) : undefined;
     });
 }
 
@@ -138,7 +153,7 @@ export function isDrawError(error: PlayerProblem | DrawProblem): error is DrawPr
 export function drawById(idDraw: string, parent?: string | Tournament): { draw?: Draw, event?: TEvent } {
     // eslint-disable-next-line prefer-const
     let [idDraw2, idEvent2 /* , idTournament */] = idDraw.split('-');
-    let tournament = selection.tournament;
+    let tournament: Tournament = selTournament;
     if (parent) {
         if (typeof parent === 'string') {
             idEvent2 = parent;
@@ -152,18 +167,16 @@ export function drawById(idDraw: string, parent?: string | Tournament): { draw?:
 }
 
 // TODO could return URL and preserve current search
-export function urlBox(box: PlayerIn | Match | undefined, draw: Draw, event: TEvent, tournament: Tournament, scroll?: boolean) {
-
-    const location = useLocation();
+export function urlBox(box: PlayerIn | Match | undefined, draw: Draw, event: TEvent, tournament: Tournament, query?: SearchParams, scroll?: boolean) {
 
     const search = box && isMatch(box) ? {
-        ...location.query,
+        ...query,
         day: dayOf(box.date, tournament.info),
         hour: minutes(box.date),
         place: box.place,
         playerId: box.playerId,
     } : {
-        ...location.query,
+        ...query,
         playerId: box?.playerId
     };
 

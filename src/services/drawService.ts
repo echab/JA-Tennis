@@ -1,15 +1,15 @@
+import { snapshot } from "solid-js";
 import { byId, indexOf } from "./util/find";
 import { guid } from "./util/guid";
 import { ASSERT, shuffle } from "../utils/tool";
-
 import { type Box, type Draw, KNOCKOUT, type Match, type PlayerIn, QEMPTY } from "../domain/draw";
 import type { TEvent } from "../domain/tournament";
 import type { OptionalId } from "../domain/object";
 import type { Command } from "./util/commandManager";
-import { selection, setSelection } from "../components/util/selection";
+import { selectBox, selectDraw, selection, setTournamentBox, setTournamentEvent } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
 import type { Player } from "../domain/player";
-import { defined } from "./util/object";
+import { applyChanges, applyChangesAt, defined } from "./util/object";
 import type { DataType } from "../domain/types";
 
 const MAX_TETESERIE = 32,
@@ -21,83 +21,62 @@ export function updateDraws(
 ): Command {
     const draw = draws[0]; // TODO use all draws (generated round robin)
     const id = draw.id;
-    if (!id) {
-        draw.id = guid("d");
-    }
+    draw.id ??= guid("d");
     const d = draw as Draw;
     const i = id ? indexOf(event.draws, "id", id) : -1;
-    // const prev = id ? { ...event.draws[i] } : undefined; // clone
-    const prev = id ? event.draws[i] : undefined;
+    const prev = id ? snapshot(event.draws[i]) : undefined;
 
-    const act = () => setSelection((sel) => {
-        sel.event = event;
-        sel.draw = d;
-        if (!id) {
-            sel.event.draws.push(d);
-        } else {
-            sel.event.draws[i] = d;
-        }
-    });
-    // const newSel = {
-    //     ...selection,
-    //     event: {
-    //         ...event,
-    //         draws: i === -1
-    //             ? [...event.draws, d]
-    //             : event.draws.map((dd,ii) => ii === i ? d : dd),
-    //     },
-    //     draw: d,
-    // };
-    // const act = () => setSelection(reconcile(newSel));
+    const act = () => {
+        setTournamentEvent(event.id, (evt) => {
+            applyChangesAt(evt.draws, i, d);
+        });
+        selectDraw(event.id, draw.id);
+    };
     act();
 
-    const undo = () => setSelection((sel) => {
-        sel.event = event;
-        sel.draw = prev;
-        if (prev) {
-            sel.event.draws[i] = prev;
-        } else {
-            sel.event.draws.pop();
-        }
-    });
+    const undo = () => {
+        setTournamentEvent(event.id, (evt) => {
+            applyChangesAt(evt.draws, i, prev);
+        });
+        selectDraw(event.id, prev?.id);
+    };
 
     return { name: `Add draw ${draw.name}`, act, undo };
 }
 
 export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
     // const id = match.id;
-    // if (!id) {
-    //   match.id = guid("b");
-    // }
+    // match.id ??= guid("b");
     const i = indexOf(draw.boxes, "position", match.position);
-    const prev = { ...draw.boxes[i] } as Match; // clone
+    const prev = snapshot(draw.boxes[i]) as Match; // clone
     const lib = drawLib(event, draw);
 
-    const prevBoxQ = groupFindQ(event, draw, match);
+    const prevBoxQ = snapshot(groupFindQ(event, draw, match));
 
-    const act = () => setSelection((sel) => {
-        sel.event = event;
-        sel.draw = draw;
-        sel.box = sel.draw.boxes[i];
-        sel.boxQ = prevBoxQ;
-        if (!sel.box || !isMatch(sel.box)) {
-            throw new Error("updateMatch without selected match");
-        }
-        sel.draw.boxes[i] = match;
-        lib.putResult(sel.box, match, sel.boxQ);
-    });
+    const act = () => {
+        setTournamentBox(event.id, draw.id, i, (boxes) => {
+            const box = boxes[i];
+            if (!box || !isMatch(box)) {
+                throw new Error("updateMatch without selected match");
+            }
+            applyChanges(box, match); // boxes[i] = match;
+            lib.putResult(box, match, prevBoxQ);
+        });
+        selectBox(event.id, draw.id, match.position);
+    };
     act();
 
-    const undo = () => setSelection((sel) => {
-        sel.event = event;
-        sel.draw = draw;
-        sel.box = sel.draw.boxes[i];
-        sel.boxQ = prevBoxQ;
-        if (!sel.box || !isMatch(sel.box)) {
-            throw new Error("updateMatch without selected match");
-        }
-        lib.putResult(sel.box, prev, sel.boxQ);
-    });
+    const undo = () => {
+        setTournamentBox(event.id, draw.id, i, (boxes) => {
+            const box = boxes[i];
+            if (!box || !isMatch(box)) {
+                throw new Error("updateMatch without selected match");
+            }
+            applyChanges(box, prev); // boxes[i] = prev;
+            lib.putResult(box, prev, prevBoxQ);
+        });
+        selectBox(event.id, draw.id, match.position);
+    };
 
     return { name: `Match result ${match.position}`, act, undo }; // TODO
 }
@@ -124,7 +103,7 @@ export function newDraw({ rank }: DataType, parent: TEvent, source?: OptionalId<
     return draw;
 }
 
-export function deleteDraw(drawId: string): Command {
+export function deleteDraw(eventId: string, drawId: string): Command {
     const event = selection.event;
     if (!event) {
         throw new Error('No selected event');
@@ -133,22 +112,24 @@ export function deleteDraw(drawId: string): Command {
         event.draws,
         "id",
         drawId,
-        "Player to remove not found",
+        "Draw to be removed not found",
     );
-    const prevDraw = event.draws[i];
+    const prevDraw = snapshot(event.draws[i]);
 
-    const act = () => setSelection((sel) => {
-        sel.event = event;
-        sel.event.draws.splice(i, 1);
-        sel.draw = event.draws.at(i);
-    });
+    const act = () => {
+        setTournamentEvent(eventId, (event) => {
+            event.draws.splice(i, 1);
+        });
+        selectDraw(eventId);
+    };
     act();
 
-    const undo = () => setSelection((sel) => {
-        sel.event = event;
-        sel.event.draws.splice(i, 0, prevDraw);
-        sel.draw = prevDraw;
-    });
+    const undo = () => {
+        setTournamentEvent(eventId, (event) => {
+            event.draws.splice(i, 0, prevDraw);
+        });
+        selectDraw(eventId, prevDraw.id);
+    };
 
     return { name: `Remove draw ${prevDraw.name}`, act, undo };
 }
@@ -176,14 +157,6 @@ export function newBox<T extends Box = Box>(
     return box;
 }
 
-// export function validate(draw: Draw): void {
-//   _validateDraw(draw);
-// }
-
-// export function generate(draw: Draw, generate?: GenerateType): void {
-//   _updateDraw(draw, undefined, generate || GenerateType.Create);
-// }
-
 /** A match, with a score field */
 export function isMatch(box: PlayerIn | Match | undefined): box is Match {
     return box !== undefined && (box as Match).score !== undefined;
@@ -191,7 +164,7 @@ export function isMatch(box: PlayerIn | Match | undefined): box is Match {
 
 /** A input player, without a score field */
 export function isPlayerIn(box: PlayerIn | Match | undefined): box is PlayerIn {
-    return box !== undefined && (box as Match).score !== undefined;
+    return box !== undefined && (box as Match).score === undefined;
 }
 
 export function _updateQualif(event: TEvent, draw: Draw): void {

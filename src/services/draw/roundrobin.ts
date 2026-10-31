@@ -228,9 +228,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
             let draw: Draw;
             if (t === 0) {
                 draw = refDraw as Draw;
-                if (!draw.id) {
-                    draw.id = guid('d');
-                }
+                draw.id ??= guid('d');
             } else {
                 draw = newDraw(types, event, refDraw);
                 draw.cont = true;

@@ -53,7 +53,7 @@ export function storeTournament(tournament: Tournament): StoredTournament {
 }
 
 export function restoreTournament(id?: string): Promise<Tournament> {
-    const t = _storedTournaments.find((t) => t.id === id);
+    const t = id ? _storedTournaments.find((t) => t.id === id) : _storedTournaments[0];
     // TODO binary/base64 instead of json
     return t ? deserializeTournament(t.content) : mockTournament();
 }

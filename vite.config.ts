@@ -10,8 +10,8 @@ export default defineConfig((env) => ({
   plugins: [
     solid({
       start: true,
-      hot: env.mode !== 'test', // no HMR for tests
-      diagnostics: false,
+      refresh: env.mode !== 'test', // no HMR for tests
+      diagnostics: true, // http://localhost:3000/__solid/diagnostics
     }),
     tailwindcss(),
     // eslint(),

@@ -1,6 +1,6 @@
-import { selection } from "../../components/util/selection";
-import { Player } from "../../domain/player";
-import { TEvent } from "../../domain/tournament";
+import { selTournament } from "../../components/util/selection";
+import type { Player } from "../../domain/player";
+import type { TEvent } from "../../domain/tournament";
 import { byId } from "./find";
 
 // let current: {type: string, id: string}; // TODO use on over to check drop validity
@@ -27,7 +27,7 @@ export function getDragPlayer(evt: DragEvent): Player | undefined {
     if (evt.dataTransfer) {
         const [type, id] = evt.dataTransfer.getData("text/plain").split("-");
         if (type === "player") {
-            return byId(selection.tournament.players, id);
+            return byId(selTournament.players, id);
         }
     }
 }
@@ -36,7 +36,7 @@ export function getDropEvent(evt: DragEvent): TEvent | undefined {
     const t = evt.currentTarget as unknown as HTMLOrSVGElement;
     const { type, id } = t.dataset;
     if (id && type === "event") {
-        return byId(selection.tournament.events, id);
+        return byId(selTournament.events, id);
     }
 }
 
@@ -47,7 +47,7 @@ export function getDropPlayer(evt: DragEvent): Player | undefined {
     if (t.ondrop) {
         const { type, id } = t.dataset;
         if (id && type === "player") {
-            return byId(selection.tournament.players, id);
+            return byId(selTournament.players, id);
         }
     }
 }

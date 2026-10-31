@@ -1,20 +1,18 @@
 import { Match, Switch, type ParentComponent } from "solid-js";
-import { useLocation, useParams, useSearchParams } from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
 import { errorCount } from "../services/validationService";
 import { Problems } from "./Problems";
-import { Events } from "./event/Events";
-import { Players } from "./player/Players";
+import { SideEvents } from "./event/SideEvents";
+import { SidePlayers } from "./player/SidePlayers";
 import { Tournaments } from "./tournament/Tournaments";
 import { Badge } from "./misc/Badge";
 import { selection } from "./util/selection";
-import { Planning } from "./planning/Planning";
+import { SidePlanning } from "./planning/SidePlanning";
 import { Settings } from "./Settings";
-import type { Params, Searchs } from "../App";
+import type { Searchs } from "../App";
 
 export const SidePanel: ParentComponent = () => {
 
-    const params = useParams<Params>();
-    const location = useLocation();
     const [search] = useSearchParams<Searchs>();
     const buildSearch = (pane: Searchs['pane']) => {
         const s = { ...search};
@@ -25,8 +23,6 @@ export const SidePanel: ParentComponent = () => {
         }
         return `?${new URLSearchParams(s).toString()}`;
     }
-
-    const routeSectionProps = { params, location, data:{} };
 
     return <aside class={["flex flex-row bg-slate-100 border-r border-slate-300 print:hidden",
         {
@@ -81,9 +77,9 @@ export const SidePanel: ParentComponent = () => {
         <div class="grow overflow-x-auto">
             <Switch>
                 <Match when={search.pane === 'tournament'}><Tournaments /></Match>
-                <Match when={search.pane === 'players'}><Players {...routeSectionProps} data={{short: true}} /></Match>
-                <Match when={search.pane === 'events'}><Events {...routeSectionProps} /></Match>
-                <Match when={search.pane === 'planning'}><Planning {...routeSectionProps} data={{short: true}} /></Match>
+                <Match when={search.pane === 'players'}><SidePlayers /></Match>
+                <Match when={search.pane === 'events'}><SideEvents /></Match>
+                <Match when={search.pane === 'planning'}><SidePlanning /></Match>
                 <Match when={search.pane === 'problems'}><Problems /></Match>
                 <Match when={search.pane === 'settings'}><Settings /></Match>
             </Switch>

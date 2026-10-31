@@ -2,7 +2,7 @@ import { useNavigate } from "@solidjs/router";
 import { Component, For, Show } from "solid-js";
 import { openFile, saveFile } from "../../services/file/file";
 import { showDialog } from "../Dialogs";
-import { selection } from "../util/selection";
+import { selectTournament, selTournament } from "../util/selection";
 import { clearStoredTournaments, listStoredTournaments, restoreTournament, storeTournament } from "./TournamentsStore";
 import { dateLocal } from "../../utils/date";
 import type { Tournament } from "../../domain/tournament";
@@ -17,6 +17,7 @@ export const Tournaments: Component = () => {
             name: "new",
             onOk(t: Tournament) {
                 storeTournament(t);
+                selectTournament(t);
                 navigate(Router.paths({ pane: 'tournament' }));
             },
         });
@@ -25,11 +26,12 @@ export const Tournaments: Component = () => {
     const loadFile = async () => {
         const t = await openFile();
         storeTournament(t);
+        selectTournament(t);
         navigate(Router.paths({ pane: 'tournament' }));
     };
 
     const saveTheFile = async () => {
-        await saveFile(selection.tournament);
+        await saveFile(selTournament);
     };
 
     const clearStorage = async () => {
@@ -46,7 +48,7 @@ export const Tournaments: Component = () => {
         <h3>Tournmanent</h3>
         <span>
             <button type="button" onClick={[showDialog, { name: "info" }]}><i class="icon2-info" /></button>
-            {selection.tournament.info.name}
+            {selTournament.info.name}
         </span>
 
         <div>

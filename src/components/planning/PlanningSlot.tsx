@@ -1,5 +1,6 @@
 import { type Component, Show, untrack } from "solid-js";
 import type { JSX } from '@solidjs/web';
+import { useLocation } from "@solidjs/router";
 import type { Player } from "../../domain/player";
 import type { Slot, Tournament } from "../../domain/tournament";
 import { byId } from "../../services/util/find";
@@ -20,14 +21,14 @@ const SlotPlayer: Component<PlayerProps> = (props) => <>
     }} />
     {/* {props.qualifIn !== undefined ? `Q${props.qualifIn > 0 ? props.qualifIn : ''} ` : ''} */}
     {props.player ? `${props.player.name} ${props.player.firstname?.[0] ?? ''}` : ''}
-    <Show when={props.player}>
+    <Show when={props.player?.id} keyed>{(id) =>
         <i class="icon2-player hover cursor-pointer" title={`Edit the ${props.player?.teamIds ? 'team' : 'player'}`}
             onClick={() => {
-                selectPlayer(props.player);
+                selectPlayer(id);
                 showDialog({ name: "player" });
             }}
         />
-    </Show>
+    }</Show>
 </>;
 
 type Props = {
@@ -38,6 +39,8 @@ type Props = {
 
 export const PlanningSlot: Component<Props> = (props) => {
 
+    const location = useLocation();
+    
     const { player1, player2, match } = untrack(() => props.slot);
 
     const [p1, p2] = untrack(() => [
@@ -59,12 +62,12 @@ export const PlanningSlot: Component<Props> = (props) => {
         {/* ({match.date!.toLocaleString()}) */}
         {/* {match.date!.toLocaleDateString()} */}
         {/* - {match.place} */}
-        <a href={urlBox(match, props.slot.draw, props.slot.event, props.tournament)} title="View in draw" class="hover">
+        <a href={urlBox(match, props.slot.draw, props.slot.event, props.tournament, location.query)} title="View in draw" class="hover">
             <i class="icon2-draw"/>
         </a>
         <span class="cursor-pointer" title="Edit the match"
             onClick={() => {
-                selectBox(props.slot.event, props.slot.draw, match);
+                selectBox(props.slot.event.id, props.slot.draw.id, match.position);
                 showDialog({ name: "match" });
             }}
         >

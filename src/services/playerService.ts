@@ -1,4 +1,5 @@
-import { selection, setSelection } from "../components/util/selection";
+import { snapshot } from "solid-js";
+import { selectPlayer, selTournament, setTournament } from "../components/util/selection";
 import type { OptionalId } from "../domain/object";
 import type { Player } from "../domain/player";
 import type { TEvent } from "../domain/tournament";
@@ -6,6 +7,7 @@ import { removeValue } from "./util/array";
 import type { Command } from "./util/commandManager";
 import { indexOf } from "./util/find";
 import { guid } from "./util/guid";
+import { applyChangesAt } from "./util/object";
 
 export function updatePlayer(
     player: OptionalId<Player>,
@@ -13,31 +15,24 @@ export function updatePlayer(
     // const p: Player = { ...player, id: guid("p") }; // clone source
     const p = player as Player;
     const id = player.id;
-    if (!id) {
-        player.id = guid("p");
-    }
-    const i = id ? indexOf(selection.tournament.players, "id", id) : -1;
-    // const prev = id ? { ...selection.tournament.players[i] } : undefined; // clone
-    const prev = id ? selection.tournament.players[i] : undefined;
+    player.id ??= guid("p");
+    const i = id ? indexOf(selTournament.players, "id", id) : -1;
+    const prev = snapshot<Player | undefined>(selTournament.players[i]);
 
-    const act = () => setSelection((sel) => {
-        if (!id) {
-            sel.tournament.players.push(p);
-        } else {
-            sel.tournament.players[i] = p;
-        }
-        sel.player = p;
-    });
+    const act = () => {
+        setTournament((t) => {
+            applyChangesAt(t.players, i, p);
+        });
+        selectPlayer(p.id);
+    };
     act();
 
-    const undo = () => setSelection((sel) => {
-        if (prev) {
-            sel.tournament.players[i] = prev;
-        } else {
-            sel.tournament.players.pop();
-        }
-        sel.player = sel.tournament.players.at(i);
-    });
+    const undo = () => {
+        setTournament((t) => {
+            applyChangesAt(t.players, i, prev);
+        });
+        selectPlayer(prev?.id);
+    };
 
     return { name: `Add player ${player.name}`, act, undo };
 }
@@ -45,38 +40,40 @@ export function updatePlayer(
 export function deletePlayer(
     playerId: string,
 ): Command {
-    const tournament = selection.tournament;
-
     const i = indexOf(
-        tournament.players,
+        selTournament.players,
         "id",
         playerId,
         "Player to remove not found",
     );
-    const prevPlayer = tournament.players[i];
-    const prevBoxes = tournament.events.flatMap((event, e) =>
+    const prevPlayer = snapshot(selTournament.players[i]);
+    const prevBoxes = selTournament.events.flatMap((event, e) =>
         event.draws.flatMap((draw, d) =>
             draw.boxes.filter((box) => box.playerId === playerId)
                 .map((_, b) => ({ e, d, b }))
         )
     );
 
-    const act = () => setSelection((sel) => {
-        sel.tournament.players.splice(i, 1);
-        for (const { e, d, b } of prevBoxes) {
-            sel.tournament.events[e].draws[d].boxes[b].playerId = "";
-        }
-        sel.player = sel.tournament.players.at(i);
-    });
+    const act = () => {
+        setTournament((t) => {
+            t.players.splice(i, 1);
+            for (const { e, d, b } of prevBoxes) {
+                t.events[e].draws[d].boxes[b].playerId = "";
+            }
+        });
+        selectPlayer();
+    };
     act();
 
-    const undo = () => setSelection((sel) => {
-        sel.tournament.players.splice(i, 0, prevPlayer);
-        for (const { e, d, b } of prevBoxes) {
-            sel.tournament.events[e].draws[d].boxes[b].playerId = playerId;
-        }
-        sel.player = prevPlayer;
-    });
+    const undo = () => {
+        setTournament((t) => {
+            t.players.splice(i, 0, prevPlayer);
+            for (const { e, d, b } of prevBoxes) {
+                t.events[e].draws[d].boxes[b].playerId = playerId;
+            }
+        });
+        selectPlayer(prevPlayer.id);
+    };
 
     return { name: `Remove player ${prevPlayer.name}`, act, undo };
 }
@@ -86,32 +83,35 @@ export function registerPlayer(
     event: TEvent,
     register = true,
 ): Command {
-    const iPlayer = indexOf(selection.tournament.players, "id", player.id);
+    const iPlayer = indexOf(selTournament.players, "id", player.id);
     const eventId = event.id;
 
-    const prev = [...selection.tournament.players[iPlayer].registration]; // clone
+    const prev = snapshot(selTournament.players[iPlayer].registration);
 
     // TODO check compatibility
     // isSexeCompatible(event, player.sexe)
 
-    const act = () => setSelection((sel) => {
-        const p = sel.tournament.players[iPlayer];
-        if (register) {
-            if (!p.registration.includes(eventId)) {
-                p.registration.push(eventId);
+    const act = () => {
+        setTournament((t) => {
+            const p = t.players[iPlayer];
+            if (register) {
+                if (!p.registration.includes(eventId)) {
+                    p.registration.push(eventId);
+                }
+            } else {
+                removeValue(p.registration, eventId);
             }
-        } else {
-            removeValue(p.registration, eventId);
-        }
-        sel.player = p;
-    });
+        });
+        selectPlayer(player.id);
+    };
     act();
 
-    const undo = () => setSelection((sel) => {
-        const p = sel.tournament.players[iPlayer];
-        p.registration = [...prev]; // clone again?
-        sel.player = p;
-    });
+    const undo = () => {
+        setTournament((t) => {
+            t.players[iPlayer].registration = prev;
+        });
+        selectPlayer(player.id);
+    };
 
     return {
         name: `${

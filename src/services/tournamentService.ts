@@ -1,3 +1,4 @@
+import { reconcile, snapshot } from "solid-js";
 import { guid } from "./util/guid";
 import { shuffle } from "../utils/tool";
 import { loadType, TYPES } from "./types";
@@ -5,7 +6,7 @@ import type { Player } from "../domain/player";
 import type { Tournament, TournamentInfo, TEvent, TypeName } from "../domain/tournament";
 import type { DataType, RankString } from "../domain/types";
 import type { Command } from "./util/commandManager";
-import { selection, setSelection } from "../components/util/selection";
+import { selTournament, setSelection, setTournament } from "../components/util/selection";
 import { type Draw, FINAL } from "../domain/draw";
 import { reviverDates } from "../utils/date";
 import { deserializeTournament, serializeTournament } from "../components/tournament/TournamentsStore";
@@ -67,7 +68,7 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
 
 export async function save(tournament: Tournament, url?: string) {
     //   if (!tournament) {
-    //     tournament = selection.tournament;
+    //     tournament = selTournament;
     //   }
 
     // const data = {};
@@ -88,7 +89,7 @@ export async function save(tournament: Tournament, url?: string) {
 export function createTournament(onOk: (newTournament: Tournament) => void) {
     return (infoAndType: TournamentInfo & Partial<TypeName>): Command => {
         const { _typeName, ...info } = infoAndType;
-        const prev = selection.tournament;
+        const prev = snapshot(selTournament);
 
         const act = async () => {
             const newOne = await reviveTournament({
@@ -100,7 +101,7 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
                 events: [],
             });
             setSelection((sel) => {
-                sel.tournament = newOne;
+                setTournament(reconcile(newOne));
                 sel.event = sel.player = sel.place = sel.draw = undefined;
             });
             onOk(newOne);
@@ -108,7 +109,8 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
         act(); // TODO? await
 
         const undo = () => setSelection((sel) => {
-            sel.tournament = prev;
+            setTournament(reconcile(prev));
+            sel.event = sel.player = sel.place = sel.draw = undefined;
             onOk(prev);
         });
 
@@ -117,15 +119,15 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
 }
 
 export function updateInfo(info: TournamentInfo): Command {
-    const prev = { ...selection.tournament.info };
+    const prev = snapshot(selTournament.info);
 
-    const act = () => setSelection((sel) => {
-        sel.tournament.info = info;
+    const act = () => setTournament((t) => {
+        t.info = info;
     });
     act();
 
-    const undo = () => setSelection((sel) => {
-        sel.tournament.info = prev;
+    const undo = () => setTournament((t) => {
+        t.info = prev;
     });
 
     return { name: 'Update info', act, undo };

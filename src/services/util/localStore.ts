@@ -22,6 +22,6 @@ export function createLocalStore<T extends object>(
     , { name: 'localStore' });
     createEffect(() => state, (state) => {
         localStorage.setItem(name, JSON.stringify(state, options?.replacer, options?.space));
-    });
+    }, { name: 'localStoreEffect' });
     return [state, setState];
 }

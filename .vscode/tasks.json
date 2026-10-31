@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Dev",
+            "icon": { "id": "play" },
+            "type": "shell",
+            "command": "pnpm run dev",
+            "options": {"env": {} },
+            "problemMatcher": []
+        },
+        {
+            "label": "Check",
+            "icon": { "id": "checklist" },
+            "type": "shell",
+            "command": "pnpm run lint & pnpm run typecheck",
+            "options": {"env": { }},
+            "problemMatcher": []
+        },
+        {
+            "label": "Build",
+            "icon": { "id": "package" },
+            "type": "shell",
+            "command": "pnpm run build",
+            "options": {"env": { }},
+            "problemMatcher": []
+        }
+    ]
+}

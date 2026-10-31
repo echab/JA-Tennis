@@ -11,9 +11,6 @@ const validLibs: IValidation[] = [
     roundrobinValidation,
 ];
 
-// const [drawProblems, setDrawProblems] = createStore<{ [id: string]: DrawError[] }>({}, { name: 'drawProblems' });
-// const [playerProblems, setPlayerProblems] = createStore<{ [id: string]: PlayerError[] }>({}, { name: 'playerProblems' });
-
 export const addValidator = (validator: IValidation) => {
     validLibs.push(validator); // TODO validLibs is undefined in tests?!?
 }

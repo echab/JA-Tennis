@@ -15,29 +15,28 @@ const indexes = new WeakMap<any_[],Map<string,IIndex>>();
 /**
  * Returns the index of an object in the array. Or -1 if not found.
 */
-export function indexOf<T>(array: T[], member: StringKey<T>, value: any_, error?: string): number {
+export function indexOf<T>(array: T[], member: StringKey<T>, value: any_, error?: string, notFound = -1): number {
 
-    let i: number, a: T;
+    let i: number | undefined, a: T;
 
-    if (value === null || value === undefined || !array.length) {
-        return -1;
-    }
+    if (value !== null && value !== undefined && array.length) {
 
-    let idx = indexes.get(array)?.get(member) ?? _reindex(array, member);
+        let idx = indexes.get(array)?.get(member) ?? _reindex(array, member);
 
-    if (!(value in idx) || idx._length !== array.length) {
-        idx = _reindex(array, member);
-        // a = (array as any_)[member];
-        // i = (a as any_)[value];
-        i = idx[value];
-    } else {
-        i = idx[value];
-        a = array[i];
-        if (a[member] !== value) {
+        if (!(value in idx) || idx._length !== array.length) {
             idx = _reindex(array, member);
             // a = (array as any_)[member];
             // i = (a as any_)[value];
             i = idx[value];
+        } else {
+            i = idx[value];
+            a = array[i];
+            if (a[member] !== value) {
+                idx = _reindex(array, member);
+                // a = (array as any_)[member];
+                // i = (a as any_)[value];
+                i = idx[value];
+            }
         }
     }
 
@@ -45,7 +44,7 @@ export function indexOf<T>(array: T[], member: StringKey<T>, value: any_, error?
         throw new Error(error);
     }
 
-    return i !== undefined ? i : -1;
+    return i !== undefined ? i : notFound;
 }
 
 /**

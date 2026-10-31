@@ -120,8 +120,8 @@ export abstract class DrawLibBase implements IDrawLib {
         if (this.isGauchePoule(box)) {
             //TODO boxIn.rank = 0;   //classement de la poule
         } else if (match) {
-            match.date = undefined;
-            match.place = undefined;
+            // match.date = undefined;
+            // match.place = undefined;
         }
 
         // const boxOut = box as Match;

@@ -23,25 +23,26 @@
     "dist"
   ],
   "dependencies": {
-    "@solidjs/router": "^2.0.0-next.30",
-    "@solidjs/web": "2.0.0-rc.10",
-    "solid-js": "2.0.0-rc.10"
+    "@solidjs/router": "2.0.0-next.43",
+    "@solidjs/web": "2.0.0-rc.20",
+    "solid-js": "2.0.0-rc.20"
   },
   "devDependencies": {
-    "@solidjs/testing-library": "^1.0.0-beta.3",
-    "@solidjs/vite-plugin": "3.0.0-next.46",
+    "@solidjs/diagnostics": "2.0.0-rc.20",
+    "@solidjs/testing-library": "1.0.0-rc.2",
+    "@solidjs/vite-plugin": "3.0.0-next.54",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^26",
+    "@types/node": "^26.6.5",
     "@types/wicg-file-system-access": "^2023.10.7",
-    "eslint-plugin-solid": "^0.18.0",
-    "happy-dom": "^20.14.5",
-    "oxlint": "^1.85.0",
-    "oxlint-tsgolint": "^7.0.2003",
+    "eslint-plugin-solid": "^0.18.1",
+    "happy-dom": "^21.0.4",
+    "oxlint": "^1.90.0",
+    "oxlint-tsgolint": "^7.0.2005",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.3.1",
-    "vitest": "^5.0.2"
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -2,7 +2,7 @@ import { type Component, createSignal, Match as Case, Switch } from "solid-js";
 import { commandManager } from "../services/util/commandManager";
 import { DialogInfo } from "./tournament/DialogInfo";
 import { DialogPlayer } from "./player/DialogPlayer";
-import { selection } from "./util/selection";
+import { selection, selTournament } from "./util/selection";
 import { createTournament, updateInfo } from "../services/tournamentService";
 import { updatePlayer } from "../services/playerService";
 import { DialogEvent } from "./event/DialogEvent";
@@ -26,54 +26,54 @@ export const [dialog, showDialog] = createSignal<DialogProps<unknown> | undefine
 export const Dialogs: Component = () => {
     return <Switch>
         <Case when={dialog()?.name === "new"}>
-            <DialogInfo info={{ name: '', slotLength: selection.tournament.info.slotLength, _typeName: selection.tournament.types.name, _new: true }}
+            <DialogInfo info={{ name: '', slotLength: selTournament.info.slotLength, _typeName: selTournament.types.name, _new: true }}
                 onOk={commandManager.wrap(createTournament(dialog()?.onOk as (t: Tournament) => void))}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
         <Case when={dialog()?.name === "info"}>
-            <DialogInfo info={{...selection.tournament.info, _typeName: selection.tournament.types.name }}
+            <DialogInfo info={{...selTournament.info, _typeName: selTournament.types.name }}
                 onOk={commandManager.wrap(updateInfo)}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
         <Case when={dialog()?.name === "player"}>
             <DialogPlayer
                 player={selection.player}
-                tournament={selection.tournament}
+                tournament={selTournament}
                 onOk={commandManager.wrap(updatePlayer)}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
         <Case when={dialog()?.name === "place" && selection.place}>
             <DialogPlace
                 place={selection.place!}
                 onOk={commandManager.wrap(updatePlace)}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
         <Case when={dialog()?.name === "event"}>
             <DialogEvent
-                _types={selection.tournament._types}
+                _types={selTournament._types}
                 event={selection.event}
                 onOk={commandManager.wrap(updateEvent)}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
         <Case when={dialog()?.name === "draw"}>
             <DialogDraw event={selection.event!} draw={selection.draw}
-                tournament={selection.tournament}
+                tournament={selTournament}
 
                 onOk={commandManager.wrap(updateDraws)}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
         <Case when={dialog()?.name === "match" && selection.event && selection.draw}>
-            <DialogMatch event={selection.event!} draw={selection.draw!} tournament={selection.tournament}
+            <DialogMatch event={selection.event!} draw={selection.draw!} tournament={selTournament}
                 match={selection.box as Match}
 
                 onOk={commandManager.wrap(updateMatch)}
-                onClose={() => showDialog()}
+                onClose={showDialog}
             />
         </Case>
     </Switch>

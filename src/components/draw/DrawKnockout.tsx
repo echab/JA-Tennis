@@ -1,7 +1,6 @@
 /* eslint-disable no-bitwise */
-import { type Component, For, Repeat, Show } from 'solid-js';
-import type { JSX } from '@solidjs/web';
-import { useParams } from '@solidjs/router';
+import { type Component, createMemo, For, onSettled, Repeat, Show } from 'solid-js';
+import { useLocation, useNavigate, useParams } from '@solidjs/router';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Params } from '../../App';
 import { selectBox, urlBox } from '../util/selection';
@@ -21,15 +20,18 @@ type Props = {
 
 export const DrawKnockout: Component<Props> = (props) => {
 
+    const navigate = useNavigate();
+    const location = useLocation();
     const params = useParams<Params>();
 
-    const nLine = () => countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut);
+    const nLine = createMemo(() => countInCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut), { name: 'nLineM' });
 
-    const cols = (l: number) => {
+    const cols = createMemo(() => (l: number) => {
         const result = [];
         const cMax = columnMax(props.draw.nbColumn, props.draw.nbOut);
         const cMin = columnMin(props.draw.nbOut);
         const boxes = mapBy<PlayerIn & Match>(props.draw.boxes as Match[], 'position');
+        const players = props.tournament.players;
         for (let c = cMax; c >= cMin; c--) {
             const ic = cMax - c;
             const pos = positionTopCol(c) - (l >> ic);
@@ -37,7 +39,7 @@ export const DrawKnockout: Component<Props> = (props) => {
             const visible = !!box && (!!box.order || box.qualifIn !== undefined || isMatch(box))
             result.push({
                 box,
-                player: byId(props.tournament.players, box?.playerId),
+                player: byId(players, box?.playerId),
                 even: (pos & 1) === 0 && visible,
                 odd: (pos & 1) !== 0 && visible,
                 rowspan: 1 << ic,
@@ -48,61 +50,64 @@ export const DrawKnockout: Component<Props> = (props) => {
             }
         }
         return result;
-    }
+    }, { name: 'colsM' });
 
     // for VainDef, retreive the name of the winner
-    const lib = () => drawLib(props.event, props.draw);
-    const otherName = (match?: Match) => {
+    const lib = createMemo(() => drawLib(props.event, props.draw), { name: 'libM' });
+    const otherName = createMemo(() => (match?: Match) => {
         if (!match) { return ''; }
         const { player1, player2 } = lib().boxesOpponents(match);
         const otherId = match.playerId ? match.playerId === player1.playerId ? player2.playerId : player1.playerId : undefined;
         const otherPlayer = otherId ? byId(props.tournament.players, otherId) : undefined;
         return otherPlayer ? `${otherPlayer.name} ${otherPlayer.firstname?.[0] ?? ''}` : '';
-    };
+    }, { name: 'otherNameM' });
 
-    const handleKey: JSX.EventHandlerUnion<HTMLAnchorElement, KeyboardEvent> = (evt) => {
-        // console.log('keydown=', evt.key)
-        if (!params.boxPos) { return; }
-        const curPos = +params.boxPos;
-        const col = column(curPos);
-        let pos = -1;
-        switch(evt.key) {
-            case 'Home': pos = positionMax(props.draw.nbColumn, props.draw.nbOut); break;
-            // case 'Home': pos = positionTopCol(col); break;
-            case 'ArrowUp': if (curPos > positionTopCol(col)) { pos = curPos - 1; } break;
-            case 'ArrowDown': if (curPos < positionBottomCol(col, props.draw.nbOut)) { pos = curPos + 1; } break;
-            case 'ArrowLeft': if (col < columnMax(props.draw.nbColumn, props.draw.nbOut)) { pos = positionOpponent1(curPos); } break;
-            case 'ArrowRight': if (col > columnMin(props.draw.nbOut)) { pos = positionMatch(curPos); } break;
-            case 'End': pos = positionBottomCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut); break;
-            // case 'End': pos = positionBottomCol(col, props.draw.nbOut); break;
-        }
-        if (pos !== -1) {
-            const b = by(props.draw.boxes, 'position', pos);
-            if (b) {
-                evt.preventDefault();
-                selectBox(props.event, props.draw, b);
+    onSettled(() => {
+        const handleKey = (evt: KeyboardEvent) => {
+            // console.log('keydown=', evt.key)
+            if (!params.boxPos) { return; }
+            const curPos = +params.boxPos;
+            const col = column(curPos);
+            let pos = -1;
+            switch(evt.key) {
+                case 'Home': pos = positionMax(props.draw.nbColumn, props.draw.nbOut); break;
+                // case 'Home': pos = positionTopCol(col); break;
+                case 'ArrowUp': if (curPos < positionTopCol(col)) { pos = curPos + 1; } break;
+                case 'ArrowDown': if (curPos > positionBottomCol(col, props.draw.nbOut)) { pos = curPos - 1; } break;
+                case 'ArrowLeft': if (col < columnMax(props.draw.nbColumn, props.draw.nbOut)) { pos = positionOpponent1(curPos); } break;
+                case 'ArrowRight': if (col > columnMin(props.draw.nbOut)) { pos = positionMatch(curPos); } break;
+                case 'End': pos = positionBottomCol(columnMax(props.draw.nbColumn, props.draw.nbOut), props.draw.nbOut); break;
+                // case 'End': pos = positionBottomCol(col, props.draw.nbOut); break;
             }
-        }
-    };
+            if (pos !== -1) {
+                evt.preventDefault();
+                const box = by(props.draw.boxes, 'position', pos);
+                if (box) {
+                    navigate(urlBox(box, props.draw, props.event, props.tournament, location.query))
+                }
+            }
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    });
 
     return <table class="tableau">
         <tbody>
             <Repeat count={nLine()}>{(l) =>
                 <tr>
-                    <For each={cols(l)}>{({ odd, even, rowspan, box, player, isRight }) =>
+                    <For each={cols()(l)}>{({ odd, even, rowspan, box, player, isRight }) =>
                         <td rowspan={rowspan} class={{
                             even, odd, qs: isRight
                         }}>
                             <Show when={props.draw.lock === BUILD || even || odd}>
-                                {/* TODO <DrawBox box={b} players={props.tournament.players} /> */}
+                                {/* TODO <DrawBox box={box} player={player} /> */}
                                 <a class={["boite joueur block print:border-none print:bg-transparent",
                                     { selected: !!params.boxPos && +params.boxPos === box?.position }]}
                                     // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                                     // onclick={() => navigate(urlBox(box), {replace:true})}
-                                    href={urlBox(box, props.draw, props.event, props.tournament)} replace noscroll
+                                    href={urlBox(box, props.draw, props.event, props.tournament, location.query)} replace noscroll
                                     id={`pos${box?.position}`}
                                     tabindex={0}
-                                    onKeyDown={handleKey}
                                 >
                                     <Show when={box?.qualifIn !== undefined}><span class="qe">Q{box!.qualifIn || ''}</span></Show>
                                     <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
@@ -115,7 +120,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             <Show when={box?.order && box.order > 0}> {player?.firstname}</Show>
                                         </span>
                                     }>
-                                        <span class="nom inline-block border-l-2 border-gray-500 pl-1">{player?.name} requalified<br />{otherName(box)} withdraws</span>
+                                        <span class="nom inline-block border-l-2 border-gray-500 pl-1">{player?.name} requalified<br />{otherName()(box)} withdraws</span>
                                     </Show>
                                     <Show when={box?.order && box.order > 0 && player?.rank}><span class="classement">{player!.rank}</span></Show>
                                     <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
@@ -132,7 +137,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     <Show when={box && isMatch(box)}>
                                         <span title="Edit the match"
                                             onClick={() => {
-                                                selectBox(props.event, props.draw, box);
+                                                selectBox(props.event.id, props.draw.id, box?.position);
                                                 showDialog({ name: "match" });
                                             }}>
                                             <i class="icon2-match hover2" />
@@ -166,7 +171,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                         <Show when={isRight && props.draw.type !== FINAL}>
                                             <i class="icon2-qualif-out hover" title="Edit qualified out"
                                                 onClick={() => {
-                                                    selectBox(props.event, props.draw, box);
+                                                    selectBox(props.event.id, props.draw.id, box?.position);
                                                     // showDialog("qualif");
                                                 }}
                                             />
