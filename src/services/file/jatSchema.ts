@@ -11,7 +11,7 @@ import { isMatch, isPlayerIn } from "../drawService";
 import { defaultDrawName } from "../tournamentService";
 import { loadType, TYPES } from "../types";
 import { by, byId, indexOf } from "../util/find";
-import { FieldParent, Fields, FnType, generateId, Serializer } from "./serializer";
+import { type FieldParent, type Fields, type FnType, generateId, type SerialReader, type SerialWriter } from "./serializer";
 
 const DAY = 24 * 3600 * 1000; // YEAR = DAY * 365.25;
 const MAX_JOUR = 42;
@@ -35,13 +35,16 @@ const MIN_COL = 2;
 const MAX_COL = 9;
 const MAX_COL_POULE = 22;
 
-type JatSerializer = Serializer & {
+type JatCustom = {
     _types?: DataType,
     _refDate?: Date,
     _curSexe?: number,
     _playerRegs?: Record<string, number>,
     _teamNames?: Record<string, string | undefined>,
-};
+}
+type JatReader = SerialReader & JatCustom;
+type JatWriter = SerialWriter & JatCustom;
+type JatSerializer = JatReader | JatWriter;
 
 export const jatFileType: FilePickerAcceptType = {
     description: 'JA-Tennis document',
@@ -110,14 +113,14 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
         predicate: ({ _sexe }: { _sexe: number }) => _sexe & EQUIPE_MASK, type: "bstr",
         reviver(s: string, p: Player & { _teamName?: string }) { p._teamName = s || undefined },
         replacer(
-            this: JatSerializer,
+            this: JatWriter,
             s: string, p: Player) {
             return p.teamIds && this._teamNames?.[p.id];
         },
     },
     licence: {
         predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "u32",
-        reviver(this: JatSerializer, l) { return l ? `${String(l).padStart(7, '0')}${this._types!.licence.getKey(String(l).padStart(7, '0')) ?? ''}` : undefined; },
+        reviver(this: JatReader, l) { return l ? `${String(l).padStart(7, '0')}${this._types!.licence.getKey(String(l).padStart(7, '0')) ?? ''}` : undefined; },
         replacer: (s) => s ? parseInt(s, 10) : 0
     },
     name: { predicate: ({ _sexe }: { _sexe: number }) => !(_sexe & EQUIPE_MASK), type: "bstr" },
@@ -130,7 +133,7 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     phone2: { type: "bstr", reviver: optionalString },
     email: { version: 5, type: "bstr", reviver: optionalString },
     birth: {
-        type: "date", reviver(this: JatSerializer, d: Date | number | undefined, p: Player) {
+        type: "date", reviver(this: JatReader, d: Date | number | undefined, p: Player) {
             // TODO: compute Categorie from birthDate
             // const age = d && Math.round(new Date().getFullYear() - (typeof d === 'string' ? +d : d.getFullYear()));
             // p.category = age && `categ${age}`;
@@ -162,16 +165,12 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     },
     _categ: {
         maxVersion: 1, type: "u8",
-        reviver(this: JatSerializer, b: number, p: Player & { _sexe: number }) { p.category = this._types?.category.list()[b].id; },
+        reviver(this: JatReader, b: number, p: Player & { _sexe: number }) { p.category = this._types?.category.list()[b].id; },
     },
     club: { type: "bstr", reviver: optionalString },
     registration: {
-        type: "u32", replacer(this: JatSerializer, reg, p: Player) {
-            if (!this.writing) {
-                return reg;
-            } else {
-                return this._playerRegs?.[p.id];
-            }
+        type: "u32", replacer(this: JatWriter, reg, p: Player) {
+            return this._playerRegs?.[p.id];
         }
     },
     _partenaire: { version: 2, type: "u16", replacer: () => 0xffff },
@@ -333,8 +332,8 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
     lock: { version: 4, type: "u8", def: 0, reviver: truthy },
     _lock: { maxVersion: 1, type: "u8", reviver: (b, p: Box) => { if (b) { p.locked = b; } } },
     orientation: { type: "u8" },
-    _minRank: { maxVersion: 7, type: "u8", reviver(this: JatSerializer, r, p: Draw) { p.minRank = this._types?.rank.list()[r] ?? ''; } },
-    _maxRank: { maxVersion: 7, type: "u8", reviver(this: JatSerializer, r, p: Draw) { p.maxRank = this._types?.rank.list()[r] ?? ''; } },
+    _minRank: { maxVersion: 7, type: "u8", reviver(this: JatReader, r, p: Draw) { p.minRank = this._types?.rank.list()[r] ?? ''; } },
+    _maxRank: { maxVersion: 7, type: "u8", reviver(this: JatReader, r, p: Draw) { p.maxRank = this._types?.rank.list()[r] ?? ''; } },
     minRank: { version: 8, type: rankFields },
     maxRank: { version: 8, type: rankFields },
     cont: { version: 7, type: "u8", def: 0 },
@@ -396,7 +395,7 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
     name: { version: 10, type: "bstr" },
     sexe: {
         type: "u8",
-        reviver(this: JatSerializer, b: number, p: TEvent) {
+        reviver(this: JatReader, b: number, p: TEvent) {
             if (b & DOUBLE_MASK_OLD) {
                 b = (b | EQUIPE_MASK) & (~DOUBLE_MASK_OLD);
             }
@@ -413,7 +412,7 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
     _categ7: { maxVersion: 6, type: "u8", reviver: (b) => b * 10, valid: () => false },
     category: {
         version: 7, type: "u8",
-        reviver(this: JatSerializer, b) {
+        reviver(this: JatReader, b) {
             // const i = this._types!.category.list().findIndex(({id}) => b === id); // TODO category by type
 
             // // TODO, from .ini, by types
@@ -518,14 +517,14 @@ export const docFields: Fields<Tournament> = {
         version: 9, type: {
             name: { version: 9, type: "bstr", def: 'FFT', valid: (t) => t in TYPES },
             versionTypes: { version: 9, type: "u8", def: 1, valid: (v) => v <= 5 },
-            data: { version: 10, type: "customData" },
+            data: { version: 10, type: "customData" }, // never used by any type
         }, def: { name: 'FFT', version: 1 },
-        async reviver(this: JatSerializer, t, parent) {
+        async reviver(this: JatReader, t, parent) {
             // this._type = t;
             this._types = parent._types = await loadType(t.name, t.versionTypes);
             return t;
         },
-        replacer(this: JatSerializer, t, parent) {
+        replacer(this: JatWriter, t, parent) {
             this._types = parent._types;
             return t;
         },
@@ -533,7 +532,7 @@ export const docFields: Fields<Tournament> = {
     _types: { type: {} },
     _start: {
         version: 12, type: "date",
-        reviver(this: JatSerializer, d: Date | undefined, p: Tournament & { _start?: Date }) {
+        reviver(this: JatReader, d: Date | undefined, p: Tournament & { _start?: Date }) {
             p._start = d ? atZeroHour(d) : undefined;
 
             this._refDate = atZeroHour(d ?? new Date(this._fileDate ?? Date.now()));

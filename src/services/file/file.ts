@@ -1,6 +1,6 @@
 import { Tournament } from "../../domain/tournament";
 import { docFields, jatFileType } from "./jatSchema";
-import { createSerializer } from "./serializer";
+import { createReader, createWriter } from "./serializer";
 
 let fileName: string = '';
 
@@ -26,7 +26,7 @@ async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
     const buffer = await file.arrayBuffer();
     const value = new Uint8Array(buffer);
 
-    const reader = createSerializer(value, new Date(file.lastModified)); // File parameter for streaming
+    const reader = createReader(value, new Date(file.lastModified)); // File parameter for streaming
     const doc = await reader.readObject(docFields);
     console.log(doc);
 
@@ -42,7 +42,7 @@ export async function saveFile(doc: Tournament) {
     });
     const writable = await fileHandle.createWritable();
 
-    const writer = createSerializer(new Uint8Array(8192)); // TODO dynamic buffer size, or stream
+    const writer = createWriter(new Uint8Array(8192)); // TODO dynamic buffer size, or stream
     writer.writeObject(doc, docFields, docFields.version.def);
 
     await writable.write(writer._buffer);

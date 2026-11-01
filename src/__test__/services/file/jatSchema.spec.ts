@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { KNOCKOUT } from "../../../domain/draw.ts";
 import { docFields } from "../../../services/file/jatSchema.ts";
-import { createSerializer } from "../../../services/file/serializer.ts";
+import { createReader, createWriter } from "../../../services/file/serializer.ts";
 import { reviveTournament } from '../../../services/tournamentService.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,7 +53,7 @@ describe("jatSchema", async () => {
         const b = await readFile(`${__dirname}/tournament1.jat`);
         const buf = b.buffer;
 
-        const reader = createSerializer(new Uint8Array(buf), refDate);
+        const reader = createReader(new Uint8Array(buf), refDate);
 
         const result = await reader.readObject(docFields);
 
@@ -70,7 +70,7 @@ describe("jatSchema", async () => {
     // });
 
     it('should save tournament to array buffer', () => {
-        const writer = createSerializer(new Uint8Array(8192), refDate); // TODO size
+        const writer = createWriter(new Uint8Array(8192), refDate); // TODO size
         writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
@@ -78,11 +78,11 @@ describe("jatSchema", async () => {
     });
 
     it('should save and reload same tournament', async () => {
-        const writer = createSerializer(new Uint8Array(8192), refDate); // TODO size
+        const writer = createWriter(new Uint8Array(8192), refDate); // TODO size
         writer.writeObject(tournament2, docFields);
         const buf = writer._buffer.slice(0, writer._position);
 
-        const reader = createSerializer(buf, refDate);
+        const reader = createReader(buf, refDate);
         const result = await reader.readObject(docFields);
 
         expect(result.version).toBe(13);
@@ -93,10 +93,10 @@ describe("jatSchema", async () => {
         const b = await readFile(`${__dirname}/tournament1.jat`);
         const expected = new Uint8Array(b.buffer);
 
-        const reader = createSerializer(new Uint8Array(b.buffer), refDate);
+        const reader = createReader(new Uint8Array(b.buffer), refDate);
         const doc = await reader.readObject(docFields);
 
-        const writer = createSerializer(new Uint8Array(expected.length * 2), refDate); // TODO size
+        const writer = createWriter(new Uint8Array(expected.length * 2), refDate); // TODO size
         writer.writeObject(doc, docFields);
         const result = writer._buffer.slice(0, writer._position);
 
