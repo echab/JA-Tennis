@@ -14,6 +14,8 @@ export async function openFile(): Promise<Tournament> {
     return readFile(fileHandle);
 }
 
+// https://streams.spec.whatwg.org/#example-rbs-pull
+
 async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
     // console.log('reading ', fileHandle.name);
     const file = await fileHandle.getFile();
@@ -28,7 +30,7 @@ async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
     const doc = await reader.readObject(docFields);
     console.log(doc);
 
-    fileName = fileHandle.name;
+    fileName = doc._url = fileHandle.name;
 
     return doc;
 }
@@ -36,7 +38,7 @@ async function readFile(fileHandle: FileSystemFileHandle): Promise<Tournament> {
 export async function saveFile(doc: Tournament) {
     const fileHandle = await showSaveFilePicker({
         types: [jatFileType],
-        suggestedName: fileName.replace(/(\.jat)$/i, '-saved$1'),
+        suggestedName: (doc._url ?? fileName).replace(/(\.jat)$/i, '-saved$1'),
     });
     const writable = await fileHandle.createWritable();
 

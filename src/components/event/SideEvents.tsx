@@ -6,6 +6,7 @@ import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
 import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragdrop';
 import { isSexeCompatible } from '../../services/tournamentService';
+import { drawName } from '../../services/drawService';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
 import { Router } from '../../router';
@@ -90,7 +91,7 @@ export const SideEvents: Component<Props> = () => {
                                 {/* <small>{draw.id} </small> */}
                                 <i class="icon2-draw" />
                                 <Show when={draw.lock}><i class="icon2-locker opacity-60 mr-1" /></Show>
-                                {draw.name} {draw.cont ? '(c)' : ''}
+                                {drawName(draw)} {draw.cont ? '(c)' : ''}
                                 {/* TODO list the count of registered players in this draw, by rank */}
 
                                 <span class="float-right hover">&Gt;</span>

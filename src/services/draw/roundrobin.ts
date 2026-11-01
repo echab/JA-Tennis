@@ -282,9 +282,9 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
     //Calcul classement des poules
     /** @override */
     computeScore(): boolean {
-
+        return false;
         //TODO
-        throw new Error("Not implemented");
+        // throw new Error("Not implemented");
 
         // const m_pOrdrePoule: Ranking[];    //classement de chaque joueur de la poule
 

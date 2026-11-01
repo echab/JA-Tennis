@@ -18,6 +18,8 @@ export const DrawRoundRobin: Component<Props> = (props) => {
         b: number,
         box?: PlayerIn & Match,
         player?: Player,
+        playerIn?: boolean,
+        isRight?: boolean,
     };
     
     //for round robin, fill the list of rows/columns for the view
@@ -27,13 +29,13 @@ export const DrawRoundRobin: Component<Props> = (props) => {
         const n = props.draw.nbColumn;
         return Array.from({ length: n }, (_, r) => {
             let b = (n + 1) * n - r - 1;
-            return Array.from({ length: n + 1 }, () => {
+            return Array.from({ length: n + 1 }, (_, c) => {
                 // TODO snapshot or deep(cell.box) to keep reactivity?
                 const box = snapshot(boxes.get(b));
                 const player = byId(players, box?.playerId);
                 const bCur = b;
                 b -= n;
-                return { b: bCur, box, player } satisfies Cell;
+                return { b: bCur, box, player, playerIn: c === 0, isRight: c === n } satisfies Cell;
             });
         });
     }, { name: 'mRows' });
@@ -42,7 +44,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
         return (position % props.draw.nbColumn) * (props.draw.nbColumn + 1) === position;
     }
 
-    return <table class="draw roundrobin"
+    return <table class="tableau draw roundrobin"
         // onclick={selectBox(event, draw, undefined)}
     >
         <tbody>
@@ -50,7 +52,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
                 <td class="w-32" />
                 <For each={rows()}>{(row) =>
                     <td class="w-32">
-                        <DrawBox box={row[0].box} player={row[0].player}
+                        <DrawBox box={row[0].box} player={row[0].player} {...props}
                             // if.bind={props.draw.type !== ROUNDROBIN}
                         />
                     </td>
@@ -65,7 +67,7 @@ export const DrawRoundRobin: Component<Props> = (props) => {
                 <tr class="h-8">
                     <For each={row}>{(cell) =>
                         <td class={{ diag: isDiag(cell.b) }}>
-                            <DrawBox box={cell.box} player={cell.player}
+                            <DrawBox {...cell} {...props}
                                 //  if.bind={props.draw.type !== ROUNDROBIN}
                             />
                         </td>

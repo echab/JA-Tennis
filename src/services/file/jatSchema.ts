@@ -51,6 +51,8 @@ export const jatFileType: FilePickerAcceptType = {
 const optionalString = (s: string | undefined) => s?.trim() || undefined;
 // const optionalString = (s: string | undefined) => s || undefined; // TODO just for exact matching with .jat
 
+const truthy = <T extends string | number | boolean>(v: T | undefined) => v || undefined;
+
 function buildTeamName(teamIds: string[], players: Player[]): string {
     return teamIds.map((id) => byId(players, id) ?? { name: `#${id}` } as Player)
         .map((p) => `${p.name} ${p?.firstname?.[0] ?? ''}`.trim())
@@ -58,7 +60,7 @@ function buildTeamName(teamIds: string[], players: Player[]): string {
 }
 
 function rankFields<T extends string>(this: JatSerializer, s: T): T {
-    // _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver: (c, p) => { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
+    // _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver(c, p) { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     const { rank } = this._types!;
     if (!this.writing) {
         const b = this.i8;
@@ -106,7 +108,7 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     },
     _teamName: {
         predicate: ({ _sexe }: { _sexe: number }) => _sexe & EQUIPE_MASK, type: "bstr",
-        reviver: (s: string, p: Player & { _teamName?: string }) => p._teamName = s || undefined,
+        reviver(s: string, p: Player & { _teamName?: string }) { p._teamName = s || undefined },
         replacer(
             this: JatSerializer,
             s: string, p: Player) {
@@ -137,16 +139,16 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
         }
     },
     // solde: { maxVersion: 6, type(value, _, { version }) { return (version < 7) ? this.f32 : this.u32; } }, // decimal * 100
-    solde: { version: 7, type: "u32", reviver: (v) => v || undefined }, // decimal * 100
-    _solde: { maxVersion: 6, type: "f32", reviver: (v, p: Player) => { if (v) { p.solde = v; } } },
-    soldeType: { version: 8, type: "u8", reviver: (v) => v || undefined },
-    soldeEspece: { version: 10, type: "u32", def: 0, reviver: (v) => v || undefined },
-    soldeCheque: { version: 10, type: "u32", def: 0, reviver: (v) => v || undefined },
+    solde: { version: 7, type: "u32", reviver: truthy }, // decimal * 100
+    _solde: { maxVersion: 6, type: "f32", reviver(v, p: Player) { if (v) { p.solde = v; } } },
+    soldeType: { version: 8, type: "u8", reviver: truthy },
+    soldeEspece: { version: 10, type: "u32", def: 0, reviver: truthy },
+    soldeCheque: { version: 10, type: "u32", def: 0, reviver: truthy },
     rank: { type: rankFields },
     rank2: { type: rankFields }, //, replacer: (v, p: Player) => p.teamIds ? -1 : v },
     _bfRank: {
         version: 9, type: "u8", // 1=Etranger 2=Assimilé
-        reviver: (v: number, p: Player) => {
+        reviver(v: number, p: Player) {
             if (v & 1) { p.foreign = true; }
             if (v & 2) { p.assimilated = true; }
         },
@@ -155,8 +157,12 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     nationality: { version: 9, type: "bstr", reviver: optionalString },
     _sexe: {
         maxVersion: 3, type: "u8",
-        reviver: (b: number, p: Player & { _sexe: number }) => { p.sexe = 'HFM'[b & ~EQUIPE_MASK] as SexeString; return b; },
+        reviver(b: number, p: Player & { _sexe: number }) { p.sexe = 'HFM'[b & ~EQUIPE_MASK] as SexeString; },
         replacer: (_, p) => "HFM".indexOf(p.sexe)
+    },
+    _categ: {
+        maxVersion: 1, type: "u8",
+        reviver(this: JatSerializer, b: number, p: Player & { _sexe: number }) { p.category = this._types?.category.list()[b].id; },
     },
     club: { type: "bstr", reviver: optionalString },
     registration: {
@@ -221,7 +227,7 @@ const boxFields: Fields<PlayerIn & Match & { version: number }> = {
     score: { type: scoreFields },
     _flags: {
         type: "u16",
-        reviver: (f: number, p: PlayerIn & Match) => {
+        reviver(f: number, p: PlayerIn & Match) {
             if (f & 1) { p.hidden = true; }
             const qualif = (f >> 1) & 0b11; //0=no, 1=Entrant,	2=Sortant,	3=T�teS�rie
             const num = (f >> 3) & 0b11111;
@@ -259,11 +265,10 @@ const boxFields: Fields<PlayerIn & Match & { version: number }> = {
     date: { type: "date" },
     _hour: {
         type: "u16",
-        reviver: (h: number | undefined, p: FieldParent<Match>) => {
+        reviver(h: number | undefined, p: FieldParent<Match>) {
             if (p.date && h !== undefined) {
                 p.date.setHours(Math.trunc(h / 60), Math.trunc(h % 60));
             }
-            return undefined;
         },
         replacer: (h: number | undefined, p: FieldParent<Match>) => {
             return p.date ? p.date.getHours() * 60 + p.date.getMinutes() : 0;
@@ -289,7 +294,7 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
     _schema: { type: "schema", valid: (s) => s === 'CTableau', replacer: () => 'CTableau' },
     version: { type: "u8", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { version: 10, type: "u16", def: generateId, reviver: (id: number) => id ? String(id) : generateId() },
-    _name: { maxVersion: 2, type: "bstr", reviver: (s, p: Draw) => { p.name = s; } },
+    _name: { maxVersion: 2, type: "bstr", reviver(s, p: Draw) { p.name = s; } },
     name: { version: 5, type: "bstr",
         reviver: (s: string) => s.trim(),
         replacer: (s: string | undefined, p: Draw) => s !== defaultDrawName(p) ? s : undefined
@@ -325,11 +330,11 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
             });
         },
     },
-    lock: { version: 4, type: "u8", def: 0, reviver: (l) => l || undefined },
+    lock: { version: 4, type: "u8", def: 0, reviver: truthy },
     _lock: { maxVersion: 1, type: "u8", reviver: (b, p: Box) => { if (b) { p.locked = b; } } },
     orientation: { type: "u8" },
-    _minRank: { maxVersion: 7, type: "u8" }, // TODO
-    _maxRank: { maxVersion: 7, type: "u8" }, // TODO
+    _minRank: { maxVersion: 7, type: "u8", reviver(this: JatSerializer, r, p: Draw) { p.minRank = this._types?.rank.list()[r] ?? ''; } },
+    _maxRank: { maxVersion: 7, type: "u8", reviver(this: JatSerializer, r, p: Draw) { p.maxRank = this._types?.rank.list()[r] ?? ''; } },
     minRank: { version: 8, type: rankFields },
     maxRank: { version: 8, type: rankFields },
     cont: { version: 7, type: "u8", def: 0 },
@@ -337,9 +342,9 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
     _: {
         type(value, _, p: Draw) {
             if (!this.writing) {
-                if (!p.name) {
-                    p.name = defaultDrawName(p);
-                }
+                // if (!p.name) {
+                //     p.name = defaultDrawName(p);
+                // }
 
                 // hide boxes on left off entering players
                 // const hideBox = (box: Box, b: number) => box.hidden = true;
@@ -387,7 +392,7 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
     _schema: { type: "schema", valid: (s) => s === 'CEpreuve', replacer: () => 'CEpreuve' },
     version: { type: "u8", def: 10, valid: (v) => v <= 10, replacer: () => 10 },
     id: { version: 9, type: "u16", def: generateId, reviver: (id: number) => id ? String(id) : generateId() },
-    _name: { maxVersion: 2, type: "bstr", reviver: (s, p: TEvent) => { p.name = s; } },
+    _name: { maxVersion: 2, type: "bstr", reviver(s, p: TEvent) { p.name = s; } },
     name: { version: 10, type: "bstr" },
     sexe: {
         type: "u8",
@@ -417,7 +422,7 @@ const eventFields: Fields<TEvent & { version: number, dateMaj: Date }> = {
         },
     },
     _bDouble: { type: "u8" },
-    _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver: (c, p: FieldParent<TEvent>) => { p.maxRank = p.version && p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
+    _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver(c, p: FieldParent<TEvent>) { p.maxRank = p.version && p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     maxRank: { version: 8, type: rankFields }, // TODO use version of FFT types instead of tableau.version
     consolation: { type: "u8" },
     start: { type: "date" },
@@ -537,7 +542,7 @@ export const docFields: Fields<Tournament> = {
     },
     _end: {
         version: 12, type: "date",
-        reviver: (d: Date | undefined, p: Tournament & { _end?: Date }) => { p._end = d ? atMidnight(d) : undefined; },
+        reviver(d: Date | undefined, p: Tournament & { _end?: Date }) { p._end = d ? atMidnight(d) : undefined; },
         replacer: (_, p: Tournament) => p.info.end
     },
 

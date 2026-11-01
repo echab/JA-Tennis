@@ -1,5 +1,5 @@
+import { type Component, For } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { Component, For, Show } from "solid-js";
 import { openFile, saveFile } from "../../services/file/file";
 import { showDialog } from "../Dialogs";
 import { selectTournament, selTournament } from "../util/selection";
@@ -35,38 +35,41 @@ export const Tournaments: Component = () => {
     };
 
     const clearStorage = async () => {
-        clearStoredTournaments();
+        const t = await clearStoredTournaments();
+        selectTournament(t);
         navigate(Router.paths({ pane: 'tournament' }));
     };
 
     const selectItem = async (id: string) => {
         // move the selected tournament on top of the list
-        await restoreTournament(id);
+        const t = await restoreTournament(id)
+        selectTournament(t);
     }
 
     return <div class="p-2">
-        <h3>Tournmanent</h3>
-        <span>
-            <button type="button" onClick={[showDialog, { name: "info" }]}><i class="icon2-info" /></button>
-            {selTournament.info.name}
-        </span>
-
-        <div>
+        <div class="flex items-baseline justify-between">
+            <h3>Tournmanent</h3>
             <button type="button" onClick={newItem} class="p-2 rounded-full">➕New tournament</button>
 
             <button type="button" onClick={loadFile} class="p-2 rounded-full"><i class="icon2-open" /> Open file</button>
             <button type="button" onClick={saveTheFile} class="p-2 rounded-full"><i class="icon2-save" /> Save file</button>
-            <button type="button" onClick={clearStorage} class="p-2 rounded-full">❌ Clear storage</button>
+        </div>
+        <div>
+            <button type="button" onClick={() => showDialog({ name: "info" })}><i class="icon2-info" /></button>
+            {selTournament.info.name} - {selTournament._url}
         </div>
 
-        <h3>Last tournaments:</h3>
+        <div class="flex gap-4 items-baseline justify-between">
+            <h2>Last tournaments:</h2>
+            <button type="button" onClick={clearStorage} class="p-2 rounded-full">❌ Clear storage</button>
+        </div>
         <ul>
-            <For each={listStoredTournaments()}>{(tournament, i) => (
-                <Show when={i() > 0}>
-                    <li><a href="/?pane=tournament" onClick={() => selectItem(tournament.id)}>
-                        {tournament.name} ({dateLocal(tournament.date)}) #{tournament.id}
-                    </a></li>
-                </Show>
+            <For each={listStoredTournaments().slice(1)} keyed={(t) => t.id}>{(tournament) => (
+                <li>
+                    <button type="button" onClick={() => selectItem(tournament().id)}>
+                        {tournament().name} ({dateLocal(tournament().date)}) {tournament().url} #{tournament().id}
+                    </button>
+                </li>
             )}</For>
         </ul>
     </div>

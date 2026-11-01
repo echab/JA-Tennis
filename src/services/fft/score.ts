@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import type { Score } from "../../domain/types";
 
-const reScore = /^(([0-9]{1,2}\/[0-9]{1,2})\s+){2,5}(Ab )?$/;
+const reScore = /^([0-9]{1,2}\/[0-9]{1,2})(?:\s+([0-9]{1,2}\/[0-9]{1,2})){1,4}( Ab)?$/;
 
 export class ScoreFFT implements Score {
 

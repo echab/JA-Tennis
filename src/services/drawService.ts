@@ -11,9 +11,14 @@ import { drawLib } from "./draw/drawLib";
 import type { Player } from "../domain/player";
 import { applyChanges, applyChangesAt, defined } from "./util/object";
 import type { DataType } from "../domain/types";
+import { defaultDrawName } from "./tournamentService";
 
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32;
+
+export function drawName(draw: Draw) {
+    return draw.name || defaultDrawName(draw);
+}
 
 export function updateDraws(
     event: TEvent,

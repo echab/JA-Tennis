@@ -1,3 +1,4 @@
+import { createStore, snapshot } from "solid-js";
 import { replacerPrivateField } from "../../services/util/object";
 import type { Tournament } from "../../domain/tournament";
 import { reviveTournament } from "../../services/tournamentService";
@@ -9,51 +10,82 @@ type StoredTournament = {
     name: string;
     id: string,
     date: Date;
+    url?: string;
     content: string; // JSON.stringify
 }
 
 const MAX_MRU = 10;
-const _storedTournaments: StoredTournament[] = JSON.parse(localStorage.jat ?? '[]');
+const [storedTournaments, setStoredTournaments] = createStore<StoredTournament[]>(
+    JSON.parse(localStorage.jat ?? '[]'),
+    { shallow: true, name: 'tournamentsStore' }
+);
 
 export function serializeTournament(tournament: Tournament) {
     // TODO binary/base64 instead of json
     return JSON.stringify(tournament, replacerPrivateField);
 }
 
-export function deserializeTournament(data: string): Promise<Tournament> {
+export async function deserializeTournament(data: string, url?: string): Promise<Tournament> {
     // TODO binary/base64 instead of json
-    return reviveTournament(JSON.parse(data, reviverDates));
+    const t = await reviveTournament(JSON.parse(data, reviverDates));
+    t._url = url;
+    return t;
 }
 
-export function listStoredTournaments() {
-    return _storedTournaments.map(({ name, id, date }) => ({ name, id, date }));
+export function listStoredTournaments(): Array<Omit<StoredTournament, 'content'>> {
+    return storedTournaments;
 }
 
 export async function clearStoredTournaments() {
-    _storedTournaments.splice(0, _storedTournaments.length);
+    setStoredTournaments((a) => {
+        a.splice(0, storedTournaments.length);
+    });
     // localStorage.removeItem('jat');
-    storeTournament(await emptyTournament());
+    const t = await emptyTournament();
+    storeTournament(t);
+    return t;
 }
 
 export function storeTournament(tournament: Tournament): StoredTournament {
-    const i = _storedTournaments.findIndex((t) => t.id === tournament.id);
     const t = {
         name: tournament.info.name,
         id: tournament.id,
         date: new Date(Date.now()),
+        url: tournament._url,
         content: serializeTournament(tournament),
     };
-    if (i !== -1) {
-        _storedTournaments.splice(i, 1);
-    }
-    _storedTournaments.unshift(t);
-    _storedTournaments.splice(MAX_MRU);
-    localStorage.jat = JSON.stringify(_storedTournaments);
+    setStoredTournaments((a) => {
+        const i = a.findIndex((t) => t.id === tournament.id);
+        if (i === 0) {
+            a[0] = t;
+        } else {
+            if (i !== -1) {
+                a.splice(i, 1);
+            }
+            a.unshift(t);
+            a.splice(MAX_MRU);
+        }
+        localStorage.jat = JSON.stringify(snapshot(a));
+    });
     return t;
 }
 
 export function restoreTournament(id?: string): Promise<Tournament> {
-    const t = id ? _storedTournaments.find((t) => t.id === id) : _storedTournaments[0];
+    const i = id ? storedTournaments.findIndex((t) => t.id === id) : 0;
+    const t = storedTournaments[i];
+    if (!t) {
+        return mockTournament();
+    }
+    if (i !== 0) {
+        setStoredTournaments((a) => {
+            if (i !== -1) {
+                a.splice(i, 1);
+            }
+            a.unshift(t);
+            a.splice(MAX_MRU);
+            localStorage.jat = JSON.stringify(snapshot(a));
+        });
+    }
     // TODO binary/base64 instead of json
-    return t ? deserializeTournament(t.content) : mockTournament();
+    return deserializeTournament(t.content, t.url);
 }

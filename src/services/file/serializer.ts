@@ -1,8 +1,9 @@
 /* eslint-disable no-bitwise */
 const decoder = new TextDecoder("iso-8859-1");
 // const decoder = new TextDecoder("windows-1252");
+const decoderUnicode = new TextDecoder("utf-16");
 
-const encoder = new TextEncoder(); // "iso-8859-1"
+const encoder = new TextEncoder(); // "utf-8" not "iso-8859-1"
 
 export type Serializer = ReturnType<typeof createSerializer>;
 
@@ -52,6 +53,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
     readBytes(n: number) {
         const r = this._buffer.slice(this._position, this._position + n);
         this._position += n;
+        console.assert(this._position < this._buffer.byteOffset + this._buffer.byteLength);
         return r;
     },
     writeBytes(bytes: Uint8Array<ArrayBuffer>) {
@@ -104,9 +106,10 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
         name: string
     ): Promise<T | undefined> {
         this.writing = false;
+        const pos = this._position;
         const { version, maxVersion, predicate, type, def, valid, reviver } = field;
         if ((maxVersion || version) && !parent.version) {
-            throw new Error(`Missing parent.version for ${name}`);
+            throw new Error(`Missing parent.version for ${name} at 0x${pos.toString(16)}`);
         }
         if ((!maxVersion || (parent.version ?? 0) <= maxVersion)
             && (!predicate || predicate.call(this, parent))) {
@@ -118,7 +121,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
             }
             if (typeof valid === 'function') {
                 if (!valid.call(this, r, parent)) {
-                    throw new Error(`Invalid value for field "${name}": ${r}`)
+                    throw new Error(`Invalid value for field "${name}": ${r} at 0x${pos.toString(16)}`)
                 }
             }
             if (typeof reviver === 'function') {
@@ -136,7 +139,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
         this.writing = true;
         const { version, maxVersion, predicate, type, replacer } = field;
         if ((maxVersion || version) && !parent.version) {
-            throw new Error(`Missing parent.version for ${name}`);
+            throw new Error(`Missing parent.version for ${name} at 0x${this._position.toString(16)}`);
         }
         if ((!maxVersion || (parent.version ?? 0) <= maxVersion)
             && (!predicate || predicate.call(this, parent))) {
@@ -182,7 +185,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
         name?: string
     ): Promise<T[]> {
         const { itemType } = field;
-        if (!itemType) { throw new Error("undefined field or itemType"); }
+        if (!itemType) { throw new Error(`undefined field or itemType at 0x${this._position.toString(16)}`); }
         const prev = this._arrayIndex;
         const result = Array(n).fill(0);
         for (let i = 0; i < n; i++) {
@@ -199,7 +202,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
         name?: string
     ) {
         const { itemType } = field;
-        if (!itemType) { throw new Error("undefined field or itemType"); }
+        if (!itemType) { throw new Error(`undefined array field or itemType at 0x${this._position.toString(16)}`); }
         const prev = this._arrayIndex;
         items?.forEach((item, i) => {
             this._arrayIndex = i;
@@ -235,6 +238,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
     get i8() {
         const r = this._view.getInt8(this._position);
         this._position += 1;
+        console.assert(this._position < this._buffer.byteOffset + this._buffer.byteLength);
         return r;
     },
     set i8(i) {
@@ -245,6 +249,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
     get i16() {
         const r = this._view.getInt16(this._position, true);
         this._position += 2;
+        console.assert(this._position < this._buffer.byteOffset + this._buffer.byteLength);
         return r;
     },
     set i16(i) {
@@ -264,6 +269,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
     get f32() {
         const r = this._view.getFloat32(this._position, true);
         this._position += 4;
+        console.assert(this._position < this._buffer.byteOffset + this._buffer.byteLength);
         return r;
     },
     set f32(f) {
@@ -297,7 +303,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
             && 1 <= month && month <= 12
             && 1900 <= year && year <= 2060
             && day === result.getDate())) {
-            throw new Error(`Invalid date: ${day}/${month}/${year}`);
+            throw new Error(`Invalid date: ${day}/${month}/${year} at 0x${(this._position - 4).toString(16)}`);
         }
         return result;
     },
@@ -316,14 +322,47 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
         this.u8 = (year >> 8) & 0x7f;
     },
 
+    // https://github.com/Musashii-kun/winscp/blob/e0fcef1c1ea8074dbcf31ea61fa61150bb21eff9/libs/mfc/source/arccore.cpp#L155
+    // CString serialization code
+    // String format:
+    //      UNICODE strings are always prefixed by 0xff, 0xfffe
+    //      if < 0xff chars: len:BYTE, TCHAR chars
+    //      if >= 0xff characters: 0xff, len:WORD, TCHAR chars
+    //      if >= 0xfffe characters: 0xff, 0xffff, len:DWORD, TCHARs    
     get bstr() {
-        const n = this.u8;
+        let n = this.u8;
+        if (n === 0xff) {
+            n = this.u16;
+            if (n === 0xffff) {
+                n = this.u32;
+            } else if (n === 0xfffe) {
+                // unicode
+                n = this.u8;
+                if (n === 0xff) {
+                    n = this.u16;
+                    if (n === 0xffff) {
+                        n = this.u32;
+                    }
+                }
+                return decoderUnicode.decode(this.readBytes(n));
+            }
+        }
         return decoder.decode(this.readBytes(n));
     },
     set bstr(s) {
         // const buf = encoder.encode(s); // UTF-8
         const buf = new Uint8Array([...s ?? ''].map((c) => c.charCodeAt(0)));
-        this.u8 = buf.length;
+        if (buf.length < 0xff) {
+            this.u8 = buf.length;
+        } else {
+            this.u8 = 0xff;
+            if (buf.length < 0xfffe) {
+                this.u16 = buf.length;
+            } else {
+                this.u16 = 0xffff;
+                this.u32 = buf.length;
+            }
+        }
         this.writeBytes(buf);
     },
 
@@ -353,6 +392,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
         // https://www.codeproject.com/Articles/1176939/All-About-MFC-Serialization
         // atlmfc/src/mfc/arcobj.cpp
 
+        const pos = this._position;
         const wTag = this.u16;
         let obTag;
         if (wTag === wBigObjectTag) {
@@ -371,7 +411,7 @@ export const createSerializer = (buffer: Uint8Array<ArrayBuffer>, fileDate?: Dat
             // const nClassIndex = obTag & ~dwBigClassTag;
             const nClassIndex = obTag;
             if (nClassIndex === 0 || !this._classNames[nClassIndex]) {
-                throw new Error(`invalid class index ${nClassIndex}`);
+                throw new Error(`invalid class index ${nClassIndex} at 0x${pos.toString(16)}`);
             }
             const className = this._classNames[nClassIndex];
             this._nMapCount += 1;

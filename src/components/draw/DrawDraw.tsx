@@ -6,7 +6,7 @@ import { selTournament, setTournamentDraw } from "../util/selection";
 import { IconSexe } from "../misc/IconSexe";
 import { commandManager } from "../../services/util/commandManager";
 import { drawLib, GenerateType } from "../../services/draw/drawLib";
-import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
+import { drawName, findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
 import { BUILD, type Draw, PLAN, PLAY, ROUNDROBIN } from "../../domain/draw";
 import type { TEvent } from "../../domain/tournament";
 import { DrawKnockout } from './DrawKnockout';
@@ -126,7 +126,7 @@ const DrawHeader: Component<Props> = (props) => {
                 title="View the previous draw of the event"
             ><i class="icon2-left-arrow" /></a>
             {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info" /></button> */}
-            <span class="inline-block min-w-[5em]">{props.draw.name}</span>
+            <span class="inline-block min-w-[5em]">{drawName(props.draw)}</span>
             <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50",
                 { "pointer-events-none": !nextDraw() }]}
                 // onclick={() => selectDraw(props.event, nextDraw())}

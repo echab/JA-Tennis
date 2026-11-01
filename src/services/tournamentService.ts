@@ -7,7 +7,7 @@ import type { Tournament, TournamentInfo, TEvent, TypeName } from "../domain/tou
 import type { DataType, RankString } from "../domain/types";
 import type { Command } from "./util/commandManager";
 import { selTournament, setSelection, setTournament } from "../components/util/selection";
-import { type Draw, FINAL } from "../domain/draw";
+import { type Draw, FINAL, ROUNDROBIN } from "../domain/draw";
 import { reviverDates } from "../utils/date";
 import { deserializeTournament, serializeTournament } from "../components/tournament/TournamentsStore";
 
@@ -35,7 +35,7 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
         const resp = await fetch(file_url);
         if (resp.ok) {
             const data = await resp.text();
-            const tournament = await deserializeTournament(data); // TODO binary file?
+            const tournament = await deserializeTournament(data, file_url); // TODO binary file?
             tournament._url = file_url;
             return tournament;
         } else {
@@ -198,5 +198,6 @@ export function isSexeCompatible(event: TEvent, sexe: string): boolean {
 export function defaultDrawName({ minRank, maxRank, type }: Pick<Draw, 'minRank' | 'maxRank' | 'type'>): string {
     return type === FINAL
         ? 'Final draw'
-        : minRank === maxRank ? minRank : `${minRank} - ${maxRank}`;
+        // oxlint-disable-next-line no-bitwise
+        : `${type & ROUNDROBIN ? 'Poule ' : ''}${minRank === maxRank ? minRank : `${minRank} - ${maxRank}`}`;
 }

@@ -127,3 +127,7 @@ table.tableau tr:last-child>td
     left: calc(100% + .5em);
     top: calc(50% - .7em);
 }
+
+.tableau.roundrobin td {
+    border: 1px solid grey;
+}
