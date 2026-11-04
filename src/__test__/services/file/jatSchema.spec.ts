@@ -1,17 +1,19 @@
 /// <reference types="node" />
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { KNOCKOUT } from "../../../domain/draw.ts";
 import { docFields } from "../../../services/file/jatSchema.ts";
-import { createReader, createWriter } from "../../../services/file/serializer.ts";
+import { createReader } from "../../../services/file/serialReader.ts";
+import { createWriter } from "../../../services/file/serialWriter.ts";
 import { reviveTournament } from '../../../services/tournamentService.ts';
+import { createResizableWritableStream } from '../../../services/file/file.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 beforeAll(() => {
-    vi.spyOn(globalThis.console, 'warn').mockImplementation(() => {});
+    vi.spyOn(globalThis.console, 'warn').mockImplementation(() => { });
 });
 afterAll(() => {
     vi.restoreAllMocks();
@@ -50,10 +52,9 @@ describe("jatSchema", async () => {
     const refDate = new Date('2025-05-11');
 
     it('should read binary tournament1.jat file version 13', async () => {
-        const b = await readFile(`${__dirname}/tournament1.jat`);
-        const buf = b.buffer;
+        const b = readFileSync(`${__dirname}/tournament1.jat`);
 
-        const reader = createReader(new Uint8Array(buf), refDate);
+        const reader = createReader(new Blob([b]).stream(), refDate);
 
         const result = await reader.readObject(docFields);
 
@@ -64,25 +65,33 @@ describe("jatSchema", async () => {
     });
 
     // it('should read binary tournament1.jat file into snapshot', async () => {
-    //     const b = await readFile(`${__dirname}/tournament1.jat`);
+    //     const b = readFileSync(`${__dirname}/tournament1.jat`);
 
-    //     expect(new Uint8Array(b.buffer)).toMatchSnapshot();
+    //     expect(new Blob([b]).stream()).toMatchSnapshot();
     // });
 
-    it('should save tournament to array buffer', () => {
-        const writer = createWriter(new Uint8Array(8192), refDate); // TODO size
-        writer.writeObject(tournament2, docFields);
-        const buf = writer._buffer.slice(0, writer._position);
+    it('should save tournament to array buffer', async () => {
+        const writable = createResizableWritableStream();
+        {
+            await using writer = createWriter(writable.stream, refDate);
+            await writer.writeObject(tournament2, docFields);
+            // writer.close(); // already closed by using
+        }
+        const buf = writable.writtenBytes;
 
+        expect(buf.length).toBe(562);
         expect(buf).toMatchSnapshot();
     });
 
     it('should save and reload same tournament', async () => {
-        const writer = createWriter(new Uint8Array(8192), refDate); // TODO size
-        writer.writeObject(tournament2, docFields);
-        const buf = writer._buffer.slice(0, writer._position);
+        const writable = createResizableWritableStream();
+        {
+            await using writer = createWriter(writable.stream, refDate); // TODO size
+            await writer.writeObject(tournament2, docFields);
+        }
+        const buf = writable.writtenBytes;
 
-        const reader = createReader(buf, refDate);
+        const reader = createReader(new Blob([buf]).stream(), refDate);
         const result = await reader.readObject(docFields);
 
         expect(result.version).toBe(13);
@@ -90,17 +99,40 @@ describe("jatSchema", async () => {
     });
 
     it('should write binary with the same tournament1.jat content', async () => {
-        const b = await readFile(`${__dirname}/tournament1.jat`);
-        const expected = new Uint8Array(b.buffer);
+        const b = readFileSync(`${__dirname}/tournament1.jat`);
+        const expected = new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
 
-        const reader = createReader(new Uint8Array(b.buffer), refDate);
+        const reader = createReader(new Blob([b]).stream(), refDate);
         const doc = await reader.readObject(docFields);
 
-        const writer = createWriter(new Uint8Array(expected.length * 2), refDate); // TODO size
-        writer.writeObject(doc, docFields);
-        const result = writer._buffer.slice(0, writer._position);
+        const writable = createResizableWritableStream();
+        {
+            await using writer = createWriter(writable.stream, refDate); // TODO size
+            await writer.writeObject(doc, docFields);
+        }
+        const result = writable.writtenBytes;
 
+        expect(result.length).toEqual(expected.byteLength);
+        expect(joinedChunks(result)).toEqual(joinedChunks(expected));
         expect(result).toEqual(expected);
     });
-
 });
+
+function joinedChunks(arr: Uint8Array, size = 32): string {
+    return chunks(arr, size).map((chunk, i) =>
+        `${(i * size).toString(16).padStart(6, '0')}: ` +
+        Array.from(
+            chunk,
+            (v => v.toString(16).padStart(2, '0'))
+        ).join(' ')
+    ).join('\n');
+}
+
+function chunks<T extends Uint8Array>(arr: T, size?: number): T[]
+function chunks(arr: unknown[], size = 32) {
+    const result = [];
+    for (let i = 0; i < arr.length; i += size) {
+        result.push(arr.slice(i, i + size));
+    }
+    return result;
+}

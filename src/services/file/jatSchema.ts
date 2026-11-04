@@ -11,7 +11,9 @@ import { isMatch, isPlayerIn } from "../drawService";
 import { defaultDrawName } from "../tournamentService";
 import { loadType, TYPES } from "../types";
 import { by, byId, indexOf } from "../util/find";
-import { type FieldParent, type Fields, type FnType, generateId, type SerialReader, type SerialWriter } from "./serializer";
+import type {  FieldParent,  Fields,  FnType } from "./serialTypes";
+import { generateId, type SerialReader } from "./serialReader";
+import type { SerialWriter } from "./serialWriter";
 
 const DAY = 24 * 3600 * 1000; // YEAR = DAY * 365.25;
 const MAX_JOUR = 42;
@@ -62,11 +64,11 @@ function buildTeamName(teamIds: string[], players: Player[]): string {
         .join(' / ');
 }
 
-function rankFields<T extends string>(this: JatSerializer, s: T): T {
+async function rankFields<T extends string>(this: JatSerializer, s: T): Promise<T> {
     // _rankAccept: { version: 2, maxVersion: 7, type: "u8", reviver(c, p) { p.rankAccept = p.version < 6 ? c === -5 + 60 ? -6 * 60 : c === -6 * 60 ? 19 * 60 : c : c; } },
     const { rank } = this._types!;
     if (!this.writing) {
-        const b = this.i8;
+        const b = await this.i8();
 
         ASSERT(b === PAS_CLASSEMT || (MAXCLAST <= b && b <= NC));
 
@@ -83,7 +85,7 @@ function rankFields<T extends string>(this: JatSerializer, s: T): T {
         const r = ranks.indexOf(s);
         const cc = s === undefined ? PAS_CLASSEMT : (19 - r) * 60;
         const b = cc / 60 + 1;
-        this.i8 = b;
+        await this.i8(b);
         return '' as T; // unused
     }
 }
@@ -189,15 +191,15 @@ const playerFields: Fields<Player & { version: number, dateMaj: Date }> = {
     // TODO version:1 two additional "00 00" (pos 67 into jeu2test-3.jat) not read ?!?
 } as const;
 
-const scoreFields: FnType<ScoreString> = function(value: string, f, p: PlayerIn & Match) {
+const scoreFields: FnType<ScoreString> = async function(value: string, f, p: PlayerIn & Match) {
     if (!this.writing) {
-        const games = Array.from({ length: 5 }, () => {
-            const b = this.u8;
+        const games = (await Promise.all(Array.from({ length: 5 }, async () => {
+            const b = await this.u8();
             return [b & 0xf, (b >> 4) & 0xf]; // {j1:4, j2:4}
-        }).filter(([g1, g2]) => g1 !== 0 || g2 !== 0)
+        }))).filter(([g1, g2]) => g1 !== 0 || g2 !== 0)
             .map(([g1, g2]) => `${g1}/${g2}`)
             .join(' ');
-        const flags = this.u8;
+        const flags = await this.u8();
         if (flags & 1) { p.wo = true; }
         if (flags & 4) { p.vainqDef = true; }
         return games; // `${games}${flags & 1 ? 'WO' : ''}${flags & 4 ? ' VD' : ''}`;
@@ -205,11 +207,11 @@ const scoreFields: FnType<ScoreString> = function(value: string, f, p: PlayerIn 
         const games = (value ?? '').replace(/WO|\s*VD/g, '').split(' ').map((game) => game.split('/').map((g) => parseInt(g, 10)));
         for (let i = 0; i < 5; i++) {
             const [g1, g2] = games[i] ?? [0, 0];
-            this.u8 = g1 & 0xf | (g2 & 0xf) << 4;
+            await this.u8(g1 & 0xf | (g2 & 0xf) << 4);
         }
         // const flags = (value?.match(/WO/) ? 1 : 0) | (value?.match(/VD/) ? 4 : 0)
         const flags = (p.wo ? 1 : 0) | (p.vainqDef ? 4 : 0)
-        this.u8 = flags;
+        await this.u8(flags);
         return '';
     }
 };
@@ -559,13 +561,13 @@ export const docFields: Fields<Tournament> = {
     _content: { version: 5, type: "u8", def: 1, replacer: () => 1 }, // Contenu { tournoi = 1, epreuve = 2, tableau = 3, boites  = 4, joueurs = 5 }
 
     '_places.avail': {
-        version: 8, type(value, _, doc: Tournament & { _start?: Date, _end?: Date }) {
+        version: 8, async type(value, _, doc: Tournament & { _start?: Date, _end?: Date }) {
             if (!this.writing) {
                 if (doc._start && doc._end && doc.places?.length) {
                     const nDay = Math.floor((doc._end.getTime() - doc._start.getTime()) / DAY) + 1;
                     for (let i = 0; i < nDay; i++) {
                         for (const place of doc.places) {
-                            let avail = this.u32;
+                            let avail = await this.u32();
                             if (doc.version < 11) {
                                 avail = 0xFFFFFFFF;	//always available
                             }
@@ -578,7 +580,7 @@ export const docFields: Fields<Tournament> = {
                     const nDay = Math.floor((doc.info.end.getTime() - doc.info.start.getTime()) / DAY) + 1;
                     for (let i = 0; i < nDay; i++) {
                         for (const place of doc.places) {
-                            this.u32 = place.avail[i];
+                            await this.u32(place.avail[i]);
                         }
                     }
                 }
