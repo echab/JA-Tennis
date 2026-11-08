@@ -9,7 +9,7 @@ import type { Command } from "./util/commandManager";
 import { selTournament, setSelection, setTournament } from "../components/util/selection";
 import { type Draw, FINAL, ROUNDROBIN } from "../domain/draw";
 import { reviverDates } from "../utils/date";
-import { deserializeTournament, serializeTournament } from "../components/tournament/TournamentsStore";
+import { deserializeTournament, serializeTournament } from "./tournamentsStore";
 
 export type TournamentSerial = Omit<Tournament, '_types'> & { _types?: DataType };
 
@@ -67,16 +67,10 @@ export async function load(file_url?: Blob | string): Promise<Tournament> {
 }
 
 export async function save(tournament: Tournament, url?: string) {
-    //   if (!tournament) {
-    //     tournament = selTournament;
-    //   }
-
-    // const data = {};
-    // copy(tournament, data);
     if (!url) {
         //this.$log.info(JSON.stringify(data));
         // window.localStorage.tournament = JSON.stringify(data);
-        window.localStorage.setItem('tournament', serializeTournament(tournament));
+        window.localStorage.setItem('tournament', await serializeTournament(tournament));
         return;
     }
 

@@ -3,7 +3,7 @@ import { useNavigate } from "@solidjs/router";
 import { openFile, saveFile } from "../../services/file/file";
 import { showDialog } from "../Dialogs";
 import { selectTournament, selTournament } from "../util/selection";
-import { clearStoredTournaments, listStoredTournaments, restoreTournament, storeTournament } from "./TournamentsStore";
+import { clearStoredTournaments, listStoredTournaments, restoreTournament, storeTournament } from "../../services/tournamentsStore";
 import { dateLocal } from "../../utils/date";
 import type { Tournament } from "../../domain/tournament";
 import { Router } from "../../router";

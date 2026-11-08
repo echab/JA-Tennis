@@ -478,3 +478,51 @@ export async function* streamRecords(stream: ReadableStream, recordSize: number)
         reader.releaseLock();
     }
 }
+
+/**
+ * Convert the input data to base64, optionally compressed.
+ * @param str a string, a blob or a readable stream.
+ */
+export async function toBase64(str: BlobPart | ReadableStream<Uint8Array<ArrayBuffer>>, gzip = true): Promise<string> {
+    const stream = str instanceof ReadableStream ? str : new Blob([str]).stream();
+
+    const blob = await new Response(
+        gzip ? stream.pipeThrough(new CompressionStream("gzip")) : stream
+    ).blob();
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const dataUrl = reader.result as string | null;
+            const i = dataUrl?.indexOf(',') ?? -1;
+            if (!dataUrl || i < 0) {
+                reject('empty stream');
+                return;
+            }
+            resolve(dataUrl.slice(i + 1));
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+/**
+ * Convert a base64 string, potentially gzip compressed, into a plain string.
+ * @param base64 base64 encoded string or data URL
+ */
+export async function fromBase64(base64: string): Promise<string> {
+    if (!base64.startsWith('data:')) {
+        base64 = `data:application/octet-stream;base64,${base64}`;
+        // base64 = `data:application/${base64.startsWith('\x1F\x8B\x08') ? 'gzip' : 'octet-stream'};base64,${base64}`;
+    }
+
+    let response = await fetch(base64);
+    if (!response.body) {
+        throw new Error('Converting base64');
+    }
+    if (base64.startsWith('data:application/octet-stream;base64,H4sI')) { // gzip signature: 1F8B08
+        response = new Response(response.body.pipeThrough(new DecompressionStream('gzip')));
+    }
+
+    return response.text();
+}

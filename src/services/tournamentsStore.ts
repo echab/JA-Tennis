@@ -1,11 +1,11 @@
 import { createStore, snapshot } from "solid-js";
-import { replacerPrivateField } from "../../services/util/object";
-import type { Tournament } from "../../domain/tournament";
-import { reviveTournament } from "../../services/tournamentService";
-import { reviverDates } from "../../utils/date";
-import { emptyTournament, mockTournament } from "../../assets/data";
+import { replacerPrivateField } from "./util/object";
+import type { Tournament } from "../domain/tournament";
+import { reviveTournament } from "./tournamentService";
+import { reviverDates } from "../utils/date";
+import { emptyTournament, mockTournament } from "../assets/data";
+import { fromBase64, toBase64 } from "./file/buffer";
 
-// TODO store tournaments as binary, to avoid deep reactivity, and initTournament on load
 type StoredTournament = {
     name: string;
     id: string,
@@ -20,13 +20,15 @@ const [storedTournaments, setStoredTournaments] = createStore<StoredTournament[]
     { shallow: true, name: 'tournamentsStore' }
 );
 
-export function serializeTournament(tournament: Tournament) {
-    // TODO binary/base64 instead of json
-    return JSON.stringify(tournament, replacerPrivateField);
+export async function serializeTournament(tournament: Tournament): Promise<string> {
+    const json = JSON.stringify(tournament, replacerPrivateField);
+    return toBase64(json);
 }
 
 export async function deserializeTournament(data: string, url?: string): Promise<Tournament> {
-    // TODO binary/base64 instead of json
+    if (!data.startsWith('{')) {
+        data = await fromBase64(data);
+    }
     const t = await reviveTournament(JSON.parse(data, reviverDates));
     t._url = url;
     return t;
@@ -46,13 +48,13 @@ export async function clearStoredTournaments() {
     return t;
 }
 
-export function storeTournament(tournament: Tournament): StoredTournament {
+export async function storeTournament(tournament: Tournament): Promise<StoredTournament> {
     const t = {
         name: tournament.info.name,
         id: tournament.id,
         date: new Date(Date.now()),
         url: tournament._url,
-        content: serializeTournament(tournament),
+        content: await serializeTournament(tournament),
     };
     setStoredTournaments((a) => {
         const i = a.findIndex((t) => t.id === tournament.id);

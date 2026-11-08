@@ -5,7 +5,7 @@ import { selection, selectTournament, selTournament } from './components/util/se
 import { SidePanel } from './components/SidePanel';
 import { Dialogs } from './components/Dialogs';
 // import { ErrorToast } from './components/misc/ErrorToast';
-import { restoreTournament } from './components/tournament/TournamentsStore';
+import { restoreTournament } from './services/tournamentsStore';
 
 import styles from './App.module.css';
 import './index.css';
