@@ -6,6 +6,7 @@ import { TEvent, Tournament } from '../../domain/tournament';
 import { useForm } from '../util/useForm';
 import { byId } from '../../services/util/find';
 import { dateTimeLocal } from '../../utils/date';
+import { drawName } from '../../services/drawService';
 
 type Props = {
     event: TEvent;
@@ -95,6 +96,12 @@ export const DialogMatch: Component<Props> = (props) => {
             <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
                     {/* <input id="id" type="hidden" value={form.id} /> */}
+                    <div 
+                        class={["border-l-8 mb-2"]}
+                        style={{ "border-color": props.event.color ?? 'transparent' }}                        
+                    >
+                        {props.event.name} - {drawName(props.draw)}
+                    </div>
 
                     <div class="mb-1">
                         <span class="inline-block w-3/12 text-right pr-3">Winner:</span>

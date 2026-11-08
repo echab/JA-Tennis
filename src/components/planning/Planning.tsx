@@ -1,7 +1,6 @@
 import { type Component, createMemo, For, Show } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { matchesByDays } from "../../services/planningService";
-import { defined } from "../../services/util/object";
+import { matchesOfTheDay } from "../../services/planningService";
 import { DAYS, minutes } from "../../utils/date";
 import { showDialog } from "../Dialogs";
 import { selectPlace, selTournament } from "../util/selection";
@@ -21,20 +20,20 @@ export const Planning: Component<Props> = (props) => {
 
     const editPlace = (iPlace?: number) => { selectPlace(iPlace); showDialog({ name: "place" }); };
 
-    const start = () => selTournament.info.start;
+    const days = createMemo(() => {
+        const { start, end } = selTournament.info;
+        if (!start || !end || start > end) {
+            return [];
+        }
+        const dayCount = Math.floor((end.getTime() - start.getTime()) / DAYS + 1);
+        const d0 = start.getTime();
+        return Array.from({ length: dayCount }, (_, i) => new Date(d0 + i * DAYS));
+    }, { name: 'mDays' });
 
-    const slots = createMemo(() => matchesByDays(selTournament), { name: 'planningSlots'});
-    // const slots = () => matchesByDays(selTournament);
-
-    const days = () => slots().map((_, i) => {
-        const d0 = start();
-        return d0 ? new Date(d0.getTime() + i * DAYS) : undefined
-    }).filter(defined);
-
-    const daySlots = () => props.day !== undefined ? slots()[props.day] : [];
+    const daySlots = createMemo(() => props.day !== undefined ? matchesOfTheDay(selTournament, props.day) : [], { name: 'mDaySlots' });
 
     const prevDay = () => props.day ? props.day - 1 : undefined;
-    const nextDay = () => props.day !== undefined && props.day + 1 < slots().length ? props.day + 1 : undefined;
+    const nextDay = () => props.day !== undefined && props.day + 1 < days().length ? props.day + 1 : undefined;
 
     const hourStart = 8, hourEnd = 23;
     const hours = Array.from({ length: hourEnd - hourStart }, (_, i) => `${hourStart + i}h `);
@@ -68,7 +67,7 @@ export const Planning: Component<Props> = (props) => {
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
             <Show when={props.short}>
-                <a href={Router.paths.planning(props.day ?? '')(location.query)} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
+                <a href={Router.paths.planning(props.day ?? '')({ ...location.query, pane: '' })} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
             </Show>
         </div>
 

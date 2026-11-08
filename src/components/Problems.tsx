@@ -4,6 +4,7 @@ import { validateTournament } from "../services/validationService";
 import { IconSexe } from "./misc/IconSexe";
 import { drawById, selection, selTournament } from "./util/selection";
 import { Router } from "../router";
+import { drawName } from "../services/drawService";
 
 export const Problems: Component = () => {
     const [selectedDraw, setSelectedDraw] = createSignal(false, { name: 'pb:selectedDraw' });
@@ -43,7 +44,7 @@ export const Problems: Component = () => {
                         style={{ "border-color": event?.color ?? 'transparent' }}
                     >
                         <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(location.query, location.hash)} replace>
-                            <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {draw?.name || eventdrawId}
+                            <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {drawName(draw) || eventdrawId}
                         </a>
                     </h4>
                     <ul>

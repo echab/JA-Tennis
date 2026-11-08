@@ -6,6 +6,7 @@ import type { Slot, Tournament } from "../../domain/tournament";
 import { byId } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
 import { selectBox, selectPlayer, urlBox } from "../util/selection";
+import { drawName } from "../../services/drawService";
 
 type PlayerProps = {
     qualifIn?: number;
@@ -51,7 +52,7 @@ export const PlanningSlot: Component<Props> = (props) => {
     return <li
         class={["bg-slate-300 border-l-8", { 'crossed-out': !!match.playerId }]}
         style={{ "border-color": props.slot.event?.color ?? 'transparent', ...props.style }}
-        title={`${props.slot.event.name} - ${props.slot.draw.name}`}
+        title={`${props.slot.event.name} - ${drawName(props.slot.draw)}`}
         id={`${match.position}-${props.slot.draw.id}-${props.slot.event.id}`}
     >
         <SlotPlayer qualifIn={player1?.qualifIn} player={p1} aware={match.aware1} />

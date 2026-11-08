@@ -16,8 +16,8 @@ import { defaultDrawName } from "./tournamentService";
 const MAX_TETESERIE = 32,
     MAX_QUALIF = 32;
 
-export function drawName(draw: Draw) {
-    return draw.name || defaultDrawName(draw);
+export function drawName(draw?: OptionalId<Draw>) {
+    return draw ? draw.name || defaultDrawName(draw) : '';
 }
 
 export function updateDraws(
@@ -46,7 +46,7 @@ export function updateDraws(
         selectDraw(event.id, prev?.id);
     };
 
-    return { name: `Add draw ${draw.name}`, act, undo };
+    return { name: `Add draw ${drawName(draw)}`, act, undo };
 }
 
 export function updateMatch(event: TEvent, draw: Draw, match: Match): Command {
@@ -136,7 +136,7 @@ export function deleteDraw(eventId: string, drawId: string): Command {
         selectDraw(eventId, prevDraw.id);
     };
 
-    return { name: `Remove draw ${prevDraw.name}`, act, undo };
+    return { name: `Remove draw ${drawName(prevDraw)}`, act, undo };
 }
 
 //newBox(parent: Draw, matchFormat?: string, position?: number): Box

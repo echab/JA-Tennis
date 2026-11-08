@@ -5,7 +5,7 @@ import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
 import type { TEvent, Tournament } from '../../domain/tournament';
-import { deleteDraw, findGroupQualifOuts, groupDraw } from '../../services/drawService';
+import { deleteDraw, drawName, findGroupQualifOuts, groupDraw } from '../../services/drawService';
 import { getRegisteredPlayers, defaultDrawName } from '../../services/tournamentService';
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
@@ -132,7 +132,7 @@ export const DialogDraw: Component<Props> = (props) => {
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
             <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <span><i class='icon2-draw' /> <IconSexe sexe={event.sexe} double={event.typeDouble} />{event.name} - <b>{draw ? `Edit draw ${draw?.name ?? ''}` : 'New draw'}</b></span>
+                <span><i class='icon2-draw' /> <IconSexe sexe={event.sexe} double={event.typeDouble} />{event.name} - <b>{draw ? `Edit draw ${drawName(draw)}` : 'New draw'}</b></span>
                 <small>Id: {draw?.id}</small>
                 <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}

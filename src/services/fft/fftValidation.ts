@@ -50,7 +50,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
         //VERIFIE //1   //progression des classements
         //rank progress, no more than two ranks difference into a column
-        if (player && !isTypePoule) {
+        if (player && boxIn && !isTypePoule) {
             const c = column(box.position);
 
             const colRank = pColClast[player.rank];

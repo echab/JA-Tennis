@@ -10,11 +10,11 @@ import { MINUTES } from '../../utils/date';
 import { drawLib } from './drawLib';
 import { DrawProblem } from '../../domain/validation';
 import { ASSERT } from '../../utils/tool';
-import { dayOf, matchesByDays } from '../planningService';
+import { dayOf, matchesOfTheDay } from '../planningService';
 
-const MAX_TETESERIE = 32,
+const MAX_TETESERIE = 32;
     // MAX_QUALIF = 32,
-    MAX_MATCHJOUR = 16;
+    // MAX_MATCHJOUR = 16,
 
 function validateGroup({ rank }: DataType, event: TEvent, draw: Draw): DrawProblem[] {
     const result: DrawProblem[] = [];
@@ -237,20 +237,23 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
 
             ASSERT(!!player1 && !!player2);
 
-            if (!match.score) {
+            if (!match.score && !match.wo) {
 
                 if (match.playerId) {
                     result.push({ message: 'ERR_VAINQ_SCORE_NO', draw, box: match, player, detail: player?.name });
                 }
 
             } else {
-                ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut), 'No match on left column'); //Pas de match colonne de gauche
+                // ASSERT(b < positionBottomCol(draw.nbColumn, draw.nbOut), `No match on left column (${event.name} - ${drawName(draw)} pos=${b})`); //Pas de match colonne de gauche
 
                 if (!match.playerId) {
                     result.push({ message: 'ERR_SCORE_VAINQ_NO', draw, box: match });
                 }
 
-                if (!score.isValid(match.score)) {
+                if (!match.wo && !score.isValid(match.score)) {
+                    result.push({ message: 'ERR_SCORE_BAD', draw, box: match, player, detail: match.score as string });
+                }
+                if (match.wo && match.score) {
                     result.push({ message: 'ERR_SCORE_BAD', draw, box: match, player, detail: match.score as string });
                 }
 
@@ -330,8 +333,8 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
                 if (tournament.info.start && tournament.info.end) {
                     const day = dayOf(match.date, tournament.info);
                     if (isFinite(day)) {
-                        const dayMatches = matchesByDays(tournament)[day];
-                        ASSERT(dayMatches && dayMatches.length <= MAX_MATCHJOUR);
+                        const dayMatches = matchesOfTheDay(tournament, day);
+                        // ASSERT(dayMatches && dayMatches.length <= MAX_MATCHJOUR);
 
                         for (let m = dayMatches.length - 1; m >= 0; m--) {
                             const match2 = dayMatches[m].match;

@@ -7,7 +7,7 @@ import { atMidnight, atZeroHour } from "../../utils/date";
 import { ASSERT } from "../../utils/tool";
 import { drawLib } from "../draw/drawLib";
 import { column, columnMax, positionBottomCol, positionMax, positionMin, scanLeftBoxes } from "../draw/knockoutLib";
-import { isMatch, isPlayerIn } from "../drawService";
+import { drawName, isMatch, isPlayerIn } from "../drawService";
 import { defaultDrawName } from "../tournamentService";
 import { loadType, TYPES } from "../types";
 import { by, byId, indexOf } from "../util/find";
@@ -249,6 +249,14 @@ const boxFields: Fields<PlayerIn & Match & { version: number }> = {
             if (p.aware1 === 0) { delete p.aware1; }
             if (p.aware2 === 0) { delete p.aware2; }
             if (p.matchFormat === 0) { delete p.matchFormat; }
+
+            if ((p.qualifIn || p.seeded) && p.score === '') {
+                delete (p as Partial<Match>).score;
+                delete p.receive;
+                delete p.aware1;
+                delete p.aware2;
+                delete p.matchFormat;
+            }
         },
         replacer: (f: number, p: PlayerIn & Match) => {
             let result = f;
@@ -351,12 +359,12 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
                 // const hideBox = (box: Box, b: number) => box.hidden = true;
                 for (const box of p.boxes) {
                     if (isPlayerIn(box)) {
-                        for (const leftBox of scanLeftBoxes(p, box.position, false)) {
+                        for (const leftBox of scanLeftBoxes(p, box.position, true)) {
                             if (leftBox.playerId) {
-                                console.warn(`cleanup draw ${p.id} ${p.name} box.pos=${leftBox.position} player=${leftBox.playerId}`);
+                                console.warn(`cleanup draw ${p.id} ${drawName(p)} box.pos=${leftBox.position} player=${leftBox.playerId}`);
                             } else {
                                 const b = indexOf(p.boxes, "position", leftBox.position);
-                                delete p.boxes[b];
+                                p.boxes.splice(b, 1);
                             }
                         }
                     }
@@ -368,7 +376,9 @@ const drawFields: Fields<Draw & { version: number, dateMaj: Date }> = {
                     const pMin = positionBottomCol(leftCol, p.nbOut);
                     for( const box of p.boxes) {
                         if (box.position >= pMin && isMatch(box)) {
-                            console.warn(`cleanup draw ${p.id} ${p.name} box.pos=${box.position} remove match on left column`);
+                            if (box.score || box.date) {
+                                console.warn(`cleanup draw ${p.id} ${drawName(p)} box.pos=${box.position} remove match on left column (score=${box.score} date=${box.date})`);
+                            }
                             delete (box as Partial<Match>).score;
                         }
                     }

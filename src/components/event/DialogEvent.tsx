@@ -7,6 +7,7 @@ import { deleteEvent } from '../../services/eventService';
 import { commandManager } from '../../services/util/commandManager';
 import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
+import { drawName } from '../../services/drawService';
 
 const EMPTY: OptionalId<TEvent> = { name: '', sexe: 'H', category: -1, maxRank: 'NC', draws: [] };
 
@@ -178,7 +179,7 @@ export const DialogEvent: Component<Props> = (props) => {
                 <div class="mb-1">
                     <label class="inline-block w-3/12 text-right pr-3">Draws:</label>
                     <For each={event?.draws}>{(draw) =>
-                        <span><i class="icon2-draw" /> {draw.name}</span>
+                        <span><i class="icon2-draw" /> {drawName(draw)}</span>
                     }</For>
                 </div>
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>

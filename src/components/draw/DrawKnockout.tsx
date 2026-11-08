@@ -3,11 +3,11 @@ import { type Component, createMemo, For, onSettled, Repeat, Show } from 'solid-
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Params } from '../../App';
-import { selectBox, urlBox } from '../util/selection';
+import { selectBox, selectPlayer, urlBox } from '../util/selection';
 import { type PlayerIn, type Draw, type Match, BUILD, FINAL } from '../../domain/draw';
 import { by, byId, mapBy } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
-import { isMatch } from '../../services/drawService';
+import { isMatch, isPlayerIn } from '../../services/drawService';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent1, positionTopCol } from '../../services/draw/knockoutLib';
 import { drawLib } from '../../services/draw/drawLib';
 import './Draw.css';
@@ -83,7 +83,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                 evt.preventDefault();
                 const box = by(props.draw.boxes, 'position', pos);
                 if (box) {
-                    navigate(urlBox(box, props.draw, props.event, props.tournament, location.query))
+                    navigate(urlBox(box, props.draw, props.event, props.tournament, location.query), { replace: true, scroll: false });
                 }
             }
         };
@@ -102,7 +102,8 @@ export const DrawKnockout: Component<Props> = (props) => {
                             <Show when={props.draw.lock === BUILD || even || odd}>
                                 {/* TODO <DrawBox box={box} player={player} /> */}
                                 <a class={["boite joueur block print:border-none print:bg-transparent",
-                                    { selected: !!params.boxPos && +params.boxPos === box?.position }]}
+                                    { selected: !!params.boxPos && +params.boxPos === box?.position }
+                                ]}
                                     // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                                     // onclick={() => navigate(urlBox(box), {replace:true})}
                                     href={urlBox(box, props.draw, props.event, props.tournament, location.query)} replace noscroll
@@ -113,16 +114,24 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     <Show when={box?.seeded}><span class="ts">{box!.seeded}</span></Show>
 
                                     <Show when={box?.order && box.order > 0}><small class="pr-1">{box!.order}</small></Show>
-                                    <Show when={box && isMatch(box)}><small class="pr-1">m</small></Show>
 
                                     <Show when={box?.vainqDef} fallback={
                                         <span class="nom">{player?.name}
-                                            <Show when={box?.order && box.order > 0}> {player?.firstname}</Show>
+                                            <Show when={(box?.order && box.order > 0) || box?.qualifIn !== undefined || box?.qualifOut !== undefined}> {player?.firstname}</Show>
                                         </span>
                                     }>
                                         <span class="nom inline-block border-l-2 border-gray-500 pl-1">{player?.name} requalified<br />{otherName()(box)} withdraws</span>
                                     </Show>
                                     <Show when={box?.order && box.order > 0 && player?.rank}><span class="classement">{player!.rank}</span></Show>
+                                    <Show when={isPlayerIn(box) && box.playerId} keyed>{(playerId) =>
+                                        <span title="Edit the player"
+                                            onClick={() => {
+                                                selectPlayer(playerId);
+                                                showDialog({ name: "player" });
+                                            }}>
+                                            <i class="icon2-player hover2" />
+                                        </span>
+                                    }</Show>
                                     <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                                     <br />
                                     <Show when={box?.order && box.order > 0}>
@@ -134,14 +143,14 @@ export const DrawKnockout: Component<Props> = (props) => {
                                         /> */}
                                         <span class="club">{player?.club}</span>
                                     </Show>
-                                    <Show when={box && isMatch(box)}>
+                                    <Show when={isMatch(box)}>
                                         <span title="Edit the match"
                                             onClick={() => {
                                                 selectBox(props.event.id, props.draw.id, box?.position);
                                                 showDialog({ name: "match" });
                                             }}>
                                             <i class="icon2-match hover2" />
-                                            <Show when={box?.note}><i class='icon2-note'/></Show>
+                                            <Show when={box?.note}>{(note) => <i class='icon2-note' title={note()}/>}</Show>
                                         </span>
 
                                         <i class={{

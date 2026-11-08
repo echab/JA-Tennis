@@ -41,7 +41,7 @@ export function dayOf(date: Date | undefined, { start, end }: { start?: Date, en
     return Math.floor((d - start.getTime()) / DAYS);
 }
 
-export function matchesByDays(tournament: Tournament): Slot[][] {
+export function matchesOfTheDay(tournament: Tournament, day: number): Slot[] {
     const { start, end } = tournament.info;
 
     if (!start || !end || start > end) {
@@ -49,26 +49,27 @@ export function matchesByDays(tournament: Tournament): Slot[][] {
     }
 
     const dayCount = Math.floor((end.getTime() - start.getTime()) / DAYS + 1);
+    if (day < 0 || dayCount < day) {
+        return [];
+    }
 
-    const result = Array.from<unknown, Slot[]>({ length: dayCount }, () => []);
+    const result: Slot[] = [];
 
     for (const event of tournament.events) {
         for (const draw of event.draws) {
             const lib = drawLib(event, draw);
             for (const match of draw.boxes) {
                 if (isMatch(match) && match.date) {
-                    const day = dayOf(match.date, tournament.info);
-                    if (isFinite(day)) {
+                    const d = dayOf(match.date, tournament.info);
+                    if (isFinite(d) && day === d) {
                         const { player1, player2 } = lib.boxesOpponents(match);
-                        result[day].push({ event, draw, match, player1, player2 });
+                        result.push({ event, draw, match, player1, player2 });
                     }
                 }
             }
         }
     }
-    result.forEach((matches) => {
-        matches.sort(bySlotTime);
-    });
+    result.sort(bySlotTime);
 
     return result;
 }

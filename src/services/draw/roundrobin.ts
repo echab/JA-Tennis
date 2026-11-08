@@ -3,7 +3,7 @@ import type { Player } from '../../domain/player';
 import { Draw, Match, PlayerIn, ROUNDROBIN } from '../../domain/draw';
 import { DrawLibBase } from './drawLibBase';
 import { indexOf, by } from '../util/find';
-import { groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
+import { drawName, groupDraw, groupFindPlayerIn, groupFindPlayerOut, newBox, newDraw, nextGroup } from '../drawService';
 import { sortPlayers } from '../tournamentService';
 import { ASSERT } from '../../utils/tool';
 import { positionOpponent1, iDiagonalePos, positionFirstIn, positionLastIn, positionResize, seedPositionOpponent1, seedPositionOpponent2 } from './roundrobinLib';
@@ -223,7 +223,7 @@ export class Roundrobin extends DrawLibBase implements IDrawLib {
         const draws: Draw[] = [];
 
         //Créé les poules
-        const name = refDraw.name;
+        const name = drawName(refDraw);
         for (let t = 0; t < nDraw; t++) {
             let draw: Draw;
             if (t === 0) {

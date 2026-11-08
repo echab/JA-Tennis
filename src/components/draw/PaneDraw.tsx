@@ -18,6 +18,7 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
         untrack(() => {
             // console.log('effect: select box', boxPos, eventId, drawId);
             selectBox(eventId, drawId, Number(boxPos));
+            document.getElementById(`pos${boxPos}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     });
 
