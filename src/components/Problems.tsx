@@ -1,18 +1,18 @@
-import { type Component, createMemo, createSignal, For } from "solid-js";
+import { type Component, createMemo, For } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import { validateTournament } from "../services/validationService";
 import { IconSexe } from "./misc/IconSexe";
 import { drawById, selection, selTournament } from "./util/selection";
 import { Router } from "../router";
 import { drawName } from "../services/drawService";
+import { changeSetting, setting } from "../services/settings";
 
 export const Problems: Component = () => {
-    const [selectedDraw, setSelectedDraw] = createSignal(false, { name: 'pb:selectedDraw' });
     const location = useLocation();
     
     const filteredDrawProblems = createMemo(() =>
         [...selection.drawProblems.entries()]
-        .filter(([edId]) => !selectedDraw() || (edId.startsWith(`${selection.draw?.id}-`)))
+        .filter(([edId]) => !setting.pbSelectedDraw || (edId.startsWith(`${selection.draw?.id}-`)))
         .map(([eventdrawId, errors]) => ({ eventdrawId, ...drawById(eventdrawId), errors }))
     );
 
@@ -20,8 +20,8 @@ export const Problems: Component = () => {
         <div class="flex justify-between items-center px-2">
             <h3>Problems</h3>
             <label><input type="checkbox"
-                checked={selectedDraw()}
-                onChange={({target}) => setSelectedDraw((target as HTMLInputElement).checked)}
+                checked={setting.pbSelectedDraw}
+                onChange={({target}) => changeSetting('pbSelectedDraw', (target as HTMLInputElement).checked)}
             /> selected draw</label>
             <button onClick={() => validateTournament(selTournament)}><i class="icon2-refresh" /></button>
         </div>

@@ -1,6 +1,6 @@
-import { type Component, For, onSettled, untrack } from 'solid-js';
+import { type Component, createMemo, For, onSettled, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
-import { type Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
+import { BUILD, type Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
@@ -61,8 +61,8 @@ export const DialogDraw: Component<Props> = (props) => {
     drawTypes[ROUNDROBIN_RETURN] = { value: ROUNDROBIN_RETURN, label: "Round-robin with return" };
 
     /** @returns registered players and entries numbers from previous draw */
-    const registeredPlayersOrQ = (): Array<Player|number> => {
-        const players: Array<Player|number> = getRegisteredPlayers(_types, props.tournament.players, event, form.minRank, form.maxRank);
+    const registeredPlayersOrQ = createMemo((): Array<Player|number> => {
+        const players: Array<Player|number> = untrack(() => getRegisteredPlayers(_types, props.tournament.players, event, form.minRank, form.maxRank));
         const prevDraw = event.draws.at(-1);
         if (prevDraw) {
             const [iStart, iNext] = groupDraw(event, prevDraw.id);
@@ -74,7 +74,7 @@ export const DialogDraw: Component<Props> = (props) => {
             }
         }
         return players;
-    }
+    }, { name: 'mRegisteredPlayersOrQ' });
 
     const getNbEntry = (): number => {
         // eslint-disable-next-line no-bitwise
@@ -181,19 +181,19 @@ export const DialogDraw: Component<Props> = (props) => {
                         <legend>Dimensions:</legend>
                         <div class="mb-1">
                             <span class="inline-block w-3/12 text-right pr-3" />
-                            <label><input type="checkbox" checked={form.lock === PLAN} value={PLAN} onChange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
+                            <label><input type="checkbox" defaultChecked={form.lock === PLAN} value={PLAN} onChange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
                         </div>
                         <div class="mb-1">
                             <label for="nbIn" class="inline-block w-3/12 text-right pr-3">Entries:</label>
-                            <input id="nbIn" type="number" readonly value={getNbEntry()} class="w-3/12 p-1" />
+                            <input id="nbIn" type="number" readonly value={getNbEntry()} class="w-3/12 p-1 opacity-60" />
                         </div>
                         <div class="mb-1">
                             <label for="nbColumn" class="inline-block w-3/12 text-right pr-3">Columns:</label>
-                            <input id="nbColumn" type="number" value={form.nbColumn} onChange={updateField('nbColumn')} min="2" max="9" required class="w-3/12 p-1" />
+                            <input id="nbColumn" type="number" value={form.nbColumn} disabled={form.lock !== BUILD} onChange={updateField('nbColumn')} min="2" max="9" required class="w-3/12 p-1" />
                         </div>
                         <div class="mb-1">
                             <label for="nbOut" class="inline-block w-3/12 text-right pr-3">Outputs:</label>
-                            <input id="nbOut" type="number" value={form.nbOut} onChange={updateField('nbOut')} min="1" max="16" required class="w-3/12 p-1" />
+                            <input id="nbOut" type="number" value={form.nbOut} disabled={form.lock !== BUILD} onChange={updateField('nbOut')} min="1" max="16" required class="w-3/12 p-1" />
                         </div>
                     </fieldset>
 
@@ -204,7 +204,7 @@ export const DialogDraw: Component<Props> = (props) => {
                 </div>
                 <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
                     <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
-                        value="Delete" disabled={!form.id}
+                        value="Delete" disabled={!form.id || form.lock !== BUILD}
                         onClick={deleteAndClose}
                     >✖ Delete
                     </button>
@@ -216,6 +216,7 @@ export const DialogDraw: Component<Props> = (props) => {
 
                     <button type="submit" value="generate"
                         //  disabled={!!drawForm.$error.required}
+                        disabled={form.lock !== BUILD}
                         class="rounded-md border border-transparent bg-indigo-200 py-2 px-4 min-w-24">
                         <i class="icon2-draw-generate" /> Generate
                     </button>

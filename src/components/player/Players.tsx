@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, For, Show, untrack } from 'solid-js';
+import { Component, createMemo, For, Show, untrack } from 'solid-js';
 import { selection, selectPlayer, selTournament } from '../util/selection';
 import { dragStart } from '../../services/util/dragdrop';
 import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
@@ -6,6 +6,7 @@ import { findDrawPlayerIds } from '../../services/drawService';
 import { getId } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
+import { changeSetting, setting } from '../../services/settings';
 
 type Props = {
     short?: boolean;
@@ -17,10 +18,8 @@ export const Players: Component<Props> = (props) => {
 
     // const location = useLocation();
 
-    const [registered, setRegistered] = createSignal(() => !!props.short, { name: 'registered'});
-
     const visiblePlayers = createMemo(() =>
-        registered() && selection.event
+        setting.registered && selection.event
             ? selTournament.players.filter((p) => untrack(() => p.registration.includes(selection.event!.id)))
             : selTournament.players
     );
@@ -46,8 +45,8 @@ export const Players: Component<Props> = (props) => {
                 <h3>Players</h3>
 
                 <label><input type="checkbox"
-                    checked={registered()}
-                    onChange={({target}) => setRegistered((target as HTMLInputElement).checked)}
+                    checked={setting.registered}
+                    onChange={({target}) => changeSetting('registered', (target as HTMLInputElement).checked)}
                 /> registered</label>
 
                 <button type="button" onClick={() => editPlayer(undefined)} class="p-2 rounded-full" title='Add player'>➕</button>

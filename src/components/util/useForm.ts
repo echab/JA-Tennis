@@ -52,7 +52,10 @@ export function useForm<FormFields extends {} = Record<string, string | number |
         const input = event.currentTarget as HTMLInputElement;
         setForm((draft) => {
             if (input.type === "checkbox") {
-                draft[fieldName] = !!input.checked as any_;
+                const t = typeof draft[fieldName];
+                const vTrue = t === 'number' ? Number(input.value ?? 1) : t === 'boolean' ? true : 'on';
+                const vFalse = t === 'number' ? 0 : undefined;
+                draft[fieldName] = input.checked ? vTrue : vFalse as any_;
             } else if (input.type === "radio") {
                 if (input.checked) {
                     const v = input.value;

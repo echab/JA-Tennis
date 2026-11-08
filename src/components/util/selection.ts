@@ -10,7 +10,7 @@ import { validateDraw, validatePlayer } from "../../services/validationService";
 import { minutes } from "../../utils/date";
 import { emptyTournament } from "../../assets/data";
 import { Router } from "../../router";
-import { byId } from "../../services/util/find";
+import { by, byId } from "../../services/util/find";
 
 // create a store for the tournament to use reconcile() on load
 export const [selTournament, setTournament] = createStore<Tournament>(emptyTournament, null, { name: 'selTournament'});
@@ -114,8 +114,11 @@ export function selectPlace(i?: number): void {
 export function selectDraw(eventId?: string, drawId?: string): void {
     setSelection((sel) => {
         // const { draw, event } = drawById(drawId, eventId);
-        sel.event = selTournament.events.find((e) => e.id === eventId);
-        sel.draw = drawId ? sel.event?.draws.find((d) => d.id === drawId) : undefined;
+        // const evt = sel.event = selTournament.events.find((e) => e.id === eventId);
+        // sel.draw = drawId ? evt?.draws.find((d) => d.id === drawId) : undefined;
+        const evt = sel.event = byId(selTournament.events, eventId);
+        sel.draw = evt ? byId(evt.draws, drawId) : undefined;
+
         sel.box = undefined;
         sel.boxQ = undefined;
     });
@@ -123,9 +126,28 @@ export function selectDraw(eventId?: string, drawId?: string): void {
 
 export function selectBox(eventId?: string, drawId?: string, boxPos?: number): void {
     setSelection((sel) => {
-        const evt = sel.event = eventId ? selTournament.events.find((e) => e.id === eventId) : undefined;
-        const drw = sel.draw = drawId ? evt?.draws.find((d) => d.id === drawId) : undefined;
-        const box = sel.box = boxPos ? drw?.boxes.find((b) => b.position === boxPos) : undefined;
+        // const evt = sel.event = eventId ? selTournament.events.find((e) => e.id === eventId) : undefined;
+        // const drw = sel.draw = drawId ? evt?.draws.find((d) => d.id === drawId) : undefined;
+        // const box = sel.box = boxPos ? drw?.boxes.find((b) => b.position === boxPos) : undefined;
+
+        const evt = sel.event = byId(selTournament.events, eventId);
+        const drw = sel.draw = evt ? byId(evt.draws, drawId) : undefined; // TODO IMMUTABLE_UPDATE_IN_STORE
+
+        // const drw = evt ? byId(evt.draws, drawId) : undefined;
+        // if (drw && sel.draw) {
+        //     reconcile(drw, null)(sel.draw);
+        // } else {
+        //     sel.draw = drw;
+        // }
+        
+        // const drw = evt ? byId(evt.draws, drawId) : undefined;
+        // if (sel.draw && drw) {
+        //     applyChanges(sel.draw, drw);
+        // } else {
+        //     sel.draw = drw;
+        // }
+
+        const box = sel.box = drw ? by(drw.boxes, 'position', boxPos) : undefined;
         sel.boxQ = box && evt && drw ? groupFindQ(evt, drw, box) : undefined;
     });
 }
@@ -133,7 +155,7 @@ export function selectBox(eventId?: string, drawId?: string, boxPos?: number): v
 export function selectByError(error: PlayerProblem | DrawProblem) {
     setSelection((sel) => {
         if (isDrawError(error)) {
-            const { draw, event } = drawById(error.draw.id)
+            const { draw, event } = drawById(error.draw.id);
             sel.event = event;
             sel.draw = draw;
             sel.box = error.box;

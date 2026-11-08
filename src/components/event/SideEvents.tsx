@@ -53,7 +53,7 @@ export const SideEvents: Component<Props> = () => {
                     aria-selected={selection.event === event ? 'true' : 'false'}
                 >
                     {/* <input type="checkbox" /> */}
-                    <a href={Router.paths.draw(event.id)(location.query)} replace>
+                    <a href={Router.paths.draw(event.id)(location.query)} noscroll>
                         <i class="icon2-info hover" onClick={() => {
                             selectDraw(event.id);
                             showDialog({ name: "event" });
@@ -80,7 +80,7 @@ export const SideEvents: Component<Props> = () => {
                             <a class={["aria-selected:bg-blue-200 block", { "mt-2": !draw.cont }]}
                                 aria-selected={selection.draw?.id === draw.id ? 'true' : 'false'}
                                 // onclick={() => selectDraw(event, draw)}
-                                href={Router.paths.draw(event.id)(draw.id)(location.query)} replace
+                                href={Router.paths.draw(event.id)(draw.id)(location.query)} noscroll
                             >
                                 <i class="icon2-info hover"
                                     onClick={() => {
