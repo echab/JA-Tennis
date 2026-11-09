@@ -188,8 +188,8 @@ export function drawById(idDraw: string, parent?: string | Tournament): { draw?:
     return { draw, event };
 }
 
-// TODO could return URL and preserve current search
-export function urlBox(box: PlayerIn | Match | undefined, draw: Draw, event: TEvent, tournament: Tournament, query?: SearchParams, scroll?: boolean) {
+/** Return the box URL, preserving current search */
+export function urlBox(box: PlayerIn | Match | undefined, drawId: string, eventId: string, tournament: Tournament, query?: SearchParams, scroll?: boolean) {
 
     const search = box && isMatch(box) ? {
         ...query,
@@ -202,5 +202,5 @@ export function urlBox(box: PlayerIn | Match | undefined, draw: Draw, event: TEv
         playerId: box?.playerId
     };
 
-    return Router.paths.draw(event.id)(draw.id)(box?.position ?? '')(search, scroll && box?.position ? `pos${box.position}` : '');
+    return Router.paths.draw(eventId)(drawId)(box?.position ?? '')(search, scroll && box?.position ? `pos${box.position}` : '');
 }

@@ -37,7 +37,7 @@ export const DrawBox: Component<BoxProps> = (props) => {
             // title={error ? error.message +' '+ error.detail : ''}
             // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
             // onclick={() => navigate(urlBox(box), {replace:true})}
-            href={urlBox(box, props.draw, props.event, props.tournament, location.query)} replace noscroll
+            href={urlBox(box, props.draw.id, props.event.id, props.tournament, location.query)} replace noscroll
             id={`pos${box?.position}`}
             tabindex={0}
         >

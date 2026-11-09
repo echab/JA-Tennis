@@ -63,7 +63,7 @@ export const PlanningSlot: Component<Props> = (props) => {
         {/* ({match.date!.toLocaleString()}) */}
         {/* {match.date!.toLocaleDateString()} */}
         {/* - {match.place} */}
-        <a href={urlBox(match, props.slot.draw, props.slot.event, props.tournament, location.query)} title="View in draw" class="hover">
+        <a href={urlBox(match, props.slot.draw.id, props.slot.event.id, props.tournament, location.query)} title="View in draw" class="hover">
             <i class="icon2-draw"/>
         </a>
         <span class="cursor-pointer" title="Edit the match"

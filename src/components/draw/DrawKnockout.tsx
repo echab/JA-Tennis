@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { type Component, createMemo, For, onSettled, Repeat, Show } from 'solid-js';
+import { type Component, createMemo, For, Match as Case, onSettled, Repeat, Show, Switch } from 'solid-js';
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Params } from '../../App';
@@ -83,7 +83,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                 evt.preventDefault();
                 const box = by(props.draw.boxes, 'position', pos);
                 if (box) {
-                    navigate(urlBox(box, props.draw, props.event, props.tournament, location.query), { replace: true, scroll: false });
+                    navigate(urlBox(box, props.draw.id, props.event.id, props.tournament, location.query), { replace: true, scroll: false });
                 }
             }
         };
@@ -106,7 +106,7 @@ export const DrawKnockout: Component<Props> = (props) => {
                                 ]}
                                     // onclick={(evt) => { selectBox(props.event, props.draw, box); evt.preventDefault(); }}
                                     // onclick={() => navigate(urlBox(box), {replace:true})}
-                                    href={urlBox(box, props.draw, props.event, props.tournament, location.query)} replace noscroll
+                                    href={urlBox(box, props.draw.id, props.event.id, props.tournament, location.query)} replace noscroll
                                     id={`pos${box?.position}`}
                                     tabindex={0}
                                 >
@@ -134,59 +134,62 @@ export const DrawKnockout: Component<Props> = (props) => {
                                     }</Show>
                                     <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                                     <br />
-                                    <Show when={box?.order && box.order > 0}>
-                                        {/* <i class="icon2-qualif-in hover" title="Edit qualified in"
-                                          onclick={() => {
-                                            selectBox(props.event, props.draw, box);
-                                            // showDialog("qualif");
-                                          }}
-                                        /> */}
-                                        <span class="club">{player?.club}</span>
-                                    </Show>
-                                    <Show when={isMatch(box)}>
-                                        <span title="Edit the match"
-                                            onClick={() => {
-                                                selectBox(props.event.id, props.draw.id, box?.position);
-                                                showDialog({ name: "match" });
-                                            }}>
-                                            <i class="icon2-match hover2" />
-                                            <Show when={box?.note}>{(note) => <i class='icon2-note' title={note()}/>}</Show>
-                                        </span>
-
-                                        <i class={{
-                                            'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
-                                        }} />
-
-                                        {/* <Show when={box?.date}>
-                                            <i class={{
-                                                // 'icon2-planning':  !!box?.date,
-                                                // 'hover':  !!box?.date,
-                                                'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
+                                    <Switch>
+                                        <Case when={box?.order && box.order > 0}>
+                                            {/* <i class="icon2-qualif-in hover" title="Edit qualified in"
+                                            onclick={() => {
+                                                selectBox(props.event, props.draw, box);
+                                                // showDialog("qualif");
                                             }}
-                                            title="View in planning"
-                                            onclick={(evt) => {
-                                                evt.preventDefault();
-                                                selectDay(dayOf(box?.date, props.tournament.info));
-                                            }}
-                                            />
-                                        </Show> */}
-                                        <Show when={box?.score || box?.wo} fallback={
-                                            <>
-                                                <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
-                                                <Show when={box?.place !== undefined}> <span class="place">{props.tournament.places?.[box!.place!]?.name ?? ''}</span></Show>
-                                            </>
-                                        }><span class="score">{`${box?.score}${box?.wo ? ' WO' : ''}`}</span></Show>
-
-                                        <Show when={isRight && props.draw.type !== FINAL}>
-                                            <i class="icon2-qualif-out hover" title="Edit qualified out"
+                                            /> */}
+                                            <span class="club">{player?.club}</span>
+                                        </Case>
+                                        <Case when={isMatch(box)}>
+                                            <span title="Edit the match"
                                                 onClick={() => {
                                                     selectBox(props.event.id, props.draw.id, box?.position);
-                                                    // showDialog("qualif");
+                                                    showDialog({ name: "match" });
+                                                }}>
+                                                <i class="icon2-match hover2" />
+                                                <Show when={box?.note}>{(note) => <i class='icon2-note' title={note()}/>}</Show>
+                                            </span>
+
+                                            <i class={{
+                                                'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
+                                            }} />
+
+                                            {/* <Show when={box?.date}>
+                                                <i class={{
+                                                    // 'icon2-planning':  !!box?.date,
+                                                    // 'hover':  !!box?.date,
+                                                    'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
                                                 }}
-                                            />
-                                        </Show>
-                                        <Show when={box?.vainqDef}><br/><br/></Show>
-                                    </Show>
+                                                title="View in planning"
+                                                onclick={(evt) => {
+                                                    evt.preventDefault();
+                                                    selectDay(dayOf(box?.date, props.tournament.info));
+                                                }}
+                                                />
+                                            </Show> */}
+                                            <Show when={box?.score || box?.wo} fallback={
+                                                <>
+                                                    <Show when={box?.date}><span class="date">{box!.date!.toLocaleString()}</span></Show>
+                                                    <Show when={box?.place !== undefined}> <span class="place">{props.tournament.places?.[box!.place!]?.name ?? ''}</span></Show>
+                                                </>
+                                            }><span class="score">{`${box?.score}${box?.wo ? ' WO' : ''}`}</span></Show>
+
+                                            <Show when={isRight && props.draw.type !== FINAL}>
+                                                <i class="icon2-qualif-out hover" title="Edit qualified out"
+                                                    onClick={() => {
+                                                        selectBox(props.event.id, props.draw.id, box?.position);
+                                                        // showDialog("qualif");
+                                                    }}
+                                                />
+                                            </Show>
+                                            <Show when={box?.vainqDef}><br/><br/></Show>
+                                        </Case>
+                                    </Switch>
+                                    &nbsp;
                                 </a>
                             </Show>
                         </td>
