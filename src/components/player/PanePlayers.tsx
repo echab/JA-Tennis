@@ -1,7 +1,7 @@
 import { type Component, createEffect, untrack } from "solid-js";
 import { useLocation, type RouteSectionProps } from "@solidjs/router";
 import { selectPlayer } from "../util/selection";
-import { Router } from "../../router";
+import { paths } from "../../router";
 import { Players } from "./Players";
 
 type Data = {
@@ -20,6 +20,6 @@ export const PanePlayers: Component<RouteSectionProps<Data | undefined>> = (prop
 
     return <Players
         playerId={props.params.playerId}
-        urlNewPlayer={(playerId) => Router.paths.players(playerId ?? '')(location.query)}
+        urlNewPlayer={(playerId) => paths.players(playerId ?? '')(location.query)}
     />
 };

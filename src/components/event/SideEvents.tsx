@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js';
+import { type Component, For } from 'solid-js';
 import type { JSX } from '@solidjs/web';
 import { useLocation } from '@solidjs/router';
 import { selectDraw, selection, selTournament } from '../util/selection';
@@ -6,10 +6,10 @@ import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
 import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragdrop';
 import { isSexeCompatible } from '../../services/tournamentService';
-import { drawName } from '../../services/drawService';
+import { SideDraws } from './SideDraws';
 import { showDialog } from '../Dialogs';
 import { IconSexe } from '../misc/IconSexe';
-import { Router } from '../../router';
+import { paths } from '../../router';
 
 type Props = {
 }
@@ -44,16 +44,16 @@ export const SideEvents: Component<Props> = () => {
         </div>
         <For each={selTournament.events} fallback={<div>No event</div>}>{(event) =>
             <div
-                aria-selected={event.id === selection.event?.id ? 'true' : 'false'}
+                aria-selected={event.id === selection.eventId ? 'true' : 'false'}
                 class="border-l-8 m-2"
                 style={{ "border-color": event.color ?? 'transparent' }}
                 onDrop={drop_handler} onDragOver={dragOver} data-type='event' data-id={event.id}
             >
                 <div class="flex justify-between items-center aria-selected:bg-blue-200 bg-slate-200"
-                    aria-selected={selection.event === event ? 'true' : 'false'}
+                    aria-selected={selection.eventId === event.id ? 'true' : 'false'}
                 >
                     {/* <input type="checkbox" /> */}
-                    <a href={Router.paths.draw(event.id)(location.query)} noscroll>
+                    <a href={paths.draw(event.id)(location.query)} noscroll>
                         <i class="icon2-info hover" onClick={() => {
                             selectDraw(event.id);
                             showDialog({ name: "event" });
@@ -72,35 +72,7 @@ export const SideEvents: Component<Props> = () => {
                     >➕ Draw</button>
                 </div>
 
-                <div>
-                    <For each={event.draws}>{(draw) =>
-                        <div class={["draws px-1", { error: selection.drawProblems.has(`${draw.id}-${event.id}`) }]}
-                            aria-selected={draw.id === selection.draw?.id ? 'true' : 'false'}
-                        >
-                            <a class={["aria-selected:bg-blue-200 block", { "mt-2": !draw.cont }]}
-                                aria-selected={selection.draw?.id === draw.id ? 'true' : 'false'}
-                                // onclick={() => selectDraw(event, draw)}
-                                href={Router.paths.draw(event.id)(draw.id)(location.query)} noscroll
-                            >
-                                <i class="icon2-info hover"
-                                    onClick={() => {
-                                        selectDraw(event.id, draw.id);
-                                        showDialog({ name: "draw" });
-                                    }}
-                                />
-                                {/* <small>{draw.id} </small> */}
-                                <i class="icon2-draw" />
-                                <Show when={draw.lock}><i class="icon2-locker opacity-60 mr-1" /></Show>
-                                {drawName(draw)} {draw.cont ? '(c)' : ''}
-                                {/* TODO list the count of registered players in this draw, by rank */}
-
-                                <span class="float-right hover">&Gt;</span>
-
-                                {/* <span class=" float-right hover" onClick={() => commandManager.wrap(() => deleteDraw(draw.id))}><i class="icon2-cross" /></span> */}
-                            </a>
-                        </div>
-                    }</For>
-                </div>
+                <SideDraws event={event} short />
 
                 {/* TODO list the count of registered players not in any draw, by rank */}
 

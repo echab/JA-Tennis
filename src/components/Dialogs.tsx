@@ -2,11 +2,11 @@ import { type Component, createSignal, Match as Case, Switch } from "solid-js";
 import { commandManager } from "../services/util/commandManager";
 import { DialogInfo } from "./tournament/DialogInfo";
 import { DialogPlayer } from "./player/DialogPlayer";
-import { selection, selTournament } from "./util/selection";
+import { drawById, selDraw, selection, selEvent, selTournament } from "./util/selection";
 import { createTournament, updateInfo } from "../services/tournamentService";
 import { updatePlayer } from "../services/playerService";
 import { DialogEvent } from "./event/DialogEvent";
-import { updateDraws, updateMatch } from "../services/drawService";
+import { isMatch, updateDraws, updateMatch } from "../services/drawService";
 import { updateEvent } from "../services/eventService";
 import { DialogDraw } from "./draw/DialogDraw";
 import { DialogMatch } from "./draw/DialogMatch";
@@ -55,26 +55,26 @@ export const Dialogs: Component = () => {
         <Case when={dialog()?.name === "event"}>
             <DialogEvent
                 _types={selTournament._types}
-                event={selection.event}
+                event={selEvent()}
                 onOk={commandManager.wrap(updateEvent)}
                 onClose={showDialog}
             />
         </Case>
-        <Case when={dialog()?.name === "draw"}>
-            <DialogDraw event={selection.event!} draw={selection.draw}
+        <Case when={dialog()?.name === "draw" && selEvent()}>{(event) =>
+            <DialogDraw event={event()} draw={selDraw()}
                 tournament={selTournament}
 
                 onOk={commandManager.wrap(updateDraws)}
                 onClose={showDialog}
             />
-        </Case>
-        <Case when={dialog()?.name === "match" && selection.event && selection.draw}>
-            <DialogMatch event={selection.event!} draw={selection.draw!} tournament={selTournament}
+        }</Case>
+        <Case when={dialog()?.name === "match" && isMatch(selection.box) && drawById(selection.drawId, selection.eventId)}>{(sel) =>
+            <DialogMatch event={sel().event} draw={sel().draw} tournament={selTournament}
                 match={selection.box as Match}
 
                 onOk={commandManager.wrap(updateMatch)}
                 onClose={showDialog}
             />
-        </Case>
+        }</Case>
     </Switch>
 }

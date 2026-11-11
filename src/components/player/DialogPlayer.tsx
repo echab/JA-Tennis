@@ -11,7 +11,7 @@ import { byId } from '../../services/util/find';
 import { dateLocal } from '../../utils/date';
 import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
-import { Router } from '../../router';
+import { paths } from '../../router';
 
 const EMPTY: OptionalId<Player> = { name: '', sexe: 'H', rank: 'NC', registration: [] };
 
@@ -136,7 +136,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                                     return <li>{
                                         teamPlayer
                                             ? <span>
-                                                <a href={Router.paths.players(teamPlayer.id)(location.query)}><i class="icon2-info" /></a>
+                                                <a href={paths.players(teamPlayer.id)(location.query)}><i class="icon2-info" /></a>
                                                 <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
                                             </span>
                                             : `#${playerId}`

@@ -1,5 +1,5 @@
 import { Component, createMemo, For, Show, untrack } from 'solid-js';
-import { selection, selectPlayer, selTournament } from '../util/selection';
+import { selDraw, selection, selectPlayer, selEvent, selTournament } from '../util/selection';
 import { dragStart } from '../../services/util/dragdrop';
 import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
 import { findDrawPlayerIds } from '../../services/drawService';
@@ -19,18 +19,18 @@ export const Players: Component<Props> = (props) => {
     // const location = useLocation();
 
     const visiblePlayers = createMemo(() =>
-        setting.registered && selection.event
-            ? selTournament.players.filter((p) => untrack(() => p.registration.includes(selection.event!.id)))
+        setting.registered && selection.eventId
+            ? selTournament.players.filter((p) => untrack(() => p.registration.includes(selection.eventId!)))
             : selTournament.players
     );
 
     const eventById = (id: string) => selTournament.events.find((e) => e.id === id);
 
-    const drawPlayerIds = () => selection.draw ? findDrawPlayerIds(selection.draw) : new Set<string>();
+    const drawPlayerIds = () => selDraw() ? findDrawPlayerIds(selDraw()!) : new Set<string>();
 
     const drawRegisteredPlayerIds = () => new Set(
-        selection.event && selection.draw
-            ? getRegisteredPlayers(selTournament._types, selTournament.players, selection.event, selection.draw.minRank, selection.draw.maxRank).map(getId)
+        selection.eventId && selection.drawId
+            ? getRegisteredPlayers(selTournament._types, selTournament.players, selEvent()!, selDraw()!.minRank, selDraw()!.maxRank).map(getId)
             : []
     );
 
@@ -51,7 +51,7 @@ export const Players: Component<Props> = (props) => {
 
                 <button type="button" onClick={() => editPlayer(undefined)} class="p-2 rounded-full" title='Add player'>➕</button>
                 <Show when={props.short}>
-                    {/* <a href={Router.paths.players(location.query)} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</a> */}
+                    {/* <a href={paths.players(location.query)} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</a> */}
                     <a href={props.urlNewPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</a>
                 </Show>
             </div>
@@ -105,9 +105,9 @@ export const Players: Component<Props> = (props) => {
                             <td class="text-left">{player.rank}</td>
                             <Show when={!props.short} fallback={
                                 <td class="text-left">
-                                    <Show when={selection.event}><i
+                                    <Show when={selection.eventId}><i
                                         class={{
-                                            "icon2-checkmark": (!selection.draw && isRegistred(selection.event!, player)) || drawPlayerIds().has(player.id),
+                                            "icon2-checkmark": (!selection.drawId && isRegistred(selection.eventId!, player)) || drawPlayerIds().has(player.id),
                                             "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
                                         }}
                                     /></Show>

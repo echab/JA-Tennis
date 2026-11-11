@@ -208,7 +208,7 @@ function validateDraw(tournament: Tournament, event: TEvent, draw: Draw): DrawPr
             if (!isSexeCompatible(event, player.sexe)) {
                 result.push({ message: 'ERR_EPR_SEXE', draw, box: boxIn, player, detail: player.sexe });
 
-            } else if (!isRegistred(event, player)) {
+            } else if (!isRegistred(event.id, player)) {
                 result.push({ message: 'ERR_INSCR_NO', draw, box: boxIn, player });
             }
 

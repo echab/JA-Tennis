@@ -6,7 +6,7 @@ import { selectTournament, selTournament } from "../util/selection";
 import { clearStoredTournaments, listStoredTournaments, restoreTournament, storeTournament } from "../../services/tournamentsStore";
 import { dateLocal } from "../../utils/date";
 import type { Tournament } from "../../domain/tournament";
-import { Router } from "../../router";
+import { paths } from "../../router";
 
 export const Tournaments: Component = () => {
 
@@ -18,7 +18,7 @@ export const Tournaments: Component = () => {
             onOk(t: Tournament) {
                 storeTournament(t);
                 selectTournament(t);
-                navigate(Router.paths({ pane: 'tournament' }));
+                navigate(paths({ pane: 'tournament' }));
             },
         });
     };
@@ -27,7 +27,7 @@ export const Tournaments: Component = () => {
         const t = await openFile();
         storeTournament(t);
         selectTournament(t);
-        navigate(Router.paths({ pane: 'tournament' }));
+        navigate(paths({ pane: 'tournament' }));
     };
 
     const saveTheFile = async () => {
@@ -37,7 +37,7 @@ export const Tournaments: Component = () => {
     const clearStorage = async () => {
         const t = await clearStoredTournaments();
         selectTournament(t);
-        navigate(Router.paths({ pane: 'tournament' }));
+        navigate(paths({ pane: 'tournament' }));
     };
 
     const selectItem = async (id: string) => {

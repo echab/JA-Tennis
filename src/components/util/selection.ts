@@ -9,7 +9,7 @@ import { dayOf } from "../../services/planningService";
 import { validateDraw, validatePlayer } from "../../services/validationService";
 import { minutes } from "../../utils/date";
 import { emptyTournament } from "../../assets/data";
-import { Router } from "../../router";
+import { paths } from "../../router";
 import { by, byId } from "../../services/util/find";
 
 // create a store for the tournament to use reconcile() on load
@@ -50,14 +50,15 @@ export function setTournamentBox(eventId: string, drawId: string, i: number, cb:
 
 export interface SelectionItems {
     player?: Player;
-    event?: TEvent;
-    draw?: Draw;
+    eventId?: string;
+    drawId?: string;
     box?: PlayerIn | Match;
     boxQ?: PlayerIn | Match;
     day?: number;
     place?: Place;
 
     playerProblems: Map<string, PlayerProblem[]>;
+    /** key like "drawId-eventId" */
     drawProblems: Map<string, DrawProblem[]>;
 }
 
@@ -66,13 +67,27 @@ export const [selection, setSelection] = createStore<SelectionItems>({
     drawProblems: new Map(),
 }, { shallow: true, name: 'selectionStore' });
 
+export function selEvent(): TEvent | undefined {
+    if (!selection.eventId) {
+        return undefined;
+    }
+    return byId(selTournament.events, selection.eventId);
+}
+export function selDraw(): Draw | undefined {
+    if (!selection.drawId) {
+        return undefined;
+    }
+    const evt = selEvent();
+    return evt ? byId(evt.draws, selection.drawId) : undefined;
+}
+
 export function selectTournament(tournament: Tournament) {
     setTournament(() => tournament);
 
     setSelection((sel) => {
         sel.player = undefined;
-        sel.event = undefined;
-        sel.draw = undefined;
+        sel.eventId = undefined;
+        sel.drawId = undefined;
         sel.box = undefined;
         sel.boxQ = undefined;
         sel.day = undefined;
@@ -113,11 +128,9 @@ export function selectPlace(i?: number): void {
 
 export function selectDraw(eventId?: string, drawId?: string): void {
     setSelection((sel) => {
-        // const { draw, event } = drawById(drawId, eventId);
-        // const evt = sel.event = selTournament.events.find((e) => e.id === eventId);
-        // sel.draw = drawId ? evt?.draws.find((d) => d.id === drawId) : undefined;
-        const evt = sel.event = byId(selTournament.events, eventId);
-        sel.draw = evt ? byId(evt.draws, drawId) : undefined;
+        const evt = byId(selTournament.events, eventId);
+        sel.eventId = evt?.id;
+        sel.drawId = evt ? byId(evt.draws, drawId)?.id : undefined;
 
         sel.box = undefined;
         sel.boxQ = undefined;
@@ -126,12 +139,10 @@ export function selectDraw(eventId?: string, drawId?: string): void {
 
 export function selectBox(eventId?: string, drawId?: string, boxPos?: number): void {
     setSelection((sel) => {
-        // const evt = sel.event = eventId ? selTournament.events.find((e) => e.id === eventId) : undefined;
-        // const drw = sel.draw = drawId ? evt?.draws.find((d) => d.id === drawId) : undefined;
-        // const box = sel.box = boxPos ? drw?.boxes.find((b) => b.position === boxPos) : undefined;
-
-        const evt = sel.event = byId(selTournament.events, eventId);
-        const drw = sel.draw = evt ? byId(evt.draws, drawId) : undefined; // TODO IMMUTABLE_UPDATE_IN_STORE
+        const evt = byId(selTournament.events, eventId);
+        const drw = evt ? byId(evt.draws, drawId) : undefined; // TODO IMMUTABLE_UPDATE_IN_STORE
+        sel.eventId = evt?.id;
+        sel.drawId = drw?.id;
 
         // const drw = evt ? byId(evt.draws, drawId) : undefined;
         // if (drw && sel.draw) {
@@ -152,18 +163,6 @@ export function selectBox(eventId?: string, drawId?: string, boxPos?: number): v
     });
 }
 
-export function selectByError(error: PlayerProblem | DrawProblem) {
-    setSelection((sel) => {
-        if (isDrawError(error)) {
-            const { draw, event } = drawById(error.draw.id);
-            sel.event = event;
-            sel.draw = draw;
-            sel.box = error.box;
-        }
-        sel.player = error.player;
-    });
-}
-
 export function isPlayerError(error: PlayerProblem | DrawProblem): error is PlayerProblem {
     return !!error.player;
 }
@@ -171,21 +170,18 @@ export function isDrawError(error: PlayerProblem | DrawProblem): error is DrawPr
     return !!(error as DrawProblem).draw;
 }
 
-/** find a draw from id which could be a composed like `idDraw-idEvent` */
-export function drawById(idDraw: string, parent?: string | Tournament): { draw?: Draw, event?: TEvent } {
-    // eslint-disable-next-line prefer-const
-    let [idDraw2, idEvent2 /* , idTournament */] = idDraw.split('-');
-    let tournament: Tournament = selTournament;
-    if (parent) {
-        if (typeof parent === 'string') {
-            idEvent2 = parent;
-        } else {
-            tournament = parent;
-        }
-    }
-    const event = idEvent2 ? tournament.events.find(({ id }) => id === idEvent2) : selection.event;
-    const draw = idDraw2 ? event?.draws.find(({ id }) => id === idDraw2) : undefined;
-    return { draw, event };
+/** find a draw from id which like `idDraw-idEvent` */
+export function eventDrawById(idDrawEvent: string, tournament?: Tournament): { draw: Draw, event: TEvent } | undefined {
+    const [idDraw, idEvent /* , idTournament */] = idDrawEvent.split('-');
+    const event = byId((tournament ?? selTournament).events, idEvent);
+    const draw = event ? byId(event.draws, idDraw) : undefined;
+    return draw && event ? { draw, event } : undefined;
+}
+
+export function drawById(idDraw?: string, idEvent?: string, tournament?: Tournament): { draw: Draw, event: TEvent } | undefined {
+    const event = idEvent ? byId((tournament ?? selTournament).events, idEvent) : undefined;
+    const draw = idDraw && event ? byId(event.draws, idDraw) : undefined;
+    return draw && event ? { draw, event } : undefined;
 }
 
 /** Return the box URL, preserving current search */
@@ -202,5 +198,5 @@ export function urlBox(box: PlayerIn | Match | undefined, drawId: string, eventI
         playerId: box?.playerId
     };
 
-    return Router.paths.draw(eventId)(drawId)(box?.position ?? '')(search, scroll && box?.position ? `pos${box.position}` : '');
+    return paths.draw(eventId)(drawId)(box?.position ?? '')(search, scroll && box?.position ? `pos${box.position}` : '');
 }

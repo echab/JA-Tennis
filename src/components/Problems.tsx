@@ -2,8 +2,8 @@ import { type Component, createMemo, For } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import { validateTournament } from "../services/validationService";
 import { IconSexe } from "./misc/IconSexe";
-import { drawById, selection, selTournament } from "./util/selection";
-import { Router } from "../router";
+import { eventDrawById, selection, selTournament } from "./util/selection";
+import { paths } from "../router";
 import { drawName } from "../services/drawService";
 import { changeSetting, setting } from "../services/settings";
 
@@ -12,8 +12,8 @@ export const Problems: Component = () => {
     
     const filteredDrawProblems = createMemo(() =>
         [...selection.drawProblems.entries()]
-        .filter(([edId]) => !setting.pbSelectedDraw || (edId.startsWith(`${selection.draw?.id}-`)))
-        .map(([eventdrawId, errors]) => ({ eventdrawId, ...drawById(eventdrawId), errors }))
+        .filter(([edId]) => !setting.pbSelectedDraw || (edId.startsWith(`${selection.drawId}-`)))
+        .map(([eventdrawId, errors]) => ({ eventdrawId, ...eventDrawById(eventdrawId), errors }))
     );
 
     return (<>
@@ -29,7 +29,7 @@ export const Problems: Component = () => {
             <For each={[...selection.playerProblems.entries()]}>{([_playerId, errors]) => (
                 <For each={errors}>{({message, detail, player}) => (
                     <li class="p-2">
-                        <a href={Router.paths.players(player.id)(location.query, location.hash)} replace noscroll>
+                        <a href={paths.players(player.id)(location.query, location.hash)} replace noscroll>
                             {message}: {player.name}{detail ? ` (${detail})` : ''}
                         </a>
                     </li>
@@ -43,14 +43,14 @@ export const Problems: Component = () => {
                     <h4 class="bg-slate-300 border-l-8"
                         style={{ "border-color": event?.color ?? 'transparent' }}
                     >
-                        <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(location.query, location.hash)} replace>
+                        <a href={paths.draw(event?.id ?? '')(draw?.id ?? '')(location.query, location.hash)} replace>
                             <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {drawName(draw) || eventdrawId}
                         </a>
                     </h4>
                     <ul>
                         <For each={errors}>{({message, detail, player, box}) => (
                             <li>
-                                <a href={Router.paths.draw(event?.id ?? '')(draw?.id ?? '')(box?.position ?? '')(location.query)} replace noscroll>
+                                <a href={paths.draw(event?.id ?? '')(draw?.id ?? '')(box?.position ?? '')(location.query)} replace noscroll>
                                     {message}: {player ? `${player.name} ` : ''}{detail ? ` (${detail})` : ''}
                                 </a>
                             </li>

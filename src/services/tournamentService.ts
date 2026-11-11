@@ -96,7 +96,7 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
             });
             setSelection((sel) => {
                 setTournament(reconcile(newOne));
-                sel.event = sel.player = sel.place = sel.draw = undefined;
+                sel.eventId = sel.player = sel.place = sel.drawId = undefined;
             });
             onOk(newOne);
         };
@@ -104,7 +104,7 @@ export function createTournament(onOk: (newTournament: Tournament) => void) {
 
         const undo = () => setSelection((sel) => {
             setTournament(reconcile(prev));
-            sel.event = sel.player = sel.place = sel.draw = undefined;
+            sel.eventId = sel.player = sel.place = sel.drawId = undefined;
             onOk(prev);
         });
 
@@ -127,21 +127,21 @@ export function updateInfo(info: TournamentInfo): Command {
     return { name: 'Update info', act, undo };
 }
 
-export function isRegistred(event: TEvent, player: Player): boolean {
-    return player.registration.indexOf(event.id) !== -1;
+export function isRegistred(eventId: string, player: Player): boolean {
+    return player.registration.indexOf(eventId) !== -1;
     //   return player.registration?.includes(event.id);
 }
 
 export function getRegistred(players: Player[], event: TEvent): Player[] {
     return players.filter((player) =>
-        isRegistred(event, player)
+        isRegistred(event.id, player)
     );
 }
 
 export function getRegisteredPlayers({ rank }: DataType, allPlayers: Player[], event: TEvent, drawMinRank: RankString, drawMaxRank: RankString): Player[] { //GetJoueursInscrit
     //Récupère les joueurs inscrits
     return allPlayers.filter((player) =>
-        isRegistred(event, player)
+        isRegistred(event.id, player)
         && (!player.rank || rank.within(player.rank, drawMinRank, drawMaxRank))
     );
 }

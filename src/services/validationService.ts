@@ -1,4 +1,4 @@
-﻿import { drawById, type SelectionItems, setSelection } from "../components/util/selection";
+﻿import { eventDrawById, type SelectionItems, setSelection } from "../components/util/selection";
 import type { Draw } from "../domain/draw";
 import type { Player } from "../domain/player";
 import type { TEvent, Tournament } from "../domain/tournament";
@@ -34,10 +34,10 @@ export function validateTournament(tournament: Tournament) {
         });
 
         // cleanup errors from deleted draws
-        [...sel.drawProblems.keys()].forEach((key) => {
-            const {draw} = drawById(key, tournament);
-            if (!draw) {
-                sel.drawProblems.delete(key);
+        [...sel.drawProblems.keys()].forEach((drawEventId) => {
+            const cur = eventDrawById(drawEventId, tournament);
+            if (!cur) {
+                sel.drawProblems.delete(drawEventId);
             }
         });
 

@@ -81,7 +81,7 @@ const Main: ParentComponent = (props) => {
                     <button type="button" onclick={paste} ><i class='icon2-paste'/> Paste</button> */}
                 </div>
                 <div>
-                    selection: tournament={selTournament.id} player={selection.player?.id} event={selection.event?.id} draw={selection.draw?.id} box={selection.box?.position} day={selection.day} place={selection.place?.name}
+                    selection: tournament={selTournament.id} player={selection.player?.id} event={selection.eventId} draw={selection.drawId} box={selection.box?.position} day={selection.day} place={selection.place?.name}
                 </div>
             </header>
             <div class="flex">

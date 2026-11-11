@@ -5,7 +5,7 @@ import { DAYS, minutes } from "../../utils/date";
 import { showDialog } from "../Dialogs";
 import { selectPlace, selTournament } from "../util/selection";
 import { PlanningSlot } from "./PlanningSlot";
-import { Router } from "../../router";
+import { paths } from "../../router";
 
 type Props = {
     short?: boolean;
@@ -67,7 +67,7 @@ export const Planning: Component<Props> = (props) => {
 
             {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
             <Show when={props.short}>
-                <a href={Router.paths.planning(props.day ?? '')({ ...location.query, pane: '' })} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
+                <a href={paths.planning(props.day ?? '')({ ...location.query, pane: '' })} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
             </Show>
         </div>
 

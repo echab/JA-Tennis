@@ -1,17 +1,14 @@
 import { type Component, Show } from "solid-js";
-import { useLocation } from "@solidjs/router";
-import { indexOf } from "../../services/util/find";
 import { showDialog } from "../Dialogs";
 import { selTournament, setTournamentDraw } from "../util/selection";
-import { IconSexe } from "../misc/IconSexe";
 import { commandManager } from "../../services/util/commandManager";
 import { drawLib, GenerateType } from "../../services/draw/drawLib";
-import { drawName, findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
+import { findDrawPlayersOrQ, updateDraws } from "../../services/drawService";
 import { BUILD, type Draw, PLAN, PLAY, ROUNDROBIN } from "../../domain/draw";
 import type { TEvent } from "../../domain/tournament";
+import { DrawHeader } from "./DrawHeader";
 import { DrawKnockout } from './DrawKnockout';
 import { DrawRoundRobin } from './DrawRoundRobin';
-import { Router } from "../../router";
 import './Draw.css';
 
 type Props = {
@@ -98,42 +95,3 @@ export const DrawDraw: Component<Props> = (props) => {
         </Show>
     </div>;
 };
-
-const DrawHeader: Component<Props> = (props) => {
-
-    const location = useLocation();
-
-    const drawIndex = () => {
-        return props.event && props.draw.id
-            ? indexOf(props.event.draws ?? [], 'id', props.draw.id)
-            : -2;
-    };
-
-    const prevDraw = () => props.event.draws[drawIndex() - 1];
-    const nextDraw = () => props.event.draws[drawIndex() + 1];
-
-    return <h4 class="border-l-8 bg-white bg-opacity-80"
-        style={{ "border-color": props.event?.color ?? 'transparent' }}
-    >
-        <IconSexe sexe={props.event?.sexe} double={props.event?.typeDouble} />
-        {props.event?.name}
-        <Show when={props.draw}>
-            <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ",
-                { "pointer-events-none": !prevDraw() }]}
-                // onclick={() => selectDraw(props.event!, prevDraw())}
-                // disabled={!prevDraw()}
-                href={Router.paths.draw(props.event?.id ?? '')(prevDraw()?.id ?? '')(location.query)} replace
-                title="View the previous draw of the event"
-            ><i class="icon2-left-arrow" /></a>
-            {/* <button class="p-2 rounded-full" onClick={() => showDialog("draw")}><i class="icon2-info" /></button> */}
-            <span class="inline-block min-w-[5em]">{drawName(props.draw)}</span>
-            <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50",
-                { "pointer-events-none": !nextDraw() }]}
-                // onclick={() => selectDraw(props.event, nextDraw())}
-                // disabled={!nextDraw()}
-                href={Router.paths.draw(props.event.id ?? '')(nextDraw()?.id ?? '')(location.query)} replace
-                title="View the next draw of the event"
-            ><i class="icon2-right-arrow" /></a>
-        </Show>
-    </h4>
-}

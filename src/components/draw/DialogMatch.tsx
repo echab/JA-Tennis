@@ -1,8 +1,8 @@
 import { type Component, For, onSettled, snapshot, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
-import { Draw, Match } from '../../domain/draw';
+import type { Draw, Match } from '../../domain/draw';
 import { drawLib } from '../../services/draw/drawLib';
-import { TEvent, Tournament } from '../../domain/tournament';
+import type { TEvent, Tournament } from '../../domain/tournament';
 import { useForm } from '../util/useForm';
 import { byId } from '../../services/util/find';
 import { dateTimeLocal } from '../../utils/date';

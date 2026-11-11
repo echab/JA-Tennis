@@ -6,7 +6,7 @@ import { type Box, type Draw, KNOCKOUT, type Match, type PlayerIn, QEMPTY } from
 import type { TEvent } from "../domain/tournament";
 import type { OptionalId } from "../domain/object";
 import type { Command } from "./util/commandManager";
-import { selectBox, selectDraw, selection, setTournamentBox, setTournamentEvent } from "../components/util/selection";
+import { selectBox, selectDraw, selEvent, setTournamentBox, setTournamentEvent } from "../components/util/selection";
 import { drawLib } from "./draw/drawLib";
 import type { Player } from "../domain/player";
 import { applyChanges, applyChangesAt, defined } from "./util/object";
@@ -109,7 +109,7 @@ export function newDraw({ rank }: DataType, parent: TEvent, source?: OptionalId<
 }
 
 export function deleteDraw(eventId: string, drawId: string): Command {
-    const event = selection.event;
+    const event = selEvent();
     if (!event) {
         throw new Error('No selected event');
     }
