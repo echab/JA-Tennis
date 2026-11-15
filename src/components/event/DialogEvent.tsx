@@ -1,11 +1,12 @@
 import { type Component, For, onSettled, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
+import { TrashIcon, XIcon } from '@lucide/solid';
+import { DrawIcon, IconSexe } from '../misc/Icons';
 import type { OptionalId } from '../../domain/object';
 import type { TEvent } from '../../domain/tournament';
 import type { DataType } from '../../domain/types';
 import { deleteEvent } from '../../services/eventService';
 import { commandManager } from '../../services/util/commandManager';
-import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
 import { drawName } from '../../services/drawService';
 
@@ -77,12 +78,12 @@ export const DialogEvent: Component<Props> = (props) => {
 
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
-            <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
+            <header class="flex justify-between items-center sticky top-0 bg-surface-bar text-onsurface-bar p-1">
                 <b><IconSexe sexe={event?.sexe} double={event?.typeDouble} />{event ? `Edit event ${event?.name ?? ''}` : 'New event'}</b>
                 <small>Id: {event?.id}</small>
                 <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
-                >&times;</button>
+                ><XIcon /></button>
             </header>
             <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
@@ -122,17 +123,17 @@ export const DialogEvent: Component<Props> = (props) => {
                         <label>
                             <input value='H' type="radio" required class='mr-1'
                                 checked={form.sexe === 'H'} onChange={updateField("sexe")} />
-                            <i class={{"icon2-male":!form.typeDouble, "icon2-double-male":!!form.typeDouble}}/> Male
+                            <IconSexe sexe='H' double={form.typeDouble} /> Male
                         </label>
                         <label>
                             <input value='F' type="radio" required class='mr-1'
                                 checked={form.sexe === 'F'} onChange={updateField("sexe")} />
-                            <i class={{"icon2-female":!form.typeDouble, "icon2-double-female":!!form.typeDouble}}/> Female
+                            <IconSexe sexe='F' double={form.typeDouble} /> Female
                         </label>
                         <label>
                             <input value='M' type="radio" required class='mr-1'
                                 checked={form.sexe === 'M'} onChange={updateField("sexe")} />
-                            <i class={{"icon2-mixte":!form.typeDouble, "icon2-double-mixte":!!form.typeDouble}}/> Mixte
+                            <IconSexe sexe='M' double={form.typeDouble} /> Mixte
                         </label>
                     </div>
 
@@ -179,10 +180,10 @@ export const DialogEvent: Component<Props> = (props) => {
                 <div class="mb-1">
                     <label class="inline-block w-3/12 text-right pr-3">Draws:</label>
                     <For each={event?.draws}>{(draw) =>
-                        <span><i class="icon2-draw" /> {drawName(draw)}</span>
+                        <span><DrawIcon /> {drawName(draw)}</span>
                     }</For>
                 </div>
-                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
+                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-surface/90'>
                     {/* <button
                   disabled={!event?.id}
                   onclick={() => {
@@ -192,21 +193,21 @@ export const DialogEvent: Component<Props> = (props) => {
                      refDlg.close();
                   }
                   }}
-               >✖ Delete</button> */}
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+               ><TrashIcon /> Delete</button> */}
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         value="Delete" disabled={!form.id}
                         onClick={deleteAndClose}
-                    >✖ Delete
+                    ><TrashIcon /> Delete
                     </button>
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
 
                     <button type="submit"
                         //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                        class="rounded-md border border-transparent bg-surface-primary text-onsurface-primary py-2 px-4 min-w-24"
                     >OK
                     </button>
                 </footer>

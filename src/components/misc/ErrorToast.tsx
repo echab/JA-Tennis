@@ -7,7 +7,7 @@ type Props = {
 export const ErrorToast: Component<Props> = (props) => {
     untrack(() => { console.error(props.message); });
 
-    return <div class="bg-black text-white border-red-500 border-2">
+    return <div class="bg-surface text-onsurface border-stroke-error border-2">
         <h3 class="font-bold">⚠ Error</h3>
         <div class="font-mono">{props.message}</div>
     </div>

@@ -1,11 +1,12 @@
-import { Component, createMemo, For, Show, untrack } from 'solid-js';
+import { Component, createMemo, For, Match, Show, Switch, untrack } from 'solid-js';
+import { CheckCheckIcon, CheckIcon, CheckLineIcon, ChevronsRightIcon, FileSlidersIcon, PlusIcon } from '@lucide/solid';
+import { IconSexe } from '../misc/Icons';
 import { selDraw, selection, selectPlayer, selEvent, selTournament } from '../util/selection';
 import { dragStart } from '../../services/util/dragdrop';
 import { getRegisteredPlayers, isRegistred } from '../../services/tournamentService';
 import { findDrawPlayerIds } from '../../services/drawService';
 import { getId } from '../../services/util/find';
 import { showDialog } from '../Dialogs';
-import { IconSexe } from '../misc/IconSexe';
 import { changeSetting, setting } from '../../services/settings';
 
 type Props = {
@@ -26,13 +27,14 @@ export const Players: Component<Props> = (props) => {
 
     const eventById = (id: string) => selTournament.events.find((e) => e.id === id);
 
-    const drawPlayerIds = () => selDraw() ? findDrawPlayerIds(selDraw()!) : new Set<string>();
+    const drawPlayerIds = createMemo(() => selDraw() ? findDrawPlayerIds(selDraw()!) : undefined);
 
-    const drawRegisteredPlayerIds = () => new Set(
-        selection.eventId && selection.drawId
-            ? getRegisteredPlayers(selTournament._types, selTournament.players, selEvent()!, selDraw()!.minRank, selDraw()!.maxRank).map(getId)
-            : []
-    );
+    const drawRegisteredPlayerIds = createMemo(() => {
+        const evt = selEvent(), drw = selDraw();
+        return evt && drw
+            ? new Set(getRegisteredPlayers(selTournament._types, selTournament.players, evt, drw.minRank, drw.maxRank).map(getId))
+            : undefined
+    });
 
     const editPlayer = (playerId?: string) => {
         selectPlayer(playerId);
@@ -49,10 +51,10 @@ export const Players: Component<Props> = (props) => {
                     onChange={({target}) => changeSetting('registered', (target as HTMLInputElement).checked)}
                 /> registered</label>
 
-                <button type="button" onClick={() => editPlayer(undefined)} class="p-2 rounded-full" title='Add player'>➕</button>
+                <button type="button" onClick={() => editPlayer(undefined)} class="p-2 rounded-full" title='Add player'><PlusIcon /></button>
                 <Show when={props.short}>
-                    {/* <a href={paths.players(location.query)} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</a> */}
-                    <a href={props.urlNewPlayer()} replace class="p-2 rounded-full" title="Open the list in the main page">&Gt;</a>
+                    {/* <a href={paths.players(location.query)} replace class="p-2 rounded-full" title="Open the list in the main page"><ChevronsRightIcon /></a> */}
+                    <a href={props.urlNewPlayer()} replace class="p-2 rounded-full hover:bg-surface-selecting" title="Open the list in the main page"><ChevronsRightIcon /></a>
                 </Show>
             </div>
             <table class={['table table-hover table-condensed table-fixed w-90 mx-2',
@@ -96,7 +98,7 @@ export const Players: Component<Props> = (props) => {
                                 {/* <small>{player.id}</small> */}
                             </td>
                             <td class="text-left">
-                                <i class="icon2-info hover" onClick={() => editPlayer(player.id)}/>
+                                <FileSlidersIcon class=" hover" onClick={() => editPlayer(player.id)}/>
                                 <IconSexe sexe={player.sexe} />
                             </td>
                             <td class="text-left w-46 overflow-hidden whitespace-nowrap text-ellipsis">
@@ -105,12 +107,13 @@ export const Players: Component<Props> = (props) => {
                             <td class="text-left">{player.rank}</td>
                             <Show when={!props.short} fallback={
                                 <td class="text-left">
-                                    <Show when={selection.eventId}><i
-                                        class={{
-                                            "icon2-checkmark": (!selection.drawId && isRegistred(selection.eventId!, player)) || drawPlayerIds().has(player.id),
-                                            "icon2-checkmark2": drawRegisteredPlayerIds().has(player.id),
-                                        }}
-                                    /></Show>
+                                    <Show when={selection.eventId}>
+                                        <Switch>
+                                            <Match when={(!selection.drawId && isRegistred(selection.eventId!, player))}><CheckIcon /></Match>
+                                            <Match when={drawPlayerIds()?.has(player.id)}><CheckLineIcon /></Match>
+                                            <Match when={drawRegisteredPlayerIds()?.has(player.id)}><CheckCheckIcon /></Match>
+                                        </Switch>
+                                    </Show>
                                 </td>
                             }>
                                 <td>
@@ -132,7 +135,7 @@ export const Players: Component<Props> = (props) => {
                                 </td>
                             </Show>
                             {/* <td class="hover">
-                                <button type="button" onclick={[commandManager.wrap(deletePlayer), player.id]} title={`Delete the player ${player.id}`}>✖</button>
+                                <button type="button" onclick={[commandManager.wrap(deletePlayer), player.id]} title={`Delete the player ${player.id}`}><XIcon /></button>
                             </td> */}
                         </tr>
                     }</For>

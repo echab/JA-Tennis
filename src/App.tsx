@@ -1,16 +1,17 @@
 import { type VoidComponent, onSettled, Loading, type ParentComponent, DEV } from 'solid-js';
+import { installDiagnosticsBridge } from "@solidjs/diagnostics/browser";
+import { Redo2Icon, Undo2Icon } from '@lucide/solid';
+import { BallIcon } from './components/misc/Icons';
 import { Router } from './router';
 import { commandManager } from './services/util/commandManager';
 import { selection, selectTournament, selTournament } from './components/util/selection';
 import { SidePanel } from './components/SidePanel';
 import { Dialogs } from './components/Dialogs';
+import { ThemeSwitcher } from './components/misc/ThemeSwitcher';
 // import { ErrorToast } from './components/misc/ErrorToast';
 import { restoreTournament } from './services/tournamentsStore';
-
-import styles from './App.module.css';
 import './index.css';
 
-import { installDiagnosticsBridge } from "@solidjs/diagnostics/browser";
 DEV && installDiagnosticsBridge();
 
 export type Params = {
@@ -68,21 +69,22 @@ const Main: ParentComponent = (props) => {
 
     return <>
         <Dialogs />
-        <div class={styles.App}>
-            <header class="px-3 flex items-center justify-between min-h-[2.5em] text-slate-200 bg-linear-to-l from-slate-500 to-slate-800 print:hidden">
-                <span><i class="icon2-ball" /> JA-Tennis</span>
+        <div class="bg-surface text-onsurface">
+            <header class="px-3 flex items-center justify-between min-h-[2.5em] text-onsurface-appbar bg-linear-to-r from-surface-appbar1 to-surface-appbar2 print:hidden">
+                <span><BallIcon /> JA-Tennis</span>
                 <div>
-                    <button type="button" class="border-2 border-zinc-500" disabled={!commandManager.canUndo} onClick={() => commandManager.undo()} title={`Undo ${commandManager.undoNames(1)?.[0] ?? ''}`}>↶ Undo</button>
+                    <button type="button" disabled={!commandManager.canUndo} onClick={() => commandManager.undo()} title={`Undo ${commandManager.undoNames(1)?.[0] ?? ''}`}><Undo2Icon /> Undo</button>
                     &nbsp;
-                    <button type="button" disabled={!commandManager.canRedo} onClick={() => commandManager.redo()} title={`Redo ${commandManager.redoNames(1)?.[0] ?? ''}`}>↷ Redo</button>
+                    <button type="button" disabled={!commandManager.canRedo} onClick={() => commandManager.redo()} title={`Redo ${commandManager.redoNames(1)?.[0] ?? ''}`}><Redo2Icon /> Redo</button>
                     {/* &nbsp;
-                    <button type="button" onclick={copy} ><i class='icon2-copy'/> Copy</button>
+                    <button type="button" onclick={copy} ><ClipboardCopyIcon/> Copy</button>
                     &nbsp;
-                    <button type="button" onclick={paste} ><i class='icon2-paste'/> Paste</button> */}
+                    <button type="button" onclick={paste} ><ClipboardPasteIcon/> Paste</button> */}
                 </div>
                 <div>
                     selection: tournament={selTournament.id} player={selection.player?.id} event={selection.eventId} draw={selection.drawId} box={selection.box?.position} day={selection.day} place={selection.place?.name}
                 </div>
+                <ThemeSwitcher />
             </header>
             <div class="flex">
                 <SidePanel />

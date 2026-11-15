@@ -1,5 +1,6 @@
 import { type Component, createEffect, Show, untrack } from "solid-js";
 import type { RouteSectionProps } from "@solidjs/router";
+import { PlusIcon } from "@lucide/solid";
 import { selTournament, selectBox, selectDraw } from "../util/selection";
 import { DrawHeader } from "./DrawHeader.tsx";
 import { DrawDraw } from "./DrawDraw.tsx";
@@ -10,7 +11,7 @@ import { byId } from "../../services/util/find.ts";
 type Data = {
 }
 
-export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) => {
+export const PaneDraw: Component<RouteSectionProps<Data>> = (props) => {
 
     // init selection from url and after tournament load
     createEffect(() => {
@@ -34,7 +35,7 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
         >{(event) =>
             <Show when={byId(event().draws, props.params.drawId)}
                 fallback={
-                    <div class="m-2">
+                    <div class="mx-2">
                         <DrawHeader event={event()} />
                         <SideDraws event={event()} />
                         <hr />
@@ -44,7 +45,7 @@ export const PaneDraw: Component<RouteSectionProps<Data | undefined>> = (props) 
                                     selectDraw(event().id, undefined);
                                     showDialog({ name: "draw" });
                                 }}
-                            >➕ Add a new draw</button>
+                            ><PlusIcon /> Add a new draw</button>
                         </div>
                     </div>
                 }

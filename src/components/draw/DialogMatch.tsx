@@ -1,5 +1,7 @@
 import { type Component, For, onSettled, snapshot, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
+import { HomeIcon, PhoneIcon, StickyNoteIcon, XIcon } from '@lucide/solid';
+import { MatchIcon } from '../misc/Icons';
 import type { Draw, Match } from '../../domain/draw';
 import { drawLib } from '../../services/draw/drawLib';
 import type { TEvent, Tournament } from '../../domain/tournament';
@@ -86,12 +88,12 @@ export const DialogMatch: Component<Props> = (props) => {
 
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
-            <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <span><i class='icon2-match' /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
+            <header class="flex justify-between items-center sticky top-0 bg-surface-bar text-onsurface-bar p-1">
+                <span><MatchIcon /> Match - {player1?.name ?? '-'} vs {player2?.name ?? '-'}</span>
                 {/* <small>{props.match.position}</small> */}
                 <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
-                >&times;</button>
+                ><XIcon /></button>
             </header>
             <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
@@ -156,13 +158,13 @@ export const DialogMatch: Component<Props> = (props) => {
 
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">{player1?.name}:</label>
-                            <label><input type="checkbox" checked={!!form.aware1} onChange={updateField("aware1")} /><i class='icon2-aware' />Aware</label>
-                            <label class="pl-5"><input type="checkbox" checked={!form.receive} onChange={updateField("receive")} /><i class='icon2-home' />Receive</label>
+                            <label><input type="checkbox" checked={!!form.aware1} onChange={updateField("aware1")} /><PhoneIcon />Aware</label>
+                            <label class="pl-5"><input type="checkbox" checked={!form.receive} onChange={updateField("receive")} /><HomeIcon />Receive</label>
                         </div>
                         <div class="mb-1">
                             <label class="inline-block w-3/12 text-right pr-3">{player2?.name}:</label>
-                            <label><input type="checkbox" checked={!!form.aware2} onChange={updateField("aware2")} /><i class='icon2-aware' />Aware</label>
-                            <label class="pl-5"><input type="checkbox" checked={!!form.receive} onChange={updateField("receive")} /><i class='icon2-home' />Receive</label>
+                            <label><input type="checkbox" checked={!!form.aware2} onChange={updateField("aware2")} /><PhoneIcon />Aware</label>
+                            <label class="pl-5"><input type="checkbox" checked={!!form.receive} onChange={updateField("receive")} /><HomeIcon />Receive</label>
                         </div>
                     </fieldset>
 
@@ -176,20 +178,20 @@ export const DialogMatch: Component<Props> = (props) => {
                         </div>
 
                         <div class="flex mb-1">
-                            <label class="inline-block w-3/12 text-right pr-3"><i class="icon2-note" /> Note:</label>
+                            <label class="inline-block w-3/12 text-right pr-3"><StickyNoteIcon /> Note:</label>
                             <textarea value={form.note ?? ''} onChange={updateField('note')} class="w-9/12 p-1" />
                         </div>
                     </fieldset>
                 </div>
-                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-surface/90'>
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
 
                     <button type="submit"
                         //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                        class="rounded-md border border-transparent bg-surface-primary text-onsurface-primary py-2 px-4 min-w-24"
                     >OK
                     </button>
                 </footer>

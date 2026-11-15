@@ -176,13 +176,7 @@ export function _updateQualif(event: TEvent, draw: Draw): void {
     const lib = drawLib(event, draw);
 
     //retreive qualifIn box
-    const qualifs: PlayerIn[] = [];
-    for (let i = draw.boxes.length - 1; i >= 0; i--) {
-        const boxIn = draw.boxes[i] as PlayerIn;
-        if (boxIn.qualifIn) {
-            qualifs.push(boxIn);
-        }
-    }
+    const qualifs = draw.boxes.filter(isPlayerIn).filter((box) => box.qualifIn);
 
     shuffle(qualifs);
 
@@ -299,17 +293,15 @@ export function findSeeded(
 }
 
 export function groupFindQ(event: TEvent, draw: Draw, box: Box): PlayerIn | Match | undefined {
-    const qualifOut = (box as Match).qualifOut;
-    const qualifIn = (box as PlayerIn).qualifIn;
-    if (qualifOut !== undefined && qualifOut !== QEMPTY) {
+    if (isMatch(box) && box.qualifOut !== undefined && box.qualifOut !== QEMPTY) {
         const nextGrp = nextGroup(event, draw.id);
         if (nextGrp) {
-            return groupFindPlayerIn(event, nextGrp, qualifOut)[0];
+            return groupFindPlayerIn(event, nextGrp, box.qualifOut)[0];
         }
-    } else if (qualifIn !== undefined && qualifIn !== QEMPTY) {
+    } else if (isPlayerIn(box) && box.qualifIn !== undefined && box.qualifIn !== QEMPTY) {
         const prevGrp = previousGroup(event, draw.id);
         if (prevGrp) {
-            return groupFindPlayerOut(event, prevGrp, qualifIn)[0];
+            return groupFindPlayerOut(event, prevGrp, box.qualifIn)[0];
         }
     }
 }
@@ -337,7 +329,8 @@ export function groupFindPlayerOut(
 
 export function findDrawPlayerIds(draw: Draw, withQualifIn = true): Set<string> {
     return new Set(
-        (draw.boxes as PlayerIn[])
+        (draw.boxes)
+            .filter(isPlayerIn)
             .filter(({ playerId, qualifIn }) => playerId && (withQualifIn || !qualifIn))
             .map(({ playerId }) => playerId)
             .filter(defined)
@@ -350,9 +343,9 @@ export function findDrawPlayerIds(draw: Draw, withQualifIn = true): Set<string> 
  */
 export function findDrawPlayersOrQ(draw: Draw, players: Player[]): Array<Player | number> {
     return draw.boxes
-        .filter((b): b is PlayerIn => !isMatch(b))
+        .filter(isPlayerIn)
         .map(({ qualifIn, playerId }) => qualifIn || (playerId ? byId(players, playerId) : undefined))
-        .filter((q): q is Player | number => q !== undefined);
+        .filter(defined);
 }
 
 /**
@@ -364,9 +357,10 @@ export function findGroupQualifOuts(event: TEvent, [groupStart, groupEnd]: [numb
     for (let i = groupStart; i < groupEnd; i++) {
         const draw = event.draws[i];
         result.push(...
-        (draw.boxes as Match[])
-            .filter(({qualifOut}) => qualifOut !== undefined)
-            .map<[number, Match, Draw]>((match) => [match.qualifOut!, match, draw])
+            draw.boxes
+                .filter(isMatch)
+                .filter(({qualifOut}) => qualifOut !== undefined)
+                .map<[number, Match, Draw]>((match) => [match.qualifOut!, match, draw])
         );
     }
     return result;
@@ -381,9 +375,10 @@ export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [numbe
     for (let i = groupStart; i < groupEnd; i++) {
         const draw = event.draws[i];
         result.push(...
-        (draw.boxes as PlayerIn[])
-            .filter(({qualifIn}) => qualifIn !== undefined)
-            .map<[PlayerIn, Draw]>((playerIn) => [playerIn, draw])
+            draw.boxes
+                .filter(isPlayerIn)
+                .filter(({qualifIn}) => qualifIn !== undefined)
+                .map<[PlayerIn, Draw]>((playerIn) => [playerIn, draw])
         );
     }
     return result;
@@ -392,7 +387,7 @@ export function findGroupQualifIns(event: TEvent, [groupStart, groupEnd]: [numbe
 export function findPlayerIn(draw: OptionalId<Draw>, qualif: number): PlayerIn | undefined { //FindQualifieEntrant
     ASSERT(0 <= qualif);
 
-    for (const boxIn of draw.boxes as PlayerIn[]) {
+    for (const boxIn of draw.boxes.filter(isPlayerIn)) {
         const e = boxIn.qualifIn;
         if (e === qualif || (qualif === QEMPTY && e)) { // TODO? return first empty Q
             return boxIn;
@@ -407,7 +402,7 @@ export function findPlayerOut(draw: OptionalId<Draw>, qualif: number): Match | u
         return;
     }
 
-    for (const match of draw.boxes as Match[]) {
+    for (const match of draw.boxes.filter(isMatch)) {
         if (match.qualifOut === qualif) {
             return match;
         }

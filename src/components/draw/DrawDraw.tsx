@@ -1,4 +1,6 @@
 import { type Component, Show } from "solid-js";
+import { CircleLetterHIcon, DicesIcon, FileSlidersIcon, LockKeyholeIcon } from "@lucide/solid";
+import { DrawBottomIcon, DrawLeftIcon, QualifInIcon } from "../misc/Icons";
 import { showDialog } from "../Dialogs";
 import { selTournament, setTournamentDraw } from "../util/selection";
 import { commandManager } from "../../services/util/commandManager";
@@ -9,7 +11,6 @@ import type { TEvent } from "../../domain/tournament";
 import { DrawHeader } from "./DrawHeader";
 import { DrawKnockout } from './DrawKnockout';
 import { DrawRoundRobin } from './DrawRoundRobin';
-import './Draw.css';
 
 type Props = {
     event: TEvent,
@@ -52,40 +53,40 @@ export const DrawDraw: Component<Props> = (props) => {
     return <div class="flex flex-col items-start">
         <div class="flex justify-between self-stretch items-center px-2 sticky top-0 z-20">
             <DrawHeader event={props.event} draw={props.draw} boxPos={props.boxPos} />
-            <div class="bg-white bg-opacity-80 print:hidden">
+            <div class="bg-surface/80 print:hidden">
                 <button class="p-2 rounded-full" title="Edit draw information"
                     onClick={() => showDialog({ name: "draw" })}
-                ><i class="icon2-info" /></button>
+                ><FileSlidersIcon /></button>
 
-                <button class="p-2 rounded-full aria-selected:bg-blue-200"
+                <button class="p-2 rounded-full aria-selected:bg-surface-selected"
                     title={`Lock/unlock draw updates (${props.draw.lock ?? BUILD})`}
                     aria-selected={props.draw.lock === PLAN ? 'true' : 'false'}
                     onClick={lockDraw}
-                ><i class="icon2-locker" /></button>
+                ><LockKeyholeIcon /></button>
 
                 <Show when={(props.draw.lock ?? BUILD) === BUILD}>
                     {/* eslint-disable-next-line no-bitwise */}
                     <Show when={!((props.draw.lock ?? BUILD) & PLAY)}>
                         <button class="p-2 rounded-full" title="Change the draw structure to be more progressive"
                             onClick={generateLeft}
-                        ><i class="icon2-draw-left" /></button>
+                        ><DrawLeftIcon /></button>
 
                         <button class="p-2 rounded-full" title="Change the draw structure to be more direct"
                             onClick={generateDown}
-                        ><i class="icon2-draw-bottom" /></button>
+                        ><DrawBottomIcon /></button>
                     </Show>
 
                     <button class="p-2 rounded-full" title="Shuffle the players with same rank"
                         onClick={randomize}
-                    ><i class="icon2-random" /></button>
+                    ><DicesIcon /></button>
 
                     <button class="p-2 rounded-full" title="Place the seeded positions"
                         // onClick={placeSeeded}
-                    ><i class="icon2-seeded" /></button>
+                    ><CircleLetterHIcon /></button>
                 </Show>
                 <button class="p-2 rounded-full" title="Place the qualified position, in or out of the draw group"
                     // onClick={placeQualifs}
-                ><i class="icon2-qualif-in" /></button>
+                ><QualifInIcon /></button>
             </div>
         </div>
         <Show when={!!(props.draw.type & ROUNDROBIN)} fallback={ // oxlint-disable-line no-bitwise

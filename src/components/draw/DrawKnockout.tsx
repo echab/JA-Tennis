@@ -1,6 +1,8 @@
 /* eslint-disable no-bitwise */
 import { type Component, createMemo, For, Match as Case, onSettled, Repeat, Show, Switch } from 'solid-js';
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
+import { ClockExclamationPointIcon, StickyNoteIcon, UserRoundIcon } from '@lucide/solid';
+import { MatchIcon, QualifOutIcon } from '../misc/Icons';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Params } from '../../App';
 import { selectBox, selectPlayer, urlBox } from '../util/selection';
@@ -10,7 +12,6 @@ import { showDialog } from '../Dialogs';
 import { isMatch, isPlayerIn } from '../../services/drawService';
 import { column, columnMax, columnMin, countInCol, positionBottomCol, positionMatch, positionMax, positionOpponent1, positionTopCol } from '../../services/draw/knockoutLib';
 import { drawLib } from '../../services/draw/drawLib';
-import './Draw.css';
 
 type Props = {
     event: TEvent,
@@ -120,23 +121,23 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             <Show when={(box?.order && box.order > 0) || box?.qualifIn !== undefined || box?.qualifOut !== undefined}> {player?.firstname}</Show>
                                         </span>
                                     }>
-                                        <span class="nom inline-block border-l-2 border-gray-500 pl-1">{player?.name} requalified<br />{otherName()(box)} withdraws</span>
+                                        <span class="nom inline-block border-l-2 border-stroke pl-1">{player?.name} requalified<br />{otherName()(box)} withdraws</span>
                                     </Show>
                                     <Show when={box?.order && box.order > 0 && player?.rank}><span class="classement">{player!.rank}</span></Show>
                                     <Show when={isPlayerIn(box) && box.playerId} keyed>{(playerId) =>
-                                        <span title="Edit the player"
+                                        <span title="Edit the player" class="hover2"
                                             onClick={() => {
                                                 selectPlayer(playerId);
                                                 showDialog({ name: "player" });
                                             }}>
-                                            <i class="icon2-player hover2" />
+                                            <UserRoundIcon />
                                         </span>
                                     }</Show>
                                     <Show when={box?.qualifOut}><span class="qs">Q{box!.qualifOut}</span></Show>
                                     <br />
                                     <Switch>
                                         <Case when={box?.order && box.order > 0}>
-                                            {/* <i class="icon2-qualif-in hover" title="Edit qualified in"
+                                            {/* <QualifInIcon class=" hover" title="Edit qualified in"
                                             onclick={() => {
                                                 selectBox(props.event, props.draw, box);
                                                 // showDialog("qualif");
@@ -150,26 +151,22 @@ export const DrawKnockout: Component<Props> = (props) => {
                                                     selectBox(props.event.id, props.draw.id, box?.position);
                                                     showDialog({ name: "match" });
                                                 }}>
-                                                <i class="icon2-match hover2" />
-                                                <Show when={box?.note}>{(note) => <i class='icon2-note' title={note()}/>}</Show>
+                                                <span class="hover2"><MatchIcon /></span>
+                                                <Show when={box?.note}>{(note) => <span title={note()}><StickyNoteIcon color="var(--color-warning)" /></span>}</Show>
                                             </span>
 
-                                            <i class={{
-                                                'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
-                                            }} />
+                                            <Show when={!!(box && (!box.date && !box.score && !box.wo))}>
+                                                <ClockExclamationPointIcon color="var(--color-warning)" />
+                                            </Show>
 
                                             {/* <Show when={box?.date}>
-                                                <i class={{
-                                                    // 'icon2-planning':  !!box?.date,
-                                                    // 'hover':  !!box?.date,
-                                                    'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
-                                                }}
-                                                title="View in planning"
-                                                onclick={(evt) => {
-                                                    evt.preventDefault();
-                                                    selectDay(dayOf(box?.date, props.tournament.info));
-                                                }}
-                                                />
+                                                <span title="View in planning"
+                                                    onclick={(evt) => {
+                                                        evt.preventDefault();
+                                                        selectDay(dayOf(box?.date, props.tournament.info));
+                                                    }}>
+                                                    <Show when={box && (!box.date && !box.score && !box.wo)}><ClockExclamationPointIcon /></Show>
+                                                </span>
                                             </Show> */}
                                             <Show when={box?.score || box?.wo} fallback={
                                                 <>
@@ -179,12 +176,11 @@ export const DrawKnockout: Component<Props> = (props) => {
                                             }><span class="score">{`${box?.score}${box?.wo ? ' WO' : ''}`}</span></Show>
 
                                             <Show when={isRight && props.draw.type !== FINAL}>
-                                                <i class="icon2-qualif-out hover" title="Edit qualified out"
+                                                <span class="hover" title="Edit qualified out"
                                                     onClick={() => {
                                                         selectBox(props.event.id, props.draw.id, box?.position);
                                                         // showDialog("qualif");
-                                                    }}
-                                                />
+                                                }}><QualifOutIcon /></span>
                                             </Show>
                                             <Show when={box?.vainqDef}><br/><br/></Show>
                                         </Case>

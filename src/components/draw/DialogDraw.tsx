@@ -1,5 +1,8 @@
 import { type Component, createMemo, For, onSettled, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
+import { LockKeyholeIcon, PencilSparklesIcon, TrashIcon, XIcon } from '@lucide/solid';
+import { DrawIcon } from '../misc/Icons';
+import { IconSexe } from '../misc/Icons';
 import { BUILD, type Draw, FINAL, KNOCKOUT, PLAN, ROUNDROBIN, ROUNDROBIN_RETURN } from '../../domain/draw';
 import { drawLib, GenerateType } from '../../services/draw/drawLib';
 import type { OptionalId } from '../../domain/object';
@@ -10,7 +13,6 @@ import { getRegisteredPlayers, defaultDrawName } from '../../services/tournament
 import { useForm } from '../util/useForm';
 import { commandManager } from '../../services/util/commandManager';
 import { selectDraw } from '../util/selection';
-import { IconSexe } from '../misc/IconSexe';
 import { columnMax, countInCol } from '../../services/draw/knockoutLib';
 
 type Props = {
@@ -131,12 +133,12 @@ export const DialogDraw: Component<Props> = (props) => {
 
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
-            <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <span><i class='icon2-draw' /> <IconSexe sexe={event.sexe} double={event.typeDouble} />{event.name} - <b>{draw ? `Edit draw ${drawName(draw)}` : 'New draw'}</b></span>
+            <header class="flex justify-between items-center sticky top-0 bg-surface-bar text-onsurface-bar p-1">
+                <span><DrawIcon /> <IconSexe sexe={event.sexe} double={event.typeDouble} />{event.name} - <b>{draw ? `Edit draw ${drawName(draw)}` : 'New draw'}</b></span>
                 <small>Id: {draw?.id}</small>
                 <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
-                >&times;</button>
+                ><XIcon /></button>
             </header>
             <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
@@ -181,7 +183,7 @@ export const DialogDraw: Component<Props> = (props) => {
                         <legend>Dimensions:</legend>
                         <div class="mb-1">
                             <span class="inline-block w-3/12 text-right pr-3" />
-                            <label><input type="checkbox" defaultChecked={form.lock === PLAN} value={PLAN} onChange={updateField('lock')} class="p-1" /> <i class="icon2-locker" /> Lock</label>
+                            <label><input type="checkbox" defaultChecked={form.lock === PLAN} value={PLAN} onChange={updateField('lock')} class="p-1" /> <LockKeyholeIcon size={24} /> Lock</label>
                         </div>
                         <div class="mb-1">
                             <label for="nbIn" class="inline-block w-3/12 text-right pr-3">Entries:</label>
@@ -202,14 +204,14 @@ export const DialogDraw: Component<Props> = (props) => {
           */}
 
                 </div>
-                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-surface/90'>
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         value="Delete" disabled={!form.id || form.lock !== BUILD}
                         onClick={deleteAndClose}
-                    >✖ Delete
+                    ><TrashIcon /> Delete
                     </button>
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
@@ -217,12 +219,12 @@ export const DialogDraw: Component<Props> = (props) => {
                     <button type="submit" value="generate"
                         //  disabled={!!drawForm.$error.required}
                         disabled={form.lock !== BUILD}
-                        class="rounded-md border border-transparent bg-indigo-200 py-2 px-4 min-w-24">
-                        <i class="icon2-draw-generate" /> Generate
+                        class="rounded-md border border-transparent bg-surface-secondary text-onsurface-secondary py-2 px-4 min-w-24">
+                        <PencilSparklesIcon /> Generate
                     </button>
                     <button type="submit"
                         //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                        class="rounded-md border border-transparent bg-surface-primary text-onsurface-primary py-2 px-4 min-w-24"
                     >OK
                     </button>
                 </footer>

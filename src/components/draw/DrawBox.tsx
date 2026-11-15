@@ -1,10 +1,11 @@
 import { Component, Show } from 'solid-js';
 import { useLocation } from '@solidjs/router';
+import { ClockExclamationPointIcon, StickyNoteIcon } from '@lucide/solid';
+import { MatchIcon, QualifOutIcon } from '../misc/Icons';
 import { selectBox, urlBox } from '../util/selection';
 import { FINAL, type Draw, type Match, type PlayerIn } from '../../domain/draw';
 import type { Player } from '../../domain/player';
 import { isMatch } from '../../services/drawService';
-import './Draw.css';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import { showDialog } from '../Dialogs';
 
@@ -64,26 +65,22 @@ export const DrawBox: Component<BoxProps> = (props) => {
                         selectBox(props.event.id, props.draw.id, box?.position);
                         showDialog({ name: "match" });
                     }}>
-                    <i class="icon2-match hover2" />
-                    <Show when={box?.note}><i class='icon2-note'/></Show>
+                    <span class="hover2"><MatchIcon /></span>
+                    <Show when={box?.note}>{(note) => <span title={note()}><StickyNoteIcon color="var(--color-warning)" /></span>}</Show>
                 </span>
 
-                <i class={{
-                    'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
-                }} />
+                <Show when={!!(box && (!box.date && !box.score && !box.wo))}>
+                    <ClockExclamationPointIcon color="var(--color-warning)" />
+                </Show>
 
                 {/* <Show when={box?.date}>
-                    <i class={{
-                        // 'icon2-planning':  !!box?.date,
-                        // 'hover':  !!box?.date,
-                        'icon2-planning-no': !!(box && (!box.date && !box.score && !box.wo)),
-                    }}
-                    title="View in planning"
-                    onclick={(evt) => {
-                        evt.preventDefault();
-                        selectDay(dayOf(box?.date, props.tournament.info));
-                    }}
-                    />
+                    <span title="View in planning"
+                        onclick={(evt) => {
+                            evt.preventDefault();
+                            selectDay(dayOf(box?.date, props.tournament.info));
+                        }}>
+                        <Show when={box && (!box.date && !box.score && !box.wo)}><ClockExclamationPointIcon /></Show>
+                    </span>
                 </Show> */}
                 <Show when={box?.score || box?.wo} fallback={
                     <>
@@ -93,12 +90,12 @@ export const DrawBox: Component<BoxProps> = (props) => {
                 }><span class="score">{`${box?.score}${box?.wo ? ' WO' : ''}`}</span></Show>
 
                 <Show when={props.isRight && props.draw.type !== FINAL}>
-                    <i class="icon2-qualif-out hover" title="Edit qualified out"
+                    <span  class="hover" title="Edit qualified out"
                         onClick={() => {
                             selectBox(props.event.id, props.draw.id, box?.position);
                             // showDialog("qualif");
-                        }}
-                    />
+                    }}><QualifOutIcon />
+                    </span>
                 </Show>
                 <Show when={box?.vainqDef}><br/><br/></Show>
             </Show>            

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@lucide/solid':
+        specifier: ^1.73.0
+        version: 1.73.0(solid-js@2.0.0-rc.20)
       '@solidjs/router':
         specifier: 2.0.0-next.43
         version: 2.0.0-next.43(@solidjs/web@2.0.0-rc.20(solid-js@2.0.0-rc.20))(solid-js@2.0.0-rc.20)
@@ -244,6 +247,11 @@ packages:
 
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
+
+  '@lucide/solid@1.73.0':
+    resolution: {integrity: sha512-y/vwcf9YX0gV3+Kiv0/bURyzGqFPKoZe9dfUT5gJMbkuz2hLUcIq1YxV2/p6h3TgfablaBNUEsKd+VsyMxBgrA==}
+    peerDependencies:
+      solid-js: ^2.0.0-rc.0
 
   '@napi-rs/wasm-runtime@1.2.6':
     resolution: {integrity: sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==}
@@ -1939,6 +1947,10 @@ snapshots:
       keyv: 5.6.0
 
   '@keyv/serialize@1.1.1': {}
+
+  '@lucide/solid@1.73.0(solid-js@2.0.0-rc.20)':
+    dependencies:
+      solid-js: 2.0.0-rc.20
 
   '@napi-rs/wasm-runtime@1.2.6(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)':
     dependencies:

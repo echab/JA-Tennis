@@ -1,6 +1,8 @@
 import { type Component, For, onSettled, Show, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
 import { useLocation } from '@solidjs/router';
+import { XIcon, FileSlidersIcon, PlusIcon, UserRoundIcon, TrashIcon } from '@lucide/solid';
+import { IconSexe } from '../misc/Icons';
 import type { OptionalId } from '../../domain/object';
 import type { Player } from '../../domain/player';
 import type { Tournament } from '../../domain/tournament';
@@ -9,7 +11,6 @@ import { isSexeCompatible } from '../../services/tournamentService';
 import { commandManager } from '../../services/util/commandManager';
 import { byId } from '../../services/util/find';
 import { dateLocal } from '../../utils/date';
-import { IconSexe } from '../misc/IconSexe';
 import { useForm } from '../util/useForm';
 import { paths } from '../../router';
 
@@ -90,12 +91,12 @@ export const DialogPlayer: Component<Props> = (props) => {
 
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
-            <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <b><i class='icon2-player' /> {player ? `Edit ${player.teamIds ? 'team' : 'player'} ${player?.name ?? ''}` : 'New player'}</b>
+            <header class="flex justify-between items-center sticky top-0 bg-surface-bar text-onsurface-bar p-1">
+                <b><UserRoundIcon /> {player ? `Edit ${player.teamIds ? 'team' : 'player'} ${player?.name ?? ''}` : 'New player'}</b>
                 <small>Id: {player?.id}</small>
                 <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
-                >&times;</button>
+                ><XIcon /></button>
             </header>
             <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
@@ -104,13 +105,13 @@ export const DialogPlayer: Component<Props> = (props) => {
                         <label class="inline-block w-3/12 text-right pr-3 h-8">Sexe:</label>
                         <label class="px-1">
                             <input value='H' type="radio" required
-                                checked={form.sexe === 'H'} onChange={updateField("sexe")} /> <i class="icon2-male" /></label>
+                                checked={form.sexe === 'H'} onChange={updateField("sexe")} /> <IconSexe sexe='H' /></label>
                         <label class="px-1">
                             <input value='F' type="radio" required
-                                checked={form.sexe === 'F'} onChange={updateField("sexe")} /> <i class="icon2-female" /></label>
+                                checked={form.sexe === 'F'} onChange={updateField("sexe")} /> <IconSexe sexe="F" /></label>
                         <label class="px-1">
                             <input value='M' type="radio" required
-                                checked={form.sexe === 'M'} onChange={updateField("sexe")} /> <i class="icon2-mixte" /></label>
+                                checked={form.sexe === 'M'} onChange={updateField("sexe")} /> <IconSexe sexe='M' /></label>
                     </div>
                     <div class="mb-1">
                         <label for="name" class="inline-block w-3/12 text-right pr-3">Name:</label>
@@ -128,7 +129,7 @@ export const DialogPlayer: Component<Props> = (props) => {
                         <div class="mb-1 flex">
                             <div class="inline-block w-3/12 text-right pr-3">
                                 Team:<br/>
-                                <button type="button" class="rounded-full p-1" title="Add team member">➕</button>
+                                <button type="button" class="rounded-full p-1" title="Add team member"><PlusIcon /></button>
                             </div>
                             <ul>
                                 <For each={form.teamIds}>{(playerId) => {
@@ -136,12 +137,12 @@ export const DialogPlayer: Component<Props> = (props) => {
                                     return <li>{
                                         teamPlayer
                                             ? <span>
-                                                <a href={paths.players(teamPlayer.id)(location.query)}><i class="icon2-info" /></a>
+                                                <a href={paths.players(teamPlayer.id)(location.query)}><FileSlidersIcon /></a>
                                                 <IconSexe sexe={teamPlayer.sexe} /> {teamPlayer.name} {teamPlayer.firstname ?? ''} {teamPlayer.rank} {teamPlayer.rank2 && teamPlayer.rank2 !== teamPlayer.rank ? `(${teamPlayer.rank2})` :''}
                                             </span>
                                             : `#${playerId}`
                                     }
-                                    <button type="button" class="rounded-full p-1 hover">✖</button>
+                                    <button type="button" class="rounded-full p-1 hover"><XIcon /></button>
                                     </li> ;
                                 }
                                 }</For>
@@ -235,21 +236,21 @@ export const DialogPlayer: Component<Props> = (props) => {
                         </div>
                     </fieldset>
                 </div>
-                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-surface/90'>
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         value="Delete" disabled={!form.id}
                         onClick={deleteAndClose}
-                    >✖ Delete
+                    ><TrashIcon /> Delete
                     </button>
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         data-dismiss="modal"
                         onClick={() => refDlg.close()}
                     >Cancel</button>
 
                     <button type="submit"
                         //  disabled.bind="!!playerForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                        class="rounded-md border border-transparent bg-surface-primary text-onsurface-primary py-2 px-4 min-w-24"
                     >OK
                     </button>
                 </footer>

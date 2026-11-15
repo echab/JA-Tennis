@@ -1,6 +1,8 @@
 import { type Component, For } from 'solid-js';
 import type { JSX } from '@solidjs/web';
 import { useLocation } from '@solidjs/router';
+import { FileSlidersIcon, PlusIcon } from '@lucide/solid';
+import { IconSexe } from '../misc/Icons';
 import { selectDraw, selection, selTournament } from '../util/selection';
 import { commandManager } from '../../services/util/commandManager';
 import { registerPlayer } from '../../services/playerService';
@@ -8,7 +10,6 @@ import { dragOver, getDragPlayer, getDropEvent } from '../../services/util/dragd
 import { isSexeCompatible } from '../../services/tournamentService';
 import { SideDraws } from './SideDraws';
 import { showDialog } from '../Dialogs';
-import { IconSexe } from '../misc/IconSexe';
 import { paths } from '../../router';
 
 type Props = {
@@ -33,14 +34,14 @@ export const SideEvents: Component<Props> = () => {
         <div class="flex justify-between items-center px-2">
             <h3>Draws</h3>
 
-            <button type="button" class="rounded-full p-2 hover"
+            <button type="button" class="rounded-full hover"
                 onClick={() => {
                     selectDraw(undefined);
                     showDialog({ name: "event" });
                 }}
-            >➕ Add an event</button>
+            ><PlusIcon /> Add an event</button>
 
-            {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
+            {/* <button type="button" class="p-2 rounded-full"><ChevronsRightIcon /></button> */}
         </div>
         <For each={selTournament.events} fallback={<div>No event</div>}>{(event) =>
             <div
@@ -49,27 +50,27 @@ export const SideEvents: Component<Props> = () => {
                 style={{ "border-color": event.color ?? 'transparent' }}
                 onDrop={drop_handler} onDragOver={dragOver} data-type='event' data-id={event.id}
             >
-                <div class="flex justify-between items-center aria-selected:bg-blue-200 bg-slate-200"
+                <div class="px-1 flex justify-between items-center aria-selected:bg-surface-selected/50 bg-surface-alt"
                     aria-selected={selection.eventId === event.id ? 'true' : 'false'}
                 >
                     {/* <input type="checkbox" /> */}
                     <a href={paths.draw(event.id)(location.query)} noscroll>
-                        <i class="icon2-info hover" onClick={() => {
+                        <FileSlidersIcon class=" hover" onClick={() => {
                             selectDraw(event.id);
                             showDialog({ name: "event" });
                         }}/>
                         {/* <small>{event.id} </small> */}
                         <IconSexe sexe={event.sexe} double={event.typeDouble} />
-                        <span>{event.name}</span>
+                        <span> {event.name}</span>
                         {/* <small>X click.trigger="eventEditor.remove(event)"</small> */}
                     </a>
 
-                    <button type="button" class="rounded-full p-0.5 px-1 hover" title="Add a draw"
+                    <button type="button" class="rounded-full hover" title="Add a draw"
                         onClick={() => {
                             selectDraw(event.id, undefined);
                             showDialog({ name: "draw" });
                         }}
-                    >➕ Draw</button>
+                    ><PlusIcon /> Draw</button>
                 </div>
 
                 <SideDraws event={event} short />
@@ -84,6 +85,6 @@ export const SideEvents: Component<Props> = () => {
                 selectDraw(undefined);
                 showDialog({ name: "event" });
             }}
-        >➕ Add an event</button>
+        ><PlusIcon /> Add an event</button>
     </>
 }

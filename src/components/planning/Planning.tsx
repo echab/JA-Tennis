@@ -1,5 +1,6 @@
 import { type Component, createMemo, For, Show } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
+import { ChevronLeftIcon, ChevronRightIcon, ChevronsRightIcon, FileSlidersIcon, PlusIcon } from "@lucide/solid";
 import { matchesOfTheDay } from "../../services/planningService";
 import { DAYS, minutes } from "../../utils/date";
 import { showDialog } from "../Dialogs";
@@ -41,11 +42,11 @@ export const Planning: Component<Props> = (props) => {
     return <>
         <div class="flex justify-between items-center px-2">
             <h3>Planning
-                <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ", 
+                <a class={["p-2 rounded-full inline-block hover:bg-selecting [&.pointer-events-none]:opacity-40 ", 
                     { "pointer-events-none": prevDay() === undefined }]}
                     href={props.urlNewDate(prevDay() ?? 0)} replace
                     title="View the previous day of the tournament"
-                ><i class="icon2-left-arrow" /></a>
+                ><ChevronLeftIcon strokeWidth="4" /></a>
 
                 {/* {days()[selection.day ?? -1]?.toLocaleDateString(undefined, { dateStyle: props.data.short ? 'medium' : 'full' })} */}
                 <select class="border-0"
@@ -58,16 +59,16 @@ export const Planning: Component<Props> = (props) => {
                     }</For>
                 </select>
 
-                <a class={["p-2 rounded-full inline-block hover:bg-gray-200 [&.pointer-events-none]:opacity-50 ",
+                <a class={["p-2 rounded-full inline-block hover:bg-selecting [&.pointer-events-none]:opacity-40 ",
                     { "pointer-events-none": nextDay() === undefined }]}
                     href={props.urlNewDate(nextDay() ?? 0)} replace
                     title="View the next day of the tournament"
-                ><i class="icon2-right-arrow" /></a>
+                ><ChevronRightIcon strokeWidth="4" /></a>
             </h3>
 
-            {/* <button type="button" class="p-2 rounded-full">&Gt;</button> */}
+            {/* <button type="button" class="p-2 rounded-full"><ChevronsRightIcon /></button> */}
             <Show when={props.short}>
-                <a href={paths.planning(props.day ?? '')({ ...location.query, pane: '' })} replace class="p-2 rounded-full" title="Open the planning in the main page">&Gt;</a>
+                <a href={paths.planning(props.day ?? '')({ ...location.query, pane: '' })} replace class="p-2 rounded-full" title="Open the planning in the main page"><ChevronsRightIcon /></a>
             </Show>
         </div>
 
@@ -80,12 +81,12 @@ export const Planning: Component<Props> = (props) => {
                 <li class='row-[place]' style={{
                     'grid-column-start': i() + 2
                 }}>
-                    <i class="icon2-info hover" onClick={[editPlace, i]} />
+                    <FileSlidersIcon class=" hover" onClick={[editPlace, i]} />
                     {place.name}
                 </li>
             }</For>
             <For each={hours}>{(hour, i) =>
-                <li class='col-[hour] text-right align-top bg-slate-200'
+                <li class='col-[hour] text-right align-top bg-surface-alt'
                     style={{
                         'grid-row': `${2 + i() * 12}/span 12`,
                     }}
@@ -100,6 +101,6 @@ export const Planning: Component<Props> = (props) => {
             }</For>
         </ul>
 
-        <button type="button" onClick={[editPlace, null]} class="p-2 rounded-full" title='Add a place'>➕</button>
+        <button type="button" onClick={[editPlace, null]} class="p-2 rounded-full" title='Add a place'><PlusIcon /></button>
     </>
 }

@@ -23,6 +23,7 @@
     "dist"
   ],
   "dependencies": {
+    "@lucide/solid": "^1.73.0",
     "@solidjs/router": "2.0.0-next.43",
     "@solidjs/web": "2.0.0-rc.20",
     "solid-js": "2.0.0-rc.20"

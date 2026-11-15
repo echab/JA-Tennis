@@ -1,5 +1,7 @@
 import { type Component, onSettled, Show, untrack } from 'solid-js';
 import type { JSX } from '@solidjs/web';
+import { XIcon } from '@lucide/solid';
+import { BallIcon } from '../misc/Icons';
 import type { TournamentInfo, TypeName } from '../../domain/tournament';
 import { atMidnight, atZeroHour } from '../../utils/date';
 import { useForm } from '../util/useForm';
@@ -78,11 +80,11 @@ export const DialogInfo: Component<Props> = (props) => {
 
     return (
         <dialog ref={(el) => refDlg = el} class="p-0" aria-modal="true">
-            <header class="flex justify-between items-center sticky top-0 bg-slate-300 p-1">
-                <b><i class='icon2-ball' /> Tournament information</b>
+            <header class="flex justify-between items-center sticky top-0 bg-surface-bar text-onsurface-bar p-1">
+                <b><BallIcon /> Tournament information</b>
                 <button type="button" data-dismiss="modal"
                     onClick={() => refDlg.close()}
-                >&times;</button>
+                ><XIcon /></button>
             </header>
             <form method="dialog" class="w-lg" onSubmit={submit}>
                 <div class="p-4">
@@ -213,7 +215,7 @@ export const DialogInfo: Component<Props> = (props) => {
                     </fieldset>
                 </div>
                 <hr />
-                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-gray-50 bg-opacity-60'>
+                <footer class='sticky bottom-0 flex justify-end space-x-2 mt-2 pt-3 pb-3 pr-4 bg-surface/90'>
                     {/* <button
                         disabled={!event?.id}
                         onclick={() => {
@@ -223,9 +225,9 @@ export const DialogInfo: Component<Props> = (props) => {
                             refDlg.close();
                         }
                         }}
-                    >✖ Delete</button> */}
+                    ><TrashIcon /> Delete</button> */}
 
-                    <button type="button" class="rounded-md border border-transparent bg-gray-200 py-2 px-4 min-w-24"
+                    <button type="button" class="rounded-md border border-transparent bg-surface-alt py-2 px-4 min-w-24"
                         data-dismiss="modal"
                         // aria-hidden="true"
                         onClick={() => refDlg.close()}
@@ -233,7 +235,7 @@ export const DialogInfo: Component<Props> = (props) => {
 
                     <button type="submit"
                         //  disabled.bind="!!eventForm.$error.required"
-                        class="rounded-md border border-transparent bg-indigo-400 py-2 px-4 min-w-24"
+                        class="rounded-md border border-transparent bg-surface-primary text-onsurface-primary py-2 px-4 min-w-24"
                     >OK
                     </button>
                 </footer>

@@ -1,7 +1,8 @@
 import { type Component, createMemo, For } from "solid-js";
 import { useLocation } from "@solidjs/router";
+import { RefreshCcwIcon } from "@lucide/solid";
+import { IconSexe } from "./misc/Icons";
 import { validateTournament } from "../services/validationService";
-import { IconSexe } from "./misc/IconSexe";
 import { eventDrawById, selection, selTournament } from "./util/selection";
 import { paths } from "../router";
 import { drawName } from "../services/drawService";
@@ -23,7 +24,7 @@ export const Problems: Component = () => {
                 checked={setting.pbSelectedDraw}
                 onChange={({target}) => changeSetting('pbSelectedDraw', (target as HTMLInputElement).checked)}
             /> selected draw</label>
-            <button onClick={() => validateTournament(selTournament)}><i class="icon2-refresh" /></button>
+            <button class="rounded-full" onClick={() => validateTournament(selTournament)}><RefreshCcwIcon /></button>
         </div>
         <ul>
             <For each={[...selection.playerProblems.entries()]}>{([_playerId, errors]) => (
@@ -40,11 +41,11 @@ export const Problems: Component = () => {
                 <p class="italic m-2">No problem</p>
             }>{({ eventdrawId, event, draw, errors }) => 
                 <li class="p-2">
-                    <h4 class="bg-slate-300 border-l-8"
+                    <h4 class="bg-surface-alt text-onsurface-alt border-l-8 p-2"
                         style={{ "border-color": event?.color ?? 'transparent' }}
                     >
                         <a href={paths.draw(event?.id ?? '')(draw?.id ?? '')(location.query, location.hash)} replace>
-                            <IconSexe sexe={event?.sexe} double={event?.typeDouble}/>{event?.name} - {drawName(draw) || eventdrawId}
+                            <IconSexe sexe={event?.sexe} double={event?.typeDouble}/> {event?.name} - {drawName(draw) || eventdrawId}
                         </a>
                     </h4>
                     <ul>

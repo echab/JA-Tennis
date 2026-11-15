@@ -13,7 +13,7 @@ export default function Document(props: ParentProps) {
         <link rel="stylesheet" href="/icons.css" />
         <HydrationScript />
       </head>
-      <body>{props.children}</body>
+      <body class="bg-surface text-onsurface">{props.children}</body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 import { type Component, For } from "solid-js";
 import { useNavigate } from "@solidjs/router";
+import { FileSlidersIcon, FolderOpenIcon, PlusIcon, SaveIcon, TrashIcon } from "@lucide/solid";
 import { openFile, saveFile } from "../../services/file/file";
 import { showDialog } from "../Dialogs";
 import { selectTournament, selTournament } from "../util/selection";
@@ -49,19 +50,19 @@ export const Tournaments: Component = () => {
     return <div class="p-2">
         <div class="flex items-baseline justify-between">
             <h3>Tournmanent</h3>
-            <button type="button" onClick={newItem} class="p-2 rounded-full">➕New tournament</button>
+            <button type="button" onClick={newItem} class="p-2 rounded-full"><PlusIcon />New tournament</button>
 
-            <button type="button" onClick={loadFile} class="p-2 rounded-full"><i class="icon2-open" /> Open file</button>
-            <button type="button" onClick={saveTheFile} class="p-2 rounded-full"><i class="icon2-save" /> Save file</button>
+            <button type="button" onClick={loadFile} class="p-2 rounded-full"><FolderOpenIcon /> Open file</button>
+            <button type="button" onClick={saveTheFile} class="p-2 rounded-full"><SaveIcon /> Save file</button>
         </div>
         <div>
-            <button type="button" onClick={() => showDialog({ name: "info" })}><i class="icon2-info" /></button>
+            <button type="button" onClick={() => showDialog({ name: "info" })}><FileSlidersIcon /></button>
             {selTournament.info.name} - {selTournament._url}
         </div>
 
         <div class="flex gap-4 items-baseline justify-between">
             <h2>Last tournaments:</h2>
-            <button type="button" onClick={clearStorage} class="p-2 rounded-full">❌ Clear storage</button>
+            <button type="button" onClick={clearStorage} class="p-2 rounded-full"><TrashIcon /> Clear storage</button>
         </div>
         <ul>
             <For each={listStoredTournaments().slice(1)} keyed={(t) => t.id}>{(tournament) => (

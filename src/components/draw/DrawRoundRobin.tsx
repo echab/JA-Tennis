@@ -4,7 +4,6 @@ import { byId, mapBy } from '../../services/util/find';
 import type { TEvent, Tournament } from '../../domain/tournament';
 import type { Player } from '../../domain/player';
 import { DrawBox } from './DrawBox';
-import './Draw.css';
 
 type Props = {
     event: TEvent,

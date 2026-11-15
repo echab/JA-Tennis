@@ -1,6 +1,8 @@
-import { type Component, Show, untrack } from "solid-js";
+import { type Component, Show, Match as Case, untrack, Switch } from "solid-js";
 import type { JSX } from '@solidjs/web';
 import { useLocation } from "@solidjs/router";
+import { ClockExclamationPointIcon, PhoneIcon, PhoneLogIcon, StickyNoteIcon, UserRoundIcon } from "@lucide/solid";
+import { DrawIcon, MatchIcon } from "../misc/Icons";
 import type { Player } from "../../domain/player";
 import type { Slot, Tournament } from "../../domain/tournament";
 import { byId } from "../../services/util/find";
@@ -15,20 +17,20 @@ type PlayerProps = {
 }
 
 const SlotPlayer: Component<PlayerProps> = (props) => <>
-    <i class={{
-        'icon2-planning-no': !props.aware,
-        'icon2-responder': props.aware === 1,
-        'icon2-aware': props.aware === 2,
-    }} />
+    <Switch>
+        <Case when={!props.aware}><ClockExclamationPointIcon color="var(--color-warning)" /></Case>
+        <Case when={props.aware === 1}><PhoneLogIcon /></Case>{/* responder */}
+        <Case when={props.aware === 2}><PhoneIcon /></Case>
+    </Switch>
     {/* {props.qualifIn !== undefined ? `Q${props.qualifIn > 0 ? props.qualifIn : ''} ` : ''} */}
     {props.player ? `${props.player.name} ${props.player.firstname?.[0] ?? ''}` : ''}
     <Show when={props.player?.id} keyed>{(id) =>
-        <i class="icon2-player hover cursor-pointer" title={`Edit the ${props.player?.teamIds ? 'team' : 'player'}`}
+        <span class="hover cursor-pointer" title={`Edit the ${props.player?.teamIds ? 'team' : 'player'}`}
             onClick={() => {
                 selectPlayer(id);
                 showDialog({ name: "player" });
             }}
-        />
+        ><UserRoundIcon /></span>
     }</Show>
 </>;
 
@@ -50,7 +52,7 @@ export const PlanningSlot: Component<Props> = (props) => {
     ]);
 
     return <li
-        class={["bg-slate-300 border-l-8", { 'crossed-out': !!match.playerId }]}
+        class={["bg-surface-alt text-onsurface-alt border-l-8", { 'crossed-out': !!match.playerId }]}
         style={{ "border-color": props.slot.event?.color ?? 'transparent', ...props.style }}
         title={`${props.slot.event.name} - ${drawName(props.slot.draw)}`}
         id={`${match.position}-${props.slot.draw.id}-${props.slot.event.id}`}
@@ -64,7 +66,7 @@ export const PlanningSlot: Component<Props> = (props) => {
         {/* {match.date!.toLocaleDateString()} */}
         {/* - {match.place} */}
         <a href={urlBox(match, props.slot.draw.id, props.slot.event.id, props.tournament, location.query)} title="View in draw" class="hover">
-            <i class="icon2-draw"/>
+            <DrawIcon />
         </a>
         <span class="cursor-pointer" title="Edit the match"
             onClick={() => {
@@ -72,8 +74,8 @@ export const PlanningSlot: Component<Props> = (props) => {
                 showDialog({ name: "match" });
             }}
         >
-            <i class="icon2-match hover2"/>
-            <Show when={match.note}><i class="icon2-note" /></Show>
+            <span class="hover2"><MatchIcon /></span>
+            <Show when={match.note}><StickyNoteIcon /></Show>
         </span>
     </li>
 };

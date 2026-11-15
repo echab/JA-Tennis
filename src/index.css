@@ -4,6 +4,8 @@
   strategy: 'base';
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   *,
   ::after,
@@ -12,29 +14,87 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+
+  svg.lucide, img.lucide {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+  }
 }
 
-body {
-  --fore: black;
-  --back: white;
+@theme {
+  --color-surface: white;
+  --color-surface-bar: var(--color-slate-300);
+  --color-surface-panel: var(--color-slate-200);
+  --color-surface-selected: var(--color-blue-300);
+  --color-surface-selecting: var(--color-slate-200);
+  --color-surface-alt: var(--color-slate-300);
+  --color-surface-appbar1: var(--color-slate-500);
+  --color-surface-appbar2: var(--color-slate-800);
+
+  --color-surface-primary: var(--color-indigo-400);
+  --color-surface-secondary: var(--color-indigo-300);
+
+  --color-onsurface: black;
+  --color-onsurface-bar: black;
+  --color-onsurface-alt: black;
+  --color-onsurface-appbar: white;
+  --color-onsurface-primary: black;
+  --color-onsurface-secondary: black;
+  --color-onsurface-error: white;
+  
+  --color-stroke: black;
+  --color-stroke-alt: darkgrey;
+  --color-stroke-panel: var(--color-slate-300);
+  --color-stroke-error: var(--color-red-500);
+  --color-onsurface-warning: black;
+
+  --color-error: var(--color-red-600);
+  --color-warning: var(--color-orange-300);
+  --color-male: #3030ff;
+  --color-female: #EA3FF7;
 }
 
-/* body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-} */
+:root.dark, .dark {
+  --color-surface: #121314;
+  --color-surface-bar: #191A1B; /* var(--color-slate-900); */
+  --color-surface-panel: #191A1B; /* var(--color-slate-800); */
+  --color-surface-selected: #2C2D2E; /* ##256078 #20414E;  var(--color-blue-900); */
+  --color-surface-selecting: #313233; /* var(--color-blue-800); */
+  --color-surface-alt: #202122; /* var(--color-slate-700); */
+  --color-surface-appbar1: #313233; /* var(--color-slate-900); */
+  --color-surface-appbar2: #191A1B; /* var(--color-slate-700); */
+  
+  --color-surface-primary: #256078; /* var(--color-indigo-400); */
+  --color-surface-secondary: #182D36; /* var(--color-indigo-700); */
+  
+  --color-onsurface: #BFBFBF;
+  --color-onsurface-bar: #BFBFBF;
+  --color-onsurface-alt: #BFBFBF;
+  --color-onsurface-appbar: #BFBFBF;
+  --color-onsurface-primary: black;
+  --color-onsurface-secondary: black;
+  --color-onsurface-error: white;
+  --color-onsurface-warning: white;
+  
+  --color-stroke: #BFBFBF;
+  --color-stroke-alt: darkgrey;
+  --color-stroke-panel: #2A2B2C; /* var(--color-slate-600); */
+  
+  --color-error: var(--color-red-600);
+  --color-warning: var(--color-orange-500);
+  --color-male: #4646ff;
+  --color-female: #EA3FF7;
+}
+
+input, select, textarea, option, optgroup {
+  @apply bg-surface text-onsurface;
+  /* @apply bg-inherit text-inherit; */
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-}
-
-i.glyphicon {
-  font-style: normal;
 }
 
 .hover, .hover2 {
@@ -51,30 +111,6 @@ i.glyphicon {
   background-position: center;
   background-size: cover;
 }
-/* .crossed-out {
-  position: relative;
-  display: inline-block;
-}
-.crossed-out::before,
-.crossed-out::after {
-  content: '';
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0px;
-  top: -50%;
-  opacity: 0.7;
-  border-bottom: 2px solid gray;
-}
-.crossed-out::before {
-  -webkit-transform: skewY(-20deg);
-  transform: skewY(-20deg);
-}
-.crossed-out::after {
-  border-bottom: 2px solid gray;
-  -webkit-transform: skewY(20deg);
-  transform: skewY(20deg);
-} */
 
 dialog {
   position: absolute;
@@ -82,14 +118,130 @@ dialog {
   left: 50vw;
   transform: translateX(-50%);
   border-radius: 5px;
-  /*
-  color: --fore;
-  background-color: --back;
-  */
+  @apply bg-surface text-onsurface;
 }
 
-/* fieldset {
-  border-right: none;
-  border-bottom: none;
-  padding-right: 0px;
-} */
+button {
+  padding: .5em;
+  border-color: transparent;
+  &[disabled] {
+    opacity: .4;
+  }
+}
+button:not([disabled]):hover {
+  cursor: pointer;
+  @apply bg-surface-selecting;
+}
+
+
+table.tableau {
+    --boite-width: 9em;
+    --boite-height: 4em;
+    --boite-weigth: 1px;
+    --boite-border: var(--boite-weigth) solid var(--color-stroke);
+    --boite-corner: 7px;
+
+    border-spacing: 0px;
+    padding-left: 2em;
+    /* for qualified */
+    padding-right: 2em;
+    margin-left: 2em;
+    margin-right: 2em;
+
+    & td {
+        /* height: var(--boite-height); */
+        min-width: var(--boite-width);
+        padding: 3px;
+        position: relative;
+
+        &.even::before, &.odd::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            pointer-events: none;
+        }
+        &.even::before {
+            top: 50%;
+            border-top: var(--boite-border);
+        }
+        &.even:not(.qs)::before {
+            border-right: var(--boite-border);
+            border-top-right-radius: var(--boite-corner);
+        }
+        &.odd::before {
+            bottom: 50%;
+            border-bottom: var(--boite-border);
+        }
+        &.odd:not(.qs)::before {
+            border-right: var(--boite-border);
+            border-bottom-right-radius: var(--boite-corner);
+        }
+    }
+
+    /* drop box TODO: ne couvre pas le club/score */
+    & .joueur {
+        border: 1px dashed transparent;
+        border-radius: 5px;
+        min-height: 2.5em;
+        transition: .3s;
+
+        &:hover {
+            border-color: var(--color-stroke-alt);
+            /* background-color: var(--color-surface-alt); */
+        }
+
+        &:focus,
+        &.selected {
+            border-color: var(--color-stroke-alt);
+            background-color: var(--color-surface-alt);
+            cursor: pointer;
+        }
+    }
+
+    & .joueur>.nom,
+    & .club {
+        padding-right: 3em;
+    }
+
+    & span {
+        &.classement {
+            /* z-index: 2; */
+            /* border: 1px solid var(--color-stroke-alt); */
+            border-radius: 3px;
+            color: var(--color-onsurface-alt);
+            background-color: var(--color-surface-alt);
+            padding: 0 .1em 0 .1em;
+            position: absolute;
+            right: 1em;
+            top: calc(50% - .7em);
+        }
+
+        &.qe {
+            position: absolute;
+            left: -1.5em;
+            top: calc(50% - .7em);
+        }
+
+        &.ts {
+            position: absolute;
+            left: -1.5em;
+            top: calc(50% - .7em);
+            border-radius: 50%;
+            border: 1px solid var(--color-stroke-alt);
+            color: var(--color-onsurface-alt);
+            background-color: var(--color-surface-alt);
+            padding: 0em .3em 0em .3em;
+        }
+
+        &.qs {
+            position: absolute;
+            left: calc(100% + .5em);
+            top: calc(50% - .7em);
+        }
+    }
+
+    &.roundrobin td {
+        border: 1px solid var(--color-stroke-alt);
+    }
+}
