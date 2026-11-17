@@ -1,11 +1,11 @@
 import { type Component, createSignal, onSettled, Show } from "solid-js";
 import { MoonIcon, SunIcon } from "@lucide/solid";
 
+const isSystemDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+export const isDark = () => localStorage.theme === "dark" || (!("theme" in localStorage) && isSystemDark());
+
 export const ThemeSwitcher: Component = () => {
-
-    const isSystemDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    const isDark = () => localStorage.theme === "dark" || (!("theme" in localStorage) && isSystemDark());
 
     const [isThemeDark, setThemeDark] = createSignal(isDark);
 

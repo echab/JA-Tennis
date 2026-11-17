@@ -39,7 +39,7 @@ type StoreInit<T> = (() => T | Promise<T> | AsyncIterable<T>) & NoArray<T>;
 export function useForm<FormFields extends {} = Record<string, string | number | boolean | Date>>(
     initFieldsGetter: StoreInit<FormFields>,
 ) {
-    const [form, setForm] = createStore(initFieldsGetter, null, { name: 'formStore' });
+    const [form, setForm] = createStore(initFieldsGetter, null, { name: 'stForm' });
     // Object.entries(initFields).forEach(([k,v]) => updateField)
 
     const clearField = (fieldName: keyof FormFields) => {

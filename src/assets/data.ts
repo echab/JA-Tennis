@@ -4,7 +4,7 @@ import { reviveTournament } from "../services/tournamentService";
 import { guid } from "../services/util/guid";
 
 export function emptyTournament() {
-    return reviveTournament({ // TODO top await bug, prevent dynamic import and bundle
+    return reviveTournament({
         version: 13,
         id: guid('T'),
         types: { name: 'FFT', versionTypes: 5 },

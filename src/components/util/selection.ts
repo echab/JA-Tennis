@@ -13,7 +13,7 @@ import { paths } from "../../router";
 import { by, byId } from "../../services/util/find";
 
 // create a store for the tournament to use reconcile() on load
-export const [selTournament, setTournament] = createStore<Tournament>(emptyTournament, null, { name: 'selTournament'});
+export const [selTournament, setTournament] = createStore<Tournament>(emptyTournament, null, { name: 'stSelTournament'});
 
 export function setTournamentEvent(eventId: string, cb: (event: TEvent) => void) {
     setTournament((t) => {
@@ -65,7 +65,7 @@ export interface SelectionItems {
 export const [selection, setSelection] = createStore<SelectionItems>({
     playerProblems: new Map(),
     drawProblems: new Map(),
-}, { shallow: true, name: 'selectionStore' });
+}, { shallow: true, name: 'stSelection' });
 
 export function selEvent(): TEvent | undefined {
     if (!selection.eventId) {
